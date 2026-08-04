@@ -1,0 +1,25 @@
+# Local environment and secrets
+.env
+.venv/
+
+# Python caches and build metadata
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# IDE files
+.idea/
+.vscode/
+
+# Large and generated Yelp artifacts
+data/raw/*.tar
+data/raw/yelp_academic_dataset_*.json
+data/processed/
+data/task_dataset/
+data/features/
+runs/

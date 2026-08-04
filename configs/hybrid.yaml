@@ -1,0 +1,7 @@
+category_weight: 0.4
+text_weight: 0.3
+quality_weight: 0.2
+location_weight: 0.1
+location_scale_km: 10.0
+bayesian_prior_count: 20
+tuning_step: 0.1

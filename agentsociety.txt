@@ -1,0 +1,490 @@
+===== PAGE 1 =====
+AGENT SOCIETY CHALLENGE : D ESIGNING LLM A GENTS FOR
+USER MODELING AND RECOMMENDATION ON WEB PLATFORMS
+Yuwei Yan1,2† Yu Shang1† Qingbin Zeng1 Yu Li1 Keyu Zhao1 Zhiheng Zheng1 Xuefei Ning1
+Tianji Wu3 Shengen Yan3 Yu Wang1 Fengli Xu1,∗ Yong Li1,∗
+ABSTRACT
+The AgentSociety Challenge is the first competition in the Web Conference that aims to explore
+the potential of Large Language Model (LLM) agents in modeling user behavior and enhancing
+recommender systems on web platforms. The Challenge consists of two tracks: the User Modeling
+Track and the Recommendation Track. Participants are tasked to utilize a combined dataset from Yelp,
+Amazon, and Goodreads, along with an interactive environment simulator, to develop innovative LLM
+agents. The Challenge has attracted 295 teams across the globe and received over 1,400 submissions
+in total over the course of 37 official competition days. The participants have achieved 21.9% and
+20.3% performance improvement for Track 1 and Track 2 in the Development Phase, and 9.1%
+and 15.9% in the Final Phase, representing a significant accomplishment. This paper discusses the
+detailed designs of the Challenge, analyzes the outcomes, and highlights the most successful LLM
+agent designs. To support further research and development, we have open-sourced the benchmark
+environment at https://tsinghua-fib-lab.github.io/AgentSocietyChallenge .
+Keywords LLM Agent, Recommender System, User Modeling, Web Platforms
+1 Description
+With the rapid advancement of web technologies, human social interactions are increasingly intertwined between the
+physical world and cyberspace. The web has evolved from a mere information exchange platform to a dynamic medium
+for modeling and influencing human behaviors. Web platforms, in particular, provide rich data capturing how users
+access information, make decisions, and interact with content and other users. These data offer invaluable insights
+into human dynamics, especially in understanding user intent and optimizing information retrieval (IR) systems for
+personalized online service. In parallel, large language models (LLMs) have demonstrated exceptional capabilities in
+reasoning and prediction tasks [1, 2, 3], which are now widely applied in user behavior modeling and recommendation
+systems [4, 5]. LLM-based agents [6, 7] further extend these capabilities by effectively simulating complex, generative
+human behaviors [8, 9, 10, 11]. This advancement has profound implications for behavior modeling, paving a new way
+to model user preferences, engagement patterns, and decision-making processes.
+LLM agents possess unique strengths that extend beyond traditional deep learning models. One key advantage is their
+capability for commonsense reasoning [1, 2, 12, 13], allowing them to make few-shot predictions based on minimal
+data and effectively addressing data-sparse tasks such as recommendations for users with limited historical records.
+Additionally, their proficiency in zero-shot role-playing [ 8, 14] enables them to simulate user behaviors in diverse
+1 Tsinghua University
+2 The Hong Kong University of Science and Technology (Guangzhou)
+3 InfinigenceAI
+† Both authors contributed equally to this work.
+∗ Corresponding authors. E-mail: fenglixu@tsinghua.edu.cn,liyong07@tsinghua.edu.cn.
+arXiv:2502.18754v1  [cs.IR]  26 Feb 2025
+===== PAGE 2 =====
+AgentSociety Challenge
+contexts and adapt to new scenarios with in-context information. This makes them particularly valuable for tasks such
+as simulating context-sensitive and personalized user intent and behaviors. However, there’s still a critical challenge in
+bridging these technological advancements with practical, useful tools for information retrieval and recommendation
+systems. The AgentSociety Challenge is proposed to address this gap by asking participants to leverage the simulation
+and decision-making power of LLM agents to tackle two fundamental IR challenges: simulating user behaviors and
+developing personalized recommendation systems. The challenge consists of two parallel tracks:
+User Modeling Track. In this track, participants are tasked to design agents to simulate user reviews and star ratings,
+focusing on simulating user behavior when facing specific items by leveraging their historical actions and accessible
+environmental data.
+Recommendation Track. In this track, participants will develop LLM agents that act as a recommendation assistant [14,
+10]. The agent should provide tailored recommendations for users based on historical interactions and retrieved
+information.
+AgentSociety Challenge aligns closely with the core themes of the Web Conference by addressing fundamental problems
+in web technologies and user-centered Computing. The competition draws the participation of 295 teams and receives
+over 1,400 submissions over the course of 37 official competition days. Rooted in areas like information retrieval,
+recommendation systems, and user modeling, this challenge leverages cutting-edge LLM agents to simulate and predict
+complex human behaviors in dynamic web-enabled environments.
+2 Dataset and Evaluation
+2.1 Dataset
+The proposed challenge utilizes three open-source datasets, including Yelp, Amazon, and Goodreads, to evaluate agents.
+These datasets were carefully chosen for their relevance and diversity in capturing real-world user interactions, making
+them ideal for building LLM-based agents for user modeling and recommendation.
+• Yelp Dataset: This dataset [15] includes millions of user reviews, business information, and user feedback
+such as ratings and engagement metrics.
+• Amazon Dataset: This dataset [16] contains millions of reviews for a wide range of products, offering insight
+into user preferences in the e-commerce context.
+• Goodreads Dataset: This dataset [17] includes user ratings, reviews, and metadata for books, capturing user
+preferences and interactions in the book community.
+2.2 Environment Simulator
+One key capability of a Web Agent is its ability to acquire information and data from interactive web platforms. To
+adequately assess LLM agents, it is essential to furnish an environment that reflects these intricacies. This environment
+empowers agents to perform tasks such as user modeling and personalized recommendations within an interactive and
+realistic setting.
+To that end, we have built a simulator that controls all retrieval actions from LLM agents. The core of the simulator
+used in the challenge is the InteractionTool. This tool constructs an interactive environment comprising a network
+of users, reviews, and items, allowing agents to access historical data as needed. By leveraging these datasets, agents
+can simulate user behaviors, including generating reviews and ratings and produce personalized recommendations
+based on contextual information. This configuration enables a thorough evaluation of agent performance in tasks that
+closely resemble real-world applications. The framework of the simulator is shown as Fig.1.
+2.3 Evaluation
+User Modeling Track. In this Track, the performance of participants’ agents will be evaluated through quantitative
+metrics, focusing on the accuracy of user behavior predictions.
+Preference Estimation: The preference estimation accuracy is evaluated through the mean absolute error (MAE) of the
+predicted star ratings compared to the actual ratings. The MAE is defined as:
+M AE= 1
+N
+NX
+i=1
+|ˆsni − sni|
+2
+===== PAGE 3 =====
+AgentSociety Challenge
+User
+Review
+Item
+U
+I
+R
+U-R-INetworkDatasets
+Simulator
+LLMAgents
+Figure 1: Framework of environment simulator.
+where N is the total number of reviews, ˆsni is the predicted star rating, and sni is the ground truth star rating[18]. A
+lower MAE indicates a better performance in estimating user preferences.
+Review Generation: The review generation accuracy is measured through a combined metric that considers Emotional
+Tone Errors, Sentiment Attitudes Errors, and Topic relevance errors. The overall review generation error is given by:
+Error = 1− (0.25 × Emotional Tone Error + 0.25 × Sentiment Attitude Error + 0.5 × Topic Relevance Error) where
+each individual error is calculated as follows:
+• Emotional Tone Error. A predefined emotion classifier model[19] and the error is the MAE of the normalized
+emotion scores between the predicted and actual emotions.
+• Sentiment Attitude Error. The sentiment attitude of the review text is analyzed using the MAE of sentiment
+scores derived from sentiment analysis tools.
+• Topic Relevance Error. A predefined embedding model[ 20] and the error is measured using the cosine
+similarity between the predicted and actual text embeddings.
+Overall Quality: The overall quality of the reviews is evaluated by averaging the Preference Estimation and Review
+Generation errors.
+Recommendation Track. The Recommendation Track focuses on developing LLM agents that generate personalized
+recommendations for users. The performance of the recommendation agents is evaluated through the precision of the
+ranking, with a focus on the top N hit rate.
+Ranking Accuracy: Ranking accuracy is evaluated using the top N hit rate, where N = 1, 3, 5. This metric measures
+how often the ground truth item appears in the top N of the ranked list of 20 candidate items. The formula for the Top N
+Hit Rate is:
+HR@N = 1
+T
+TX
+t=1
+I(pt ∈ Pˆ
+t(N ))
+where T is the total number of test tasks, pt is the ground truth item, and Pˆ
+t(N ) is the set of top N recommended items
+for task t. The indicator function I(pt ∈ Pˆ
+t(N )) equals 1 if the ground truth item is in the top N recommendations and
+0 otherwise.
+Two Phase Evaluation. The evaluation procedure is divided into two phases: Development Phase and Final Phase
+(Top 20 teams per track). In the Development Phase, simulated groundtruth is utilized to assess participants’ agents,
+while a combination of simulated groundtruth (40%) and real groundtruth (60%) is employed in the Final Phase.
+This design aims to prevent overfitting by ensuring that agents are not solely optimized for public available data.
+Simulated groundtruth represents new or unseen users (data), offering a broader scope for testing how agents handle
+variations that might not be captured in real-world data alone. A blocking mechanism is implemented to conceal the real
+groundtruth according to the specific task requirements, which ensures that agents infer and generate outputs without
+direct access to the groundtruth. The simulated groundtruth generation agents are available at https://github.com/
+tsinghua-fib-lab/AgentSocietyChallenge/tree/main/GTsimulation .
+3
+===== PAGE 4 =====
+AgentSociety Challenge
+01-0301-0401-0501-0601-0701-0801-0901-1001-1101-1201-1301-1401-1501-1601-1701-1801-1901-2001-2101-2201-2301-2401-2501-2601-2701-2801-2901-3001-31
+Submission Time
+0.60
+0.65
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00Overall Score
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+Overall Hit Ratio
+Track 1 Optimal Score
+Track 2 Optimal Score
+(a) Development Phase.
+02-04 02-05 02-06 02-07 02-08 02-09 02-10 02-11 02-12 02-13
+Submission Time
+0.820
+0.825
+0.830
+0.835
+0.840
+0.845
+0.850Overall Score
+0.450
+0.455
+0.460
+0.465
+0.470
+0.475
+0.480
+Overall Hit Ratio
+Track 1 Optimal Score
+Track 2 Optimal Score (b) Final Phase.
+Figure 2: Performance improvement in Development Phase (a) and Final Phase (b).
+3 Competition Outcome Analysis
+3.1 Submission Performance Statistics
+There are 295 teams registered for the challenge. During the Development Phase, Track 1 received a total of 503
+submissions, while Track 2 received 405 submissions. After the Development Phase, the top 20 teams from each track
+advanced to the Final Phase. During the Final Phase, Track 1 received 262 submissions, while Track 2 received 282
+submissions.
+Fig. 2 presents the daily submission performance statistics for both tracks during the development and Final Phases.
+Overall, the performance of the submitted agents gradually improved over time. At the beginning of the challenge, we
+provide an official agent for reference on both tracks. Early in the Development Phase, participants’ designed agents are
+primarily around the baseline. However, as the challenge progressed, several designs emerged that significantly surpassed
+the performance of the baseline agent. Moreover, we have found that the designed agent-based recommendation methods
+generally outperform traditional deep-learning recommendation models (e.g., NCF [21]), highlighting their significant
+potential.
+3.2 Textual Environment Simulator
+Here we provide an analysis of the simulated groundtruth used for evaluation. First, we aim to ensure that the simulation
+groundtruth can objectively assess agents’ performance, thereby reducing the risk of overfitting to specific real-world
+test conditions. Second, we validate that the simulated groundtruth accurately reflects actual user behaviors and
+preferences, demonstrating its potential to enhance traditional methods, such as deep learning-based models.
+Correlation between simulated and real groundtruth for evaluation. We analyze the correlation between the
+performance of submitted agents (179 agents on Track 1 and 196 agents on Track 2) during the Final Phase of our
+generated simulated and real test groundtruth. The results are shown in Fig. 3, from which it can be observed that
+there’s a strong correlation between the performance on simulated and real groundtruth, with a Pearson correlation
+coefficient of 0.9739 for Track 1 and 0.9245 for Track 2. This suggests that the generated simulated groundtruth is
+reliable and meaningful, thus the agent performance on the simulated groundtruth can provide a strong prediction of
+their real-world performance.
+Generalization ability of mixed and real groundtruth. We evaluate the agents’ performance on the following three
+types of datasets: (1) a mixture of simulated and real groundtruth (referred to as "Mixed Data"), (2) a sample of real
+groundtruth (referred to as "Real Data A"), and (3) another sample of real groundtruth (referred to as "Real Data B").
+We then compare the agent performance correlation of Mixed Data and Real Data A against Real Data B to assess
+their generalization capability. The results on Track 1 and 2 are shown in Fig. 4 and 5, respectively. For Track 1, the
+Pearson correlation coefficient between Mixed Data and Real Data B is 0.7516, while the correlation between Real
+Data A and Real Data B is 0.7331. In Track 2, the correlation between Mixed Data and Real Data B is 0.7641, whereas
+the correlation between Real Data A and Real Data B is lower, at 0.5825. The results suggest that the use of mixed
+simulation-real groundtruth leads to better performance prediction of the agents’ real-world capabilities compared to
+purely using real groundtruth. For instance, Agent 2 on Track 2 performs poorly on Real Data A but excels on Real Data
+B. Such a discrepancy can be effectively mitigated when using mixed groundtruth for evaluation. This finding suggests
+that incorporating simulated groungtruth helps provide a more robust evaluation of the agents’ real performance.
+4
+===== PAGE 5 =====
+AgentSociety Challenge
+0.725 0.750 0.775 0.800 0.825 0.850 0.875 0.900
+Score@Simulation
+0.66
+0.68
+0.70
+0.72
+0.74
+0.76
+0.78
+0.80Score@Real
+r = 0.9739
+(a) Track 1.
+0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65
+Score@Simulation
+0.150
+0.175
+0.200
+0.225
+0.250
+0.275
+0.300
+0.325
+0.350Score@Real
+r = 0.9245 (b) Track 2.
+Figure 3: Correlation between agent performance on simulated and real groundtruth on Track 1 (a) and Track 2 (b).
+0.60 0.65 0.70 0.75 0.80 0.85
+Score@Mixed data
+0.60
+0.65
+0.70
+0.75
+0.80
+0.85Score@Real data B
+r = 0.7516
+0
+1
+23
+4
+5
+6
+7
+89
+10
+11
+12
+13
+14
+1516
+1718
+19
+(a) Mixed data v.s. Real data B.
+0.60 0.65 0.70 0.75 0.80 0.85
+Score@Real data A
+0.60
+0.65
+0.70
+0.75
+0.80
+0.85Score@Real data B
+r = 0.7331
+0
+1
+23
+4
+5
+6
+7
+89
+10
+11
+12
+13
+14
+1516
+1718
+19 (b) Real data A v.s. Real data B.
+Figure 4: Generalization ability comparison on Track 1.
+Effect of simulated groundtruth on classic deep learning models. We tested three deep learning-based recommenda-
+tion models from [ 21]—NCF, GMF, and MLP on both simulated and real groundtruth. The results from Fig. 6 show
+that incorporating a certain amount of simulated groundturth into the training process improved the model performance
+compared to training solely on real groundtruth. This indicates that the simulated groundtruth effectively captures user
+behaviors and preferences, thereby facilitating the learning of user features.
+4 Case Study
+4.1 Top Agents in User Modeling
+This section analyzes the top three performing agents from the User Modeling Track (named “ASC”, “JiuWen”,
+“STDYW”). Specifically:
+Design Pattern. All agents follow a multi-stage retrieve-plan-generate pipeline. They employ contextual prompt
+engineering by combining user profiles, item attributes, and historical reviews using platform-specific templates.
+5
+===== PAGE 6 =====
+AgentSociety Challenge
+0.15 0.20 0.25 0.30 0.35 0.40
+Score@Mixed data
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40Score@Real data B
+0
+1
+2
+3
+45
+6
+7
+8
+9
+10
+11
+12
+13
+18
+20
+r = 0.7641
+(a) Mixed data v.s. Real data B.
+0.15 0.20 0.25 0.30 0.35 0.40
+Score@Real data A
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40Score@Real data B
+0
+1
+2
+3
+45
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+161718 19
+20
+r = 0.5825 (b) Real data A v.s. Real data B.
+Figure 5: Generalization ability comparison on Track 2.
+MLP GMF NCF
+0.00
+0.05
+0.10
+0.15
+0.20Overall Score
+simluation+real data
+only real data
+Figure 6: Performance comparison of deep-learning-based recommendation methods on pure real groundtruth and
+mixed groundtruth (with simulated groundtruth).
+Extracted Features. Each agent employs a unique approach tailored to its objectives, with different strategies for
+generating ratings, memory handling, and prompt styles. ASC employs a collaborative filtering core strategy, integrating
+a preference alignment engine and using MDILU with similarity search for memory, along with statistical mean
+adjustment for rating logic. In contrast, JiuWen uses an aspect-based analysis strategy, with an aspect extractor as
+its unique module and example-driven memory. Its rating logic is guided by examples, and it employs case-based
+examples in its prompt style. STDYW, on the other hand, relies on direct LLM generation, with a sanitization module
+and basic DILU memory approach. Its rating logic is based purely on LLM output, and it uses concise instructions for
+its prompts.
+Different Competitive Advantages. The distinctive design choices made by each agent lead to notable competitive
+advantages. ASC’s integration of user and item mean ratings with variance is a sophisticated technique for improving
+rating consistency. By adjusting for the statistical variance of the data, ASC minimizes rating fluctuations, helping
+to achieve more stable and reliable user behavior predictions. JiuWen’s design excels in its innovative approach to
+extracting aspects from business reviews. By breaking down reviews into specific aspects, such as service quality,
+product features, and customer experience, JiuWen can align user behaviors with fine-grained features. Another standout
+feature is STDYW’s combination of advanced user-and-item modeling and knowledge mining. By integrating these
+components with sophisticated reasoning capabilities, STDYW enhances personalized and context-aware simulations,
+offering superior predictive accuracy and human-like review generation.
+6
+===== PAGE 7 =====
+AgentSociety Challenge
+Overall, these implementations highlight that effective user behavior modeling requires balancing LLM capabilities
+with structured reasoning frameworks.
+4.2 Top Agents in Recommendation
+In this section, we analyze the designed agents of the top 3 teams on Track 2 (named “baseline666”, “RecHackers”,
+“DummyAgent”), and summarize their key design insights as follows:
+Agentic workflow. All three agents relied on similar information to guide the ranking process, with slight variations
+in implementation. The primary elements for ranking include: (1) the user’s historical review data, reflecting past
+preferences; (2) the list of candidate items to be ranked; and (3) detailed item information, helping assess the match
+between the items and the user’s preferences. Specifically:
+Item-side feature engineering. The first primary innovation in these agents lies in item-side feature engineering.
+Especially, the baseline666 team applied platform-specific feature extraction, ensuring robust and adaptive rankings
+across different sources. For Amazon, they extracted features like item ID, name, stars, review count, and description,
+among others. For Yelp, the features were more focused, including item ID, name, stars, and review count. For
+Goodreads, a wider array of features was included, such as authors, publication year, and similar books.
+Review-side feature engineering. Another key point is the feature engineering of review data, involving filtering and
+selecting the most informative reviews to enhance both user and item descriptions. For instance, the DummyAgent
+team adopted platform-specific strategies. For Yelp, they focused on attributes like “funny”, “cool”, and “useful”, along
+with the review text. For Amazon, they included the publication date and purchase verification. For Goodreads, they
+extracted additional metadata like review date, the number of votes or comments, and reading status, in addition to the
+review text and rating.
+To summarize, the key design elements can be categorized into three aspects: First, regarding the agent’s workflow, a
+standard and effective approach involves prompting LLMs with user historical reviews, candidate items, item details,
+and platform-specific information to generate rankings. Second, extracting platform-specific item attributes plays a
+critical role in enhancing performance. Lastly, prioritizing the most relevant and informative reviews is crucial for
+boosting results.
+5 Conclusion
+The AgentSociety Challenge has not only fostered the design of innovative agent-based solutions but also led to
+significant improvements in simulating user behaviors and enhancing personalized recommendations. Through the
+challenge, participants introduced diverse strategies that advanced the accuracy of user behavior simulations and
+personalized recommendation quality. These outcomes highlight the potential of LLM-driven systems in real-world
+web platforms and set the stage for continued innovation in user-centered computing.
+References
+[1] Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
+Chain-of-thought prompting elicits reasoning in large language models.Advances in neural information processing
+systems, 35:24824–24837, 2022.
+[2] Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Tom Griffiths, Yuan Cao, and Karthik Narasimhan. Tree of
+thoughts: Deliberate problem solving with large language models. Advances in Neural Information Processing
+Systems, 36, 2024.
+[3] Lin Chen, Fengli Xu, Nian Li, Zhenyu Han, Meng Wang, Yong Li, and Pan Hui. Large language model-driven
+meta-structure discovery in heterogeneous information network. In Proceedings of the 30th ACM SIGKDD
+Conference on Knowledge Discovery and Data Mining , pages 307–318, 2024.
+[4] Likang Wu, Zhi Zheng, Zhaopeng Qiu, Hao Wang, Hongchao Gu, Tingjia Shen, Chuan Qin, Chen Zhu, Hengshu
+Zhu, Qi Liu, et al. A survey on large language models for recommendation. World Wide Web, 27(5):60, 2024.
+[5] Jiayi Liao, Sihang Li, Zhengyi Yang, Jiancan Wu, Yancheng Yuan, Xiang Wang, and Xiangnan He. Llara: Large
+language-recommendation assistant. In Proceedings of the 47th International ACM SIGIR Conference on Research
+and Development in Information Retrieval , pages 1785–1795, 2024.
+[6] Yu Shang, Yu Li, Keyu Zhao, Likai Ma, Jiahe Liu, Fengli Xu, and Yong Li. Agentsquare: Automatic llm agent
+search in modular design space. arXiv preprint arXiv:2410.06153, 2024.
+7
+===== PAGE 8 =====
+AgentSociety Challenge
+[7] Chenyang Shao, Xinyuan Hu, Yutang Lin, and Fengli Xu. Division-of-thoughts: Harnessing hybrid language
+model synergy for efficient on-device agents. arXiv preprint arXiv:2502.04392, 2025.
+[8] Joon Sung Park, Joseph O’Brien, Carrie Jun Cai, Meredith Ringel Morris, Percy Liang, and Michael S Bernstein.
+Generative agents: Interactive simulacra of human behavior. In Proceedings of the 36th annual acm symposium
+on user interface software and technology , pages 1–22, 2023.
+[9] Chen Gao, Xiaochong Lan, Nian Li, Yuan Yuan, Jingtao Ding, Zhilun Zhou, Fengli Xu, and Yong Li. Large
+language models empowered agent-based modeling and simulation: A survey and perspectives. Humanities and
+Social Sciences Communications, 11(1):1–24, 2024.
+[10] An Zhang, Yuxin Chen, Leheng Sheng, Xiang Wang, and Tat-Seng Chua. On generative agents in recommendation.
+In Proceedings of the 47th international ACM SIGIR conference on research and development in Information
+Retrieval, pages 1807–1817, 2024.
+[11] Jingtao Ding, Yunke Zhang, Yu Shang, Yuheng Zhang, Zefang Zong, Jie Feng, Yuan Yuan, Hongyuan Su, Nian Li,
+Nicholas Sukiennik, et al. Understanding world or predicting future? a comprehensive survey of world models.
+arXiv preprint arXiv:2411.14499, 2024.
+[12] Yu Shang, Yu Li, Fengli Xu, and Yong Li. Defint: A default-interventionist framework for efficient reasoning with
+hybrid large language models. arXiv preprint arXiv:2402.02563, 2024.
+[13] Fengli Xu, Qianyue Hao, Zefang Zong, Jingwei Wang, Yunke Zhang, Jingyi Wang, Xiaochong Lan, Jiahui Gong,
+Tianjian Ouyang, Fanjin Meng, et al. Towards large reasoning models: A survey of reinforced reasoning with
+large language models. arXiv preprint arXiv:2501.09686, 2025.
+[14] Junjie Zhang, Yupeng Hou, Ruobing Xie, Wenqi Sun, Julian McAuley, Wayne Xin Zhao, Leyu Lin, and Ji-Rong
+Wen. Agentcf: Collaborative learning with autonomous language agents for recommender systems. InProceedings
+of the ACM on Web Conference 2024 , pages 3679–3689, 2024.
+[15] Nabiha Asghar. Yelp dataset challenge: Review rating prediction. arXiv preprint arXiv:1605.05362, 2016.
+[16] Yupeng Hou, Jiacheng Li, Zhankui He, An Yan, Xiusi Chen, and Julian McAuley. Bridging language and items
+for retrieval and recommendation. arXiv preprint arXiv:2403.03952, 2024.
+[17] Mengting Wan and Julian McAuley. Item recommendation on monotonic behavior chains. In Proceedings of the
+12th ACM conference on recommender systems , pages 86–94, 2018.
+[18] Yancheng Wang, Ziyan Jiang, Zheng Chen, Fan Yang, Yingxue Zhou, Eunah Cho, Xing Fan, Yanbin Lu, Xiaojiang
+Huang, and Yingzhen Yang. Recmind: Large language model powered agent for recommendation. In Findings of
+the Association for Computational Linguistics: NAACL 2024 , pages 4351–4364, 2024.
+[19] Francesco Barbieri, Jose Camacho-Collados, Leonardo Neves, and Luis Espinosa-Anke. Tweeteval: Unified
+benchmark and comparative evaluation for tweet classification. arXiv preprint arXiv:2010.12421, 2020.
+[20] N Reimers. Sentence-bert: Sentence embeddings using siamese bert-networks. arXiv preprint arXiv:1908.10084,
+2019.
+[21] Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng Chua. Neural collaborative filtering.
+In Proceedings of the 26th international conference on world wide web , pages 173–182, 2017.
+8

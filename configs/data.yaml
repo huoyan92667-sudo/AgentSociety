@@ -1,0 +1,48 @@
+random_seed: 42
+city: Philadelphia
+min_business_reviews: 20
+min_user_reviews: 10
+min_distinct_businesses: 3
+min_distinct_ratings: 3
+max_users: 5000
+candidate_count: 20
+hard_negative_same_category: 8
+hard_negative_related_category: 5
+preference_negative_count: 3
+random_negative_count: 3
+review_chunk_size: 100000
+
+allowed_categories:
+  - Restaurants
+  - Food
+  - Coffee & Tea
+  - Nightlife
+  - Bars
+  - Desserts
+  - Bakeries
+  - Shopping
+  - Beauty & Spas
+  - Arts & Entertainment
+
+broad_categories:
+  - Restaurants
+  - Food
+  - Nightlife
+  - Shopping
+
+category_groups:
+  dining:
+    - Restaurants
+    - Food
+    - Coffee & Tea
+    - Desserts
+    - Bakeries
+  nightlife:
+    - Nightlife
+    - Bars
+  retail:
+    - Shopping
+  personal_care:
+    - Beauty & Spas
+  entertainment:
+    - Arts & Entertainment

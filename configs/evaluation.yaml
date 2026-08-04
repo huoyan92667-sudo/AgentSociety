@@ -1,0 +1,6 @@
+primary_metric: avg_hr
+hit_cutoffs:
+  - 1
+  - 3
+  - 5
+ndcg_cutoff: 5

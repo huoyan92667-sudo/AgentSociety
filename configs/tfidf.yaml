@@ -1,0 +1,7 @@
+stop_words: english
+ngram_min: 1
+ngram_max: 2
+min_df: 2
+sublinear_tf: true
+max_features: 50000
+keyword_count: 10
