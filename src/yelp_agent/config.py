@@ -6,7 +6,7 @@ import math
 import os
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
@@ -106,11 +106,73 @@ class TfidfConfig(ConfigModel):
         return (self.ngram_min, self.ngram_max)
 
 
+class LegacyTestConfig(ConfigModel):
+    name: str = Field(min_length=1)
+    status: Literal["previously_observed"]
+    usage: Literal["historical_comparison_only"]
+
+
+class CrossValidationConfig(ConfigModel):
+    strategy: Literal["deterministic_user_level_sha256"]
+    folds: int = Field(ge=2, le=20)
+    seed: int
+
+
+class BootstrapConfig(ConfigModel):
+    unit: Literal["user"]
+    samples: int = Field(ge=100)
+    confidence_level: float = Field(gt=0, lt=1)
+    seed: int
+
+
+class ModelSelectionConfig(ConfigModel):
+    primary_metric: Literal["avg_hr"]
+    tie_break_metrics: list[Literal["mrr", "hr_at_1"]]
+
+    @model_validator(mode="after")
+    def validate_tie_break_metrics(self) -> "ModelSelectionConfig":
+        if len(set(self.tie_break_metrics)) != len(self.tie_break_metrics):
+            raise ValueError("tie_break_metrics must be unique")
+        return self
+
+
+class EvaluationReportingConfig(ConfigModel):
+    fold_mean: bool
+    fold_standard_deviation: bool
+    paired_model_delta: bool
+    bootstrap_confidence_interval: bool
+
+
+class EvaluationDataUsageConfig(ConfigModel):
+    development_split: Literal["validation"]
+    strict_blind_holdout: Literal[False]
+    legacy_test: LegacyTestConfig
+    cross_validation: CrossValidationConfig
+    bootstrap: BootstrapConfig
+    model_selection: ModelSelectionConfig
+    reporting: EvaluationReportingConfig
+    segment_dimensions: list[str]
+
+    @model_validator(mode="after")
+    def validate_segment_dimensions(self) -> "EvaluationDataUsageConfig":
+        if not self.segment_dimensions:
+            raise ValueError("segment_dimensions cannot be empty")
+        if any(
+            not dimension or dimension != dimension.strip()
+            for dimension in self.segment_dimensions
+        ):
+            raise ValueError("segment_dimensions contain an invalid name")
+        if len(set(self.segment_dimensions)) != len(self.segment_dimensions):
+            raise ValueError("segment_dimensions must be unique")
+        return self
+
+
 class AppConfig(ConfigModel):
     data: DataConfig
     hybrid: HybridConfig
     agent: AgentConfig
     tfidf: TfidfConfig
+    evaluation_data_usage: EvaluationDataUsageConfig
 
 
 class LLMEnvironment(ConfigModel):
@@ -140,6 +202,9 @@ def load_config(config_dir: str | Path = "configs") -> AppConfig:
         hybrid=HybridConfig.model_validate(_read_yaml(root / "hybrid.yaml")),
         agent=AgentConfig.model_validate(_read_yaml(root / "agent.yaml")),
         tfidf=TfidfConfig.model_validate(_read_yaml(root / "tfidf.yaml")),
+        evaluation_data_usage=EvaluationDataUsageConfig.model_validate(
+            _read_yaml(root / "evaluation_data_usage.yaml")
+        ),
     )
 
 

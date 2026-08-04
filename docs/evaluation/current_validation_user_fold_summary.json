@@ -1,0 +1,42 @@
+{
+  "format_version": 1,
+  "purpose": "deterministic user-level development cross-validation",
+  "development_split": "validation",
+  "strategy": "deterministic_user_level_sha256",
+  "seed": 42,
+  "fold_count": 5,
+  "task_count": 4971,
+  "user_count": 4971,
+  "multi_task_user_count": 0,
+  "folds": {
+    "1": {
+      "user_count": 985,
+      "task_count": 985
+    },
+    "2": {
+      "user_count": 971,
+      "task_count": 971
+    },
+    "3": {
+      "user_count": 1042,
+      "task_count": 1042
+    },
+    "4": {
+      "user_count": 971,
+      "task_count": 971
+    },
+    "5": {
+      "user_count": 1002,
+      "task_count": 1002
+    }
+  },
+  "assignment_sha256": "3077583bd1feb95ca261933a2d61fd1a425f8a011317f0c0aaf35ea162bbb34a",
+  "assignment_hash_algorithm": "SHA256 over user_id, NUL, one-based fold, LF in sorted user order",
+  "source_tasks_sha256": "86bca5edd7a93dcd478f2e222b4776ea1d75a42323052420e37ee038d1b6ace0",
+  "user_ids_included": false,
+  "task_ids_included": false,
+  "legacy_test_name": "Legacy Test V0",
+  "legacy_test_status": "previously_observed",
+  "legacy_test_usage": "historical_comparison_only",
+  "strict_blind_holdout": false
+}

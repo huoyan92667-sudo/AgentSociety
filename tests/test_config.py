@@ -28,6 +28,10 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert config.tfidf.min_df == 2
     assert config.tfidf.max_features == 50_000
     assert config.tfidf.keyword_count == 10
+    assert config.evaluation_data_usage.development_split == "validation"
+    assert config.evaluation_data_usage.legacy_test.name == "Legacy Test V0"
+    assert config.evaluation_data_usage.strict_blind_holdout is False
+    assert config.evaluation_data_usage.cross_validation.folds == 5
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
@@ -137,6 +141,23 @@ def test_agent_timeout_must_be_positive(tmp_path: Path) -> None:
     )
 
     with pytest.raises(ValidationError, match="greater than 0"):
+        load_config(config_dir)
+
+
+def test_legacy_test_cannot_be_mislabelled_as_a_blind_holdout(
+    tmp_path: Path,
+) -> None:
+    config_dir = tmp_path / "configs"
+    shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
+    policy_path = config_dir / "evaluation_data_usage.yaml"
+    policy = yaml.safe_load(policy_path.read_text(encoding="utf-8"))
+    policy["strict_blind_holdout"] = True
+    policy_path.write_text(
+        yaml.safe_dump(policy, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="Input should be False"):
         load_config(config_dir)
 
 

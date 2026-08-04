@@ -1,0 +1,40 @@
+development_split: validation
+strict_blind_holdout: false
+
+legacy_test:
+  name: Legacy Test V0
+  status: previously_observed
+  usage: historical_comparison_only
+
+cross_validation:
+  strategy: deterministic_user_level_sha256
+  folds: 5
+  seed: 42
+
+bootstrap:
+  unit: user
+  samples: 2000
+  confidence_level: 0.95
+  seed: 42
+
+model_selection:
+  primary_metric: avg_hr
+  tie_break_metrics:
+    - mrr
+    - hr_at_1
+
+reporting:
+  fold_mean: true
+  fold_standard_deviation: true
+  paired_model_delta: true
+  bootstrap_confidence_interval: true
+
+segment_dimensions:
+  - history_size
+  - target_category_seen
+  - candidate_refill
+  - hybrid_margin
+  - feature_disagreement
+  - missing_location
+  - candidate_popularity
+  - negative_sampling_frequency
