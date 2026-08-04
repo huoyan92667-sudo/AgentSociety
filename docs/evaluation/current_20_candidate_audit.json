@@ -1,0 +1,271 @@
+{
+  "format_version": 1,
+  "benchmark_name": "Current 20-Candidate Controlled Reranking",
+  "benchmark_type": "ground-truth-conditioned closed-set reranking",
+  "total_task_count": 9940,
+  "required_candidate_count": 20,
+  "required_negative_count": 19,
+  "total_candidate_row_count": 198800,
+  "total_bucket_counts": {
+    "preference": 29820,
+    "random": 29820,
+    "refill_related": 254,
+    "refill_same_fine": 3256,
+    "related": 46444,
+    "same_fine": 79266,
+    "target": 9940
+  },
+  "tasks_using_refill": 703,
+  "refill_task_rate": 0.07072434607645875,
+  "target_position_counts": {
+    "1": 463,
+    "2": 487,
+    "3": 460,
+    "4": 536,
+    "5": 480,
+    "6": 501,
+    "7": 468,
+    "8": 524,
+    "9": 527,
+    "10": 498,
+    "11": 457,
+    "12": 470,
+    "13": 526,
+    "14": 533,
+    "15": 495,
+    "16": 514,
+    "17": 500,
+    "18": 523,
+    "19": 486,
+    "20": 492
+  },
+  "dropped_task_count": 60,
+  "dropped_reason_counts": {
+    "target_unavailable_before_cutoff": 60
+  },
+  "splits": {
+    "validation": {
+      "task_count": 4971,
+      "candidate_row_count": 99420,
+      "bucket_counts": {
+        "preference": 14913,
+        "random": 14913,
+        "refill_related": 100,
+        "refill_same_fine": 1556,
+        "related": 23299,
+        "same_fine": 39668,
+        "target": 4971
+      },
+      "tasks_using_refill": 333,
+      "refill_task_rate": 0.06698853349426674,
+      "target_position_counts": {
+        "1": 234,
+        "2": 244,
+        "3": 237,
+        "4": 254,
+        "5": 246,
+        "6": 246,
+        "7": 231,
+        "8": 264,
+        "9": 275,
+        "10": 245,
+        "11": 225,
+        "12": 232,
+        "13": 255,
+        "14": 277,
+        "15": 234,
+        "16": 257,
+        "17": 266,
+        "18": 257,
+        "19": 247,
+        "20": 245
+      },
+      "dropped_task_count": 29,
+      "dropped_reason_counts": {
+        "target_unavailable_before_cutoff": 29
+      }
+    },
+    "legacy_test": {
+      "task_count": 4969,
+      "candidate_row_count": 99380,
+      "bucket_counts": {
+        "preference": 14907,
+        "random": 14907,
+        "refill_related": 154,
+        "refill_same_fine": 1700,
+        "related": 23145,
+        "same_fine": 39598,
+        "target": 4969
+      },
+      "tasks_using_refill": 370,
+      "refill_task_rate": 0.07446166230629905,
+      "target_position_counts": {
+        "1": 229,
+        "2": 243,
+        "3": 223,
+        "4": 282,
+        "5": 234,
+        "6": 255,
+        "7": 237,
+        "8": 260,
+        "9": 252,
+        "10": 253,
+        "11": 232,
+        "12": 238,
+        "13": 271,
+        "14": 256,
+        "15": 261,
+        "16": 257,
+        "17": 234,
+        "18": 266,
+        "19": 239,
+        "20": 247
+      },
+      "dropped_task_count": 31,
+      "dropped_reason_counts": {
+        "target_unavailable_before_cutoff": 31
+      }
+    }
+  },
+  "candidate_frequency": {
+    "business_universe_count": 3973,
+    "distinct_candidate_business_count": 3973,
+    "candidate_universe_coverage_rate": 1.0,
+    "distinct_negative_business_count": 3973,
+    "negative_occurrence_count": 188860,
+    "median_negative_occurrences": 39.0,
+    "p95_negative_occurrences": 84.0,
+    "p99_negative_occurrences": 216.0,
+    "max_negative_occurrences": 1904,
+    "top_negative_businesses": [
+      {
+        "business_id": "eAzeb04i354i6VZFI4bJRQ",
+        "occurrences": 1904
+      },
+      {
+        "business_id": "K7KHmHzxNwzqiijSJeKe_A",
+        "occurrences": 1333
+      },
+      {
+        "business_id": "kT8IlV47kz1rz2lTuNyO1w",
+        "occurrences": 1282
+      },
+      {
+        "business_id": "asI2vQzWZq9xBFUpfHNu4w",
+        "occurrences": 1274
+      },
+      {
+        "business_id": "-fs09akgCKv5rTTy7iUHUg",
+        "occurrences": 1156
+      },
+      {
+        "business_id": "ytynqOUb3hjKeJfRj5Tshw",
+        "occurrences": 1124
+      },
+      {
+        "business_id": "TE2IEDNV0RcI6s1wTOP4fg",
+        "occurrences": 1048
+      },
+      {
+        "business_id": "Qm8pSLYuVS7eIyOx5YsWBw",
+        "occurrences": 1044
+      },
+      {
+        "business_id": "Q-prSTdggNlxAEFV88BZOw",
+        "occurrences": 978
+      },
+      {
+        "business_id": "uVoAlvNxz2IRvhXccU1tFw",
+        "occurrences": 947
+      }
+    ]
+  },
+  "candidate_configuration": {
+    "random_seed": 42,
+    "candidate_count": 20,
+    "same_fine_requested": 8,
+    "related_requested": 5,
+    "preference_requested": 3,
+    "random_requested": 3,
+    "broad_categories": [
+      "Food",
+      "Nightlife",
+      "Restaurants",
+      "Shopping"
+    ],
+    "category_groups": {
+      "dining": [
+        "Bakeries",
+        "Coffee & Tea",
+        "Desserts",
+        "Food",
+        "Restaurants"
+      ],
+      "entertainment": [
+        "Arts & Entertainment"
+      ],
+      "nightlife": [
+        "Bars",
+        "Nightlife"
+      ],
+      "personal_care": [
+        "Beauty & Spas"
+      ],
+      "retail": [
+        "Shopping"
+      ]
+    }
+  },
+  "protocol_properties": {
+    "target_conditioned_candidate_generation": true,
+    "target_used_for_same_fine_pool": true,
+    "target_used_for_related_pool": true,
+    "target_label_visible_to_ranker": false,
+    "ground_truth_loaded_only_by_audit_or_evaluation": true,
+    "evaluates_full_catalog_retrieval": false
+  },
+  "invariant_violations": {
+    "duplicate_task_id_rows": 0,
+    "cross_split_duplicate_task_id_rows": 0,
+    "candidate_count_task_violations": 0,
+    "duplicate_candidate_task_violations": 0,
+    "split_task_id_prefix_violations": 0,
+    "duplicate_ground_truth_rows": 0,
+    "missing_ground_truth_task_rows": 0,
+    "unexpected_ground_truth_task_rows": 0,
+    "unexpected_provenance_task_rows": 0,
+    "target_missing_task_violations": 0,
+    "provenance_count_task_violations": 0,
+    "provenance_candidate_task_violations": 0,
+    "target_bucket_task_violations": 0,
+    "provenance_position_row_violations": 0,
+    "unknown_source_bucket_rows": 0,
+    "unknown_candidate_business_rows": 0,
+    "candidate_unavailable_before_cutoff_rows": 0,
+    "negative_history_overlap_rows": 0,
+    "history_cutoff_row_violations": 0,
+    "same_fine_bucket_rule_row_violations": 0,
+    "related_bucket_rule_row_violations": 0,
+    "preference_bucket_rule_row_violations": 0
+  },
+  "invariant_violation_total": 0,
+  "source_sha256": {
+    "businesses": "15e99635cf9c39fb8f5665db901a61101a72ad9184298ccfd320705f5501ec7d",
+    "candidate_ground_truth": "de0467cd44be95f3992d332568e0cbae3ab0b381a6e57c6303b28bab7c1bf5c7",
+    "candidate_provenance": "79892ed2a294945464c7cb1d2b7b9f729199739e7c510139c5a354282f88cf8f",
+    "dropped_tasks": "469dd99a99f1e14427c8465a0bce7f365b8135cda4fefac60293fea53498dc9c",
+    "interactions": "f4a94bd4f68a3a013d6c950506a0864a7d12c40c89c46aba41a6dfd7be1302da",
+    "legacy_test_tasks": "2ed0741a4c6a712e5b339f005a406ab28b3fbe69e65c91087c047b6d0bacf472",
+    "reviews": "82b2a1c90ab4e99991e72f8414c8285bc8960bcf98b942b8d6a4ba45ee73d21b",
+    "temporal_histories": "3140d22d3e2563637ab05135088e900349885c899e5eec57658ffda052f37fb6",
+    "validation_tasks": "86bca5edd7a93dcd478f2e222b4776ea1d75a42323052420e37ee038d1b6ace0"
+  },
+  "limitations": [
+    "The target business is known before the nineteen negatives are constructed.",
+    "Target fine categories create the same-fine pool and target coarse groups create the related pool.",
+    "Ranking metrics measure ordering inside a frozen set of twenty candidates, not retrieval from all Philadelphia businesses.",
+    "Legacy Test V0 has already been observed and is restricted to historical comparison.",
+    "Candidate difficulty and repeated-negative frequency can influence closed-set ranking metrics.",
+    "The fine-category exclusion list contains only Food, Nightlife, Restaurants, and Shopping; broad labels such as Bars can still act as fine categories."
+  ]
+}
