@@ -321,13 +321,6 @@ def _load_frozen_hybrid_artifact(path: str | Path) -> FrozenHybridWeights:
     return frozen
 
 
-def load_frozen_hybrid_weights(path: str | Path) -> HybridWeights:
-    """Load selected weights after validating the artifact format."""
-
-    frozen = _load_frozen_hybrid_artifact(path)
-    return frozen.selected_weights
-
-
 def load_validated_hybrid_weights(
     path: str | Path,
     *,

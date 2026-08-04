@@ -12,7 +12,6 @@ from yelp_agent.models import RecommendationTask, UserProfile
 from yelp_agent.tuning.hybrid import (
     HybridTuningError,
     enumerate_hybrid_weights,
-    load_frozen_hybrid_weights,
     load_validated_hybrid_weights,
     tune_hybrid_weights,
 )
@@ -126,7 +125,6 @@ def test_tunes_on_precomputed_validation_features_and_freezes_unique_weights(
     assert result.validation_metrics.avg_hr == 1.0
     assert result.validation_metrics.mrr == 1.0
     assert feature_store.call_count == 1
-    assert load_frozen_hybrid_weights(output_path) == result.selected_weights
     assert load_validated_hybrid_weights(
         output_path,
         feature_sources_sha256={"synthetic": "0" * 64},

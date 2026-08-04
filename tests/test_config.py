@@ -24,7 +24,6 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
         "location": 0.1,
     }
     assert config.agent.top_k_to_rerank == 8
-    assert config.evaluation.hit_cutoffs == (1, 3, 5)
     assert config.tfidf.ngram_range == (1, 2)
     assert config.tfidf.min_df == 2
     assert config.tfidf.max_features == 50_000

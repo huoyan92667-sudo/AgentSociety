@@ -226,8 +226,7 @@ def test_agent_ranker_reranks_top_eight_and_records_safe_trace() -> None:
     assert session.calls == ["history", "profile", "hybrid", "details"]
     assert len(llm.requests) == 1
 
-    assert len(ranker.traces) == 1
-    trace = ranker.traces[0]
+    trace = ranker.trace_for(task.task_id)
     assert trace.task_id == task.task_id
     assert trace.representative_review_ids == [
         "review-positive",
@@ -271,7 +270,7 @@ def test_disabled_llm_returns_complete_hybrid_without_counting_a_failure() -> No
     assert prediction.metadata["llm_attempted"] is False
     assert prediction.tool_calls == 4
     assert prediction.llm_tokens is None
-    trace = ranker.traces[0]
+    trace = ranker.trace_for(task.task_id)
     assert trace.llm_status == "disabled"
     assert trace.top_k_after == hybrid.ranking[:8]
     assert trace.fallback is True
@@ -294,7 +293,7 @@ def test_invalid_llm_output_falls_back_to_the_entire_hybrid_ranking() -> None:
     assert prediction.fallback_reason == "non_json"
     assert prediction.metadata["llm_attempted"] is True
     assert prediction.llm_tokens == 88
-    trace = ranker.traces[0]
+    trace = ranker.trace_for(task.task_id)
     assert trace.llm_status == "success"
     assert trace.top_k_after == hybrid.ranking[:8]
     assert trace.total_tokens == 88
@@ -319,7 +318,7 @@ def test_unexpected_llm_exception_is_sanitized_and_falls_back() -> None:
     assert prediction.metadata["llm_attempted"] is True
     assert "secret-live-key" not in serialized
     assert "Authorization" not in serialized
-    assert ranker.traces[0].fallback_reason == "llm_error"
+    assert ranker.trace_for(task.task_id).fallback_reason == "llm_error"
 
 
 def test_api_failure_preserves_attempt_metadata_for_failure_rate() -> None:
@@ -337,13 +336,14 @@ def test_api_failure_preserves_attempt_metadata_for_failure_rate() -> None:
     assert prediction.fallback_reason == "timeout"
     assert prediction.metadata["llm_attempted"] is True
     assert prediction.metadata["attempt_count"] == 3
-    assert ranker.traces[0].attempt_count == 3
-    assert ranker.traces[0].model == "deepseek-v4-flash"
-    assert len(ranker.traces[0].llm_attempts) == 3
-    assert ranker.traces[0].unknown_usage_attempts == 3
+    trace = ranker.trace_for(task.task_id)
+    assert trace.attempt_count == 3
+    assert trace.model == "deepseek-v4-flash"
+    assert len(trace.llm_attempts) == 3
+    assert trace.unknown_usage_attempts == 3
     assert all(
         attempt.failure_reason == "timeout"
-        for attempt in ranker.traces[0].llm_attempts
+        for attempt in trace.llm_attempts
     )
 
 
@@ -363,7 +363,7 @@ def test_tool_failure_falls_back_before_any_llm_request() -> None:
     assert prediction.fallback_reason == "tool_error"
     assert prediction.metadata["llm_attempted"] is False
     assert prediction.tool_calls == 2
-    trace = ranker.traces[0]
+    trace = ranker.trace_for(task.task_id)
     assert trace.llm_status == "not_called"
     assert trace.profile is None
     assert trace.tool_calls == 2

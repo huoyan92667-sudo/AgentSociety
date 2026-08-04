@@ -35,10 +35,6 @@ class HybridRanker:
             HybridTaskScore,
         ] = {}
 
-    @property
-    def weights(self) -> HybridWeights:
-        return self._weights
-
     def score(self, task: RecommendationTask) -> HybridTaskScore:
         """Return the merged profile and explainable candidate score details."""
 

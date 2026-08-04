@@ -86,12 +86,6 @@ class AgentConfig(ConfigModel):
     max_retries: int
 
 
-class EvaluationConfig(ConfigModel):
-    primary_metric: str
-    hit_cutoffs: tuple[int, ...]
-    ndcg_cutoff: int
-
-
 class TfidfConfig(ConfigModel):
     stop_words: str
     ngram_min: int = Field(ge=1)
@@ -116,7 +110,6 @@ class AppConfig(ConfigModel):
     data: DataConfig
     hybrid: HybridConfig
     agent: AgentConfig
-    evaluation: EvaluationConfig
     tfidf: TfidfConfig
 
 
@@ -146,9 +139,6 @@ def load_config(config_dir: str | Path = "configs") -> AppConfig:
         data=DataConfig.model_validate(_read_yaml(root / "data.yaml")),
         hybrid=HybridConfig.model_validate(_read_yaml(root / "hybrid.yaml")),
         agent=AgentConfig.model_validate(_read_yaml(root / "agent.yaml")),
-        evaluation=EvaluationConfig.model_validate(
-            _read_yaml(root / "evaluation.yaml")
-        ),
         tfidf=TfidfConfig.model_validate(_read_yaml(root / "tfidf.yaml")),
     )
 

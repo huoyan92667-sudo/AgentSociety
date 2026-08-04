@@ -116,10 +116,6 @@ class AgentRanker:
         self._llm = llm
         self._traces: dict[str, AgentTrace] = {}
 
-    @property
-    def traces(self) -> tuple[AgentTrace, ...]:
-        return tuple(self._traces.values())
-
     def trace_for(self, task_id: str) -> AgentTrace:
         """Return the trace produced by the latest rank call for one task."""
 
