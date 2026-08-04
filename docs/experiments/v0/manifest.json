@@ -1,0 +1,192 @@
+{
+  "format_version": 1,
+  "experiment_id": "v0-deepseek-pilot-20",
+  "freeze_date": "2026-08-04",
+  "experiment_type": "ground-truth-conditioned closed-set reranking",
+  "provenance": {
+    "repository": "https://github.com/huoyan92667-sudo/AgentSociety.git",
+    "freeze_audit_git_commit": "95a807408569c0418ab6d48733f7474454fd68e7",
+    "worktree_clean_before_freeze": true,
+    "experiment_source_git_commit": null,
+    "experiment_source_note": "The run did not persist its Git commit. The freeze audit commit is a post-run cleanup revision and is not claimed as the exact run revision.",
+    "agent_artifacts_observed_modified_utc": "2026-08-04T09:31:38.699383+00:00",
+    "metrics_artifacts_observed_modified_utc": "2026-08-04T10:16:29.804676+00:00"
+  },
+  "evaluation_policy": {
+    "legacy_test_name": "Legacy Test V0",
+    "legacy_test_status": "previously_observed",
+    "strict_final_blind_holdout": false,
+    "development_policy": "validation_and_user_level_cv",
+    "test_usage": "historical_comparison_only",
+    "selection_prohibitions": [
+      "feature_selection",
+      "model_selection",
+      "weight_tuning",
+      "threshold_tuning",
+      "router_tuning",
+      "prompt_selection"
+    ]
+  },
+  "task_selection": {
+    "source_path": "data/task_dataset/tasks/test_tasks.jsonl",
+    "source_sha256": "2ed0741a4c6a712e5b339f005a406ab28b3fbe69e65c91087c047b6d0bacf472",
+    "source_size_bytes": 3185129,
+    "selection_rule": "first 20 tasks in persisted file order",
+    "selected_task_count": 20,
+    "unique_task_count": 20,
+    "matches_prediction_order": true,
+    "task_ids_stored_in_manifest": false,
+    "sorted_task_ids_sha256": "ff79e2fbc5c6574dcabb39f11ae2d4d8cb9f283ce7ba0250e1f5d29545b9b46b",
+    "task_id_hash_algorithm": "SHA256 of lexicographically sorted task IDs, each UTF-8 encoded and terminated by LF",
+    "default_random_seed": 42
+  },
+  "agent": {
+    "architecture": "fixed Hybrid Top-8 LLM reranker",
+    "provider": "DeepSeek",
+    "api_compatibility": "OpenAI-compatible",
+    "model": "deepseek-v4-flash",
+    "top_k_to_rerank": 8,
+    "history_limit": 30,
+    "representative_review_count": 8,
+    "temperature": 0,
+    "timeout_seconds": 90,
+    "max_retries": 0,
+    "environment_variable_names": [
+      "OPENAI_API_KEY",
+      "OPENAI_BASE_URL",
+      "OPENAI_MODEL"
+    ],
+    "secret_values_recorded": false,
+    "authentication_headers_recorded": false
+  },
+  "hybrid": {
+    "selected_weights": {
+      "category": 0.0,
+      "text": 0.5,
+      "quality": 0.1,
+      "location": 0.4
+    },
+    "weight_selection_split": "validation",
+    "validation_task_count": 4971,
+    "tuning_step": 0.1,
+    "combination_count": 286,
+    "validation_avg_hr": 0.29846442700999126,
+    "validation_mrr": 0.2880317904134913
+  },
+  "commands": [
+    {
+      "purpose": "run Hybrid+Agent on the first 20 test tasks",
+      "argv": [
+        ".venv/Scripts/python.exe",
+        "scripts/run_agent.py",
+        "--limit",
+        "20",
+        "--output-dir",
+        "runs/agent/pilot-deepseek-20",
+        "--force"
+      ],
+      "provenance": "reconstructed",
+      "recorded_at_run_time": false,
+      "reconstruction_basis": "current CLI defaults, artifact directory, prediction count, and exact match with the first 20 persisted test tasks"
+    }
+  ],
+  "metrics": {
+    "hybrid": {
+      "task_count": 20,
+      "valid_output_rate": 1.0,
+      "hr_at_1": 0.15,
+      "hr_at_3": 0.4,
+      "hr_at_5": 0.5,
+      "avg_hr": 0.35000000000000003,
+      "mrr": 0.3288362332112332,
+      "ndcg_at_5": 0.33770711884305793,
+      "mean_latency_ms": 7.2564199996122625,
+      "p95_latency_ms": 9.430094997696893
+    },
+    "hybrid_agent": {
+      "task_count": 20,
+      "valid_output_rate": 1.0,
+      "hr_at_1": 0.0,
+      "hr_at_3": 0.2,
+      "hr_at_5": 0.5,
+      "avg_hr": 0.2333333333333333,
+      "mrr": 0.21056242368742373,
+      "ndcg_at_5": 0.24665124291579396,
+      "mean_latency_ms": 100895.94381499935,
+      "p95_latency_ms": 158292.3476900005,
+      "mean_tool_calls": 4.0,
+      "mean_llm_tokens": 17642.45,
+      "llm_attempted_count": 20,
+      "llm_failure_count": 0,
+      "llm_failure_rate": 0.0,
+      "fallback_count": 0,
+      "fallback_rate": 0.0
+    },
+    "agent_minus_hybrid": {
+      "hr_at_1": -0.15,
+      "hr_at_3": -0.2,
+      "hr_at_5": 0.0,
+      "avg_hr": -0.11666666666666672,
+      "mrr": -0.11827380952380946,
+      "ndcg_at_5": -0.09105587592726397
+    },
+    "rank_changes": {
+      "improved_count": 2,
+      "unchanged_count": 11,
+      "worsened_count": 7,
+      "mean_hybrid_target_rank": 7.25,
+      "mean_agent_target_rank": 7.75
+    },
+    "runtime": {
+      "llm_response_success_count": 20,
+      "agent_rerank_success_count": 20,
+      "top_k_changed_count": 20,
+      "timeout_attempt_count": 0,
+      "observed_input_tokens": 110951,
+      "observed_output_tokens": 241898,
+      "observed_total_tokens": 352849,
+      "mean_llm_latency_ms": 100882.38265500023,
+      "p95_llm_latency_ms": 158282.17834500066
+    }
+  },
+  "fingerprints": {
+    "algorithm": "SHA256 of raw file bytes",
+    "source_and_configuration": {
+      "pyproject.toml": "144a88bf4fddf673f8adba90cdc6971e7fb17706f4bab2f11616c45281cb6ba3",
+      "configs/agent.yaml": "16061a7dc452b8ac25df1fe3ebae8514bd945ad51e7869543b6638cdc064aea6",
+      "configs/data.yaml": "5d8522d91eeea17ee12fd72adb602199178d5893fd72a9e02717631c4507cdb4",
+      "configs/hybrid.yaml": "3ae9a332f35829ba9ee864fdcb7cc8ddfa7d95b8dd16a8bf9d1cd60783ea4da4",
+      "configs/tfidf.yaml": "1970e7f0422f1014d744bda56ff651ae18a4506ba809a8acd7e27ca63a5aa879",
+      "src/yelp_agent/agent/prompt.py": "47281e57ec2ae80f5af0429a42c6ac59139fa249ed5f4fb4bf16a91e21984a14",
+      "agent_system_prompt_utf8": "3cd4f752fc7443ca4a5ca221b5a3282579c831325d5ff3d7af7bbc0392326db1",
+      "runs/hybrid/hybrid_weights.json": "d9997c2e430c1076f8aed06839a3b38e7461137f26033ee56054e811792e6e5d"
+    },
+    "feature_artifacts": {
+      "data/features/tfidf_vectorizer.joblib": "9e9d835c971a6bbb495f67e4176fdb09dd3dd9edda208e872898315c0d8412c6",
+      "data/features/tfidf_manifest.json": "2746e1d468c8b18fb5f1ec52e376347d84b5bcc93dd749e6a8973a5d7891fbe4",
+      "data/processed/businesses.parquet": "15e99635cf9c39fb8f5665db901a61101a72ad9184298ccfd320705f5501ec7d",
+      "data/processed/interactions.parquet": "f4a94bd4f68a3a013d6c950506a0864a7d12c40c89c46aba41a6dfd7be1302da",
+      "data/processed/reviews.parquet": "82b2a1c90ab4e99991e72f8414c8285bc8960bcf98b942b8d6a4ba45ee73d21b",
+      "data/task_dataset/tasks/temporal_histories.parquet": "3140d22d3e2563637ab05135088e900349885c899e5eec57658ffda052f37fb6"
+    },
+    "experiment_artifacts": {
+      "runs/agent/pilot-deepseek-20/predictions.jsonl": "1acf10ceda1d60d25c6cae6c27bc6f1640aea30685ea726ced5be53c9b99fd16",
+      "runs/agent/pilot-deepseek-20/traces.jsonl": "23ea6dd42ae60c475291f10c048db5cc99709784ff9c8b6e7d0c58b989148c29",
+      "runs/agent/pilot-deepseek-20/metrics.json": "3633d61771a179b4ea9ed4788bbfff5faae82b9cbae756830957dd95b2c8e8de",
+      "runs/agent/pilot-deepseek-20/hybrid_metrics.json": "eba3e73c451c7d093e03c43590432478692bfd913e3ef4a8d504788e54411636",
+      "runs/agent/pilot-deepseek-20/runtime_metrics.json": "8d3ad99edcec4ad24860b42463caba9504e31ca35d99f5fa4d53eb320bee9338",
+      "runs/agent/pilot-deepseek-20/comparison.json": "e939e53e9a4bdb4236ffacb2369e37923ee71915c4831fe22036d1929a6e6b63"
+    },
+    "tracked_freeze_documents": {
+      "docs/experiments/v0/environment.txt": "cfacab557001220a2acf26b501d72e627f40a38e467d76032b3be2b831e37bf8",
+      "docs/experiments/v0/summary.md": "91a65f704bf64443fb68254c9afd1b7d09a01062812e64a530fe9090fd94114a"
+    }
+  },
+  "privacy": {
+    "api_secrets_included": false,
+    "authentication_headers_included": false,
+    "full_reviews_included": false,
+    "ground_truth_rows_included": false,
+    "task_ids_included": false
+  }
+}
