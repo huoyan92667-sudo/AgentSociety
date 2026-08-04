@@ -349,6 +349,11 @@ def fit_tfidf_model(
     artifact_partial.unlink(missing_ok=True)
     manifest_partial.unlink(missing_ok=True)
     try:
+        # scikit-learn caches ``id(self.stop_words)`` after fitting. That
+        # process-local memory address has no model semantics, but serializing
+        # it makes two identical fits produce different Joblib bytes. Reset it
+        # before persistence; sklearn safely rebuilds the cache on transform.
+        vectorizer._stop_words_id = None
         joblib.dump(vectorizer, artifact_partial)
         manifest = TfidfManifest(
             format_version=1,
