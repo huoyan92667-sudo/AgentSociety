@@ -13,20 +13,18 @@ from yelp_agent.data.reviews import preprocess_reviews
 from yelp_agent.data.temporal import build_temporal_splits
 from yelp_agent.data.users import preprocess_users_and_interactions
 from yelp_agent.evaluation.evaluator import evaluate_prediction_file
-from yelp_agent.features.category import TemporalCategoryStore
-from yelp_agent.features.hybrid import HybridFeatureStore, HybridWeights
-from yelp_agent.features.location import TemporalLocationStore
-from yelp_agent.features.quality import TemporalQualityStore
-from yelp_agent.features.text import TemporalTextStore, fit_tfidf_model
+from yelp_agent.features.hybrid import HybridWeights
+from yelp_agent.features.text import fit_tfidf_model
 from yelp_agent.models import Prediction, RecommendationTask
+from yelp_agent.ranking.assembly import (
+    HybridSourcePaths,
+    build_frozen_hybrid_runtime,
+    build_hybrid_assembly,
+)
 from yelp_agent.rankers.agent_ranker import AgentRanker
 from yelp_agent.rankers.agent_runner import run_agent_ranker
-from yelp_agent.rankers.hybrid_ranker import HybridRanker
 from yelp_agent.rankers.runner import run_ranker
-from yelp_agent.tuning.hybrid import (
-    fingerprint_hybrid_feature_sources,
-    tune_hybrid_weights,
-)
+from yelp_agent.tuning.hybrid import tune_hybrid_weights
 
 
 @dataclass(frozen=True)
@@ -256,45 +254,6 @@ def _test_config() -> AppConfig:
     )
 
 
-def _build_feature_store(
-    root: Path,
-    config: AppConfig,
-) -> tuple[HybridFeatureStore, TemporalQualityStore]:
-    businesses = root / "processed" / "businesses.parquet"
-    reviews = root / "processed" / "reviews.parquet"
-    interactions = root / "processed" / "interactions.parquet"
-    histories = root / "task_dataset" / "tasks" / "temporal_histories.parquet"
-    tfidf_artifact = root / "features" / "tfidf_vectorizer.joblib"
-    tfidf_manifest = root / "features" / "tfidf_manifest.json"
-    quality_store = TemporalQualityStore(
-        reviews,
-        prior_count=config.hybrid.bayesian_prior_count,
-    )
-    feature_store = HybridFeatureStore(
-        category_store=TemporalCategoryStore(
-            businesses,
-            interactions,
-            histories,
-            broad_categories=set(config.data.broad_categories),
-        ),
-        text_store=TemporalTextStore(
-            businesses,
-            interactions,
-            histories,
-            tfidf_artifact,
-            tfidf_manifest,
-        ),
-        quality_store=quality_store,
-        location_store=TemporalLocationStore(
-            businesses,
-            interactions,
-            histories,
-            scale_km=config.hybrid.location_scale_km,
-        ),
-    )
-    return feature_store, quality_store
-
-
 class _BehaviorFakeLLM:
     def __init__(self, behavior: str) -> None:
         self._behavior = behavior
@@ -453,27 +412,27 @@ def run_synthetic_pipeline(
         tfidf_manifest,
         config.tfidf,
     )
-    feature_store, quality_store = _build_feature_store(root, config)
-    feature_fingerprints = fingerprint_hybrid_feature_sources(
-        {
-            "businesses": businesses_parquet,
-            "reviews": reviews_parquet,
-            "interactions": interactions_parquet,
-            "histories": histories,
-            "tfidf_artifact": tfidf_artifact,
-            "tfidf_manifest": tfidf_manifest,
-        }
+    sources = HybridSourcePaths(
+        businesses=businesses_parquet,
+        reviews=reviews_parquet,
+        interactions=interactions_parquet,
+        histories=histories,
+        tfidf_artifact=tfidf_artifact,
+        tfidf_manifest=tfidf_manifest,
     )
-    tune_result = tune_hybrid_weights(
+    assembly = build_hybrid_assembly(config, sources)
+    weights_path = root / "hybrid" / "weights.json"
+    tune_hybrid_weights(
         candidate_result.validation_tasks_path,
         candidate_result.ground_truth_path,
-        feature_store,
-        root / "hybrid" / "weights.json",
+        assembly.feature_store,
+        weights_path,
         initial_weights=HybridWeights.from_config(config.hybrid),
-        feature_sources_sha256=feature_fingerprints,
+        feature_sources_sha256=assembly.feature_sources_sha256,
         step=0.5,
     )
-    hybrid_ranker = HybridRanker(feature_store, tune_result.selected_weights)
+    runtime = build_frozen_hybrid_runtime(config, sources, weights_path)
+    hybrid_ranker = runtime.ranker
     hybrid_predictions = root / "hybrid" / "predictions.jsonl"
     run_ranker(
         candidate_result.test_tasks_path,
@@ -487,7 +446,7 @@ def run_synthetic_pipeline(
         interactions_parquet,
         histories,
         hybrid_ranker=hybrid_ranker,
-        quality_store=quality_store,
+        quality_store=runtime.assembly.quality_store,
     )
     agent_outcomes: dict[str, AgentOutcome] = {}
     agent_prompt_payloads: dict[str, dict[str, object]] = {}

@@ -7,17 +7,11 @@ from pathlib import Path
 from typing import Sequence
 
 from yelp_agent.config import load_config
-from yelp_agent.features.category import TemporalCategoryStore
-from yelp_agent.features.hybrid import HybridFeatureStore
-from yelp_agent.features.location import TemporalLocationStore
-from yelp_agent.features.quality import TemporalQualityStore
-from yelp_agent.features.text import TemporalTextStore
-from yelp_agent.rankers.hybrid_ranker import HybridRanker
-from yelp_agent.rankers.runner import run_ranker
-from yelp_agent.tuning.hybrid import (
-    fingerprint_hybrid_feature_sources,
-    load_validated_hybrid_weights,
+from yelp_agent.ranking.assembly import (
+    HybridSourcePaths,
+    build_frozen_hybrid_runtime,
 )
+from yelp_agent.rankers.runner import run_ranker
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -83,51 +77,22 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     config = load_config(args.config_dir)
-    feature_sources_sha256 = fingerprint_hybrid_feature_sources(
-        {
-            "businesses": args.businesses,
-            "reviews": args.reviews,
-            "interactions": args.interactions,
-            "histories": args.histories,
-            "tfidf_artifact": args.tfidf_artifact,
-            "tfidf_manifest": args.tfidf_manifest,
-            "data_config": args.config_dir / "data.yaml",
-            "hybrid_config": args.config_dir / "hybrid.yaml",
-            "tfidf_config": args.config_dir / "tfidf.yaml",
-        }
-    )
-    weights = load_validated_hybrid_weights(
+    runtime = build_frozen_hybrid_runtime(
+        config,
+        HybridSourcePaths(
+            businesses=args.businesses,
+            reviews=args.reviews,
+            interactions=args.interactions,
+            histories=args.histories,
+            tfidf_artifact=args.tfidf_artifact,
+            tfidf_manifest=args.tfidf_manifest,
+            config_dir=args.config_dir,
+        ),
         args.weights,
-        feature_sources_sha256=feature_sources_sha256,
-    )
-    feature_store = HybridFeatureStore(
-        category_store=TemporalCategoryStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            broad_categories=set(config.data.broad_categories),
-        ),
-        text_store=TemporalTextStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            args.tfidf_artifact,
-            args.tfidf_manifest,
-        ),
-        quality_store=TemporalQualityStore(
-            args.reviews,
-            prior_count=config.hybrid.bayesian_prior_count,
-        ),
-        location_store=TemporalLocationStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            scale_km=config.hybrid.location_scale_km,
-        ),
     )
     result = run_ranker(
         args.tasks,
-        HybridRanker(feature_store, weights),
+        runtime.ranker,
         args.output,
         force=args.force,
     )

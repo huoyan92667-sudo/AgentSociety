@@ -9,18 +9,12 @@ from typing import Sequence
 from yelp_agent.agent.llm import OpenAICompatibleLLM
 from yelp_agent.agent.tools import AgentToolbox
 from yelp_agent.config import load_config
-from yelp_agent.features.category import TemporalCategoryStore
-from yelp_agent.features.hybrid import HybridFeatureStore
-from yelp_agent.features.location import TemporalLocationStore
-from yelp_agent.features.quality import TemporalQualityStore
-from yelp_agent.features.text import TemporalTextStore
+from yelp_agent.ranking.assembly import (
+    HybridSourcePaths,
+    build_frozen_hybrid_runtime,
+)
 from yelp_agent.rankers.agent_ranker import AgentRanker
 from yelp_agent.rankers.agent_runner import run_agent_ranker
-from yelp_agent.rankers.hybrid_ranker import HybridRanker
-from yelp_agent.tuning.hybrid import (
-    fingerprint_hybrid_feature_sources,
-    load_validated_hybrid_weights,
-)
 
 
 DEFAULT_OUTPUT_DIR = Path("runs/agent/test")
@@ -105,59 +99,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             "MVP Agent requires top_k=8, history_limit=30, "
             "and representative_review_count=8"
         )
-    feature_sources_sha256 = fingerprint_hybrid_feature_sources(
-        {
-            "businesses": args.businesses,
-            "reviews": args.reviews,
-            "interactions": args.interactions,
-            "histories": args.histories,
-            "tfidf_artifact": args.tfidf_artifact,
-            "tfidf_manifest": args.tfidf_manifest,
-            "data_config": args.config_dir / "data.yaml",
-            "hybrid_config": args.config_dir / "hybrid.yaml",
-            "tfidf_config": args.config_dir / "tfidf.yaml",
-        }
-    )
-    weights = load_validated_hybrid_weights(
+    runtime = build_frozen_hybrid_runtime(
+        config,
+        HybridSourcePaths(
+            businesses=args.businesses,
+            reviews=args.reviews,
+            interactions=args.interactions,
+            histories=args.histories,
+            tfidf_artifact=args.tfidf_artifact,
+            tfidf_manifest=args.tfidf_manifest,
+            config_dir=args.config_dir,
+        ),
         args.weights,
-        feature_sources_sha256=feature_sources_sha256,
     )
-    quality_store = TemporalQualityStore(
-        args.reviews,
-        prior_count=config.hybrid.bayesian_prior_count,
-    )
-    feature_store = HybridFeatureStore(
-        category_store=TemporalCategoryStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            broad_categories=set(config.data.broad_categories),
-        ),
-        text_store=TemporalTextStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            args.tfidf_artifact,
-            args.tfidf_manifest,
-        ),
-        quality_store=quality_store,
-        location_store=TemporalLocationStore(
-            args.businesses,
-            args.interactions,
-            args.histories,
-            scale_km=config.hybrid.location_scale_km,
-        ),
-    )
-    hybrid_ranker = HybridRanker(feature_store, weights)
     toolbox = AgentToolbox(
         args.businesses,
         args.interactions,
         args.histories,
-        hybrid_ranker=hybrid_ranker,
-        quality_store=quality_store,
+        hybrid_ranker=runtime.ranker,
+        quality_store=runtime.assembly.quality_store,
     )
     agent_ranker = AgentRanker(
-        hybrid_ranker=hybrid_ranker,
+        hybrid_ranker=runtime.ranker,
         toolbox=toolbox,
         llm=OpenAICompatibleLLM.from_environment(config.agent),
     )
