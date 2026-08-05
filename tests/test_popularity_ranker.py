@@ -7,11 +7,12 @@ from yelp_agent.models import RecommendationTask
 from yelp_agent.protocols import Ranker
 from yelp_agent.rankers.popularity_ranker import PopularityRanker
 
+from test_quality_features import write_quality_view
+
 
 def test_popularity_ranker_orders_by_point_in_time_quality(
     tmp_path: Path,
 ) -> None:
-    reviews_path = tmp_path / "reviews.parquet"
     candidates = [f"business-{index:02d}" for index in range(20)]
     reviews = [
         {
@@ -29,8 +30,11 @@ def test_popularity_ranker_orders_by_point_in_time_quality(
         }
         for _ in range(10)
     )
-    pd.DataFrame(reviews).to_parquet(reviews_path, index=False)
-    ranker = PopularityRanker(TemporalQualityStore(reviews_path))
+    ranker = PopularityRanker(
+        TemporalQualityStore(
+            write_quality_view(tmp_path, pd.DataFrame(reviews))
+        )
+    )
     task = RecommendationTask(
         task_id="test:user-1",
         user_id="user-1",

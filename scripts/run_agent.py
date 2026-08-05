@@ -113,9 +113,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.weights,
     )
     toolbox = AgentToolbox(
-        args.businesses,
-        args.interactions,
-        args.histories,
+        runtime.assembly.data_view,
         hybrid_ranker=runtime.ranker,
         quality_store=runtime.assembly.quality_store,
     )

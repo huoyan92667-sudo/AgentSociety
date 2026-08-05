@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.category import TemporalCategoryStore
 from yelp_agent.models import RecommendationTask
 from yelp_agent.protocols import Ranker
@@ -15,9 +16,7 @@ def test_category_ranker_orders_candidates_by_personal_affinity(
         _write_category_fixture(tmp_path)
     )
     store = TemporalCategoryStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         broad_categories={"Restaurants", "Food", "Nightlife", "Shopping"},
     )
     ranker = CategoryRanker(store)

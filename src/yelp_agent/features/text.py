@@ -6,8 +6,6 @@ import hashlib
 import json
 import os
 import re
-from collections import defaultdict
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
@@ -23,6 +21,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from yelp_agent.config import TfidfConfig
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.models import RecommendationTask, StrictModel, UnitScore
 
 
@@ -65,16 +64,6 @@ class TextTaskFeatures(StrictModel):
     positive_keywords: list[str] = Field(max_length=10)
     negative_keywords: list[str] = Field(max_length=10)
     business_scores: dict[str, TextBusinessScore]
-
-
-@dataclass(frozen=True)
-class _TextHistoryInteraction:
-    position: int
-    review_id: str
-    user_id: str
-    stars: float
-    text: str
-    date: datetime
 
 
 def _sha256_file(path: Path) -> str:
@@ -176,6 +165,30 @@ def _load_business_documents(path: Path) -> tuple[list[str], list[str]]:
         documents.append(document)
     if not documents:
         raise TextFeatureError("TF-IDF business corpus is empty")
+    return business_ids, documents
+
+
+def _business_documents_from_view(
+    data_view: TemporalDataView,
+) -> tuple[list[str], list[str]]:
+    business_ids: list[str] = []
+    documents: list[str] = []
+    for business in data_view.businesses():
+        attributes = business.attributes_dict()
+        document_parts = [
+            business.name.strip(),
+            *business.categories,
+            *_flatten_attribute(attributes),
+        ]
+        document = " ".join(
+            part for part in document_parts if part
+        ).strip()
+        if not document:
+            raise TextFeatureError(
+                f"Business {business.business_id!r} has an empty static document"
+            )
+        business_ids.append(business.business_id)
+        documents.append(document)
     return business_ids, documents
 
 
@@ -405,123 +418,27 @@ def _load_tfidf_manifest(
     return manifest
 
 
-def _load_text_histories(
-    interactions_path: Path,
-    histories_path: Path,
-) -> dict[str, tuple[_TextHistoryInteraction, ...]]:
-    for label, path in (
-        ("Interaction", interactions_path),
-        ("Temporal history", histories_path),
-    ):
-        if not path.is_file():
-            raise FileNotFoundError(f"{label} Parquet does not exist: {path}")
-    try:
-        with duckdb.connect() as connection:
-            interaction_counts = connection.execute(
-                """
-                SELECT count(*), count(DISTINCT review_id)
-                FROM read_parquet(?)
-                """,
-                [str(interactions_path)],
-            ).fetchone()
-            history_count = connection.execute(
-                "SELECT count(*) FROM read_parquet(?)",
-                [str(histories_path)],
-            ).fetchone()[0]
-            rows = connection.execute(
-                """
-                SELECT
-                    history.task_id,
-                    history.position,
-                    interaction.review_id,
-                    interaction.user_id,
-                    interaction.stars,
-                    interaction.text,
-                    interaction.date
-                FROM read_parquet(?) AS history
-                JOIN read_parquet(?) AS interaction USING (review_id)
-                ORDER BY history.task_id, history.position
-                """,
-                [str(histories_path), str(interactions_path)],
-            ).fetchall()
-    except duckdb.Error as exc:
-        raise TextFeatureError(
-            f"Could not join frozen TF-IDF histories: {exc}"
-        ) from exc
-
-    if interaction_counts[0] != interaction_counts[1]:
-        raise TextFeatureError("Interaction review_id values must be unique")
-    if len(rows) != history_count:
-        raise TextFeatureError(
-            "A frozen TF-IDF history review is missing from interactions"
-        )
-
-    grouped: defaultdict[str, list[_TextHistoryInteraction]] = defaultdict(list)
-    for task_id, position, review_id, user_id, stars, text, date in rows:
-        if (
-            not task_id
-            or not review_id
-            or not user_id
-            or not isinstance(date, datetime)
-        ):
-            raise TextFeatureError("Frozen TF-IDF history contains an invalid row")
-        rating = float(stars)
-        if not 1.0 <= rating <= 5.0 or not rating.is_integer():
-            raise TextFeatureError(
-                "Frozen TF-IDF history contains a non-integer 1-5 rating"
-            )
-        grouped[str(task_id)].append(
-            _TextHistoryInteraction(
-                position=int(position),
-                review_id=str(review_id),
-                user_id=str(user_id),
-                stars=rating,
-                text=str(text or "").strip(),
-                date=date,
-            )
-        )
-
-    result: dict[str, tuple[_TextHistoryInteraction, ...]] = {}
-    for task_id, interactions in grouped.items():
-        positions = [interaction.position for interaction in interactions]
-        review_ids = [interaction.review_id for interaction in interactions]
-        if (
-            positions != list(range(1, len(interactions) + 1))
-            or len(set(review_ids)) != len(review_ids)
-        ):
-            raise TextFeatureError(
-                f"Frozen TF-IDF positions are invalid for task {task_id!r}"
-            )
-        result[task_id] = tuple(interactions)
-    return result
-
-
 class TemporalTextStore:
     """Transform frozen user histories and candidate static text at one seam."""
 
     def __init__(
         self,
-        businesses_path: str | Path,
-        interactions_path: str | Path,
-        histories_path: str | Path,
+        data_view: TemporalDataView,
         artifact_path: str | Path,
         manifest_path: str | Path,
     ) -> None:
         artifact = Path(artifact_path)
         self._vectorizer = load_tfidf_vectorizer(artifact)
         self._manifest = _load_tfidf_manifest(Path(manifest_path), artifact)
-        business_ids, business_documents = _load_business_documents(
-            Path(businesses_path)
+        self._data_view = data_view
+        business_ids, business_documents = _business_documents_from_view(
+            data_view
         )
         self._business_row = {
             business_id: index
             for index, business_id in enumerate(business_ids)
         }
         self._business_vectors = self._vectorizer.transform(business_documents)
-        self._histories = _load_text_histories(
-            Path(interactions_path),
-            Path(histories_path),
-        )
         self._feature_names = self._vectorizer.get_feature_names_out()
         self._cache: dict[
             tuple[str, str, datetime, tuple[str, ...]],
@@ -553,21 +470,14 @@ class TemporalTextStore:
         if cached is not None:
             return cached
 
-        history = self._histories.get(task.task_id)
+        history = self._data_view.user_history(
+            task.user_id,
+            task.cutoff_time,
+        )
         if not history:
             raise TextFeatureError(
                 f"No frozen TF-IDF history exists for task {task.task_id!r}"
             )
-        for interaction in history:
-            if interaction.user_id != task.user_id:
-                raise TextFeatureError(
-                    f"Task user does not match TF-IDF history for {task.task_id!r}"
-                )
-            if interaction.date >= task.cutoff_time:
-                raise TextFeatureError(
-                    f"TF-IDF history is not before cutoff for {task.task_id!r}"
-                )
-
         positive_texts = [
             interaction.text
             for interaction in history

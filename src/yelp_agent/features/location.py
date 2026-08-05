@@ -3,16 +3,10 @@
 from __future__ import annotations
 
 import math
-from collections import defaultdict
-from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
-
-import duckdb
-import pyarrow as pa
-import pyarrow.parquet as pq
 from pydantic import Field
 
+from yelp_agent.data.temporal_view import TemporalDataError, TemporalDataView
 from yelp_agent.models import (
     LocationCenter,
     RecommendationTask,
@@ -38,15 +32,6 @@ class LocationTaskFeatures(StrictModel):
     location_center: LocationCenter | None
     history_coordinate_count: int = Field(ge=0)
     business_scores: dict[str, LocationBusinessScore]
-
-
-@dataclass(frozen=True)
-class _LocationHistoryInteraction:
-    position: int
-    review_id: str
-    user_id: str
-    business_id: str
-    date: datetime
 
 
 def haversine_km(
@@ -104,156 +89,18 @@ class TemporalLocationStore:
 
     def __init__(
         self,
-        businesses_path: str | Path,
-        interactions_path: str | Path,
-        histories_path: str | Path,
+        data_view: TemporalDataView,
         *,
         scale_km: float = 10.0,
     ) -> None:
         if not math.isfinite(scale_km) or scale_km <= 0:
             raise ValueError("scale_km must be a positive finite number")
+        self._data_view = data_view
         self._scale_km = scale_km
-        self._business_coordinates = self._load_business_coordinates(
-            Path(businesses_path)
-        )
-        self._histories = self._load_histories(
-            Path(interactions_path),
-            Path(histories_path),
-        )
         self._cache: dict[
             tuple[str, str, datetime, tuple[str, ...]],
             LocationTaskFeatures,
         ] = {}
-
-    @staticmethod
-    def _load_business_coordinates(
-        path: Path,
-    ) -> dict[str, LocationCenter | None]:
-        if not path.is_file():
-            raise FileNotFoundError(f"Business Parquet does not exist: {path}")
-        try:
-            rows = pq.read_table(
-                path,
-                columns=["business_id", "latitude", "longitude"],
-            ).to_pylist()
-        except (OSError, pa.ArrowException) as exc:
-            raise LocationFeatureError(
-                f"Could not read location businesses from {path}: {exc}"
-            ) from exc
-
-        coordinates: dict[str, LocationCenter | None] = {}
-        for row in rows:
-            business_id = row.get("business_id")
-            if (
-                not isinstance(business_id, str)
-                or not business_id
-                or business_id in coordinates
-            ):
-                raise LocationFeatureError(
-                    "Location business data contains a missing or duplicate ID"
-                )
-            coordinates[business_id] = _optional_coordinate(
-                row.get("latitude"),
-                row.get("longitude"),
-                business_id=business_id,
-            )
-        if not coordinates:
-            raise LocationFeatureError("Location business data is empty")
-        return coordinates
-
-    def _load_histories(
-        self,
-        interactions_path: Path,
-        histories_path: Path,
-    ) -> dict[str, tuple[_LocationHistoryInteraction, ...]]:
-        for label, path in (
-            ("Interaction", interactions_path),
-            ("Temporal history", histories_path),
-        ):
-            if not path.is_file():
-                raise FileNotFoundError(f"{label} Parquet does not exist: {path}")
-        try:
-            with duckdb.connect() as connection:
-                interaction_counts = connection.execute(
-                    """
-                    SELECT count(*), count(DISTINCT review_id)
-                    FROM read_parquet(?)
-                    """,
-                    [str(interactions_path)],
-                ).fetchone()
-                history_count = connection.execute(
-                    "SELECT count(*) FROM read_parquet(?)",
-                    [str(histories_path)],
-                ).fetchone()[0]
-                rows = connection.execute(
-                    """
-                    SELECT
-                        history.task_id,
-                        history.position,
-                        interaction.review_id,
-                        interaction.user_id,
-                        interaction.business_id,
-                        interaction.date
-                    FROM read_parquet(?) AS history
-                    JOIN read_parquet(?) AS interaction USING (review_id)
-                    ORDER BY history.task_id, history.position
-                    """,
-                    [str(histories_path), str(interactions_path)],
-                ).fetchall()
-        except duckdb.Error as exc:
-            raise LocationFeatureError(
-                f"Could not join frozen location histories: {exc}"
-            ) from exc
-
-        if interaction_counts[0] != interaction_counts[1]:
-            raise LocationFeatureError("Interaction review_id values must be unique")
-        if len(rows) != history_count:
-            raise LocationFeatureError(
-                "A frozen location history review is missing from interactions"
-            )
-
-        grouped: defaultdict[
-            str, list[_LocationHistoryInteraction]
-        ] = defaultdict(list)
-        for task_id, position, review_id, user_id, business_id, date in rows:
-            if (
-                not task_id
-                or not review_id
-                or not user_id
-                or not business_id
-                or not isinstance(date, datetime)
-            ):
-                raise LocationFeatureError(
-                    "Frozen location history contains an invalid row"
-                )
-            business_key = str(business_id)
-            if business_key not in self._business_coordinates:
-                raise LocationFeatureError(
-                    f"History references unknown business_id {business_key!r}"
-                )
-            grouped[str(task_id)].append(
-                _LocationHistoryInteraction(
-                    position=int(position),
-                    review_id=str(review_id),
-                    user_id=str(user_id),
-                    business_id=business_key,
-                    date=date,
-                )
-            )
-
-        result: dict[str, tuple[_LocationHistoryInteraction, ...]] = {}
-        for task_id, interactions in grouped.items():
-            positions = [interaction.position for interaction in interactions]
-            review_ids = [interaction.review_id for interaction in interactions]
-            if (
-                positions != list(range(1, len(interactions) + 1))
-                or len(set(review_ids)) != len(review_ids)
-            ):
-                raise LocationFeatureError(
-                    f"Frozen location positions are invalid for task {task_id!r}"
-                )
-            result[task_id] = tuple(interactions)
-        return result
 
     def features_for(self, task: RecommendationTask) -> LocationTaskFeatures:
         """Return a history center and distance scores for one frozen task."""
@@ -268,22 +115,25 @@ class TemporalLocationStore:
         if cached is not None:
             return cached
 
-        history = self._histories.get(task.task_id)
+        history = self._data_view.user_history(
+            task.user_id,
+            task.cutoff_time,
+        )
         if not history:
             raise LocationFeatureError(
                 f"No frozen location history exists for task {task.task_id!r}"
             )
         history_coordinates: list[LocationCenter] = []
         for interaction in history:
-            if interaction.user_id != task.user_id:
-                raise LocationFeatureError(
-                    f"Task user does not match location history for {task.task_id!r}"
-                )
-            if interaction.date >= task.cutoff_time:
-                raise LocationFeatureError(
-                    f"Location history is not before cutoff for {task.task_id!r}"
-                )
-            coordinate = self._business_coordinates[interaction.business_id]
+            try:
+                business = self._data_view.business(interaction.business_id)
+            except TemporalDataError as exc:
+                raise LocationFeatureError(str(exc)) from exc
+            coordinate = _optional_coordinate(
+                business.latitude,
+                business.longitude,
+                business_id=business.business_id,
+            )
             if coordinate is not None:
                 history_coordinates.append(coordinate)
 
@@ -304,11 +154,15 @@ class TemporalLocationStore:
 
         business_scores: dict[str, LocationBusinessScore] = {}
         for business_id in task.candidate_business_ids:
-            if business_id not in self._business_coordinates:
-                raise LocationFeatureError(
-                    f"Task references unknown business_id {business_id!r}"
-                )
-            coordinate = self._business_coordinates[business_id]
+            try:
+                business = self._data_view.business(business_id)
+            except TemporalDataError as exc:
+                raise LocationFeatureError(str(exc)) from exc
+            coordinate = _optional_coordinate(
+                business.latitude,
+                business.longitude,
+                business_id=business.business_id,
+            )
             if location_center is None or coordinate is None:
                 distance_km = None
                 location_score = 0.5

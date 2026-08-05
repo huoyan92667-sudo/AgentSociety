@@ -4,7 +4,23 @@ import pandas as pd
 import pytest
 
 from yelp_agent.features.category import TemporalCategoryStore
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.models import RecommendationTask
+
+
+def _business(business_id: str, categories: list[str]) -> dict[str, object]:
+    return {
+        "business_id": business_id,
+        "name": business_id,
+        "address": "",
+        "city": "Philadelphia",
+        "state": "PA",
+        "postal_code": "",
+        "latitude": 39.95,
+        "longitude": -75.16,
+        "categories": categories,
+        "attributes_json": "{}",
+    }
 
 
 def _write_category_fixture(root: Path) -> tuple[Path, Path, Path, list[str]]:
@@ -13,31 +29,13 @@ def _write_category_fixture(root: Path) -> tuple[Path, Path, Path, list[str]]:
     histories_path = root / "histories.parquet"
     candidates = [f"candidate-{index:02d}" for index in range(20)]
     businesses = [
-        {
-            "business_id": "history-mexican-1",
-            "categories": ["Restaurants", "Mexican"],
-        },
-        {
-            "business_id": "history-mexican-2",
-            "categories": ["Restaurants", "Mexican"],
-        },
-        {
-            "business_id": "history-coffee",
-            "categories": ["Food", "Coffee & Tea"],
-        },
-        {
-            "business_id": candidates[0],
-            "categories": ["Restaurants", "Mexican"],
-        },
-        {
-            "business_id": candidates[1],
-            "categories": ["Food", "Coffee & Tea"],
-        },
+        _business("history-mexican-1", ["Restaurants", "Mexican"]),
+        _business("history-mexican-2", ["Restaurants", "Mexican"]),
+        _business("history-coffee", ["Food", "Coffee & Tea"]),
+        _business(candidates[0], ["Restaurants", "Mexican"]),
+        _business(candidates[1], ["Food", "Coffee & Tea"]),
         *[
-            {
-                "business_id": business_id,
-                "categories": ["Shopping", "Books"],
-            }
+            _business(business_id, ["Shopping", "Books"])
             for business_id in candidates[2:]
         ],
     ]
@@ -49,6 +47,7 @@ def _write_category_fixture(root: Path) -> tuple[Path, Path, Path, list[str]]:
                 "user_id": "user-1",
                 "business_id": "history-mexican-1",
                 "stars": 5.0,
+                "text": "great mexican",
                 "date": pd.Timestamp("2020-01-01"),
             },
             {
@@ -56,6 +55,7 @@ def _write_category_fixture(root: Path) -> tuple[Path, Path, Path, list[str]]:
                 "user_id": "user-1",
                 "business_id": "history-mexican-2",
                 "stars": 3.0,
+                "text": "average mexican",
                 "date": pd.Timestamp("2020-01-02"),
             },
             {
@@ -63,6 +63,7 @@ def _write_category_fixture(root: Path) -> tuple[Path, Path, Path, list[str]]:
                 "user_id": "user-1",
                 "business_id": "history-coffee",
                 "stars": 4.0,
+                "text": "good coffee",
                 "date": pd.Timestamp("2020-01-03"),
             },
         ]
@@ -90,9 +91,7 @@ def test_builds_category_profile_and_candidate_scores_from_task_history(
         _write_category_fixture(tmp_path)
     )
     store = TemporalCategoryStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         broad_categories={"Restaurants", "Food", "Nightlife", "Shopping"},
     )
     task = RecommendationTask(
@@ -134,10 +133,10 @@ def test_test_profile_includes_the_validation_behavior(
             business_rows,
             pd.DataFrame(
                 [
-                    {
-                        "business_id": "validation-business",
-                        "categories": ["Restaurants", "Italian"],
-                    }
+                    _business(
+                        "validation-business",
+                        ["Restaurants", "Italian"],
+                    )
                 ]
             ),
         ],
@@ -154,6 +153,7 @@ def test_test_profile_includes_the_validation_behavior(
                         "user_id": "user-1",
                         "business_id": "validation-business",
                         "stars": 5.0,
+                        "text": "great italian",
                         "date": pd.Timestamp("2020-02-01"),
                     }
                 ]
@@ -185,9 +185,7 @@ def test_test_profile_includes_the_validation_behavior(
         index=False,
     )
     store = TemporalCategoryStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         broad_categories={"Restaurants", "Food", "Nightlife", "Shopping"},
     )
     validation_task = RecommendationTask(
@@ -233,9 +231,7 @@ def test_unreferenced_future_interaction_cannot_change_frozen_profile(
         }
     }
     before = TemporalCategoryStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         **kwargs,
     ).features_for(task)
     interaction_rows = pd.read_parquet(interactions)
@@ -246,6 +242,7 @@ def test_unreferenced_future_interaction_cannot_change_frozen_profile(
                 "user_id": "user-1",
                 "business_id": "history-coffee",
                 "stars": 1.0,
+                "text": "future",
                 "date": pd.Timestamp("2030-01-01"),
             }
         ]
@@ -256,9 +253,7 @@ def test_unreferenced_future_interaction_cannot_change_frozen_profile(
     )
 
     after = TemporalCategoryStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         **kwargs,
     ).features_for(task)
 

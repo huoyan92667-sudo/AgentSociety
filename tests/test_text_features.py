@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.text import (
     TemporalTextStore,
     fit_tfidf_model,
@@ -28,9 +29,7 @@ def test_scores_positive_and_negative_text_affinity_and_extracts_keywords(
         tfidf_test_config(),
     )
     store = TemporalTextStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         artifact,
         manifest,
     )

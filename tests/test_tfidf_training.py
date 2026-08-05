@@ -74,6 +74,17 @@ def write_text_fixture(
             for index, business_id in enumerate(candidates[2:], start=2)
         ],
     ]
+    for business in businesses:
+        business.update(
+            {
+                "address": "",
+                "city": "Philadelphia",
+                "state": "PA",
+                "postal_code": "",
+                "latitude": 39.95,
+                "longitude": -75.16,
+            }
+        )
     pd.DataFrame(businesses).to_parquet(businesses_path, index=False)
     pd.DataFrame(
         [

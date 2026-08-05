@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.text import TemporalTextStore, fit_tfidf_model
 from yelp_agent.models import RecommendationTask
 from yelp_agent.protocols import Ranker
@@ -26,9 +27,7 @@ def test_tfidf_ranker_orders_by_personal_text_affinity(
     )
     ranker = TfidfRanker(
         TemporalTextStore(
-            businesses,
-            interactions,
-            histories,
+            TemporalDataView(businesses, interactions, interactions),
             artifact,
             manifest,
         )

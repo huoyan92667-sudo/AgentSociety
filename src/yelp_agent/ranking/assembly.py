@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from yelp_agent.config import AppConfig
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.category import TemporalCategoryStore
 from yelp_agent.features.hybrid import HybridFeatureStore, HybridWeights
 from yelp_agent.features.location import TemporalLocationStore
@@ -35,6 +36,7 @@ class HybridSourcePaths:
 class HybridAssembly:
     """Shared feature stores and fingerprints before weights are attached."""
 
+    data_view: TemporalDataView
     feature_store: HybridFeatureStore
     quality_store: TemporalQualityStore
     location_store: TemporalLocationStore
@@ -75,27 +77,26 @@ def _assemble_feature_stores(
     sources: HybridSourcePaths,
     feature_sources_sha256: dict[str, str],
 ) -> HybridAssembly:
-    quality_store = TemporalQualityStore(
+    data_view = TemporalDataView(
+        sources.businesses,
         sources.reviews,
+        sources.interactions,
+    )
+    quality_store = TemporalQualityStore(
+        data_view,
         prior_count=config.hybrid.bayesian_prior_count,
     )
     location_store = TemporalLocationStore(
-        sources.businesses,
-        sources.interactions,
-        sources.histories,
+        data_view,
         scale_km=config.hybrid.location_scale_km,
     )
     feature_store = HybridFeatureStore(
         category_store=TemporalCategoryStore(
-            sources.businesses,
-            sources.interactions,
-            sources.histories,
+            data_view,
             broad_categories=set(config.data.broad_categories),
         ),
         text_store=TemporalTextStore(
-            sources.businesses,
-            sources.interactions,
-            sources.histories,
+            data_view,
             sources.tfidf_artifact,
             sources.tfidf_manifest,
         ),
@@ -103,6 +104,7 @@ def _assemble_feature_stores(
         location_store=location_store,
     )
     return HybridAssembly(
+        data_view=data_view,
         feature_store=feature_store,
         quality_store=quality_store,
         location_store=location_store,

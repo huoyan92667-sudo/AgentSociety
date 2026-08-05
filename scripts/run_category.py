@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Sequence
 
 from yelp_agent.config import load_config
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.category import TemporalCategoryStore
 from yelp_agent.rankers.category_ranker import CategoryRanker
 from yelp_agent.rankers.runner import run_ranker
@@ -25,16 +26,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/processed/businesses.parquet"),
     )
     parser.add_argument(
+        "--reviews",
+        type=Path,
+        default=Path("data/processed/reviews.parquet"),
+    )
+    parser.add_argument(
         "--interactions",
         type=Path,
         default=Path("data/processed/interactions.parquet"),
-    )
-    parser.add_argument(
-        "--histories",
-        type=Path,
-        default=Path(
-            "data/task_dataset/tasks/temporal_histories.parquet"
-        ),
     )
     parser.add_argument(
         "--output",
@@ -57,10 +56,13 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     config = load_config(args.config_dir)
-    category_store = TemporalCategoryStore(
+    data_view = TemporalDataView(
         args.businesses,
+        args.reviews,
         args.interactions,
-        args.histories,
+    )
+    category_store = TemporalCategoryStore(
+        data_view,
         broad_categories=set(config.data.broad_categories),
     )
     result = run_ranker(

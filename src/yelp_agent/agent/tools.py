@@ -2,18 +2,12 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
-from dataclasses import dataclass
 from datetime import datetime
-import json
-from pathlib import Path
 from typing import Any, Protocol
 
-import duckdb
-import pyarrow as pa
-import pyarrow.parquet as pq
 from pydantic import Field
 
+from yelp_agent.data.temporal_view import TemporalDataError, TemporalDataView
 from yelp_agent.features.quality import BusinessQuality
 from yelp_agent.models import (
     Prediction,
@@ -74,30 +68,6 @@ class HybridRankingResult(StrictModel):
     score_breakdowns: dict[str, ScoreBreakdown]
 
 
-@dataclass(frozen=True)
-class _StaticHistoryBusiness:
-    name: str
-    address: str
-    city: str
-    state: str
-    postal_code: str
-    latitude: float | None
-    longitude: float | None
-    categories: tuple[str, ...]
-    attributes: dict[str, Any]
-
-
-@dataclass(frozen=True)
-class _FrozenHistoryReview:
-    position: int
-    review_id: str
-    user_id: str
-    business_id: str
-    stars: int
-    text: str
-    date: datetime
-
-
 class _HybridRanker(Protocol):
     def score(self, task: RecommendationTask) -> HybridTaskScore: ...
 
@@ -117,190 +87,21 @@ class AgentToolbox:
 
     def __init__(
         self,
-        businesses_path: str | Path,
-        interactions_path: str | Path,
-        histories_path: str | Path,
+        data_view: TemporalDataView,
         *,
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
     ) -> None:
-        self._businesses = self._load_businesses(Path(businesses_path))
-        self._histories = self._load_histories(
-            Path(interactions_path),
-            Path(histories_path),
-        )
+        self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
-
-    @staticmethod
-    def _load_businesses(
-        path: Path,
-    ) -> dict[str, _StaticHistoryBusiness]:
-        if not path.is_file():
-            raise FileNotFoundError(f"Business Parquet does not exist: {path}")
-        try:
-            rows = pq.read_table(
-                path,
-                columns=[
-                    "business_id",
-                    "name",
-                    "address",
-                    "city",
-                    "state",
-                    "postal_code",
-                    "latitude",
-                    "longitude",
-                    "categories",
-                    "attributes_json",
-                ],
-            ).to_pylist()
-        except (OSError, pa.ArrowException) as exc:
-            raise AgentToolError(
-                f"Could not read Agent business data from {path}: {exc}"
-            ) from exc
-        businesses: dict[str, _StaticHistoryBusiness] = {}
-        for row in rows:
-            business_id = row.get("business_id")
-            name = row.get("name")
-            categories = row.get("categories")
-            attributes_json = row.get("attributes_json")
-            if (
-                not isinstance(business_id, str)
-                or not business_id
-                or business_id in businesses
-                or not isinstance(name, str)
-                or not name
-                or not isinstance(categories, list)
-                or not isinstance(attributes_json, str)
-            ):
-                raise AgentToolError("Agent business data contains an invalid row")
-            try:
-                attributes = json.loads(attributes_json)
-            except json.JSONDecodeError as exc:
-                raise AgentToolError(
-                    f"Business {business_id!r} has invalid attributes JSON"
-                ) from exc
-            if not isinstance(attributes, dict):
-                raise AgentToolError(
-                    f"Business {business_id!r} attributes must be an object"
-                )
-            businesses[business_id] = _StaticHistoryBusiness(
-                name=name,
-                address=str(row.get("address") or ""),
-                city=str(row.get("city") or ""),
-                state=str(row.get("state") or ""),
-                postal_code=str(row.get("postal_code") or ""),
-                latitude=(
-                    float(row["latitude"])
-                    if row.get("latitude") is not None
-                    else None
-                ),
-                longitude=(
-                    float(row["longitude"])
-                    if row.get("longitude") is not None
-                    else None
-                ),
-                categories=tuple(
-                    str(category).strip()
-                    for category in categories
-                    if str(category).strip()
-                ),
-                attributes=attributes,
-            )
-        if not businesses:
-            raise AgentToolError("Agent business data is empty")
-        return businesses
-
-    def _load_histories(
-        self,
-        interactions_path: Path,
-        histories_path: Path,
-    ) -> dict[str, tuple[_FrozenHistoryReview, ...]]:
-        for label, path in (
-            ("Interaction", interactions_path),
-            ("Temporal history", histories_path),
-        ):
-            if not path.is_file():
-                raise FileNotFoundError(f"{label} Parquet does not exist: {path}")
-        try:
-            with duckdb.connect() as connection:
-                rows = connection.execute(
-                    """
-                    SELECT
-                        history.task_id,
-                        history.position,
-                        interaction.review_id,
-                        interaction.user_id,
-                        interaction.business_id,
-                        interaction.stars,
-                        interaction.text,
-                        interaction.date
-                    FROM read_parquet(?) AS history
-                    JOIN read_parquet(?) AS interaction USING (review_id)
-                    ORDER BY history.task_id, history.position
-                    """,
-                    [str(histories_path), str(interactions_path)],
-                ).fetchall()
-                history_count = connection.execute(
-                    "SELECT count(*) FROM read_parquet(?)",
-                    [str(histories_path)],
-                ).fetchone()[0]
-        except duckdb.Error as exc:
-            raise AgentToolError(
-                f"Could not join frozen Agent histories: {exc}"
-            ) from exc
-        if len(rows) != history_count:
-            raise AgentToolError(
-                "A frozen Agent history review is missing from interactions"
-            )
-
-        grouped: defaultdict[str, list[_FrozenHistoryReview]] = defaultdict(list)
-        for (
-            task_id,
-            position,
-            review_id,
-            user_id,
-            business_id,
-            stars,
-            text,
-            date,
-        ) in rows:
-            rating = float(stars)
-            if (
-                not task_id
-                or not review_id
-                or not user_id
-                or not business_id
-                or str(business_id) not in self._businesses
-                or not rating.is_integer()
-                or not 1 <= rating <= 5
-                or not isinstance(text, str)
-                or not isinstance(date, datetime)
-            ):
-                raise AgentToolError("Frozen Agent history contains an invalid row")
-            grouped[str(task_id)].append(
-                _FrozenHistoryReview(
-                    position=int(position),
-                    review_id=str(review_id),
-                    user_id=str(user_id),
-                    business_id=str(business_id),
-                    stars=int(rating),
-                    text=text,
-                    date=date,
-                )
-            )
-        return {
-            task_id: tuple(history)
-            for task_id, history in grouped.items()
-        }
 
     def for_task(self, task: RecommendationTask) -> "TaskAgentTools":
         """Create an isolated tool session authorized for exactly one task."""
 
         return TaskAgentTools(
             task,
-            businesses=self._businesses,
-            histories=self._histories,
+            data_view=self._data_view,
             hybrid_ranker=self._hybrid_ranker,
             quality_store=self._quality_store,
         )
@@ -313,14 +114,12 @@ class TaskAgentTools:
         self,
         task: RecommendationTask,
         *,
-        businesses: dict[str, _StaticHistoryBusiness],
-        histories: dict[str, tuple[_FrozenHistoryReview, ...]],
+        data_view: TemporalDataView,
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
     ) -> None:
         self._task = task
-        self._businesses = businesses
-        self._histories = histories
+        self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
         self._call_count = 0
@@ -351,25 +150,24 @@ class TaskAgentTools:
         self._validate_identity(user_id, cutoff_time)
         if not 1 <= limit <= 30:
             raise AgentToolError("history limit must be between 1 and 30")
-        history = self._histories.get(self._task.task_id)
+        history = self._data_view.user_history(user_id, cutoff_time)
         if not history:
             raise AgentToolError(
                 f"No frozen history exists for task {self._task.task_id!r}"
             )
         reviews: list[HistoryReview] = []
         for item in reversed(history[-limit:]):
-            if item.user_id != self._task.user_id:
-                raise AgentToolError("Frozen history user does not match bound task")
-            if item.date >= self._task.cutoff_time:
-                raise AgentToolError("Frozen history is not strictly before cutoff")
-            business = self._businesses[item.business_id]
+            try:
+                business = self._data_view.business(item.business_id)
+            except TemporalDataError as exc:
+                raise AgentToolError(str(exc)) from exc
             reviews.append(
                 HistoryReview(
                     review_id=item.review_id,
                     business_id=item.business_id,
                     business_name=business.name,
                     categories=list(business.categories),
-                    stars=item.stars,
+                    stars=int(item.stars),
                     text=item.text,
                     date=item.date,
                 )
@@ -411,12 +209,14 @@ class TaskAgentTools:
         )
         details: list[BusinessDetails] = []
         for business_id in business_ids:
-            business = self._businesses.get(business_id)
+            try:
+                business = self._data_view.business(business_id)
+            except TemporalDataError as exc:
+                raise AgentToolError(str(exc)) from exc
             breakdown = scored.score_breakdowns.get(business_id)
             point_in_time_quality = quality.get(business_id)
             if (
-                business is None
-                or breakdown is None
+                breakdown is None
                 or point_in_time_quality is None
             ):
                 raise AgentToolError(
@@ -433,7 +233,7 @@ class TaskAgentTools:
                     latitude=business.latitude,
                     longitude=business.longitude,
                     categories=list(business.categories),
-                    attributes=business.attributes,
+                    attributes=business.attributes_dict(),
                     quality=point_in_time_quality,
                     score_breakdown=breakdown,
                 )

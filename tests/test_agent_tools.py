@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from yelp_agent.agent.tools import AgentToolError, AgentToolbox
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.quality import BusinessQuality
 from yelp_agent.models import (
     Prediction,
@@ -175,9 +176,7 @@ def test_history_tool_returns_only_frozen_history_and_representative_reviews(
         tmp_path
     )
     session = AgentToolbox(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         hybrid_ranker=UnusedRanker(),
         quality_store=UnusedQualityStore(),
     ).for_task(task)
@@ -206,9 +205,7 @@ def test_business_details_are_point_in_time_and_restricted_to_candidates(
         tmp_path
     )
     session = AgentToolbox(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         hybrid_ranker=FixedRanker(),
         quality_store=FixedQualityStore(),
     ).for_task(task)
@@ -243,9 +240,7 @@ def test_profile_tool_returns_bound_task_profile_and_rejects_another_user(
         tmp_path
     )
     session = AgentToolbox(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         hybrid_ranker=FixedRanker(),
         quality_store=FixedQualityStore(),
     ).for_task(task)
@@ -268,9 +263,7 @@ def test_hybrid_ranking_tool_requires_the_complete_bound_candidate_set(
         tmp_path
     )
     session = AgentToolbox(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         hybrid_ranker=FixedRanker(),
         quality_store=FixedQualityStore(),
     ).for_task(task)

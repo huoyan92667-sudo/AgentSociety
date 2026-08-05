@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Sequence
 
 from yelp_agent.config import load_config
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.text import TemporalTextStore, fit_tfidf_model
 from yelp_agent.rankers.runner import run_ranker
 from yelp_agent.rankers.tfidf_ranker import TfidfRanker
@@ -23,6 +24,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--businesses",
         type=Path,
         default=Path("data/processed/businesses.parquet"),
+    )
+    parser.add_argument(
+        "--reviews",
+        type=Path,
+        default=Path("data/processed/reviews.parquet"),
     )
     parser.add_argument(
         "--interactions",
@@ -81,10 +87,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         config.tfidf,
         force=args.force_fit,
     )
-    text_store = TemporalTextStore(
+    data_view = TemporalDataView(
         args.businesses,
+        args.reviews,
         args.interactions,
-        args.histories,
+    )
+    text_store = TemporalTextStore(
+        data_view,
         args.artifact,
         args.manifest,
     )

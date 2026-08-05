@@ -442,9 +442,7 @@ def run_synthetic_pipeline(
     hybrid_prediction = _load_prediction(hybrid_predictions)
 
     toolbox = AgentToolbox(
-        businesses_parquet,
-        interactions_parquet,
-        histories,
+        runtime.assembly.data_view,
         hybrid_ranker=hybrid_ranker,
         quality_store=runtime.assembly.quality_store,
     )

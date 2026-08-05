@@ -4,8 +4,28 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.location import TemporalLocationStore
 from yelp_agent.models import RecommendationTask
+
+
+def _business(
+    business_id: str,
+    latitude: float | None,
+    longitude: float | None,
+) -> dict[str, object]:
+    return {
+        "business_id": business_id,
+        "name": business_id,
+        "address": "",
+        "city": "Philadelphia",
+        "state": "PA",
+        "postal_code": "",
+        "latitude": latitude,
+        "longitude": longitude,
+        "categories": ["Restaurants"],
+        "attributes_json": "{}",
+    }
 
 
 def _write_location_fixture(
@@ -23,27 +43,15 @@ def _write_location_fixture(
     center_latitude, center_longitude = history_coordinates
     pd.DataFrame(
         [
-            {
-                "business_id": "history-business",
-                "latitude": center_latitude,
-                "longitude": center_longitude,
-            },
-            {
-                "business_id": candidates[0],
-                "latitude": 39.9526,
-                "longitude": -75.1652,
-            },
-            {
-                "business_id": candidates[1],
-                "latitude": 39.9526 + 0.089932,
-                "longitude": -75.1652,
-            },
+            _business(
+                "history-business",
+                center_latitude,
+                center_longitude,
+            ),
+            _business(candidates[0], 39.9526, -75.1652),
+            _business(candidates[1], 39.9526 + 0.089932, -75.1652),
             *[
-                {
-                    "business_id": business_id,
-                    "latitude": 39.9526,
-                    "longitude": -75.1652,
-                }
+                _business(business_id, 39.9526, -75.1652)
                 for business_id in candidates[2:]
             ],
         ]
@@ -54,6 +62,8 @@ def _write_location_fixture(
                 "review_id": "history-review",
                 "user_id": "user-1",
                 "business_id": "history-business",
+                "stars": 5.0,
+                "text": "history",
                 "date": pd.Timestamp("2020-01-01"),
             }
         ]
@@ -77,9 +87,7 @@ def test_scores_candidate_distance_from_dynamic_history_center(
         _write_location_fixture(tmp_path)
     )
     store = TemporalLocationStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
         scale_km=10.0,
     )
     task = RecommendationTask(
@@ -127,9 +135,7 @@ def test_missing_history_or_candidate_coordinates_return_neutral_score(
         candidate_business_ids=candidates,
     )
     missing_history_features = TemporalLocationStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
     ).features_for(task)
 
     assert missing_history_features.location_center is None
@@ -152,9 +158,7 @@ def test_missing_history_or_candidate_coordinates_return_neutral_score(
     ] = None
     business_rows.to_parquet(businesses, index=False)
     candidate_features = TemporalLocationStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
     ).features_for(task)
 
     missing_candidate = candidate_features.business_scores[candidates[0]]
@@ -175,11 +179,11 @@ def test_test_center_adds_validation_behavior_without_changing_old_center(
             business_rows,
             pd.DataFrame(
                 [
-                    {
-                        "business_id": "validation-business",
-                        "latitude": 40.0526,
-                        "longitude": -75.1652,
-                    }
+                    _business(
+                        "validation-business",
+                        40.0526,
+                        -75.1652,
+                    )
                 ]
             ),
         ],
@@ -195,6 +199,8 @@ def test_test_center_adds_validation_behavior_without_changing_old_center(
                         "review_id": "validation-review",
                         "user_id": "user-1",
                         "business_id": "validation-business",
+                        "stars": 5.0,
+                        "text": "validation",
                         "date": pd.Timestamp("2020-02-01"),
                     }
                 ]
@@ -224,9 +230,7 @@ def test_test_center_adds_validation_behavior_without_changing_old_center(
         ignore_index=True,
     ).to_parquet(histories, index=False)
     store = TemporalLocationStore(
-        businesses,
-        interactions,
-        histories,
+        TemporalDataView(businesses, interactions, interactions),
     )
     validation_task = RecommendationTask(
         task_id="validation:user-1",
