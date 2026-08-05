@@ -1,0 +1,7 @@
+minimum_history_count: 8
+maximum_tasks_per_user: 6
+minimum_target_gap: 2
+minimum_sample_weight: 0.5
+maximum_sample_weight: 1.0
+selection_strategy: evenly_spaced_include_latest
+weighting_strategy: linear_by_lifecycle_position

@@ -19,6 +19,7 @@ API Key 不属于实验超参数，禁止写入 YAML、预测、trace、配置�
 - `tfidf.yaml`：TF-IDF 词表和用户关键词参数。
 - `hybrid.yaml`：Hybrid V1 四项权重、时点质量和位置参数、validation 调权步长。
 - `agent.yaml`：是否允许 LLM、温度、单次超时和重试次数。Top-8 等固定协议不在这里伪装成可调参数。
+- `training.yaml`：rolling temporal training 的最少历史、每用户任务上限、目标间隔和时间权重规则。
 - `evaluation_data_usage.yaml`：只用 validation 开发、Legacy Test 仅作历史比较，以及交叉验证和 bootstrap 规则。
 
 所有 YAML 都通过 `src/yelp_agent/config.py` 的 Pydantic 模型加载。未知字段会直接报错，避免拼写错误被静默忽略；跨字段规则也会在运行开始前验证。
@@ -33,13 +34,15 @@ resolved_config.json
 
 它包含：
 
-- 展开并校验后的完整 YAML 配置；
+- 该类推荐运行实际使用的共享 `AppConfig`；
 - 基于有效配置值计算的 SHA-256 指纹；
 - 快照格式版本。
 
 指纹不受 YAML 缩进、字段顺序或配置目录位置影响。已有预测与当前配置指纹不一致时，运行会拒绝静默复用，必须显式使用 `--force` 重建。
 
 配置快照不读取也不保存任何 LLM 环境变量，因此不会包含 API Key。
+
+只属于某个数据阶段的设置使用该阶段自己的 manifest，避免修改无关配置后让旧实验失效。例如 `training.yaml` 会被展开记录在 `rolling_train_manifest.json`，不会进入 baseline、Hybrid 或 Agent 的 `resolved_config.json`。
 
 ## 本步骤有意不做的事情
 

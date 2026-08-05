@@ -160,6 +160,24 @@ class TfidfConfig(ConfigModel):
         return (self.ngram_min, self.ngram_max)
 
 
+class RollingTrainingConfig(ConfigModel):
+    minimum_history_count: int = Field(ge=1)
+    maximum_tasks_per_user: int = Field(ge=1, le=8)
+    minimum_target_gap: int = Field(ge=1)
+    minimum_sample_weight: float = Field(gt=0, le=1)
+    maximum_sample_weight: Literal[1.0]
+    selection_strategy: Literal["evenly_spaced_include_latest"]
+    weighting_strategy: Literal["linear_by_lifecycle_position"]
+
+    @model_validator(mode="after")
+    def validate_weight_range(self) -> "RollingTrainingConfig":
+        if self.minimum_sample_weight > self.maximum_sample_weight:
+            raise ValueError(
+                "minimum_sample_weight cannot exceed maximum_sample_weight"
+            )
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -274,6 +292,17 @@ def load_config(config_dir: str | Path = "configs") -> AppConfig:
         evaluation_data_usage=EvaluationDataUsageConfig.model_validate(
             _read_yaml(root / "evaluation_data_usage.yaml")
         ),
+    )
+
+
+def load_rolling_training_config(
+    config_dir: str | Path = "configs",
+) -> RollingTrainingConfig:
+    """Load settings used only when constructing rolling train examples."""
+
+    root = Path(config_dir)
+    return RollingTrainingConfig.model_validate(
+        _read_yaml(root / "training.yaml")
     )
 
 

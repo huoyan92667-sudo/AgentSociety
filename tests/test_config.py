@@ -10,6 +10,7 @@ from yelp_agent.config import (
     configuration_fingerprint,
     load_config,
     load_llm_environment,
+    load_rolling_training_config,
 )
 
 
@@ -37,6 +38,13 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert config.evaluation_data_usage.legacy_test.name == "Legacy Test V0"
     assert config.evaluation_data_usage.strict_blind_holdout is False
     assert config.evaluation_data_usage.cross_validation.folds == 5
+
+    training = load_rolling_training_config(PROJECT_CONFIG_DIR)
+    assert training.minimum_history_count == 8
+    assert training.maximum_tasks_per_user == 6
+    assert training.minimum_target_gap == 2
+    assert training.minimum_sample_weight == 0.5
+    assert training.maximum_sample_weight == 1.0
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
@@ -242,6 +250,21 @@ def test_configuration_fingerprint_changes_with_effective_value() -> None:
     )
 
     assert configuration_fingerprint(config) != configuration_fingerprint(changed)
+
+
+def test_rolling_training_weight_range_is_validated(tmp_path: Path) -> None:
+    config_dir = tmp_path / "configs"
+    shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
+    training_path = config_dir / "training.yaml"
+    training = yaml.safe_load(training_path.read_text(encoding="utf-8"))
+    training["minimum_sample_weight"] = 1.1
+    training_path.write_text(
+        yaml.safe_dump(training, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="less than or equal to 1"):
+        load_rolling_training_config(config_dir)
 
 
 @pytest.mark.parametrize(
