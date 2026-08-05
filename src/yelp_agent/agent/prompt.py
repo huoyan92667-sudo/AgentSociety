@@ -5,17 +5,18 @@ from __future__ import annotations
 import json
 
 from yelp_agent.agent.llm import LLMMessage
+from yelp_agent.agent.parser import TOP_K_TO_RERANK
 from yelp_agent.agent.tools import (
     BusinessDetails,
     BusinessDetailsResult,
     HistoryReview,
     HybridRankingResult,
+    REPRESENTATIVE_REVIEWS_PER_SENTIMENT,
     UserHistoryResult,
 )
 from yelp_agent.models import RecommendationTask, UserProfile
 
 
-TOP_K_TO_RERANK = 8
 MAX_REVIEW_TEXT_CHARS = 500
 
 SYSTEM_PROMPT = """You rerank exactly eight Yelp business candidates for one user.
@@ -104,7 +105,7 @@ def _validate_inputs(
         ("positive", history.recent_positive, lambda stars: stars >= 4),
         ("negative", history.recent_negative, lambda stars: stars <= 2),
     ):
-        if len(reviews) > 4:
+        if len(reviews) > REPRESENTATIVE_REVIEWS_PER_SENTIMENT:
             raise AgentPromptError(
                 f"Representative history has more than four {label} reviews"
             )
@@ -180,11 +181,15 @@ def build_rerank_prompt(
         "representative_history": {
             "negative": [
                 _review_payload(review)
-                for review in history.recent_negative[:4]
+                for review in history.recent_negative[
+                    :REPRESENTATIVE_REVIEWS_PER_SENTIMENT
+                ]
             ],
             "positive": [
                 _review_payload(review)
-                for review in history.recent_positive[:4]
+                for review in history.recent_positive[
+                    :REPRESENTATIVE_REVIEWS_PER_SENTIMENT
+                ]
             ],
         },
         "user_profile": profile.model_dump(mode="json"),

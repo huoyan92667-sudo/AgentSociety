@@ -9,14 +9,18 @@ from typing import Literal, Protocol
 
 from pydantic import Field
 
+from yelp_agent.config import AppConfig, configuration_fingerprint
 from yelp_agent.evaluation.agent_runtime import (
     summarize_agent_trace_file,
     write_agent_runtime_metrics,
 )
 from yelp_agent.experiments import (
+    ConfigurationArtifactError,
     TaskFileError,
     read_recommendation_tasks,
+    require_matching_configuration,
     write_json_artifact,
+    write_resolved_configuration,
 )
 from yelp_agent.models import Prediction, RecommendationTask, StrictModel
 from yelp_agent.rankers.agent_ranker import AgentTrace
@@ -48,6 +52,11 @@ class AgentRunResult(StrictModel):
     traces_path: str
     failures_path: str
     runtime_metrics_path: str
+    resolved_config_path: str | None = None
+    config_fingerprint: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
     task_count: int = Field(gt=0)
     failure_count: int = Field(ge=0)
 
@@ -164,6 +173,7 @@ def run_agent_ranker(
     *,
     force: bool = False,
     limit: int | None = None,
+    configuration: AppConfig | None = None,
 ) -> AgentRunResult:
     """Run Agent tasks and publish consistent JSONL plus runtime metrics."""
 
@@ -178,6 +188,7 @@ def run_agent_ranker(
         "traces": resolved_output / "traces.jsonl",
         "failures": resolved_output / "failures.jsonl",
         "runtime_metrics": resolved_output / "runtime_metrics.json",
+        "resolved_config": resolved_output / "resolved_config.json",
     }
     jsonl_names = ("predictions", "traces", "failures")
     existing = [paths[name] for name in jsonl_names if paths[name].exists()]
@@ -187,6 +198,14 @@ def run_agent_ranker(
                 "Agent output is incomplete; use force=True to rebuild"
             )
         failure_count = _validate_existing(tasks, paths)
+        if configuration is not None:
+            try:
+                require_matching_configuration(
+                    paths["resolved_config"],
+                    configuration,
+                )
+            except ConfigurationArtifactError as exc:
+                raise AgentRunError(str(exc)) from exc
         runtime_metrics = summarize_agent_trace_file(paths["traces"])
         write_agent_runtime_metrics(
             runtime_metrics,
@@ -200,11 +219,30 @@ def run_agent_ranker(
             traces_path=str(paths["traces"]),
             failures_path=str(paths["failures"]),
             runtime_metrics_path=str(paths["runtime_metrics"]),
+            resolved_config_path=(
+                str(paths["resolved_config"])
+                if configuration is not None
+                else None
+            ),
+            config_fingerprint=(
+                configuration_fingerprint(configuration)
+                if configuration is not None
+                else None
+            ),
             task_count=len(tasks),
             failure_count=failure_count,
         )
 
     resolved_output.mkdir(parents=True, exist_ok=True)
+    if configuration is not None:
+        try:
+            write_resolved_configuration(
+                paths["resolved_config"],
+                configuration,
+                force=force,
+            )
+        except ConfigurationArtifactError as exc:
+            raise AgentRunError(str(exc)) from exc
     partials = {
         name: path.with_name(path.name + ".partial")
         for name, path in paths.items()
@@ -263,6 +301,16 @@ def run_agent_ranker(
         traces_path=str(paths["traces"]),
         failures_path=str(paths["failures"]),
         runtime_metrics_path=str(paths["runtime_metrics"]),
+        resolved_config_path=(
+            str(paths["resolved_config"])
+            if configuration is not None
+            else None
+        ),
+        config_fingerprint=(
+            configuration_fingerprint(configuration)
+            if configuration is not None
+            else None
+        ),
         task_count=len(tasks),
         failure_count=failure_count,
     )

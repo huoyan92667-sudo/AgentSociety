@@ -70,6 +70,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         CategoryRanker(category_store),
         args.output,
         force=args.force,
+        configuration=config,
     )
     print(result.model_dump_json(indent=2))
     return 0

@@ -6,11 +6,11 @@ import json
 
 from pydantic import Field, ValidationError, field_validator
 
-from yelp_agent.models import StrictModel
+from yelp_agent.models import RECOMMENDATION_CANDIDATE_COUNT, StrictModel
 
 
 TOP_K_TO_RERANK = 8
-FINAL_RANKING_COUNT = 20
+FINAL_RANKING_COUNT = RECOMMENDATION_CANDIDATE_COUNT
 
 
 class AgentResponseError(RuntimeError):
@@ -92,7 +92,10 @@ def merge_reranked_top_k(
             for business_id in hybrid_ranking
         )
     ):
-        raise ValueError("hybrid_ranking must contain 20 unique valid IDs")
+        raise ValueError(
+            "hybrid_ranking must contain "
+            f"{FINAL_RANKING_COUNT} unique valid IDs"
+        )
     expected_top = hybrid_ranking[:TOP_K_TO_RERANK]
     if len(parsed.ranking) != TOP_K_TO_RERANK or set(parsed.ranking) != set(
         expected_top

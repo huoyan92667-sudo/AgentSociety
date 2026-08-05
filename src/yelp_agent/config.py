@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 import os
 from collections.abc import Mapping
@@ -11,6 +13,8 @@ from typing import Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
 
+from yelp_agent.models import RECOMMENDATION_CANDIDATE_COUNT
+
 
 class ConfigModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -18,34 +22,80 @@ class ConfigModel(BaseModel):
 
 class DataConfig(ConfigModel):
     random_seed: int
-    city: str
-    min_business_reviews: int
-    min_user_reviews: int
-    min_distinct_businesses: int
-    min_distinct_ratings: int
-    max_users: int
+    city: str = Field(min_length=1)
+    min_business_reviews: int = Field(ge=0)
+    min_user_reviews: int = Field(ge=1)
+    min_distinct_businesses: int = Field(ge=1)
+    min_distinct_ratings: int = Field(ge=1, le=5)
+    max_users: int = Field(ge=1)
     candidate_count: int
-    hard_negative_same_category: int
-    hard_negative_related_category: int
-    preference_negative_count: int
-    random_negative_count: int
-    review_chunk_size: int
+    hard_negative_same_category: int = Field(ge=0)
+    hard_negative_related_category: int = Field(ge=0)
+    preference_negative_count: int = Field(ge=0)
+    random_negative_count: int = Field(ge=0)
+    review_chunk_size: int = Field(ge=1)
     allowed_categories: list[str]
     broad_categories: list[str]
     category_groups: dict[str, list[str]]
 
     @model_validator(mode="after")
     def validate_candidate_layout(self) -> "DataConfig":
-        if self.candidate_count != 20:
-            raise ValueError("candidate_count must be exactly 20 for the MVP")
+        if self.candidate_count != RECOMMENDATION_CANDIDATE_COUNT:
+            raise ValueError(
+                "candidate_count must be exactly "
+                f"{RECOMMENDATION_CANDIDATE_COUNT} for the MVP"
+            )
         negative_count = (
             self.hard_negative_same_category
             + self.hard_negative_related_category
             + self.preference_negative_count
             + self.random_negative_count
         )
-        if negative_count != 19:
-            raise ValueError("negative candidate buckets must sum to 19")
+        required_negatives = RECOMMENDATION_CANDIDATE_COUNT - 1
+        if negative_count != required_negatives:
+            raise ValueError(
+                "negative candidate buckets must sum to "
+                f"{required_negatives}"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def validate_category_taxonomy(self) -> "DataConfig":
+        def validate_names(values: list[str], *, label: str) -> None:
+            if not values:
+                raise ValueError(f"{label} cannot be empty")
+            if any(not value or value != value.strip() for value in values):
+                raise ValueError(f"{label} contain an invalid name")
+            if len(set(values)) != len(values):
+                raise ValueError(f"{label} must be unique")
+
+        if self.city != self.city.strip():
+            raise ValueError("city cannot contain surrounding whitespace")
+        validate_names(self.allowed_categories, label="allowed_categories")
+        validate_names(self.broad_categories, label="broad_categories")
+        allowed = set(self.allowed_categories)
+        if not set(self.broad_categories).issubset(allowed):
+            raise ValueError("broad_categories must be allowed categories")
+
+        required_groups = {
+            "dining",
+            "nightlife",
+            "retail",
+            "personal_care",
+            "entertainment",
+        }
+        if set(self.category_groups) != required_groups:
+            raise ValueError(
+                "category_groups must define dining, nightlife, retail, "
+                "personal_care, and entertainment"
+            )
+        for group, categories in self.category_groups.items():
+            validate_names(categories, label=f"category_groups.{group}")
+            if not set(categories).issubset(allowed):
+                raise ValueError(
+                    f"category_groups.{group} contains a category outside "
+                    "allowed_categories"
+                )
         return self
 
 
@@ -54,9 +104,9 @@ class HybridConfig(ConfigModel):
     text_weight: float
     quality_weight: float
     location_weight: float
-    location_scale_km: float
-    bayesian_prior_count: int
-    tuning_step: float
+    location_scale_km: float = Field(gt=0)
+    bayesian_prior_count: int = Field(gt=0)
+    tuning_step: float = Field(gt=0, le=1)
 
     @model_validator(mode="after")
     def validate_weight_sum(self) -> "HybridConfig":
@@ -64,6 +114,13 @@ class HybridConfig(ConfigModel):
             raise ValueError("hybrid weights cannot be negative")
         if not math.isclose(sum(self.weights.values()), 1.0, abs_tol=1e-9):
             raise ValueError("hybrid weights must sum to 1")
+        tuning_units = round(1.0 / self.tuning_step)
+        if not math.isclose(
+            tuning_units * self.tuning_step,
+            1.0,
+            abs_tol=1e-9,
+        ):
+            raise ValueError("tuning_step must divide 1.0 exactly")
         return self
 
     @property
@@ -78,16 +135,13 @@ class HybridConfig(ConfigModel):
 
 class AgentConfig(ConfigModel):
     enabled: bool
-    top_k_to_rerank: int = Field(ge=2, le=20)
-    history_limit: int
-    representative_review_count: int
-    temperature: float
+    temperature: Literal[0.0]
     timeout_seconds: float = Field(gt=0)
-    max_retries: int
+    max_retries: int = Field(ge=0, le=2)
 
 
 class TfidfConfig(ConfigModel):
-    stop_words: str
+    stop_words: Literal["english"]
     ngram_min: int = Field(ge=1)
     ngram_max: int = Field(ge=1)
     min_df: int = Field(ge=1)
@@ -175,6 +229,21 @@ class AppConfig(ConfigModel):
     evaluation_data_usage: EvaluationDataUsageConfig
 
 
+class ResolvedConfiguration(ConfigModel):
+    """Serializable, self-validating snapshot of effective YAML settings."""
+
+    format_version: Literal[1] = 1
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    configuration: AppConfig
+
+    @model_validator(mode="after")
+    def validate_fingerprint(self) -> "ResolvedConfiguration":
+        expected = configuration_fingerprint(self.configuration)
+        if self.fingerprint != expected:
+            raise ValueError("configuration fingerprint does not match values")
+        return self
+
+
 class LLMEnvironment(ConfigModel):
     api_key: SecretStr | None = None
     base_url: str | None = None
@@ -205,6 +274,42 @@ def load_config(config_dir: str | Path = "configs") -> AppConfig:
         evaluation_data_usage=EvaluationDataUsageConfig.model_validate(
             _read_yaml(root / "evaluation_data_usage.yaml")
         ),
+    )
+
+
+def configuration_fingerprint(config: AppConfig) -> str:
+    """Hash effective values, independent of YAML formatting and file paths."""
+
+    canonical = json.dumps(
+        config.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def build_resolved_configuration(config: AppConfig) -> ResolvedConfiguration:
+    """Build the public, secret-free configuration recorded with a run."""
+
+    return ResolvedConfiguration(
+        fingerprint=configuration_fingerprint(config),
+        configuration=config,
+    )
+
+
+def load_resolved_configuration(
+    path: str | Path,
+) -> ResolvedConfiguration:
+    """Read and validate a previously recorded configuration snapshot."""
+
+    resolved = Path(path)
+    if not resolved.is_file():
+        raise FileNotFoundError(
+            f"resolved configuration does not exist: {resolved}"
+        )
+    return ResolvedConfiguration.model_validate_json(
+        resolved.read_text(encoding="utf-8")
     )
 
 

@@ -90,15 +90,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.limit is not None and args.output_dir == DEFAULT_OUTPUT_DIR:
         raise SystemExit("--limit requires an explicit --output-dir")
     config = load_config(args.config_dir)
-    if (
-        config.agent.top_k_to_rerank != 8
-        or config.agent.history_limit != 30
-        or config.agent.representative_review_count != 8
-    ):
-        raise ValueError(
-            "MVP Agent requires top_k=8, history_limit=30, "
-            "and representative_review_count=8"
-        )
     runtime = build_frozen_hybrid_runtime(
         config,
         HybridSourcePaths(
@@ -128,6 +119,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.output_dir,
         force=args.force,
         limit=args.limit,
+        configuration=config,
     )
     print(result.model_dump_json(indent=2))
     return 0

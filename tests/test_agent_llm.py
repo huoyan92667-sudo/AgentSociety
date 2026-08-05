@@ -15,9 +15,6 @@ from yelp_agent.config import AgentConfig
 def _agent_config() -> AgentConfig:
     return AgentConfig(
         enabled=True,
-        top_k_to_rerank=8,
-        history_limit=30,
-        representative_review_count=8,
         temperature=0,
         timeout_seconds=30,
         max_retries=2,

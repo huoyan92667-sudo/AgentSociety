@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 UnitScore = Annotated[float, Field(ge=0, le=1)]
 NonNegativeCount = Annotated[int, Field(ge=0)]
+RECOMMENDATION_CANDIDATE_COUNT = 20
 
 
 def _validate_business_id_permutation(
@@ -17,8 +18,11 @@ def _validate_business_id_permutation(
     *,
     field_name: str,
 ) -> list[str]:
-    if len(values) != 20:
-        raise ValueError(f"{field_name} must contain exactly 20 businesses")
+    if len(values) != RECOMMENDATION_CANDIDATE_COUNT:
+        raise ValueError(
+            f"{field_name} must contain exactly "
+            f"{RECOMMENDATION_CANDIDATE_COUNT} businesses"
+        )
     if any(not value or value != value.strip() for value in values):
         raise ValueError(
             f"{field_name} IDs must be nonempty and contain no surrounding whitespace"

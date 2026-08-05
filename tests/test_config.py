@@ -5,7 +5,12 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from yelp_agent.config import load_config, load_llm_environment
+from yelp_agent.config import (
+    build_resolved_configuration,
+    configuration_fingerprint,
+    load_config,
+    load_llm_environment,
+)
 
 
 PROJECT_CONFIG_DIR = Path(__file__).parents[1] / "configs"
@@ -23,7 +28,7 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
         "quality": 0.2,
         "location": 0.1,
     }
-    assert config.agent.top_k_to_rerank == 8
+    assert config.agent.timeout_seconds == 90
     assert config.tfidf.ngram_range == (1, 2)
     assert config.tfidf.min_df == 2
     assert config.tfidf.max_features == 50_000
@@ -114,18 +119,18 @@ def test_unknown_yaml_field_is_rejected_as_a_probable_typo(tmp_path: Path) -> No
         load_config(config_dir)
 
 
-def test_agent_top_k_cannot_exceed_candidate_count(tmp_path: Path) -> None:
+def test_fixed_agent_protocol_is_not_a_fake_yaml_knob(tmp_path: Path) -> None:
     config_dir = tmp_path / "configs"
     shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
     agent_path = config_dir / "agent.yaml"
     agent = yaml.safe_load(agent_path.read_text(encoding="utf-8"))
-    agent["top_k_to_rerank"] = 21
+    agent["top_k_to_rerank"] = 8
     agent_path.write_text(
         yaml.safe_dump(agent, sort_keys=False),
         encoding="utf-8",
     )
 
-    with pytest.raises(ValidationError, match="less than or equal to 20"):
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         load_config(config_dir)
 
 
@@ -141,6 +146,38 @@ def test_agent_timeout_must_be_positive(tmp_path: Path) -> None:
     )
 
     with pytest.raises(ValidationError, match="greater than 0"):
+        load_config(config_dir)
+
+
+def test_hybrid_tuning_step_must_divide_one_exactly(tmp_path: Path) -> None:
+    config_dir = tmp_path / "configs"
+    shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
+    hybrid_path = config_dir / "hybrid.yaml"
+    hybrid = yaml.safe_load(hybrid_path.read_text(encoding="utf-8"))
+    hybrid["tuning_step"] = 0.3
+    hybrid_path.write_text(
+        yaml.safe_dump(hybrid, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="must divide 1.0 exactly"):
+        load_config(config_dir)
+
+
+def test_category_groups_must_keep_the_five_benchmark_groups(
+    tmp_path: Path,
+) -> None:
+    config_dir = tmp_path / "configs"
+    shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
+    data_path = config_dir / "data.yaml"
+    data = yaml.safe_load(data_path.read_text(encoding="utf-8"))
+    data["category_groups"].pop("entertainment")
+    data_path.write_text(
+        yaml.safe_dump(data, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="category_groups must define"):
         load_config(config_dir)
 
 
@@ -177,6 +214,34 @@ def test_llm_environment_keeps_api_key_secret() -> None:
     assert settings.model == "example-model"
     assert "top-secret-value" not in repr(settings)
     assert "top-secret-value" not in settings.model_dump_json()
+
+
+def test_resolved_configuration_is_stable_and_contains_no_environment_secret(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "must-not-enter-resolved-config")
+    config = load_config(PROJECT_CONFIG_DIR)
+
+    first = build_resolved_configuration(config)
+    second = build_resolved_configuration(config.model_copy(deep=True))
+
+    assert first == second
+    assert first.fingerprint == configuration_fingerprint(config)
+    assert len(first.fingerprint) == 64
+    assert "must-not-enter-resolved-config" not in first.model_dump_json()
+
+
+def test_configuration_fingerprint_changes_with_effective_value() -> None:
+    config = load_config(PROJECT_CONFIG_DIR)
+    changed = config.model_copy(
+        update={
+            "agent": config.agent.model_copy(
+                update={"timeout_seconds": 89},
+            )
+        }
+    )
+
+    assert configuration_fingerprint(config) != configuration_fingerprint(changed)
 
 
 @pytest.mark.parametrize(

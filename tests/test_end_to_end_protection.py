@@ -35,6 +35,8 @@ def test_same_input_repeats_frozen_artifacts_byte_for_byte(tmp_path) -> None:
         "features/tfidf_manifest.json",
         "features/tfidf_vectorizer.joblib",
         "hybrid/weights.json",
+        "hybrid/resolved_config.json",
+        "agent/resolved_config.json",
     )
     for relative_path in stable_artifacts:
         assert (first.root / relative_path).read_bytes() == (

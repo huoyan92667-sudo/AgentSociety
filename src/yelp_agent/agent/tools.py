@@ -19,6 +19,10 @@ from yelp_agent.models import (
 from yelp_agent.rankers.hybrid_ranker import HybridTaskScore
 
 
+MAX_HISTORY_REVIEWS = 30
+REPRESENTATIVE_REVIEWS_PER_SENTIMENT = 4
+
+
 class AgentToolError(RuntimeError):
     """Raised when an Agent tool request is invalid or crosses task scope."""
 
@@ -142,14 +146,16 @@ class TaskAgentTools:
         self,
         user_id: str,
         cutoff_time: datetime,
-        limit: int = 30,
+        limit: int = MAX_HISTORY_REVIEWS,
     ) -> UserHistoryResult:
         """Return recent frozen history and up to four positive/negative examples."""
 
         self._call_count += 1
         self._validate_identity(user_id, cutoff_time)
-        if not 1 <= limit <= 30:
-            raise AgentToolError("history limit must be between 1 and 30")
+        if not 1 <= limit <= MAX_HISTORY_REVIEWS:
+            raise AgentToolError(
+                f"history limit must be between 1 and {MAX_HISTORY_REVIEWS}"
+            )
         history = self._data_view.user_history(user_id, cutoff_time)
         if not history:
             raise AgentToolError(
@@ -176,8 +182,12 @@ class TaskAgentTools:
             user_id=user_id,
             cutoff_time=cutoff_time,
             reviews=reviews,
-            recent_positive=[item for item in reviews if item.stars >= 4][:4],
-            recent_negative=[item for item in reviews if item.stars <= 2][:4],
+            recent_positive=[item for item in reviews if item.stars >= 4][
+                :REPRESENTATIVE_REVIEWS_PER_SENTIMENT
+            ],
+            recent_negative=[item for item in reviews if item.stars <= 2][
+                :REPRESENTATIVE_REVIEWS_PER_SENTIMENT
+            ],
         )
 
     def get_business_details(

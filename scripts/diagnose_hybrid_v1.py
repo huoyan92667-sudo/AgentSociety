@@ -11,6 +11,7 @@ from yelp_agent.evaluation.hybrid_diagnostics import (
     diagnose_hybrid_v1_validation,
     write_hybrid_diagnosis,
 )
+from yelp_agent.experiments import write_resolved_configuration
 from yelp_agent.ranking.assembly import (
     HybridSourcePaths,
     build_frozen_hybrid_runtime,
@@ -128,6 +129,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         task_diagnostics_path=args.task_diagnostics,
         summary_path=args.summary,
         markdown_path=args.report,
+    )
+    write_resolved_configuration(
+        args.task_diagnostics.parent / "resolved_config.json",
+        config,
+        force=True,
     )
     print(summary.model_dump_json(indent=2))
     return 0

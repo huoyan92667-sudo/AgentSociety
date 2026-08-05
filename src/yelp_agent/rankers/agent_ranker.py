@@ -10,6 +10,7 @@ from pydantic import Field
 from yelp_agent.agent.llm import LLMAttemptTrace, LLMCallResult, LLMMessage
 from yelp_agent.agent.parser import (
     AgentResponseError,
+    TOP_K_TO_RERANK,
     merge_reranked_top_k,
     parse_rerank_response,
 )
@@ -163,8 +164,8 @@ class AgentRanker:
             ],
             hybrid_ranking=hybrid_ranking,
             hybrid_score_breakdowns=score_breakdowns,
-            top_k_before=hybrid_ranking[:8],
-            top_k_after=hybrid_ranking[:8],
+            top_k_before=hybrid_ranking[:TOP_K_TO_RERANK],
+            top_k_after=hybrid_ranking[:TOP_K_TO_RERANK],
             llm_status=(
                 llm_result.status if llm_result is not None else "not_called"
             ),
@@ -283,7 +284,7 @@ class AgentRanker:
             if hybrid.ranking != hybrid_prediction.ranking:
                 raise ValueError("Hybrid tool ranking disagrees with fallback")
             details: BusinessDetailsResult = session.get_business_details(
-                hybrid.ranking[:8],
+                hybrid.ranking[:TOP_K_TO_RERANK],
                 task.cutoff_time,
             )
         except Exception:
@@ -378,7 +379,7 @@ class AgentRanker:
         try:
             parsed = parse_rerank_response(
                 llm_result.content,
-                expected_business_ids=hybrid.ranking[:8],
+                expected_business_ids=hybrid.ranking[:TOP_K_TO_RERANK],
             )
             final_ranking = merge_reranked_top_k(parsed, hybrid.ranking)
         except AgentResponseError as exc:
@@ -413,7 +414,7 @@ class AgentRanker:
             ],
             hybrid_ranking=hybrid.ranking,
             hybrid_score_breakdowns=hybrid.score_breakdowns,
-            top_k_before=hybrid.ranking[:8],
+            top_k_before=hybrid.ranking[:TOP_K_TO_RERANK],
             top_k_after=parsed.ranking,
             llm_status=llm_result.status,
             model=llm_result.model,
@@ -442,7 +443,7 @@ class AgentRanker:
             "llm_latency_ms": llm_result.latency_ms,
             "observed_total_tokens": llm_result.observed_total_tokens,
             "unknown_usage_attempts": llm_result.unknown_usage_attempts,
-            "top_k_reranked": 8,
+            "top_k_reranked": TOP_K_TO_RERANK,
         }
         if "weights" in hybrid_prediction.metadata:
             metadata["hybrid_weights"] = hybrid_prediction.metadata["weights"]

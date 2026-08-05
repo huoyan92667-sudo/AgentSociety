@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Sequence
 
 from yelp_agent.config import load_config
+from yelp_agent.experiments import write_resolved_configuration
 from yelp_agent.features.hybrid import HybridWeights
 from yelp_agent.features.text import fit_tfidf_model
 from yelp_agent.ranking.assembly import (
@@ -117,6 +118,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         initial_weights=HybridWeights.from_config(config.hybrid),
         feature_sources_sha256=assembly.feature_sources_sha256,
         step=config.hybrid.tuning_step,
+        force=args.force,
+    )
+    write_resolved_configuration(
+        args.output.parent / "resolved_config.json",
+        config,
         force=args.force,
     )
     print(result.model_dump_json(indent=2))

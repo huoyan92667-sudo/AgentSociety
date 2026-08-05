@@ -438,6 +438,7 @@ def run_synthetic_pipeline(
         candidate_result.test_tasks_path,
         hybrid_ranker,
         hybrid_predictions,
+        configuration=config,
     )
     hybrid_prediction = _load_prediction(hybrid_predictions)
 
@@ -465,6 +466,7 @@ def run_synthetic_pipeline(
             candidate_result.test_tasks_path,
             agent_ranker,
             output_dir,
+            configuration=config,
         )
         agent_prediction = _load_prediction(Path(agent_result.predictions_path))
         evaluation = evaluate_prediction_file(

@@ -7,10 +7,14 @@ from typing import Literal
 
 from pydantic import Field
 
+from yelp_agent.config import AppConfig, configuration_fingerprint
 from yelp_agent.experiments import (
+    ConfigurationArtifactError,
     TaskFileError,
     read_recommendation_tasks,
+    require_matching_configuration,
     write_jsonl_artifact,
+    write_resolved_configuration,
 )
 from yelp_agent.models import Prediction, RecommendationTask, StrictModel
 from yelp_agent.protocols import Ranker
@@ -25,6 +29,11 @@ class RankerRunResult(StrictModel):
     tasks_path: str
     predictions_path: str
     task_count: int = Field(ge=0)
+    resolved_config_path: str | None = None
+    config_fingerprint: str | None = Field(
+        default=None,
+        pattern=r"^[0-9a-f]{64}$",
+    )
 
 
 def _validate_prediction(
@@ -73,11 +82,17 @@ def run_ranker(
     predictions_path: str | Path,
     *,
     force: bool = False,
+    configuration: AppConfig | None = None,
 ) -> RankerRunResult:
     """Run a ranker over frozen tasks or safely reuse a complete output file."""
 
     resolved_tasks_path = Path(tasks_path)
     resolved_predictions_path = Path(predictions_path)
+    resolved_config_path = (
+        resolved_predictions_path.parent / "resolved_config.json"
+        if configuration is not None
+        else None
+    )
     try:
         tasks = read_recommendation_tasks(resolved_tasks_path)
     except (FileNotFoundError, TaskFileError) as exc:
@@ -85,11 +100,29 @@ def run_ranker(
 
     if resolved_predictions_path.is_file() and not force:
         _validate_existing_predictions(resolved_predictions_path, tasks)
+        if configuration is not None and resolved_config_path is not None:
+            try:
+                require_matching_configuration(
+                    resolved_config_path,
+                    configuration,
+                )
+            except ConfigurationArtifactError as exc:
+                raise RankerRunError(str(exc)) from exc
         return RankerRunResult(
             status="skipped",
             tasks_path=str(resolved_tasks_path),
             predictions_path=str(resolved_predictions_path),
             task_count=len(tasks),
+            resolved_config_path=(
+                str(resolved_config_path)
+                if resolved_config_path is not None
+                else None
+            ),
+            config_fingerprint=(
+                configuration_fingerprint(configuration)
+                if configuration is not None
+                else None
+            ),
         )
 
     predictions: list[Prediction] = []
@@ -107,6 +140,15 @@ def run_ranker(
             )
         _validate_prediction(task, prediction)
         predictions.append(prediction)
+    if configuration is not None and resolved_config_path is not None:
+        try:
+            write_resolved_configuration(
+                resolved_config_path,
+                configuration,
+                force=force,
+            )
+        except ConfigurationArtifactError as exc:
+            raise RankerRunError(str(exc)) from exc
     write_jsonl_artifact(resolved_predictions_path, predictions)
 
     return RankerRunResult(
@@ -114,4 +156,14 @@ def run_ranker(
         tasks_path=str(resolved_tasks_path),
         predictions_path=str(resolved_predictions_path),
         task_count=len(tasks),
+        resolved_config_path=(
+            str(resolved_config_path)
+            if resolved_config_path is not None
+            else None
+        ),
+        config_fingerprint=(
+            configuration_fingerprint(configuration)
+            if configuration is not None
+            else None
+        ),
     )
