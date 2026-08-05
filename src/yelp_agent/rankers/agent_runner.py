@@ -13,6 +13,11 @@ from yelp_agent.evaluation.agent_runtime import (
     summarize_agent_trace_file,
     write_agent_runtime_metrics,
 )
+from yelp_agent.experiments import (
+    TaskFileError,
+    read_recommendation_tasks,
+    write_json_artifact,
+)
 from yelp_agent.models import Prediction, RecommendationTask, StrictModel
 from yelp_agent.rankers.agent_ranker import AgentTrace
 
@@ -51,36 +56,6 @@ class _TraceableRanker(Protocol):
     def rank(self, task: RecommendationTask) -> Prediction: ...
 
     def trace_for(self, task_id: str) -> AgentTrace: ...
-
-
-def _read_tasks(path: Path, limit: int | None) -> list[RecommendationTask]:
-    if not path.is_file():
-        raise AgentRunError(f"task file does not exist: {path}")
-    if limit is not None and limit <= 0:
-        raise ValueError("limit must be positive")
-    tasks: list[RecommendationTask] = []
-    seen: set[str] = set()
-    try:
-        with path.open("r", encoding="utf-8") as handle:
-            for line_number, line in enumerate(handle, start=1):
-                if not line.strip():
-                    continue
-                task = RecommendationTask.model_validate_json(line)
-                if task.task_id in seen:
-                    raise AgentRunError(
-                        f"duplicate task_id at line {line_number}: {task.task_id}"
-                    )
-                seen.add(task.task_id)
-                tasks.append(task)
-                if limit is not None and len(tasks) == limit:
-                    break
-    except AgentRunError:
-        raise
-    except Exception as exc:
-        raise AgentRunError(f"invalid task file {path}: {exc}") from exc
-    if not tasks:
-        raise AgentRunError(f"task file contains no tasks: {path}")
-    return tasks
 
 
 def _validate_task_output(
@@ -194,7 +169,10 @@ def run_agent_ranker(
 
     resolved_tasks = Path(tasks_path)
     resolved_output = Path(output_dir)
-    tasks = _read_tasks(resolved_tasks, limit)
+    try:
+        tasks = read_recommendation_tasks(resolved_tasks, limit=limit)
+    except (FileNotFoundError, TaskFileError) as exc:
+        raise AgentRunError(str(exc)) from exc
     paths = {
         "predictions": resolved_output / "predictions.jsonl",
         "traces": resolved_output / "traces.jsonl",
@@ -269,10 +247,7 @@ def run_agent_ranker(
                     )
                     failure_count += 1
         runtime_metrics = summarize_agent_trace_file(partials["traces"])
-        partials["runtime_metrics"].write_text(
-            runtime_metrics.model_dump_json(indent=2) + "\n",
-            encoding="utf-8",
-        )
+        write_json_artifact(partials["runtime_metrics"], runtime_metrics)
         for name in (*jsonl_names, "runtime_metrics"):
             os.replace(partials[name], paths[name])
     except Exception:

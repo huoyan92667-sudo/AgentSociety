@@ -4,19 +4,26 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 import hashlib
-import os
 from pathlib import Path
 from typing import Literal, Protocol, Sequence
 
 import duckdb
 import numpy as np
-from pydantic import Field, ValidationError
+from pydantic import Field
 
 from yelp_agent.config import EvaluationDataUsageConfig
 from yelp_agent.evaluation.data_usage import (
     DataUsageViolation,
     assign_development_task_folds,
     deterministic_bootstrap_users,
+)
+from yelp_agent.experiments import (
+    TaskFileError,
+    TaskSplitError,
+    read_recommendation_tasks,
+    write_json_artifact,
+    write_jsonl_artifact,
+    write_text_artifact,
 )
 from yelp_agent.features.hybrid import (
     HybridComponentFeatures,
@@ -159,33 +166,12 @@ def _sha256_file(path: Path) -> str:
 
 
 def _load_validation_tasks(path: Path) -> list[RecommendationTask]:
-    if not path.is_file():
-        raise FileNotFoundError(f"Validation task JSONL does not exist: {path}")
-    tasks: list[RecommendationTask] = []
-    seen: set[str] = set()
-    with path.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                task = RecommendationTask.model_validate_json(line)
-            except ValidationError as exc:
-                raise HybridDiagnosisError(
-                    f"Invalid validation task at line {line_number}"
-                ) from exc
-            if not task.task_id.startswith("validation:"):
-                raise DataUsageViolation(
-                    "Hybrid V1 diagnosis accepts validation tasks only"
-                )
-            if task.task_id in seen:
-                raise HybridDiagnosisError(
-                    f"Duplicate validation task_id: {task.task_id!r}"
-                )
-            seen.add(task.task_id)
-            tasks.append(task)
-    if not tasks:
-        raise HybridDiagnosisError("Validation task JSONL contains no tasks")
-    return tasks
+    try:
+        return read_recommendation_tasks(path, required_split="validation")
+    except TaskSplitError as exc:
+        raise DataUsageViolation(str(exc)) from exc
+    except TaskFileError as exc:
+        raise HybridDiagnosisError(str(exc)) from exc
 
 
 def _load_validation_truth(
@@ -729,20 +715,6 @@ def diagnose_hybrid_v1_validation(
     return diagnostics, summary
 
 
-def _atomic_write_text(path: Path, payload: str) -> None:
-    if path.is_file() and path.read_text(encoding="utf-8") == payload:
-        return
-    path.parent.mkdir(parents=True, exist_ok=True)
-    partial = path.with_name(path.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(payload, encoding="utf-8", newline="\n")
-        os.replace(partial, path)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
-
-
 def render_hybrid_diagnosis_markdown(
     summary: HybridDiagnosisSummary,
 ) -> str:
@@ -948,15 +920,9 @@ def write_hybrid_diagnosis(
 ) -> None:
     """Write local task details plus anonymous, publishable summaries."""
 
-    _atomic_write_text(
-        Path(task_diagnostics_path),
-        _task_diagnostics_payload(diagnostics),
-    )
-    _atomic_write_text(
-        Path(summary_path),
-        summary.model_dump_json(indent=2) + "\n",
-    )
-    _atomic_write_text(
-        Path(markdown_path),
+    write_jsonl_artifact(task_diagnostics_path, diagnostics)
+    write_json_artifact(summary_path, summary)
+    write_text_artifact(
+        markdown_path,
         render_hybrid_diagnosis_markdown(summary),
     )

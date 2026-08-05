@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 from collections import Counter
-import os
 from pathlib import Path
 from typing import Sequence
 
 import numpy as np
 from pydantic import Field, ValidationError
 
+from yelp_agent.experiments import write_json_artifact
 from yelp_agent.models import StrictModel
 from yelp_agent.rankers.agent_ranker import AgentTrace
 
@@ -264,23 +264,4 @@ def write_agent_runtime_metrics(
 ) -> None:
     """Atomically write a deterministic JSON runtime report."""
 
-    destination = Path(path)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    rendered = metrics.model_dump_json(indent=2) + "\n"
-    if destination.is_file():
-        try:
-            if destination.read_text(encoding="utf-8") == rendered:
-                return
-        except OSError:
-            pass
-    partial = destination.with_name(destination.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(
-            rendered,
-            encoding="utf-8",
-        )
-        os.replace(partial, destination)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
+    write_json_artifact(path, metrics)

@@ -3,15 +3,20 @@
 from __future__ import annotations
 
 import hashlib
-import os
 import math
 from pathlib import Path
 from typing import Literal, Protocol
 
 import numpy as np
 import pyarrow.parquet as pq
-from pydantic import Field, ValidationError
+from pydantic import Field
 
+from yelp_agent.experiments import (
+    TaskFileError,
+    TaskSplitError,
+    read_recommendation_tasks,
+    write_json_artifact,
+)
 from yelp_agent.features.hybrid import (
     HybridComponentFeatures,
     HybridWeights,
@@ -127,33 +132,14 @@ def fingerprint_hybrid_feature_sources(
 
 
 def _load_validation_tasks(path: Path) -> list[RecommendationTask]:
-    if not path.is_file():
-        raise FileNotFoundError(f"Validation task JSONL does not exist: {path}")
-    tasks: list[RecommendationTask] = []
-    seen: set[str] = set()
-    with path.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                task = RecommendationTask.model_validate_json(line)
-            except ValidationError as exc:
-                raise HybridTuningError(
-                    f"Invalid validation task at line {line_number}: {exc}"
-                ) from exc
-            if not task.task_id.startswith("validation:"):
-                raise HybridTuningError(
-                    "Hybrid tuning accepts validation tasks only"
-                )
-            if task.task_id in seen:
-                raise HybridTuningError(
-                    f"Duplicate validation task_id: {task.task_id!r}"
-                )
-            seen.add(task.task_id)
-            tasks.append(task)
-    if not tasks:
-        raise HybridTuningError("Validation task JSONL contains no tasks")
-    return tasks
+    try:
+        return read_recommendation_tasks(path, required_split="validation")
+    except TaskSplitError as exc:
+        raise HybridTuningError(
+            "Hybrid tuning accepts validation tasks only"
+        ) from exc
+    except TaskFileError as exc:
+        raise HybridTuningError(str(exc)) from exc
 
 
 def _load_validation_truth(
@@ -453,16 +439,5 @@ def tune_hybrid_weights(
         validation_metrics=best_metrics,
         tie_break_policy=TIE_BREAK_POLICY,
     )
-    output.parent.mkdir(parents=True, exist_ok=True)
-    partial = output.with_name(output.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(
-            frozen.model_dump_json(indent=2) + "\n",
-            encoding="utf-8",
-        )
-        os.replace(partial, output)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
+    write_json_artifact(output, frozen)
     return _result("written", output, frozen)

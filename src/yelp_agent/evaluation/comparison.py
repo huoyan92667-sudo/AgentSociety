@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from pydantic import Field
 
 from yelp_agent.evaluation.evaluator import (
-    _load_ground_truth,
-    _load_predictions,
-    _load_tasks,
+    load_evaluation_tasks,
+    load_ground_truth,
+    load_predictions,
 )
+from yelp_agent.experiments import write_json_artifact
 from yelp_agent.models import Prediction, RecommendationTask, StrictModel
 
 
@@ -49,7 +49,7 @@ def _load_complete_predictions(
     tasks: dict[str, RecommendationTask],
     known_task_ids: set[str],
 ) -> dict[str, Prediction]:
-    predictions, invalid, missing, unexpected, _ = _load_predictions(
+    predictions, invalid, missing, unexpected, _ = load_predictions(
         path,
         tasks,
         known_task_ids=known_task_ids,
@@ -73,13 +73,13 @@ def compare_prediction_files(
 
     if task_limit is not None and task_limit <= 0:
         raise ValueError("task_limit must be positive")
-    all_tasks = _load_tasks(Path(tasks_path))
+    all_tasks = load_evaluation_tasks(Path(tasks_path))
     tasks = (
         all_tasks
         if task_limit is None
         else dict(list(all_tasks.items())[:task_limit])
     )
-    truth = _load_ground_truth(Path(ground_truth_path), tasks)
+    truth = load_ground_truth(Path(ground_truth_path), tasks)
     known_task_ids = set(all_tasks)
     baseline = _load_complete_predictions(
         Path(baseline_predictions_path),
@@ -158,16 +158,4 @@ def write_prediction_comparison(
     comparison: PredictionComparison,
     path: str | Path,
 ) -> None:
-    destination = Path(path)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    partial = destination.with_name(destination.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(
-            comparison.model_dump_json(indent=2) + "\n",
-            encoding="utf-8",
-        )
-        os.replace(partial, destination)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
+    write_json_artifact(path, comparison)

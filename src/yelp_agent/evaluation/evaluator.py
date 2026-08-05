@@ -10,6 +10,12 @@ import pyarrow.parquet as pq
 from pydantic import Field, ValidationError
 
 from yelp_agent.evaluation.metrics import compute_single_positive_metrics
+from yelp_agent.experiments import (
+    TaskFileError,
+    read_recommendation_tasks,
+    write_json_artifact,
+    write_jsonl_artifact,
+)
 from yelp_agent.models import Prediction, RecommendationTask, StrictModel
 
 
@@ -53,31 +59,17 @@ class EvaluationReport(StrictModel):
     issues: list[EvaluationIssue]
 
 
-def _load_tasks(path: Path) -> dict[str, RecommendationTask]:
-    if not path.is_file():
-        raise FileNotFoundError(f"Task JSONL does not exist: {path}")
-    tasks: dict[str, RecommendationTask] = {}
-    with path.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                task = RecommendationTask.model_validate_json(line)
-            except ValidationError as exc:
-                raise EvaluationDataError(
-                    f"Invalid frozen task at line {line_number}: {exc}"
-                ) from exc
-            if task.task_id in tasks:
-                raise EvaluationDataError(
-                    f"Duplicate task_id in task JSONL: {task.task_id!r}"
-                )
-            tasks[task.task_id] = task
-    if not tasks:
-        raise EvaluationDataError("Task JSONL contains no tasks")
-    return tasks
+def load_evaluation_tasks(path: Path) -> dict[str, RecommendationTask]:
+    """Load frozen tasks while preserving their file order."""
+
+    try:
+        tasks = read_recommendation_tasks(path)
+    except TaskFileError as exc:
+        raise EvaluationDataError(str(exc)) from exc
+    return {task.task_id: task for task in tasks}
 
 
-def _load_ground_truth(
+def load_ground_truth(
     path: Path,
     tasks: dict[str, RecommendationTask],
 ) -> dict[str, str]:
@@ -124,7 +116,7 @@ def _load_ground_truth(
     return selected_truth
 
 
-def _load_predictions(
+def load_predictions(
     path: Path,
     tasks: dict[str, RecommendationTask],
     *,
@@ -271,20 +263,20 @@ def evaluate_prediction_file(
 
     if task_limit is not None and task_limit <= 0:
         raise ValueError("task_limit must be positive")
-    all_tasks = _load_tasks(Path(tasks_path))
+    all_tasks = load_evaluation_tasks(Path(tasks_path))
     tasks = (
         all_tasks
         if task_limit is None
         else dict(list(all_tasks.items())[:task_limit])
     )
-    truth = _load_ground_truth(Path(ground_truth_path), tasks)
+    truth = load_ground_truth(Path(ground_truth_path), tasks)
     (
         predictions,
         invalid_task_ids,
         missing_task_ids,
         unexpected_count,
         issues,
-    ) = _load_predictions(
+    ) = load_predictions(
         Path(predictions_path),
         tasks,
         known_task_ids=set(all_tasks),
@@ -363,15 +355,5 @@ def write_evaluation_report(
 ) -> None:
     """Write aggregate metrics separately from task-level validation issues."""
 
-    metrics_destination = Path(metrics_path)
-    issues_destination = Path(issues_path)
-    metrics_destination.parent.mkdir(parents=True, exist_ok=True)
-    issues_destination.parent.mkdir(parents=True, exist_ok=True)
-    metrics_destination.write_text(
-        report.metrics.model_dump_json(indent=2) + "\n",
-        encoding="utf-8",
-    )
-    issues_destination.write_text(
-        "".join(issue.model_dump_json() + "\n" for issue in report.issues),
-        encoding="utf-8",
-    )
+    write_json_artifact(metrics_path, report.metrics)
+    write_jsonl_artifact(issues_path, report.issues)

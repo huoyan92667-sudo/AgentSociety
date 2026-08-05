@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 import json
-import os
 from pathlib import Path
 
 import duckdb
@@ -17,6 +16,7 @@ import pyarrow.parquet as pq
 from pydantic import Field
 
 from yelp_agent.config import DataConfig
+from yelp_agent.experiments import write_json_artifact
 from yelp_agent.models import StrictModel
 
 
@@ -746,16 +746,4 @@ def write_candidate_audit(
 ) -> None:
     """Atomically write one deterministic machine-readable audit report."""
 
-    destination = Path(output_path)
-    payload = report.model_dump_json(indent=2) + "\n"
-    if destination.is_file() and destination.read_text(encoding="utf-8") == payload:
-        return
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    partial = destination.with_name(destination.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(payload, encoding="utf-8", newline="\n")
-        os.replace(partial, destination)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
+    write_json_artifact(output_path, report)

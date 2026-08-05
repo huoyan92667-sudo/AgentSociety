@@ -4,14 +4,18 @@ from __future__ import annotations
 
 from collections import Counter
 import hashlib
-import os
 from pathlib import Path
 import random
 from typing import Sequence
 
-from pydantic import Field, ValidationError
+from pydantic import Field
 
 from yelp_agent.config import EvaluationDataUsageConfig
+from yelp_agent.experiments import (
+    TaskFileError,
+    read_recommendation_tasks,
+    write_json_artifact,
+)
 from yelp_agent.models import RecommendationTask, StrictModel
 
 
@@ -124,25 +128,6 @@ def deterministic_bootstrap_users(
     return generator.choices(ordered_users, k=len(ordered_users))
 
 
-def _load_development_tasks(path: Path) -> list[RecommendationTask]:
-    if not path.is_file():
-        raise FileNotFoundError(f"Development task file does not exist: {path}")
-    tasks: list[RecommendationTask] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line_number, line in enumerate(handle, start=1):
-            if not line.strip():
-                continue
-            try:
-                tasks.append(RecommendationTask.model_validate_json(line))
-            except ValidationError as exc:
-                raise DataUsageViolation(
-                    f"Invalid development task at {path}:{line_number}"
-                ) from exc
-    if not tasks:
-        raise DataUsageViolation(f"Development task file is empty: {path}")
-    return tasks
-
-
 def build_validation_user_fold_summary(
     validation_tasks_path: str | Path,
     policy: EvaluationDataUsageConfig,
@@ -150,7 +135,10 @@ def build_validation_user_fold_summary(
     """Summarize folds without publishing any user or task identifier."""
 
     path = Path(validation_tasks_path)
-    tasks = _load_development_tasks(path)
+    try:
+        tasks = read_recommendation_tasks(path)
+    except TaskFileError as exc:
+        raise DataUsageViolation(str(exc)) from exc
     task_assignments = assign_development_task_folds(tasks, policy)
     tasks_per_user = Counter(task.user_id for task in tasks)
     users_per_fold: Counter[int] = Counter()
@@ -206,16 +194,4 @@ def write_user_fold_summary(
 ) -> None:
     """Atomically write a byte-stable, identifier-free fold summary."""
 
-    destination = Path(output_path)
-    payload = summary.model_dump_json(indent=2) + "\n"
-    if destination.is_file() and destination.read_text(encoding="utf-8") == payload:
-        return
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    partial = destination.with_name(destination.name + ".partial")
-    partial.unlink(missing_ok=True)
-    try:
-        partial.write_text(payload, encoding="utf-8", newline="\n")
-        os.replace(partial, destination)
-    except Exception:
-        partial.unlink(missing_ok=True)
-        raise
+    write_json_artifact(output_path, summary)
