@@ -7,11 +7,11 @@ from datetime import datetime
 
 from yelp_agent.data.temporal_view import TemporalDataView, TemporalDataError
 from yelp_agent.models import (
-    RecommendationTask,
     StrictModel,
     UnitScore,
     UserProfile,
 )
+from yelp_agent.protocols import CandidateScoringRequest
 
 
 class CategoryFeatureError(RuntimeError):
@@ -38,12 +38,71 @@ class TemporalCategoryStore:
             for category in broad_categories
             if category.strip()
         }
+        self._fine_categories_by_business = {
+            business.business_id: tuple(
+                sorted(
+                    set(business.categories).difference(
+                        self._broad_categories
+                    )
+                )
+            )
+            for business in data_view.businesses()
+        }
         self._cache: dict[
             tuple[str, str, datetime, tuple[str, ...]],
             CategoryTaskFeatures,
         ] = {}
 
-    def features_for(self, task: RecommendationTask) -> CategoryTaskFeatures:
+    def score_candidates(
+        self,
+        task: CandidateScoringRequest,
+    ) -> dict[str, float]:
+        """Return category affinity only, avoiding profile model construction."""
+
+        history = self._data_view.user_history(
+            task.user_id,
+            task.cutoff_time,
+        )
+        if not history:
+            raise CategoryFeatureError(
+                f"No frozen history exists for task {task.task_id!r}"
+            )
+        counts: Counter[str] = Counter()
+        rating_sums: defaultdict[str, float] = defaultdict(float)
+        for interaction in history:
+            categories = self._fine_categories_by_business[
+                interaction.business_id
+            ]
+            for category in categories:
+                counts[category] += 1
+                rating_sums[category] += interaction.stars
+        preferences: dict[str, float] = {}
+        if counts:
+            maximum_count = max(counts.values())
+            for category, count in counts.items():
+                preferences[category] = (
+                    0.7 * ((rating_sums[category] / count - 1.0) / 4.0)
+                    + 0.3 * (count / maximum_count)
+                )
+        return {
+            business_id: max(
+                (
+                    preferences.get(category, 0.0)
+                    for category in self._fine_categories_by_business[
+                        business_id
+                    ]
+                ),
+                default=0.0,
+            )
+            for business_id in task.candidate_business_ids
+        }
+
+    def features_for(
+        self,
+        task: CandidateScoringRequest,
+        *,
+        cache: bool = True,
+    ) -> CategoryTaskFeatures:
         """Return a dynamic profile and category scores for one frozen task."""
 
         cache_key = (
@@ -52,7 +111,7 @@ class TemporalCategoryStore:
             task.cutoff_time,
             tuple(task.candidate_business_ids),
         )
-        cached = self._cache.get(cache_key)
+        cached = self._cache.get(cache_key) if cache else None
         if cached is not None:
             return cached
 
@@ -124,5 +183,6 @@ class TemporalCategoryStore:
             ),
             category_scores=category_scores,
         )
-        self._cache[cache_key] = features
+        if cache:
+            self._cache[cache_key] = features
         return features

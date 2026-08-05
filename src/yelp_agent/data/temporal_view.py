@@ -100,6 +100,25 @@ class ReviewStatistics:
 
 
 @dataclass(frozen=True, slots=True)
+class ReviewCatalogSnapshot:
+    """Aligned lightweight review aggregates for the full static catalog."""
+
+    business_ids: tuple[str, ...]
+    review_counts: tuple[int, ...]
+    star_sums: tuple[float, ...]
+    global_count: int
+    global_star_sum: float
+
+    @property
+    def global_mean_rating(self) -> float | None:
+        return (
+            None
+            if self.global_count == 0
+            else self.global_star_sum / self.global_count
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class _ReviewHistory:
     dates: tuple[datetime, ...]
     review_ids: tuple[str, ...]
@@ -153,6 +172,7 @@ class TemporalDataView:
         interactions_path: str | Path,
     ) -> None:
         self._businesses = self._load_businesses(Path(businesses_path))
+        self._sorted_business_ids = tuple(sorted(self._businesses))
         (
             self._review_histories,
             self._global_review_dates,
@@ -501,4 +521,31 @@ class TemporalDataView:
             global_star_sum=self._global_review_prefix_stars[global_count],
             positive_business_counts=tuple(positive_counts),
             businesses=MappingProxyType(requested),
+        )
+
+    def review_catalog_before(
+        self,
+        cutoff_time: datetime,
+    ) -> ReviewCatalogSnapshot:
+        """Return aligned full-catalog counts and sums strictly before cutoff."""
+
+        business_ids = self._sorted_business_ids
+        counts: list[int] = []
+        star_sums: list[float] = []
+        for business_id in business_ids:
+            history = self._review_histories.get(business_id)
+            if history is None:
+                counts.append(0)
+                star_sums.append(0.0)
+                continue
+            count = bisect_left(history.dates, cutoff_time)
+            counts.append(count)
+            star_sums.append(history.prefix_stars[count])
+        global_count = bisect_left(self._global_review_dates, cutoff_time)
+        return ReviewCatalogSnapshot(
+            business_ids=business_ids,
+            review_counts=tuple(counts),
+            star_sums=tuple(star_sums),
+            global_count=global_count,
+            global_star_sum=self._global_review_prefix_stars[global_count],
         )

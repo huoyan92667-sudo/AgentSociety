@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 from datetime import datetime
+
+import numpy as np
 from pydantic import Field
 
 from yelp_agent.data.temporal_view import TemporalDataError, TemporalDataView
 from yelp_agent.models import (
     LocationCenter,
-    RecommendationTask,
     StrictModel,
     UnitScore,
 )
+from yelp_agent.protocols import CandidateScoringRequest
 
 
 EARTH_RADIUS_KM = 6371.0088
@@ -32,6 +35,15 @@ class LocationTaskFeatures(StrictModel):
     location_center: LocationCenter | None
     history_coordinate_count: int = Field(ge=0)
     business_scores: dict[str, LocationBusinessScore]
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateLocationScores:
+    """Lightweight aligned proximity values for high-volume retrieval."""
+
+    business_ids: tuple[str, ...]
+    location_scores: np.ndarray
+    distances_km: np.ndarray
 
 
 def haversine_km(
@@ -97,12 +109,96 @@ class TemporalLocationStore:
             raise ValueError("scale_km must be a positive finite number")
         self._data_view = data_view
         self._scale_km = scale_km
+        self._coordinates = {
+            business.business_id: (business.latitude, business.longitude)
+            for business in data_view.businesses()
+        }
         self._cache: dict[
             tuple[str, str, datetime, tuple[str, ...]],
             LocationTaskFeatures,
         ] = {}
 
-    def features_for(self, task: RecommendationTask) -> LocationTaskFeatures:
+    def score_candidates(
+        self,
+        task: CandidateScoringRequest,
+    ) -> CandidateLocationScores:
+        """Return the same location formula without per-business models."""
+
+        history = self._data_view.user_history(
+            task.user_id,
+            task.cutoff_time,
+        )
+        if not history:
+            raise LocationFeatureError(
+                f"No frozen location history exists for task {task.task_id!r}"
+            )
+        coordinates: list[tuple[float, float]] = []
+        for interaction in history:
+            latitude, longitude = self._coordinates[interaction.business_id]
+            if latitude is not None and longitude is not None:
+                coordinates.append((latitude, longitude))
+        candidate_count = len(task.candidate_business_ids)
+        scores = np.full(candidate_count, 0.5, dtype=np.float64)
+        distances = np.full(candidate_count, np.nan, dtype=np.float64)
+        if coordinates:
+            center_latitude = sum(item[0] for item in coordinates) / len(
+                coordinates
+            )
+            center_longitude = sum(item[1] for item in coordinates) / len(
+                coordinates
+            )
+            latitudes = np.asarray(
+                [
+                    (
+                        np.nan
+                        if self._coordinates[item][0] is None
+                        else self._coordinates[item][0]
+                    )
+                    for item in task.candidate_business_ids
+                ],
+                dtype=np.float64,
+            )
+            longitudes = np.asarray(
+                [
+                    (
+                        np.nan
+                        if self._coordinates[item][1] is None
+                        else self._coordinates[item][1]
+                    )
+                    for item in task.candidate_business_ids
+                ],
+                dtype=np.float64,
+            )
+            valid = np.isfinite(latitudes) & np.isfinite(longitudes)
+            center_latitude_radians = math.radians(center_latitude)
+            latitudes_radians = np.radians(latitudes[valid])
+            delta_latitude = latitudes_radians - center_latitude_radians
+            delta_longitude = np.radians(
+                longitudes[valid] - center_longitude
+            )
+            haversine_values = (
+                np.sin(delta_latitude / 2.0) ** 2
+                + math.cos(center_latitude_radians)
+                * np.cos(latitudes_radians)
+                * np.sin(delta_longitude / 2.0) ** 2
+            )
+            valid_distances = EARTH_RADIUS_KM * 2.0 * np.arcsin(
+                np.sqrt(np.clip(haversine_values, 0.0, 1.0))
+            )
+            distances[valid] = valid_distances
+            scores[valid] = np.exp(-valid_distances / self._scale_km)
+        return CandidateLocationScores(
+            business_ids=tuple(task.candidate_business_ids),
+            location_scores=scores,
+            distances_km=distances,
+        )
+
+    def features_for(
+        self,
+        task: CandidateScoringRequest,
+        *,
+        cache: bool = True,
+    ) -> LocationTaskFeatures:
         """Return a history center and distance scores for one frozen task."""
 
         cache_key = (
@@ -111,7 +207,7 @@ class TemporalLocationStore:
             task.cutoff_time,
             tuple(task.candidate_business_ids),
         )
-        cached = self._cache.get(cache_key)
+        cached = self._cache.get(cache_key) if cache else None
         if cached is not None:
             return cached
 
@@ -185,5 +281,6 @@ class TemporalLocationStore:
             history_coordinate_count=len(history_coordinates),
             business_scores=business_scores,
         )
-        self._cache[cache_key] = features
+        if cache:
+            self._cache[cache_key] = features
         return features

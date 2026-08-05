@@ -1,0 +1,16 @@
+candidate_limit: 500
+per_route_limit: 500
+rrf_constant: 60.0
+exclude_history_businesses: true
+bayesian_prior_count: 20
+location_scale_km: 10.0
+
+metric_cutoffs:
+  - 50
+  - 100
+  - 500
+
+# Route-level provenance is useful for validation diagnosis but would make the
+# rolling training artifact unnecessarily large.
+provenance_splits:
+  - validation

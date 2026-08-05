@@ -102,6 +102,7 @@ def test_builds_category_profile_and_candidate_scores_from_task_history(
     )
 
     features = store.features_for(task)
+    lightweight = store.score_candidates(task)
 
     assert features.profile.history_count == 3
     assert features.profile.average_rating == pytest.approx(4.0)
@@ -119,6 +120,7 @@ def test_builds_category_profile_and_candidate_scores_from_task_history(
     assert features.category_scores[candidates[0]] == pytest.approx(0.825)
     assert features.category_scores[candidates[1]] == pytest.approx(0.675)
     assert features.category_scores[candidates[2]] == pytest.approx(0.0)
+    assert lightweight == pytest.approx(features.category_scores)
 
 
 def test_test_profile_includes_the_validation_behavior(

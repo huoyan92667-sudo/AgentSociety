@@ -178,6 +178,43 @@ class RollingTrainingConfig(ConfigModel):
         return self
 
 
+class RetrievalConfig(ConfigModel):
+    """Settings for target-blind full-catalog candidate retrieval."""
+
+    candidate_limit: int = Field(ge=1)
+    per_route_limit: int = Field(ge=1)
+    rrf_constant: float = Field(gt=0)
+    exclude_history_businesses: bool
+    bayesian_prior_count: int = Field(gt=0)
+    location_scale_km: float = Field(gt=0)
+    metric_cutoffs: list[int]
+    provenance_splits: list[Literal["train", "validation", "test"]]
+
+    @model_validator(mode="after")
+    def validate_retrieval_limits(self) -> "RetrievalConfig":
+        if self.per_route_limit < self.candidate_limit:
+            raise ValueError(
+                "per_route_limit must be at least candidate_limit"
+            )
+        if not self.metric_cutoffs:
+            raise ValueError("metric_cutoffs cannot be empty")
+        if (
+            any(cutoff <= 0 for cutoff in self.metric_cutoffs)
+            or self.metric_cutoffs != sorted(self.metric_cutoffs)
+            or len(set(self.metric_cutoffs)) != len(self.metric_cutoffs)
+        ):
+            raise ValueError(
+                "metric_cutoffs must be unique positive values in ascending order"
+            )
+        if self.metric_cutoffs[-1] > self.candidate_limit:
+            raise ValueError(
+                "metric_cutoffs cannot exceed candidate_limit"
+            )
+        if len(set(self.provenance_splits)) != len(self.provenance_splits):
+            raise ValueError("provenance_splits must be unique")
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -303,6 +340,17 @@ def load_rolling_training_config(
     root = Path(config_dir)
     return RollingTrainingConfig.model_validate(
         _read_yaml(root / "training.yaml")
+    )
+
+
+def load_retrieval_config(
+    config_dir: str | Path = "configs",
+) -> RetrievalConfig:
+    """Load settings used only by the full retrieval benchmark."""
+
+    root = Path(config_dir)
+    return RetrievalConfig.model_validate(
+        _read_yaml(root / "retrieval.yaml")
     )
 
 

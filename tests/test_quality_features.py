@@ -83,6 +83,15 @@ def test_scores_business_quality_from_reviews_before_cutoff(
         business_ids,
         pd.Timestamp("2020-02-01").to_pydatetime(),
     )
+    catalog = store.score_catalog(
+        pd.Timestamp("2020-02-01").to_pydatetime()
+    )
+    catalog_scores = dict(
+        zip(catalog.business_ids, catalog.quality_scores, strict=True)
+    )
+    catalog_counts = dict(
+        zip(catalog.business_ids, catalog.review_counts, strict=True)
+    )
 
     global_mean = 3.1
     expected_bayesian_rating = (5.0 + 20 * global_mean) / 21
@@ -99,6 +108,10 @@ def test_scores_business_quality_from_reviews_before_cutoff(
     assert (
         scores["business-00"].quality_score
         > scores["business-01"].quality_score
+    )
+    assert catalog_counts["business-00"] == 1
+    assert catalog_scores == pytest.approx(
+        {business_id: value.quality_score for business_id, value in scores.items()}
     )
 
 

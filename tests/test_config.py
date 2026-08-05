@@ -10,6 +10,7 @@ from yelp_agent.config import (
     configuration_fingerprint,
     load_config,
     load_llm_environment,
+    load_retrieval_config,
     load_rolling_training_config,
 )
 
@@ -45,6 +46,10 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert training.minimum_target_gap == 2
     assert training.minimum_sample_weight == 0.5
     assert training.maximum_sample_weight == 1.0
+
+    retrieval = load_retrieval_config(PROJECT_CONFIG_DIR)
+    assert retrieval.candidate_limit == 500
+    assert retrieval.metric_cutoffs == [50, 100, 500]
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
@@ -265,6 +270,23 @@ def test_rolling_training_weight_range_is_validated(tmp_path: Path) -> None:
 
     with pytest.raises(ValidationError, match="less than or equal to 1"):
         load_rolling_training_config(config_dir)
+
+
+def test_retrieval_metrics_cannot_exceed_frozen_candidate_limit(
+    tmp_path: Path,
+) -> None:
+    config_dir = tmp_path / "configs"
+    shutil.copytree(PROJECT_CONFIG_DIR, config_dir)
+    retrieval_path = config_dir / "retrieval.yaml"
+    retrieval = yaml.safe_load(retrieval_path.read_text(encoding="utf-8"))
+    retrieval["metric_cutoffs"] = [50, 501]
+    retrieval_path.write_text(
+        yaml.safe_dump(retrieval, sort_keys=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValidationError, match="cannot exceed candidate_limit"):
+        load_retrieval_config(config_dir)
 
 
 @pytest.mark.parametrize(

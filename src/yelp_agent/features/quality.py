@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 
 import numpy as np
@@ -23,6 +24,15 @@ class BusinessQuality(StrictModel):
     normalized_bayesian_rating: UnitScore
     normalized_popularity: UnitScore
     quality_score: UnitScore
+
+
+@dataclass(frozen=True, slots=True)
+class CatalogQualityScores:
+    """NumPy-aligned full-catalog values for high-volume retrieval."""
+
+    business_ids: tuple[str, ...]
+    review_counts: np.ndarray
+    quality_scores: np.ndarray
 
 
 class TemporalQualityStore:
@@ -69,6 +79,41 @@ class TemporalQualityStore:
         calibration = (global_mean, popularity_p95)
         self._calibration_cache[cutoff_time] = calibration
         return calibration
+
+    def score_catalog(self, cutoff_time: datetime) -> CatalogQualityScores:
+        """Return the same quality formula without per-business models."""
+
+        snapshot = self._data_view.review_catalog_before(cutoff_time)
+        counts = np.asarray(snapshot.review_counts, dtype=np.int64)
+        star_sums = np.asarray(snapshot.star_sums, dtype=np.float64)
+        global_mean = snapshot.global_mean_rating
+        if global_mean is None:
+            global_mean = 3.5
+        positive_counts = counts[counts > 0]
+        popularity_p95 = (
+            float(np.percentile(np.log1p(positive_counts), 95))
+            if positive_counts.size
+            else 0.0
+        )
+        bayesian = (
+            star_sums + self._prior_count * global_mean
+        ) / (counts + self._prior_count)
+        normalized_rating = np.clip((bayesian - 1.0) / 4.0, 0.0, 1.0)
+        normalized_popularity = (
+            np.minimum(np.log1p(counts), popularity_p95) / popularity_p95
+            if popularity_p95 > 0
+            else np.zeros_like(bayesian)
+        )
+        quality_scores = np.clip(
+            0.8 * normalized_rating + 0.2 * normalized_popularity,
+            0.0,
+            1.0,
+        )
+        return CatalogQualityScores(
+            business_ids=snapshot.business_ids,
+            review_counts=counts,
+            quality_scores=quality_scores,
+        )
 
     def score_businesses(
         self,

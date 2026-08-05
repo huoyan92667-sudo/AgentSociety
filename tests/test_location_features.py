@@ -98,6 +98,7 @@ def test_scores_candidate_distance_from_dynamic_history_center(
     )
 
     features = store.features_for(task)
+    lightweight = store.score_candidates(task)
 
     assert features.location_center is not None
     assert features.location_center.latitude == pytest.approx(39.9526)
@@ -117,6 +118,14 @@ def test_scores_candidate_distance_from_dynamic_history_center(
         math.exp(-1.0),
         rel=0.02,
     )
+    for index, business_id in enumerate(lightweight.business_ids):
+        expected = features.business_scores[business_id]
+        assert lightweight.location_scores[index] == pytest.approx(
+            expected.location_score
+        )
+        assert lightweight.distances_km[index] == pytest.approx(
+            expected.distance_km
+        )
 
 
 def test_missing_history_or_candidate_coordinates_return_neutral_score(

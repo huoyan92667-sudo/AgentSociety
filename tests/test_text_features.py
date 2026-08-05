@@ -41,6 +41,10 @@ def test_scores_positive_and_negative_text_affinity_and_extracts_keywords(
     )
 
     features = store.features_for(task)
+    lightweight = store.score_candidates(task)
+    lightweight_scores = dict(
+        zip(lightweight.business_ids, lightweight.text_scores, strict=True)
+    )
 
     liked = features.business_scores[candidates[0]]
     disliked = features.business_scores[candidates[1]]
@@ -54,3 +58,11 @@ def test_scores_positive_and_negative_text_affinity_and_extracts_keywords(
     assert any("noisy" in keyword for keyword in features.negative_keywords)
     assert len(features.positive_keywords) <= 10
     assert len(features.negative_keywords) <= 10
+    assert lightweight.positive_review_count == features.positive_review_count
+    assert lightweight.negative_review_count == features.negative_review_count
+    assert lightweight_scores == pytest.approx(
+        {
+            business_id: score.text_score
+            for business_id, score in features.business_scores.items()
+        }
+    )

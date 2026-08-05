@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from dataclasses import dataclass
 import re
 from datetime import datetime
 from pathlib import Path
@@ -22,7 +23,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from yelp_agent.config import TfidfConfig
 from yelp_agent.data.temporal_view import TemporalDataView
-from yelp_agent.models import RecommendationTask, StrictModel, UnitScore
+from yelp_agent.models import StrictModel, UnitScore
+from yelp_agent.protocols import CandidateScoringRequest
 
 
 class TextFeatureError(RuntimeError):
@@ -64,6 +66,16 @@ class TextTaskFeatures(StrictModel):
     positive_keywords: list[str] = Field(max_length=10)
     negative_keywords: list[str] = Field(max_length=10)
     business_scores: dict[str, TextBusinessScore]
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateTextScores:
+    """Lightweight aligned text scores for large candidate collections."""
+
+    business_ids: tuple[str, ...]
+    positive_review_count: int
+    negative_review_count: int
+    text_scores: np.ndarray
 
 
 def _sha256_file(path: Path) -> str:
@@ -457,7 +469,73 @@ class TemporalTextStore:
             for _, term in weighted_terms[: self._manifest.config.keyword_count]
         ]
 
-    def features_for(self, task: RecommendationTask) -> TextTaskFeatures:
+    def score_candidates(
+        self,
+        task: CandidateScoringRequest,
+    ) -> CandidateTextScores:
+        """Return vectorized scores without constructing thousands of models."""
+
+        history = self._data_view.user_history(
+            task.user_id,
+            task.cutoff_time,
+        )
+        if not history:
+            raise TextFeatureError(
+                f"No frozen TF-IDF history exists for task {task.task_id!r}"
+            )
+        positive_texts = [
+            interaction.text
+            for interaction in history
+            if interaction.stars >= 4.0 and interaction.text
+        ]
+        negative_texts = [
+            interaction.text
+            for interaction in history
+            if interaction.stars <= 2.0 and interaction.text
+        ]
+        try:
+            candidate_rows = [
+                self._business_row[business_id]
+                for business_id in task.candidate_business_ids
+            ]
+        except KeyError as exc:
+            raise TextFeatureError(
+                f"Task references unknown business_id {exc.args[0]!r}"
+            ) from exc
+        candidate_vectors = self._business_vectors[candidate_rows]
+        positive = np.clip(
+            cosine_similarity(
+                self._vectorizer.transform(["\n".join(positive_texts)]),
+                candidate_vectors,
+            )[0],
+            0.0,
+            1.0,
+        )
+        negative = np.clip(
+            cosine_similarity(
+                self._vectorizer.transform(["\n".join(negative_texts)]),
+                candidate_vectors,
+            )[0],
+            0.0,
+            1.0,
+        )
+        return CandidateTextScores(
+            business_ids=tuple(task.candidate_business_ids),
+            positive_review_count=len(positive_texts),
+            negative_review_count=len(negative_texts),
+            text_scores=np.clip(
+                0.5 + 0.5 * positive - 0.5 * negative,
+                0.0,
+                1.0,
+            ),
+        )
+
+    def features_for(
+        self,
+        task: CandidateScoringRequest,
+        *,
+        cache: bool = True,
+    ) -> TextTaskFeatures:
         """Return positive/negative text affinity for one frozen task."""
 
         cache_key = (
@@ -466,7 +544,7 @@ class TemporalTextStore:
             task.cutoff_time,
             tuple(task.candidate_business_ids),
         )
-        cached = self._cache.get(cache_key)
+        cached = self._cache.get(cache_key) if cache else None
         if cached is not None:
             return cached
 
@@ -544,5 +622,6 @@ class TemporalTextStore:
             negative_keywords=self._top_keywords(negative_vector),
             business_scores=business_scores,
         )
-        self._cache[cache_key] = features
+        if cache:
+            self._cache[cache_key] = features
         return features
