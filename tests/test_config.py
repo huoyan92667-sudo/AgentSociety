@@ -1,5 +1,5 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 import pytest
 import yaml
@@ -9,11 +9,11 @@ from yelp_agent.config import (
     build_resolved_configuration,
     configuration_fingerprint,
     load_config,
+    load_item_knn_config,
     load_llm_environment,
     load_retrieval_config,
     load_rolling_training_config,
 )
-
 
 PROJECT_CONFIG_DIR = Path(__file__).parents[1] / "configs"
 
@@ -51,6 +51,11 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert retrieval.candidate_limit == 500
     assert retrieval.metric_cutoffs == [50, 100, 500]
 
+    item_knn = load_item_knn_config(PROJECT_CONFIG_DIR)
+    assert item_knn.shrinkage_beta == 10.0
+    assert item_knn.half_life_days == 365
+    assert item_knn.reserved_tail_interactions == 2
+
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
     tmp_path: Path,
@@ -65,7 +70,10 @@ def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
         encoding="utf-8",
     )
 
-    with pytest.raises(ValidationError, match="negative candidate buckets must sum to 19"):
+    with pytest.raises(
+        ValidationError,
+        match="negative candidate buckets must sum to 19",
+    ):
         load_config(config_dir)
 
 

@@ -22,9 +22,10 @@ class RetrievalEvaluationError(RuntimeError):
 
 
 class RetrievalMetrics(StrictModel):
-    benchmark_name: Literal["Full Retrieval Benchmark V1"] = (
-        "Full Retrieval Benchmark V1"
-    )
+    benchmark_name: Literal[
+        "Full Retrieval Benchmark V1",
+        "Full Retrieval Benchmark V2 + Item-KNN",
+    ] = "Full Retrieval Benchmark V1"
     split: Literal["train", "validation", "test"]
     task_count: int = Field(ge=1)
     catalog_eligible_task_count: int = Field(ge=0)
@@ -35,9 +36,9 @@ class RetrievalMetrics(StrictModel):
     candidate_without_prior_review_count: Literal[0] = 0
     candidate_in_user_history_count: Literal[0] = 0
     catalog_eligible_rate: float = Field(ge=0, le=1)
-    primary_population: Literal[
+    primary_population: Literal["catalog_eligible_and_not_previously_visited"] = (
         "catalog_eligible_and_not_previously_visited"
-    ] = "catalog_eligible_and_not_previously_visited"
+    )
     recall_at: dict[str, float]
     all_task_recall_at: dict[str, float]
     route_recall_at: dict[str, dict[str, float]]
@@ -81,8 +82,7 @@ def _recall(
     if not population:
         return 0.0
     hits = sum(
-        row.get(rank_field) is not None
-        and int(row[rank_field]) <= cutoff
+        row.get(rank_field) is not None and int(row[rank_field]) <= cutoff
         for row in population
     )
     return hits / len(population)
@@ -101,6 +101,10 @@ def evaluate_full_retrieval(
     route_provenance_path: str | Path | None = None,
     metrics_output_path: str | Path | None = None,
     task_results_output_path: str | Path | None = None,
+    benchmark_name: Literal[
+        "Full Retrieval Benchmark V1",
+        "Full Retrieval Benchmark V2 + Item-KNN",
+    ] = "Full Retrieval Benchmark V1",
 ) -> RetrievalMetrics:
     """Score frozen candidates; target labels cross the seam only here."""
 
@@ -132,7 +136,8 @@ def evaluate_full_retrieval(
                 min(route_rank) FILTER (WHERE route = 'quality') AS quality_rank,
                 min(route_rank) FILTER (WHERE route = 'category') AS category_rank,
                 min(route_rank) FILTER (WHERE route = 'text') AS text_rank,
-                min(route_rank) FILTER (WHERE route = 'location') AS location_rank
+                min(route_rank) FILTER (WHERE route = 'location') AS location_rank,
+                min(route_rank) FILTER (WHERE route = 'item_knn') AS item_knn_rank
             FROM read_parquet(?) AS candidate
             JOIN truth
               ON truth.task_id = candidate.task_id
@@ -148,7 +153,8 @@ def evaluate_full_retrieval(
                 CAST(NULL AS INTEGER) AS quality_rank,
                 CAST(NULL AS INTEGER) AS category_rank,
                 CAST(NULL AS INTEGER) AS text_rank,
-                CAST(NULL AS INTEGER) AS location_rank
+                CAST(NULL AS INTEGER) AS location_rank,
+                CAST(NULL AS INTEGER) AS item_knn_rank
             WHERE false
         )
         """
@@ -195,7 +201,8 @@ def evaluate_full_retrieval(
             routes.quality_rank,
             routes.category_rank,
             routes.text_rank,
-            routes.location_rank
+            routes.location_rank,
+            routes.item_knn_rank
         FROM selected_context AS context
         JOIN truth USING (task_id)
         LEFT JOIN fused_hits AS fused USING (task_id)
@@ -338,7 +345,13 @@ def evaluate_full_retrieval(
                     )
                     SELECT count(*)
                     FROM route_stats
-                    WHERE route NOT IN ('quality', 'category', 'text', 'location')
+                    WHERE route NOT IN (
+                        'quality',
+                        'category',
+                        'text',
+                        'location',
+                        'item_knn'
+                    )
                        OR rows != businesses
                        OR rows != ranks
                        OR first_rank != 1
@@ -380,9 +393,10 @@ def evaluate_full_retrieval(
             "Retrieval task, truth, candidate or audit rows are inconsistent"
         )
     rows = result_table.to_pylist()
-    reachable = lambda row: bool(row["catalog_eligible"]) and not bool(
-        row["target_in_history"]
-    )
+
+    def reachable(row: dict[str, object]) -> bool:
+        return bool(row["catalog_eligible"]) and not bool(row["target_in_history"])
+
     recall_at = {
         str(cutoff): _recall(
             rows,
@@ -411,7 +425,13 @@ def evaluate_full_retrieval(
             )
             for cutoff in metric_cutoffs
         }
-        for route in ("quality", "category", "text", "location")
+        for route in (
+            "quality",
+            "category",
+            "text",
+            "location",
+            "item_knn",
+        )
     }
     candidate_counts = [int(row[0]) for row in audit_rows]
     catalog_sizes = [int(row[1]) for row in audit_rows]
@@ -422,13 +442,11 @@ def evaluate_full_retrieval(
     largest_cutoff = metric_cutoffs[-1]
     missed = sum(
         reachable(row)
-        and (
-            row["target_rank"] is None
-            or int(row["target_rank"]) > largest_cutoff
-        )
+        and (row["target_rank"] is None or int(row["target_rank"]) > largest_cutoff)
         for row in rows
     )
     metrics = RetrievalMetrics(
+        benchmark_name=benchmark_name,
         split=split,
         task_count=len(rows),
         catalog_eligible_task_count=eligible_count,

@@ -10,6 +10,11 @@ from typing import Literal
 
 from pydantic import Field
 
+from yelp_agent.collaborative.item_knn import (
+    ItemKNNHistoryEvent,
+    ItemKNNRequest,
+    TemporalItemKNNStore,
+)
 from yelp_agent.config import RetrievalConfig
 from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.category import TemporalCategoryStore
@@ -18,12 +23,19 @@ from yelp_agent.features.quality import TemporalQualityStore
 from yelp_agent.features.text import TemporalTextStore
 from yelp_agent.models import StrictModel
 
-RouteName = Literal["quality", "category", "text", "location"]
+RouteName = Literal[
+    "quality",
+    "category",
+    "text",
+    "location",
+    "item_knn",
+]
 ROUTE_NAMES: tuple[RouteName, ...] = (
     "quality",
     "category",
     "text",
     "location",
+    "item_knn",
 )
 
 
@@ -76,6 +88,14 @@ class RetrievalCandidate:
     location_rank: int | None
     location_score: float | None
     distance_km: float | None
+    item_knn_rank: int | None
+    item_knn_positive_score: float
+    item_knn_negative_evidence: float
+    item_knn_positive_support_count: int
+    item_knn_negative_support_count: int
+    item_knn_positive_neighbor_count: int
+    item_knn_negative_neighbor_count: int
+    item_knn_missing: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,12 +140,14 @@ class MultiRouteRetriever:
         quality_store: TemporalQualityStore,
         location_store: TemporalLocationStore,
         config: RetrievalConfig,
+        item_knn_store: TemporalItemKNNStore | None = None,
     ) -> None:
         self._data_view = data_view
         self._category_store = category_store
         self._text_store = text_store
         self._quality_store = quality_store
         self._location_store = location_store
+        self._item_knn_store = item_knn_store
         self._config = config
         self._all_business_ids = sorted(
             business.business_id for business in data_view.businesses()
@@ -216,6 +238,30 @@ class MultiRouteRetriever:
                 strict=True,
             )
         }
+        item_knn_result = (
+            None
+            if self._item_knn_store is None
+            else self._item_knn_store.score_candidates(
+                ItemKNNRequest(
+                    user_id=task.user_id,
+                    cutoff_time=task.cutoff_time,
+                    candidate_business_ids=tuple(eligible_ids),
+                    history=tuple(
+                        ItemKNNHistoryEvent(
+                            business_id=interaction.business_id,
+                            stars=interaction.stars,
+                            date=interaction.date,
+                        )
+                        for interaction in history
+                    ),
+                )
+            )
+        )
+        item_knn_by_business = (
+            {}
+            if item_knn_result is None
+            else {score.business_id: score for score in item_knn_result.scores}
+        )
 
         route_lists: dict[RouteName, list[tuple[str, float]]] = {}
         route_lists["quality"] = _rank_scores(
@@ -250,6 +296,18 @@ class MultiRouteRetriever:
             limit=self._config.per_route_limit,
             include_zero=True,
         )
+        route_lists["item_knn"] = (
+            _rank_scores(
+                {
+                    business_id: score.positive_score
+                    for business_id, score in item_knn_by_business.items()
+                },
+                limit=self._config.per_route_limit,
+                include_zero=False,
+            )
+            if item_knn_result is not None
+            else []
+        )
 
         by_business: dict[
             str,
@@ -275,10 +333,9 @@ class MultiRouteRetriever:
                     rank,
                     float(score),
                 )
-                fusion_scores[business_id] = (
-                    fusion_scores.get(business_id, 0.0)
-                    + 1.0 / (self._config.rrf_constant + rank)
-                )
+                fusion_scores[business_id] = fusion_scores.get(
+                    business_id, 0.0
+                ) + 1.0 / (self._config.rrf_constant + rank)
 
         fused_ids = sorted(
             fusion_scores,
@@ -291,28 +348,56 @@ class MultiRouteRetriever:
             category_item = evidence.get("category")
             text_item = evidence.get("text")
             location_item = evidence.get("location")
+            item_knn_item = evidence.get("item_knn")
             location_score, distance_km = location_details[business_id]
+            item_knn_score = item_knn_by_business.get(business_id)
             fused.append(
                 RetrievalCandidate(
                     business_id=business_id,
                     rank=rank,
                     fusion_score=fusion_scores[business_id],
                     route_count=len(evidence),
-                    quality_rank=(
-                        None if quality_item is None else quality_item[0]
-                    ),
+                    quality_rank=(None if quality_item is None else quality_item[0]),
                     quality_score=quality_by_business[business_id],
-                    category_rank=(
-                        None if category_item is None else category_item[0]
-                    ),
+                    category_rank=(None if category_item is None else category_item[0]),
                     category_score=category_scores[business_id],
                     text_rank=None if text_item is None else text_item[0],
                     text_score=text_scores[business_id],
-                    location_rank=(
-                        None if location_item is None else location_item[0]
-                    ),
+                    location_rank=(None if location_item is None else location_item[0]),
                     location_score=location_score,
                     distance_km=distance_km,
+                    item_knn_rank=(None if item_knn_item is None else item_knn_item[0]),
+                    item_knn_positive_score=(
+                        0.0 if item_knn_score is None else item_knn_score.positive_score
+                    ),
+                    item_knn_negative_evidence=(
+                        0.0
+                        if item_knn_score is None
+                        else item_knn_score.negative_evidence
+                    ),
+                    item_knn_positive_support_count=(
+                        0
+                        if item_knn_score is None
+                        else item_knn_score.positive_support_count
+                    ),
+                    item_knn_negative_support_count=(
+                        0
+                        if item_knn_score is None
+                        else item_knn_score.negative_support_count
+                    ),
+                    item_knn_positive_neighbor_count=(
+                        0
+                        if item_knn_score is None
+                        else item_knn_score.positive_neighbor_count
+                    ),
+                    item_knn_negative_neighbor_count=(
+                        0
+                        if item_knn_score is None
+                        else item_knn_score.negative_neighbor_count
+                    ),
+                    item_knn_missing=(
+                        True if item_knn_result is None else item_knn_result.missing
+                    ),
                 )
             )
 
@@ -324,8 +409,7 @@ class MultiRouteRetriever:
                 f"Task {task.task_id!r} produced an incomplete fused candidate set"
             )
         if any(
-            not math.isfinite(candidate.fusion_score)
-            or candidate.fusion_score <= 0
+            not math.isfinite(candidate.fusion_score) or candidate.fusion_score <= 0
             for candidate in fused
         ):
             raise RetrievalError(

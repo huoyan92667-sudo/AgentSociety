@@ -14,7 +14,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from pydantic import Field, ValidationError
 
-from yelp_agent.config import AppConfig, RetrievalConfig
+from yelp_agent.collaborative.item_knn import TemporalItemKNNStore
+from yelp_agent.config import AppConfig, ItemKNNConfig, RetrievalConfig
 from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.experiments.artifacts import write_json_artifact
 from yelp_agent.features.category import TemporalCategoryStore
@@ -44,6 +45,30 @@ CANDIDATE_SCHEMA = pa.schema(
         pa.field("location_rank", pa.int32()),
         pa.field("location_score", pa.float64()),
         pa.field("distance_km", pa.float64()),
+        pa.field("item_knn_rank", pa.int32()),
+        pa.field("item_knn_positive_score", pa.float64(), nullable=False),
+        pa.field("item_knn_negative_evidence", pa.float64(), nullable=False),
+        pa.field(
+            "item_knn_positive_support_count",
+            pa.int32(),
+            nullable=False,
+        ),
+        pa.field(
+            "item_knn_negative_support_count",
+            pa.int32(),
+            nullable=False,
+        ),
+        pa.field(
+            "item_knn_positive_neighbor_count",
+            pa.int32(),
+            nullable=False,
+        ),
+        pa.field(
+            "item_knn_negative_neighbor_count",
+            pa.int32(),
+            nullable=False,
+        ),
+        pa.field("item_knn_missing", pa.bool_(), nullable=False),
     ]
 )
 TASK_AUDIT_SCHEMA = pa.schema(
@@ -58,6 +83,7 @@ TASK_AUDIT_SCHEMA = pa.schema(
         pa.field("category_result_count", pa.int32(), nullable=False),
         pa.field("text_result_count", pa.int32(), nullable=False),
         pa.field("location_result_count", pa.int32(), nullable=False),
+        pa.field("item_knn_result_count", pa.int32(), nullable=False),
         pa.field("latency_ms", pa.float64(), nullable=False),
     ]
 )
@@ -83,6 +109,10 @@ class RetrievalSourcePaths:
     interactions: Path
     tfidf_artifact: Path
     tfidf_manifest: Path
+    item_knn_positive_events: Path | None = None
+    item_knn_negative_events: Path | None = None
+    item_knn_neutral_events: Path | None = None
+    item_knn_manifest: Path | None = None
 
 
 class RetrievalSplitManifest(StrictModel):
@@ -94,13 +124,15 @@ class RetrievalSplitManifest(StrictModel):
 
 
 class RetrievalBenchmarkManifest(StrictModel):
-    format_version: Literal[1] = 1
-    benchmark_name: Literal["Full Retrieval Benchmark V1"] = (
-        "Full Retrieval Benchmark V1"
-    )
+    format_version: Literal[1, 2] = 1
+    benchmark_name: Literal[
+        "Full Retrieval Benchmark V1",
+        "Full Retrieval Benchmark V2 + Item-KNN",
+    ] = "Full Retrieval Benchmark V1"
     target_conditioned: Literal[False] = False
     ground_truth_files_read: Literal[False] = False
     retrieval_configuration: RetrievalConfig
+    item_knn_configuration: ItemKNNConfig | None = None
     broad_categories: list[str]
     requested_splits: list[Literal["train", "validation", "test"]]
     source_sha256: dict[str, str]
@@ -129,11 +161,14 @@ def _sha256(path: Path) -> str:
 def _configuration_sha256(
     config: RetrievalConfig,
     broad_categories: list[str],
+    item_knn_config: ItemKNNConfig | None = None,
 ) -> str:
     payload = {
         "retrieval": config.model_dump(mode="json"),
         "broad_categories": broad_categories,
     }
+    if item_knn_config is not None:
+        payload["item_knn"] = item_knn_config.model_dump(mode="json")
     return hashlib.sha256(
         json.dumps(
             payload,
@@ -150,12 +185,8 @@ def _artifact_paths(
 ) -> dict[str, Path]:
     paths: dict[str, Path] = {}
     for split in splits:
-        paths[f"{split}_candidates"] = (
-            output_root / f"{split}_candidates.parquet"
-        )
-        paths[f"{split}_task_audit"] = (
-            output_root / f"{split}_task_audit.parquet"
-        )
+        paths[f"{split}_candidates"] = output_root / f"{split}_candidates.parquet"
+        paths[f"{split}_task_audit"] = output_root / f"{split}_task_audit.parquet"
         if split in provenance_splits:
             paths[f"{split}_route_provenance"] = (
                 output_root / f"{split}_route_provenance.parquet"
@@ -165,9 +196,7 @@ def _artifact_paths(
 
 def _load_contexts(path: Path, split: str) -> list[RetrievalTaskContext]:
     if not path.is_file():
-        raise FileNotFoundError(
-            f"Retrieval context Parquet does not exist: {path}"
-        )
+        raise FileNotFoundError(f"Retrieval context Parquet does not exist: {path}")
     try:
         rows = pq.read_table(
             path,
@@ -188,11 +217,9 @@ def _load_contexts(path: Path, split: str) -> list[RetrievalTaskContext]:
         for row in rows
         if row.get("split") == split
     ]
-    selected.sort(key=lambda task: task.task_id)
+    selected.sort(key=lambda task: (task.cutoff_time, task.task_id))
     if not selected:
-        raise RetrievalBenchmarkError(
-            f"No {split!r} contexts were found in {path}"
-        )
+        raise RetrievalBenchmarkError(f"No {split!r} contexts were found in {path}")
     task_ids = [task.task_id for task in selected]
     if len(task_ids) != len(set(task_ids)):
         raise RetrievalBenchmarkError(f"Duplicate {split!r} retrieval task_id")
@@ -216,6 +243,22 @@ def _candidate_rows(result: RetrievalResult) -> list[dict[str, object]]:
             "location_rank": candidate.location_rank,
             "location_score": candidate.location_score,
             "distance_km": candidate.distance_km,
+            "item_knn_rank": candidate.item_knn_rank,
+            "item_knn_positive_score": candidate.item_knn_positive_score,
+            "item_knn_negative_evidence": (candidate.item_knn_negative_evidence),
+            "item_knn_positive_support_count": (
+                candidate.item_knn_positive_support_count
+            ),
+            "item_knn_negative_support_count": (
+                candidate.item_knn_negative_support_count
+            ),
+            "item_knn_positive_neighbor_count": (
+                candidate.item_knn_positive_neighbor_count
+            ),
+            "item_knn_negative_neighbor_count": (
+                candidate.item_knn_negative_neighbor_count
+            ),
+            "item_knn_missing": candidate.item_knn_missing,
         }
         for candidate in result.candidates
     ]
@@ -233,6 +276,7 @@ def _audit_row(result: RetrievalResult) -> dict[str, object]:
         "category_result_count": result.route_result_counts["category"],
         "text_result_count": result.route_result_counts["text"],
         "location_result_count": result.route_result_counts["location"],
+        "item_knn_result_count": result.route_result_counts["item_knn"],
         "latency_ms": result.latency_ms,
     }
 
@@ -401,6 +445,7 @@ def build_full_retrieval_benchmark(
     app_config: AppConfig,
     retrieval_config: RetrievalConfig,
     *,
+    item_knn_config: ItemKNNConfig | None = None,
     force: bool = False,
 ) -> RetrievalBenchmarkBuildResult:
     """Build candidate files without accepting or reading ground-truth paths."""
@@ -412,29 +457,41 @@ def build_full_retrieval_benchmark(
     if not set(requested_splits).issubset(allowed_splits):
         raise ValueError("split_contexts contains an unsupported split")
 
+    item_knn_paths = {
+        "item_knn_positive_events": sources.item_knn_positive_events,
+        "item_knn_negative_events": sources.item_knn_negative_events,
+        "item_knn_neutral_events": sources.item_knn_neutral_events,
+        "item_knn_manifest": sources.item_knn_manifest,
+    }
+    configured_item_paths = {
+        name: path for name, path in item_knn_paths.items() if path is not None
+    }
+    if item_knn_config is None and configured_item_paths:
+        raise ValueError("Item-KNN source paths require item_knn_config")
+    if item_knn_config is not None and len(configured_item_paths) != 4:
+        raise ValueError(
+            "Item-KNN retrieval requires all three event files and manifest"
+        )
     source_files = {
         "businesses": sources.businesses,
         "reviews": sources.reviews,
         "interactions": sources.interactions,
         "tfidf_artifact": sources.tfidf_artifact,
         "tfidf_manifest": sources.tfidf_manifest,
-        **{
-            f"{split}_contexts": Path(path)
-            for split, path in split_contexts.items()
-        },
+        **{f"{split}_contexts": Path(path) for split, path in split_contexts.items()},
+        **{name: Path(path) for name, path in configured_item_paths.items()},
     }
     missing = [str(path) for path in source_files.values() if not path.is_file()]
     if missing:
         raise FileNotFoundError(
             "Retrieval source files do not exist: " + ", ".join(missing)
         )
-    source_sha256 = {
-        name: _sha256(path) for name, path in sorted(source_files.items())
-    }
+    source_sha256 = {name: _sha256(path) for name, path in sorted(source_files.items())}
     broad_categories = sorted(app_config.data.broad_categories)
     configuration_sha256 = _configuration_sha256(
         retrieval_config,
         broad_categories,
+        item_knn_config,
     )
     root = Path(output_root)
     root.mkdir(parents=True, exist_ok=True)
@@ -452,6 +509,7 @@ def build_full_retrieval_benchmark(
             or manifest.source_sha256 != source_sha256
             or manifest.configuration_sha256 != configuration_sha256
             or manifest.retrieval_configuration != retrieval_config
+            or manifest.item_knn_configuration != item_knn_config
             or manifest.broad_categories != broad_categories
         ):
             raise RetrievalBenchmarkError(
@@ -459,10 +517,7 @@ def build_full_retrieval_benchmark(
                 "use force=True to rebuild"
             )
         for name, path in paths.items():
-            if (
-                not path.is_file()
-                or _sha256(path) != manifest.output_sha256.get(name)
-            ):
+            if not path.is_file() or _sha256(path) != manifest.output_sha256.get(name):
                 raise RetrievalBenchmarkError(
                     f"Retrieval benchmark output changed or is missing: {name}"
                 )
@@ -497,6 +552,16 @@ def build_full_retrieval_benchmark(
             scale_km=retrieval_config.location_scale_km,
         ),
         config=retrieval_config,
+        item_knn_store=(
+            None
+            if item_knn_config is None
+            else TemporalItemKNNStore.from_event_artifacts(
+                sources.item_knn_positive_events,
+                sources.item_knn_negative_events,
+                sources.item_knn_neutral_events,
+                item_knn_config,
+            )
+        ),
     )
     split_manifests: dict[str, RetrievalSplitManifest] = {}
     for split in requested_splits:
@@ -508,11 +573,16 @@ def build_full_retrieval_benchmark(
             paths,
             write_provenance=split in retrieval_config.provenance_splits,
         )
-    output_sha256 = {
-        name: _sha256(path) for name, path in sorted(paths.items())
-    }
+    output_sha256 = {name: _sha256(path) for name, path in sorted(paths.items())}
     manifest = RetrievalBenchmarkManifest(
+        format_version=2 if item_knn_config is not None else 1,
+        benchmark_name=(
+            "Full Retrieval Benchmark V2 + Item-KNN"
+            if item_knn_config is not None
+            else "Full Retrieval Benchmark V1"
+        ),
         retrieval_configuration=retrieval_config,
+        item_knn_configuration=item_knn_config,
         broad_categories=broad_categories,
         requested_splits=requested_splits,
         source_sha256=source_sha256,

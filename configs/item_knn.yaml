@@ -1,0 +1,9 @@
+# Fixed support shrinkage for the V1 collaborative graph. Validation only
+# selects the half-life; it does not tune beta in this step.
+shrinkage_beta: 10.0
+
+# Selected and frozen after comparing: null, 180, 365 and 730 on validation.
+half_life_days: 365
+
+# The final two interactions are the frozen validation and test targets.
+reserved_tail_interactions: 2

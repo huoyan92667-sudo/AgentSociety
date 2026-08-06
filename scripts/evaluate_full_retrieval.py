@@ -67,9 +67,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--task-results",
         type=Path,
-        default=Path(
-            "runs/full_retrieval_v1/validation_task_results.parquet"
+        default=Path("runs/full_retrieval_v1/validation_task_results.parquet"),
+    )
+    parser.add_argument(
+        "--benchmark-name",
+        choices=(
+            "Full Retrieval Benchmark V1",
+            "Full Retrieval Benchmark V2 + Item-KNN",
         ),
+        default="Full Retrieval Benchmark V1",
     )
     return parser
 
@@ -89,6 +95,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         route_provenance_path=args.route_provenance,
         metrics_output_path=args.metrics,
         task_results_output_path=args.task_results,
+        benchmark_name=args.benchmark_name,
     )
     print(metrics.model_dump_json(indent=2))
     return 0

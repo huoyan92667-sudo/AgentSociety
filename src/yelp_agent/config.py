@@ -215,6 +215,14 @@ class RetrievalConfig(ConfigModel):
         return self
 
 
+class ItemKNNConfig(ConfigModel):
+    """Settings for point-in-time item-item collaborative evidence."""
+
+    shrinkage_beta: float = Field(gt=0)
+    half_life_days: Literal[180, 365, 730] | None = None
+    reserved_tail_interactions: int = Field(ge=0)
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -351,6 +359,17 @@ def load_retrieval_config(
     root = Path(config_dir)
     return RetrievalConfig.model_validate(
         _read_yaml(root / "retrieval.yaml")
+    )
+
+
+def load_item_knn_config(
+    config_dir: str | Path = "configs",
+) -> ItemKNNConfig:
+    """Load settings used only by point-in-time Item-KNN."""
+
+    root = Path(config_dir)
+    return ItemKNNConfig.model_validate(
+        _read_yaml(root / "item_knn.yaml")
     )
 
 
