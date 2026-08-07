@@ -1,0 +1,9 @@
+schema_version: 1
+profile_version: 1.0.0
+half_life_days: 365
+confidence_saturation: 3.0
+reliability_history_saturation: 20
+reliability_aspect_saturation: 20
+max_category_preferences: 20
+max_area_preferences: 3
+artifact_batch_size: 250

@@ -9,13 +9,13 @@ from typing import Sequence
 from yelp_agent.agent.llm import OpenAICompatibleLLM
 from yelp_agent.agent.tools import AgentToolbox
 from yelp_agent.config import load_config
+from yelp_agent.profiles.store import UserProfileStore
+from yelp_agent.rankers.agent_ranker import AgentRanker
+from yelp_agent.rankers.agent_runner import run_agent_ranker
 from yelp_agent.ranking.assembly import (
     HybridSourcePaths,
     build_frozen_hybrid_runtime,
 )
-from yelp_agent.rankers.agent_ranker import AgentRanker
-from yelp_agent.rankers.agent_runner import run_agent_ranker
-
 
 DEFAULT_OUTPUT_DIR = Path("runs/agent/test")
 
@@ -63,6 +63,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("runs/hybrid/hybrid_weights.json"),
     )
     parser.add_argument(
+        "--profiles",
+        type=Path,
+        default=Path("data/features/user_profiles/v1"),
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
@@ -103,24 +108,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         ),
         args.weights,
     )
-    toolbox = AgentToolbox(
-        runtime.assembly.data_view,
-        hybrid_ranker=runtime.ranker,
-        quality_store=runtime.assembly.quality_store,
-    )
-    agent_ranker = AgentRanker(
-        hybrid_ranker=runtime.ranker,
-        toolbox=toolbox,
-        llm=OpenAICompatibleLLM.from_environment(config.agent),
-    )
-    result = run_agent_ranker(
-        args.tasks,
-        agent_ranker,
-        args.output_dir,
-        force=args.force,
-        limit=args.limit,
-        configuration=config,
-    )
+    with UserProfileStore(args.profiles) as profile_store:
+        toolbox = AgentToolbox(
+            runtime.assembly.data_view,
+            hybrid_ranker=runtime.ranker,
+            quality_store=runtime.assembly.quality_store,
+            profile_store=profile_store,
+        )
+        agent_ranker = AgentRanker(
+            hybrid_ranker=runtime.ranker,
+            toolbox=toolbox,
+            llm=OpenAICompatibleLLM.from_environment(config.agent),
+        )
+        result = run_agent_ranker(
+            args.tasks,
+            agent_ranker,
+            args.output_dir,
+            force=args.force,
+            limit=args.limit,
+            configuration=config,
+        )
     print(result.model_dump_json(indent=2))
     return 0
 

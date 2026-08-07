@@ -16,8 +16,10 @@ from yelp_agent.models import (
     StrictModel,
     UserProfile,
 )
+from yelp_agent.profiles.adapter import to_agent_user_profile
+from yelp_agent.profiles.schema import UserProfileV1
+from yelp_agent.profiles.store import UserProfileStoreError
 from yelp_agent.rankers.hybrid_ranker import HybridTaskScore
-
 
 MAX_HISTORY_REVIEWS = 30
 REPRESENTATIVE_REVIEWS_PER_SENTIMENT = 4
@@ -86,6 +88,10 @@ class _QualityStore(Protocol):
     ) -> dict[str, BusinessQuality]: ...
 
 
+class _UserProfileStore(Protocol):
+    def get(self, user_id: str, cutoff_time: datetime) -> UserProfileV1: ...
+
+
 class AgentToolbox:
     """Load shared read-only data once, then bind tools to one frozen task."""
 
@@ -95,10 +101,12 @@ class AgentToolbox:
         *,
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
+        profile_store: _UserProfileStore | None = None,
     ) -> None:
         self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
+        self._profile_store = profile_store
 
     def for_task(self, task: RecommendationTask) -> "TaskAgentTools":
         """Create an isolated tool session authorized for exactly one task."""
@@ -108,6 +116,7 @@ class AgentToolbox:
             data_view=self._data_view,
             hybrid_ranker=self._hybrid_ranker,
             quality_store=self._quality_store,
+            profile_store=self._profile_store,
         )
 
 
@@ -121,11 +130,13 @@ class TaskAgentTools:
         data_view: TemporalDataView,
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
+        profile_store: _UserProfileStore | None = None,
     ) -> None:
         self._task = task
         self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
+        self._profile_store = profile_store
         self._call_count = 0
 
     @property
@@ -263,6 +274,19 @@ class TaskAgentTools:
 
         self._call_count += 1
         self._validate_identity(user_id, cutoff_time)
+        if self._profile_store is not None:
+            try:
+                frozen = self._profile_store.get(user_id, cutoff_time)
+            except UserProfileStoreError as exc:
+                raise AgentToolError(str(exc)) from exc
+            if (
+                frozen.user_id != self._task.user_id
+                or frozen.cutoff_time != self._task.cutoff_time
+            ):
+                raise AgentToolError(
+                    "Frozen profile identity does not match bound task"
+                )
+            return to_agent_user_profile(frozen)
         profile = self._hybrid_ranker.score(self._task).profile
         if profile.user_id != self._task.user_id:
             raise AgentToolError("Hybrid profile user does not match bound task")

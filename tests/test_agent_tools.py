@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from yelp_agent.agent.tools import AgentToolError, AgentToolbox
+from yelp_agent.agent.tools import AgentToolbox, AgentToolError
 from yelp_agent.data.temporal_view import TemporalDataView
 from yelp_agent.features.quality import BusinessQuality
 from yelp_agent.models import (
@@ -13,6 +14,11 @@ from yelp_agent.models import (
     RecommendationTask,
     ScoreBreakdown,
     UserProfile,
+)
+from yelp_agent.profiles.schema import (
+    PreferenceSignal,
+    ProfileEvidenceSummary,
+    UserProfileV1,
 )
 from yelp_agent.rankers.hybrid_ranker import HybridTaskScore
 
@@ -84,6 +90,64 @@ class FixedQualityStore:
             )
             for business_id in business_ids
         }
+
+
+class FixedProfileStore:
+    def __init__(self, profile: UserProfileV1) -> None:
+        self.profile = profile
+        self.requests: list[tuple[str, datetime]] = []
+
+    def get(self, user_id: str, cutoff_time: datetime) -> UserProfileV1:
+        self.requests.append((user_id, cutoff_time))
+        return self.profile
+
+
+def _frozen_profile(task: RecommendationTask) -> UserProfileV1:
+    signal = PreferenceSignal(
+        kind="category",
+        value="Steakhouses",
+        score=1.0,
+        confidence=0.75,
+        evidence_count=3,
+        effective_evidence=2.5,
+        first_seen=datetime(2019, 1, 1),
+        last_confirmed=datetime(2020, 1, 3),
+        source="rating_category",
+    )
+    aspect = PreferenceSignal(
+        kind="aspect",
+        value="quiet_environment",
+        score=1.0,
+        confidence=0.6,
+        evidence_count=2,
+        effective_evidence=1.7,
+        first_seen=datetime(2019, 1, 1),
+        last_confirmed=datetime(2020, 1, 3),
+        source="review_aspect",
+    )
+    return UserProfileV1(
+        profile_id="a" * 64,
+        user_id=task.user_id,
+        cutoff_time=task.cutoff_time,
+        history_length=3,
+        average_rating=3.0,
+        rating_distribution={"1": 1, "2": 0, "3": 1, "4": 0, "5": 1},
+        category_preferences=[signal],
+        category_dislikes=[],
+        aspect_preferences=[aspect],
+        aspect_dislikes=[],
+        frequent_areas=[],
+        reliability=0.5,
+        evidence_summary=ProfileEvidenceSummary(
+            category_evidence_count=3,
+            aspect_evidence_count=2,
+            price_evidence_count=0,
+            area_evidence_count=0,
+            first_interaction=datetime(2019, 1, 1),
+            last_interaction=datetime(2020, 1, 3),
+        ),
+        profile_version="1.0.0",
+    )
 
 
 def _write_agent_tool_fixture(
@@ -254,6 +318,29 @@ def test_profile_tool_returns_bound_task_profile_and_rejects_another_user(
     with pytest.raises(AgentToolError, match="user_id"):
         session.get_user_profile("another-user", task.cutoff_time)
     assert session.call_count == 2
+
+
+def test_profile_tool_prefers_frozen_v1_store_when_configured(
+    tmp_path: Path,
+) -> None:
+    businesses, interactions, histories, task = _write_agent_tool_fixture(
+        tmp_path
+    )
+    profile_store = FixedProfileStore(_frozen_profile(task))
+    session = AgentToolbox(
+        TemporalDataView(businesses, interactions, interactions),
+        hybrid_ranker=FixedRanker(),
+        quality_store=FixedQualityStore(),
+        profile_store=profile_store,
+    ).for_task(task)
+
+    profile = session.get_user_profile(task.user_id, task.cutoff_time)
+
+    assert profile.preferred_categories == {"Steakhouses": 1.0}
+    assert profile.aspect_preferences == {"quiet_environment": 1.0}
+    assert profile.category_confidences == {"Steakhouses": 0.75}
+    assert profile.profile_reliability == 0.5
+    assert profile_store.requests == [(task.user_id, task.cutoff_time)]
 
 
 def test_hybrid_ranking_tool_requires_the_complete_bound_candidate_set(

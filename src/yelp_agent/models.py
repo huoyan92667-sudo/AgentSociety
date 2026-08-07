@@ -7,7 +7,6 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-
 UnitScore = Annotated[float, Field(ge=0, le=1)]
 NonNegativeCount = Annotated[int, Field(ge=0)]
 RECOMMENDATION_CANDIDATE_COUNT = 20
@@ -62,12 +61,22 @@ class LocationCenter(StrictModel):
 
 
 class UserProfile(StrictModel):
+    profile_id: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     user_id: str = Field(min_length=1)
+    cutoff_time: datetime | None = None
     history_count: NonNegativeCount
     average_rating: float = Field(ge=0, le=5)
     rating_distribution: dict[str, NonNegativeCount]
     preferred_categories: dict[str, UnitScore]
     disliked_categories: dict[str, UnitScore]
+    category_confidences: dict[str, UnitScore] = Field(default_factory=dict)
+    aspect_preferences: dict[str, UnitScore] = Field(default_factory=dict)
+    aspect_dislikes: dict[str, UnitScore] = Field(default_factory=dict)
+    aspect_confidences: dict[str, UnitScore] = Field(default_factory=dict)
+    price_preference: str | None = Field(default=None, pattern=r"^[1-4]$")
+    frequent_areas: list[str] = Field(default_factory=list)
+    profile_reliability: UnitScore | None = None
+    profile_version: str | None = None
     preferred_city: str | None = None
     location_center: LocationCenter | None = None
     positive_keywords: list[str] = Field(default_factory=list)
@@ -79,9 +88,20 @@ class UserProfile(StrictModel):
         if len(values) > 10:
             raise ValueError("keyword lists can contain at most 10 items")
         if any(not value or value != value.strip() for value in values):
-            raise ValueError("keywords must be nonempty and contain no surrounding whitespace")
+            raise ValueError(
+                "keywords must be nonempty and contain no surrounding whitespace"
+            )
         if len(set(values)) != len(values):
             raise ValueError("keywords must be unique")
+        return values
+
+    @field_validator("frequent_areas")
+    @classmethod
+    def validate_frequent_areas(cls, values: list[str]) -> list[str]:
+        if any(not value or value != value.strip() for value in values):
+            raise ValueError("frequent areas must be nonempty without whitespace")
+        if len(set(values)) != len(values):
+            raise ValueError("frequent areas must be unique")
         return values
 
     @model_validator(mode="after")
@@ -124,5 +144,7 @@ class Prediction(StrictModel):
         ):
             raise ValueError("fallback predictions must include a fallback_reason")
         if not self.fallback and self.fallback_reason is not None:
-            raise ValueError("non-fallback predictions cannot include a fallback_reason")
+            raise ValueError(
+                "non-fallback predictions cannot include a fallback_reason"
+            )
         return self

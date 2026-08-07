@@ -291,6 +291,20 @@ class ReviewAspectVocabulary(ConfigModel):
         return self
 
 
+class UserProfileConfig(ConfigModel):
+    """Settings for deterministic, point-in-time user profiles."""
+
+    schema_version: Literal[1]
+    profile_version: Literal["1.0.0"]
+    half_life_days: int = Field(gt=0)
+    confidence_saturation: float = Field(gt=0)
+    reliability_history_saturation: int = Field(gt=0)
+    reliability_aspect_saturation: int = Field(gt=0)
+    max_category_preferences: int = Field(gt=0)
+    max_area_preferences: int = Field(gt=0)
+    artifact_batch_size: int = Field(gt=0)
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -455,6 +469,15 @@ def load_review_aspect_settings(
             _read_yaml(root / "review_aspect_vocabulary.yaml")
         ),
     )
+
+
+def load_user_profile_config(
+    config_dir: str | Path = "configs",
+) -> UserProfileConfig:
+    """Load deterministic long-term user-profile settings."""
+
+    root = Path(config_dir)
+    return UserProfileConfig.model_validate(_read_yaml(root / "user_profiles.yaml"))
 
 
 def configuration_fingerprint(config: AppConfig) -> str:
