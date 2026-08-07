@@ -74,11 +74,12 @@ def test_review_aspect_vocabulary_is_versioned_and_covers_exact_taxonomy() -> No
     config, vocabulary = load_review_aspect_settings(PROJECT_CONFIG_DIR)
 
     assert config.schema_version == 1
-    assert config.audit.max_tokens == 2000
+    assert config.audit.max_tokens == 12000
     assert config.audit.response_format_json is True
     assert config.audit.thinking == "disabled"
-    assert config.extractor_version == "1.1.0"
-    assert vocabulary.vocabulary_version == 2
+    assert config.audit.provider_thinking == "disabled"
+    assert config.extractor_version == "1.2.0"
+    assert vocabulary.vocabulary_version == 3
     assert config.audit.batch_size == 10
     assert tuple(vocabulary.aspects) == ASPECT_NAMES
     assert "quiet" in vocabulary.aspects["quiet_environment"].positive
@@ -166,6 +167,53 @@ def test_crowded_rule_requires_business_context_for_very_busy() -> None:
         ("crowded", "negative")
     ]
     assert all(row.aspect != "crowded" for row in personal_records)
+
+
+def test_deepseek_rule_feedback_adds_general_phrases_without_broad_parking() -> None:
+    config, vocabulary = load_review_aspect_settings(PROJECT_CONFIG_DIR)
+    extractor = RuleBasedAspectExtractor(config, vocabulary)
+
+    clear_preferences = extractor.extract(
+        ReviewDocument(
+            review_id="review-feedback-positive",
+            business_id="business-1",
+            user_id="user-1",
+            review_time=datetime(2020, 1, 1),
+            text=(
+                "The food was good at reasonable prices, the service is quick, "
+                "and the restaurant has a large parking lot."
+            ),
+        )
+    )
+    neutral_parking = extractor.extract(
+        ReviewDocument(
+            review_id="review-feedback-neutral",
+            business_id="business-1",
+            user_id="user-1",
+            review_time=datetime(2020, 1, 1),
+            text="A food truck was parked in the parking lot.",
+        )
+    )
+    negative_price = extractor.extract(
+        ReviewDocument(
+            review_id="review-feedback-negative",
+            business_id="business-1",
+            user_id="user-1",
+            review_time=datetime(2020, 1, 1),
+            text="It was over priced.",
+        )
+    )
+
+    assert {(row.aspect, row.sentiment) for row in clear_preferences} == {
+        ("food_quality", "positive"),
+        ("service", "positive"),
+        ("price_value", "positive"),
+        ("parking", "positive"),
+    }
+    assert all(row.aspect != "parking" for row in neutral_parking)
+    assert [(row.aspect, row.sentiment) for row in negative_price] == [
+        ("price_value", "negative")
+    ]
 
 
 def test_aspect_artifact_builder_is_atomic_counted_and_reusable(tmp_path: Path) -> None:

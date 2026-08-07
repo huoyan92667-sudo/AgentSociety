@@ -165,6 +165,57 @@ def test_auditor_rejects_non_json_and_wrong_item_ids_without_caching(
     assert list(tmp_path.rglob("*.json")) == []
 
 
+def test_auditor_discards_only_suggestions_without_exact_evidence(
+    tmp_path: Path,
+) -> None:
+    item = AspectAuditItem(
+        item_id="discovery-item",
+        sentence="The noodles were generally good.",
+    )
+    response = {
+        "decisions": [
+            {
+                "item_id": "discovery-item",
+                "aspect_correct": None,
+                "sentiment_correct": None,
+                "evidence_supported": None,
+                "missing_aspects": [],
+                "suggestions": [
+                    {
+                        "aspect": "food_quality",
+                        "sentiment": "positive",
+                        "evidence_span": "noodles were generally good",
+                        "suggested_phrase": "generally good",
+                        "confidence": 0.9,
+                    },
+                    {
+                        "aspect": "food_quality",
+                        "sentiment": "positive",
+                        "evidence_span": "excellent noodles",
+                        "suggested_phrase": "excellent noodles",
+                        "confidence": 0.8,
+                    },
+                ],
+                "error_code": "NONE",
+                "confidence": 0.9,
+            }
+        ]
+    }
+    auditor = ReviewAspectAuditor(
+        InvalidAuditLLM(json.dumps(response)),
+        model_name="fake-model",
+        cache_dir=tmp_path / "cache",
+    )
+
+    result = auditor.audit((item,))
+
+    assert result.status == "success"
+    assert result.discarded_suggestion_count == 1
+    assert [row.evidence_span for row in result.decisions[0].suggestions] == [
+        "noodles were generally good"
+    ]
+
+
 def test_audit_sampling_is_deterministic_stratified_and_anonymous(
     tmp_path: Path,
 ) -> None:

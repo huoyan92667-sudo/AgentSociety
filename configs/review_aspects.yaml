@@ -1,6 +1,6 @@
 schema_version: 1
 extractor_name: rule_based
-extractor_version: 1.1.0
+extractor_version: 1.2.0
 rule_confidence: 0.85
 negated_confidence: 0.72
 mixed_confidence: 0.60
@@ -15,6 +15,6 @@ audit:
   temperature: 0.0
   timeout_seconds: 90
   max_retries: 1
-  max_tokens: 2000
+  max_tokens: 12000
   response_format_json: true
   thinking: disabled

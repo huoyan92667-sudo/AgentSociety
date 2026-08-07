@@ -235,9 +235,15 @@ class ReviewAspectAuditConfig(ConfigModel):
     temperature: Literal[0.0]
     timeout_seconds: float = Field(gt=0)
     max_retries: int = Field(ge=0, le=2)
-    max_tokens: int = Field(ge=1, le=4000)
+    max_tokens: int = Field(ge=1, le=16000)
     response_format_json: Literal[True]
-    thinking: Literal["disabled"]
+    thinking: Literal["default", "enabled", "disabled"]
+
+    @property
+    def provider_thinking(self) -> Literal["enabled", "disabled"] | None:
+        """Translate human-readable default into an omitted API parameter."""
+
+        return None if self.thinking == "default" else self.thinking
 
 
 class ReviewAspectConfig(ConfigModel):
@@ -273,7 +279,7 @@ class ReviewAspectTerms(ConfigModel):
 
 
 class ReviewAspectVocabulary(ConfigModel):
-    vocabulary_version: Literal[2]
+    vocabulary_version: Literal[3]
     aspects: dict[AspectName, ReviewAspectTerms]
 
     @model_validator(mode="after")

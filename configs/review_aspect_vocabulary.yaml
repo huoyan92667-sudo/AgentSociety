@@ -1,4 +1,4 @@
-vocabulary_version: 2
+vocabulary_version: 3
 aspects:
   food_quality:
     positive:
@@ -8,6 +8,8 @@ aspects:
       - fresh food
       - cooked perfectly
       - excellent food
+      - food was good
+      - food was also good
     negative:
       - bland
       - tasteless
@@ -23,6 +25,7 @@ aspects:
       - excellent service
       - great service
       - quick service
+      - service is quick
     negative:
       - rude staff
       - inattentive
@@ -36,6 +39,7 @@ aspects:
       - good value
       - worth the price
       - reasonably priced
+      - reasonable prices
       - affordable
       - great deal
     negative:
@@ -44,6 +48,7 @@ aspects:
       - poor value
       - too expensive
       - expensive for
+      - over priced
   quiet_environment:
     positive:
       - quiet
@@ -107,13 +112,19 @@ aspects:
       - plenty of parking
       - free parking
       - parking was convenient
-      - parking lot
+      - has a parking lot
+      - there's a parking lot
+      - large parking lot
+      - private parking lot
+      - good parking options
     negative:
       - difficult parking
       - hard to park
       - no parking
       - parking was expensive
       - limited parking
+      - parking lot is full
+      - parking lot was full
   pet_friendly:
     positive:
       - dog friendly

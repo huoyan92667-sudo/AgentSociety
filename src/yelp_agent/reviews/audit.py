@@ -125,6 +125,7 @@ class AspectAuditBatchResult(StrictModel):
     total_tokens: int | None = Field(default=None, ge=0)
     observed_total_tokens: int | None = Field(default=None, ge=0)
     unknown_usage_attempts: int = Field(default=0, ge=0)
+    discarded_suggestion_count: int = Field(default=0, ge=0)
     failure_reason: str | None = None
 
 
@@ -146,6 +147,7 @@ class AspectAuditRunSummary(StrictModel):
     candidate_items: int = Field(ge=0)
     discovery_items: int = Field(ge=0)
     suggestion_count: int = Field(ge=0)
+    discarded_suggestion_count: int = Field(default=0, ge=0)
     models: list[str]
     aspect_agreement_rate: float = Field(ge=0, le=1)
     sentiment_agreement_rate: float = Field(ge=0, le=1)
@@ -300,6 +302,8 @@ class ReviewAspectAuditor:
                 failure_reason="item_id_mismatch",
                 **base,
             )
+        sanitized_decisions: list[AspectAuditDecision] = []
+        discarded_suggestion_count = 0
         for item, decision in zip(frozen, parsed.decisions, strict=True):
             correctness = (
                 decision.aspect_correct,
@@ -321,19 +325,23 @@ class ReviewAspectAuditor:
                     failure_reason="candidate_schema_validation",
                     **base,
                 )
-            if any(
-                suggestion.evidence_span not in item.sentence
+            supported_suggestions = [
+                suggestion
                 for suggestion in decision.suggestions
-            ):
-                return AspectAuditBatchResult(
-                    status="failure",
-                    decisions=[],
-                    failure_reason="unsupported_suggestion",
-                    **base,
+                if suggestion.evidence_span in item.sentence
+            ]
+            discarded_suggestion_count += len(decision.suggestions) - len(
+                supported_suggestions
+            )
+            sanitized_decisions.append(
+                decision.model_copy(
+                    update={"suggestions": supported_suggestions},
                 )
+            )
         result = AspectAuditBatchResult(
             status="success",
-            decisions=parsed.decisions,
+            decisions=sanitized_decisions,
+            discarded_suggestion_count=discarded_suggestion_count,
             failure_reason=None,
             **base,
         )
@@ -573,6 +581,9 @@ def run_review_aspect_audit(
         ),
         suggestion_count=sum(
             len(trace.decision.suggestions) for trace in traces
+        ),
+        discarded_suggestion_count=sum(
+            batch.discarded_suggestion_count for batch in batches
         ),
         models=sorted({batch.model for batch in batches if batch.model}),
         aspect_agreement_rate=rate("aspect_correct"),

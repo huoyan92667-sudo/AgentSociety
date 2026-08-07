@@ -104,7 +104,7 @@ def main() -> None:
             max_retries=config.audit.max_retries,
             max_tokens=config.audit.max_tokens,
             response_format_json=config.audit.response_format_json,
-            thinking=config.audit.thinking,
+            thinking=config.audit.provider_thinking,
         ),
         environment,
     )
