@@ -14,6 +14,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, model_validator
 
 from yelp_agent.models import RECOMMENDATION_CANDIDATE_COUNT
+from yelp_agent.reviews.schema import ASPECT_NAMES, AspectName
 
 
 class ConfigModel(BaseModel):
@@ -138,6 +139,9 @@ class AgentConfig(ConfigModel):
     temperature: Literal[0.0]
     timeout_seconds: float = Field(gt=0)
     max_retries: int = Field(ge=0, le=2)
+    max_tokens: int | None = Field(default=None, ge=1)
+    response_format_json: bool = False
+    thinking: Literal["enabled", "disabled"] | None = None
 
 
 class TfidfConfig(ConfigModel):
@@ -221,6 +225,64 @@ class ItemKNNConfig(ConfigModel):
     shrinkage_beta: float = Field(gt=0)
     half_life_days: Literal[180, 365, 730] | None = None
     reserved_tail_interactions: int = Field(ge=0)
+
+
+class ReviewAspectAuditConfig(ConfigModel):
+    enabled: bool
+    sample_size: int = Field(ge=1)
+    batch_size: int = Field(ge=1, le=25)
+    seed: int
+    temperature: Literal[0.0]
+    timeout_seconds: float = Field(gt=0)
+    max_retries: int = Field(ge=0, le=2)
+    max_tokens: int = Field(ge=1, le=4000)
+    response_format_json: Literal[True]
+    thinking: Literal["disabled"]
+
+
+class ReviewAspectConfig(ConfigModel):
+    schema_version: Literal[1]
+    extractor_name: Literal["rule_based"]
+    extractor_version: str = Field(min_length=1)
+    rule_confidence: float = Field(gt=0, le=1)
+    negated_confidence: float = Field(gt=0, le=1)
+    mixed_confidence: float = Field(gt=0, le=1)
+    negation_window_tokens: int = Field(ge=1, le=5)
+    chunk_size: int = Field(ge=1)
+    audit: ReviewAspectAuditConfig
+
+
+class ReviewAspectTerms(ConfigModel):
+    positive: list[str]
+    negative: list[str]
+
+    @model_validator(mode="after")
+    def validate_terms(self) -> "ReviewAspectTerms":
+        for name, values in (
+            ("positive", self.positive),
+            ("negative", self.negative),
+        ):
+            if not values:
+                raise ValueError(f"{name} review aspect terms cannot be empty")
+            if any(not value or value != value.strip() for value in values):
+                raise ValueError(f"{name} review aspect terms contain an invalid value")
+            normalized = [value.casefold() for value in values]
+            if len(set(normalized)) != len(normalized):
+                raise ValueError(f"{name} review aspect terms must be unique")
+        return self
+
+
+class ReviewAspectVocabulary(ConfigModel):
+    vocabulary_version: Literal[2]
+    aspects: dict[AspectName, ReviewAspectTerms]
+
+    @model_validator(mode="after")
+    def validate_taxonomy(self) -> "ReviewAspectVocabulary":
+        if tuple(self.aspects) != ASPECT_NAMES:
+            raise ValueError(
+                "review aspect vocabulary must define the frozen taxonomy in order"
+            )
+        return self
 
 
 class LegacyTestConfig(ConfigModel):
@@ -370,6 +432,22 @@ def load_item_knn_config(
     root = Path(config_dir)
     return ItemKNNConfig.model_validate(
         _read_yaml(root / "item_knn.yaml")
+    )
+
+
+def load_review_aspect_settings(
+    config_dir: str | Path = "configs",
+) -> tuple[ReviewAspectConfig, ReviewAspectVocabulary]:
+    """Load the versioned Review Aspect protocol and seed vocabulary."""
+
+    root = Path(config_dir)
+    return (
+        ReviewAspectConfig.model_validate(
+            _read_yaml(root / "review_aspects.yaml")
+        ),
+        ReviewAspectVocabulary.model_validate(
+            _read_yaml(root / "review_aspect_vocabulary.yaml")
+        ),
     )
 
 

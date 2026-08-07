@@ -101,6 +101,9 @@ class _ChatTransport(Protocol):
         messages: list[dict[str, str]],
         temperature: float,
         timeout_seconds: float,
+        max_tokens: int | None = None,
+        response_format_json: bool = False,
+        thinking: Literal["enabled", "disabled"] | None = None,
     ) -> LLMTransportResponse: ...
 
 
@@ -156,14 +159,24 @@ class OpenAIChatTransport:
         messages: list[dict[str, str]],
         temperature: float,
         timeout_seconds: float,
+        max_tokens: int | None = None,
+        response_format_json: bool = False,
+        thinking: Literal["enabled", "disabled"] | None = None,
     ) -> LLMTransportResponse:
+        request: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "timeout": timeout_seconds,
+        }
+        if max_tokens is not None:
+            request["max_tokens"] = max_tokens
+        if response_format_json:
+            request["response_format"] = {"type": "json_object"}
+        if thinking is not None:
+            request["extra_body"] = {"thinking": {"type": thinking}}
         try:
-            response = self._client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                timeout=timeout_seconds,
-            )
+            response = self._client.chat.completions.create(**request)
         except OpenAIError as exc:
             raise self._translate_error(exc) from None
 
@@ -246,12 +259,19 @@ class OpenAICompatibleLLM:
         for attempt_count in range(1, maximum_attempts + 1):
             attempt_started_at = perf_counter()
             try:
-                response = self._transport.complete(
-                    model=self._environment.model,
-                    messages=request_messages,
-                    temperature=float(self._config.temperature),
-                    timeout_seconds=float(self._config.timeout_seconds),
-                )
+                request: dict[str, Any] = {
+                    "model": self._environment.model,
+                    "messages": request_messages,
+                    "temperature": float(self._config.temperature),
+                    "timeout_seconds": float(self._config.timeout_seconds),
+                }
+                if self._config.max_tokens is not None:
+                    request["max_tokens"] = self._config.max_tokens
+                if self._config.response_format_json:
+                    request["response_format_json"] = True
+                if self._config.thinking is not None:
+                    request["thinking"] = self._config.thinking
+                response = self._transport.complete(**request)
             except LLMTransportError as exc:
                 attempts.append(
                     LLMAttemptTrace(

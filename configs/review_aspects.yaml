@@ -1,0 +1,20 @@
+schema_version: 1
+extractor_name: rule_based
+extractor_version: 1.1.0
+rule_confidence: 0.85
+negated_confidence: 0.72
+mixed_confidence: 0.60
+negation_window_tokens: 3
+chunk_size: 5000
+
+audit:
+  enabled: true
+  sample_size: 56
+  batch_size: 10
+  seed: 42
+  temperature: 0.0
+  timeout_seconds: 90
+  max_retries: 1
+  max_tokens: 2000
+  response_format_json: true
+  thinking: disabled

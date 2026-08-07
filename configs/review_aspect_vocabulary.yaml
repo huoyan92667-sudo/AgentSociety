@@ -1,0 +1,189 @@
+vocabulary_version: 2
+aspects:
+  food_quality:
+    positive:
+      - delicious
+      - tasty
+      - flavorful
+      - fresh food
+      - cooked perfectly
+      - excellent food
+    negative:
+      - bland
+      - tasteless
+      - stale food
+      - undercooked
+      - overcooked
+      - terrible food
+  service:
+    positive:
+      - friendly staff
+      - attentive
+      - helpful staff
+      - excellent service
+      - great service
+      - quick service
+    negative:
+      - rude staff
+      - inattentive
+      - ignored us
+      - terrible service
+      - service was terrible
+      - poor service
+      - slow service
+  price_value:
+    positive:
+      - good value
+      - worth the price
+      - reasonably priced
+      - affordable
+      - great deal
+    negative:
+      - overpriced
+      - not worth the price
+      - poor value
+      - too expensive
+      - expensive for
+  quiet_environment:
+    positive:
+      - quiet
+      - peaceful
+      - calm atmosphere
+      - relaxing atmosphere
+      - easy to talk
+    negative:
+      - noisy
+      - very loud
+      - too loud
+      - deafening
+      - hard to talk
+      - could not hear
+  crowded:
+    positive:
+      - not crowded
+      - plenty of space
+      - spacious
+      - uncrowded
+    negative:
+      - crowded
+      - packed
+      - cramped
+      - shoulder to shoulder
+      - no room
+      - get very busy
+      - gets very busy
+      - restaurant was very busy
+      - place was very busy
+  queue_time:
+    positive:
+      - no wait
+      - seated immediately
+      - seated right away
+      - short wait
+      - quick line
+    negative:
+      - long wait
+      - waited forever
+      - waited an hour
+      - slow line
+      - long queue
+      - took forever
+  portion_size:
+    positive:
+      - generous portions
+      - large portions
+      - huge portions
+      - plenty of food
+      - good portion
+    negative:
+      - small portions
+      - tiny portions
+      - skimpy portions
+      - portion was small
+      - not enough food
+  parking:
+    positive:
+      - easy parking
+      - plenty of parking
+      - free parking
+      - parking was convenient
+      - parking lot
+    negative:
+      - difficult parking
+      - hard to park
+      - no parking
+      - parking was expensive
+      - limited parking
+  pet_friendly:
+    positive:
+      - dog friendly
+      - pet friendly
+      - dogs are welcome
+      - allowed our dog
+      - water bowl for dogs
+    negative:
+      - no dogs allowed
+      - not pet friendly
+      - dogs not allowed
+      - would not allow our dog
+  family_friendly:
+    positive:
+      - kid friendly
+      - family friendly
+      - great for kids
+      - children are welcome
+      - kids menu
+    negative:
+      - not kid friendly
+      - not family friendly
+      - adults only
+      - no children
+  date_suitable:
+    positive:
+      - date night
+      - romantic atmosphere
+      - romantic dinner
+      - perfect for a date
+      - anniversary dinner
+    negative:
+      - not romantic
+      - bad for a date
+      - would not recommend for a date
+  group_suitable:
+    positive:
+      - great for groups
+      - large groups
+      - group dinner
+      - party of ten
+      - accommodated our group
+    negative:
+      - not good for groups
+      - cannot accommodate groups
+      - too small for groups
+      - split our group
+  spiciness:
+    positive:
+      - perfect spice
+      - good spice level
+      - pleasantly spicy
+      - spicy and flavorful
+    negative:
+      - too spicy
+      - painfully spicy
+      - not spicy
+      - no heat
+      - overly spicy
+  cleanliness:
+    positive:
+      - very clean
+      - spotless
+      - clean restaurant
+      - clean bathroom
+      - well maintained
+    negative:
+      - dirty
+      - filthy
+      - unsanitary
+      - sticky tables
+      - dirty bathroom
+      - poorly maintained

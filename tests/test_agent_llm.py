@@ -6,8 +6,8 @@ from yelp_agent.agent.llm import (
     LLMMessage,
     LLMTransportError,
     LLMTransportResponse,
-    OpenAICompatibleLLM,
     OpenAIChatTransport,
+    OpenAICompatibleLLM,
 )
 from yelp_agent.config import AgentConfig
 
@@ -116,6 +116,33 @@ def test_successful_call_forwards_deterministic_settings_and_usage() -> None:
             "timeout_seconds": 30.0,
         }
     ]
+
+
+def test_structured_non_thinking_request_options_are_forwarded() -> None:
+    transport = RecordingTransport()
+    config = AgentConfig(
+        enabled=True,
+        temperature=0,
+        timeout_seconds=90,
+        max_retries=1,
+        max_tokens=2000,
+        response_format_json=True,
+        thinking="disabled",
+    )
+    llm = OpenAICompatibleLLM.from_environment(
+        config,
+        environment={
+            "OPENAI_API_KEY": "secret-test-key",
+            "OPENAI_MODEL": "deepseek-v4-flash",
+        },
+        transport=transport,
+    )
+
+    llm.generate([LLMMessage(role="user", content="Return JSON.")])
+
+    assert transport.requests[0]["max_tokens"] == 2000
+    assert transport.requests[0]["response_format_json"] is True
+    assert transport.requests[0]["thinking"] == "disabled"
 
 
 class TwiceTimeoutThenSuccessTransport:
@@ -262,6 +289,33 @@ def test_openai_adapter_converts_sdk_response_without_provider_objects() -> None
             "messages": [{"role": "user", "content": "rerank"}],
             "temperature": 0.0,
             "timeout": 30.0,
+        }
+    ]
+
+
+def test_openai_adapter_maps_deepseek_structured_request_options() -> None:
+    client = FakeOpenAIClient()
+    transport = OpenAIChatTransport(client)
+
+    transport.complete(
+        model="deepseek-v4-flash",
+        messages=[{"role": "user", "content": "Return JSON."}],
+        temperature=0.0,
+        timeout_seconds=90.0,
+        max_tokens=2000,
+        response_format_json=True,
+        thinking="disabled",
+    )
+
+    assert client.chat.completions.requests == [
+        {
+            "model": "deepseek-v4-flash",
+            "messages": [{"role": "user", "content": "Return JSON."}],
+            "temperature": 0.0,
+            "timeout": 90.0,
+            "max_tokens": 2000,
+            "response_format": {"type": "json_object"},
+            "extra_body": {"thinking": {"type": "disabled"}},
         }
     ]
 
