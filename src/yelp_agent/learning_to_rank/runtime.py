@@ -10,6 +10,10 @@ import numpy as np
 from pydantic import Field
 
 from yelp_agent.learning_to_rank.artifacts import load_frozen_hybrid_v2
+from yelp_agent.learning_to_rank.lambdamart import LambdaMARTModel
+from yelp_agent.learning_to_rank.lambdamart_artifacts import (
+    load_frozen_lambdamart,
+)
 from yelp_agent.learning_to_rank.model import PairwiseLogisticModel
 from yelp_agent.models import StrictModel
 
@@ -28,7 +32,7 @@ class HybridV2ScoredCandidate(StrictModel):
 class FrozenHybridV2Ranker:
     """Hide model scaling and conservative rank-percentile fusion."""
 
-    model: PairwiseLogisticModel
+    model: PairwiseLogisticModel | LambdaMARTModel
     blend_alpha: float
 
     def __post_init__(self) -> None:
@@ -114,3 +118,31 @@ class FrozenHybridV2Ranker:
             )
             for rank, index in enumerate(final_order, start=1)
         )
+
+
+@dataclass(frozen=True, slots=True)
+class FrozenLambdaMARTRanker:
+    """Expose the same complete-ranking interface for the nonlinear model."""
+
+    model: LambdaMARTModel
+    blend_alpha: float
+
+    def __post_init__(self) -> None:
+        if not 0 <= self.blend_alpha <= 1:
+            raise ValueError("blend_alpha must be between zero and one")
+
+    @classmethod
+    def from_artifacts(cls, artifact_root: str | Path) -> FrozenLambdaMARTRanker:
+        model, manifest = load_frozen_lambdamart(artifact_root)
+        return cls(model=model, blend_alpha=manifest.selected_blend_alpha)
+
+    def rank(
+        self,
+        candidates: Sequence[Mapping[str, object]],
+    ) -> tuple[HybridV2ScoredCandidate, ...]:
+        """Return every unique candidate exactly once in deterministic order."""
+
+        return FrozenHybridV2Ranker(
+            model=self.model,
+            blend_alpha=self.blend_alpha,
+        ).rank(candidates)

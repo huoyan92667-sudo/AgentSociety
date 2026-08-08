@@ -375,6 +375,64 @@ class HybridV2Config(ConfigModel):
         )
 
 
+class LambdaMARTTrialConfig(ConfigModel):
+    """One bounded nonlinear ranking configuration."""
+
+    name: str = Field(min_length=1)
+    num_leaves: int = Field(ge=2, le=127)
+    learning_rate: float = Field(gt=0, le=0.3)
+    num_boost_round: int = Field(ge=10, le=1000)
+    min_child_samples: int = Field(ge=1)
+    reg_lambda: float = Field(ge=0)
+
+
+class HybridV2BConfig(ConfigModel):
+    """Frozen, deliberately small search space for LambdaMART V2-B."""
+
+    schema_version: Literal[1]
+    model_version: Literal["2.0.0-b"]
+    random_seed: int
+    fair_comparison_feature_set: Literal["without_business_profile"]
+    parameter_trials: list[LambdaMARTTrialConfig]
+    blend_alphas: list[float]
+    ablation_feature_sets: list[
+        Literal[
+            "base_only",
+            "without_item_knn",
+            "without_user_profile",
+            "without_business_profile",
+            "without_review_aspect",
+            "full",
+        ]
+    ]
+    primary_metric: Literal["avg_hr"]
+    prediction_batch_size: int = Field(ge=1000)
+    bootstrap_samples: int = Field(ge=100)
+
+    @model_validator(mode="after")
+    def validate_search_space(self) -> HybridV2BConfig:
+        names = [trial.name for trial in self.parameter_trials]
+        if not names or len(set(names)) != len(names):
+            raise ValueError("LambdaMART trials must be nonempty and uniquely named")
+        if (
+            not self.blend_alphas
+            or any(value < 0 or value > 1 for value in self.blend_alphas)
+            or len(set(self.blend_alphas)) != len(self.blend_alphas)
+            or self.blend_alphas != sorted(self.blend_alphas)
+            or self.blend_alphas[0] != 0
+            or self.blend_alphas[-1] != 1
+        ):
+            raise ValueError("blend alphas must be unique, sorted, and span 0 to 1")
+        if (
+            not self.ablation_feature_sets
+            or len(set(self.ablation_feature_sets)) != len(self.ablation_feature_sets)
+            or "full" not in self.ablation_feature_sets
+            or self.fair_comparison_feature_set not in self.ablation_feature_sets
+        ):
+            raise ValueError("ablation feature sets must be unique and cover fair/full")
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -532,6 +590,15 @@ def load_hybrid_v2_config(
 
     root = Path(config_dir)
     return HybridV2Config.model_validate(_read_yaml(root / "hybrid_v2.yaml"))
+
+
+def load_hybrid_v2_b_config(
+    config_dir: str | Path = "configs",
+) -> HybridV2BConfig:
+    """Load the bounded Hybrid V2-B LambdaMART search space."""
+
+    root = Path(config_dir)
+    return HybridV2BConfig.model_validate(_read_yaml(root / "hybrid_v2_b.yaml"))
 
 
 def load_review_aspect_settings(

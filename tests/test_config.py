@@ -9,6 +9,7 @@ from yelp_agent.config import (
     build_resolved_configuration,
     configuration_fingerprint,
     load_config,
+    load_hybrid_v2_b_config,
     load_item_knn_config,
     load_llm_environment,
     load_retrieval_config,
@@ -55,6 +56,12 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert item_knn.shrinkage_beta == 10.0
     assert item_knn.half_life_days == 365
     assert item_knn.reserved_tail_interactions == 2
+
+    hybrid_v2_b = load_hybrid_v2_b_config(PROJECT_CONFIG_DIR)
+    assert hybrid_v2_b.model_version == "2.0.0-b"
+    assert hybrid_v2_b.fair_comparison_feature_set == "without_business_profile"
+    assert len(hybrid_v2_b.parameter_trials) == 4
+    assert hybrid_v2_b.blend_alphas == [0.0, 0.25, 0.5, 0.75, 1.0]
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(

@@ -1,0 +1,52 @@
+schema_version: 1
+model_version: 2.0.0-b
+random_seed: 42
+
+# The first comparison changes only the model, not the 31 selected V2-A features.
+fair_comparison_feature_set: without_business_profile
+
+# Small bounded search: enough to test nonlinear capacity without broad tuning.
+parameter_trials:
+  - name: compact
+    num_leaves: 15
+    learning_rate: 0.05
+    num_boost_round: 150
+    min_child_samples: 50
+    reg_lambda: 1.0
+  - name: balanced
+    num_leaves: 31
+    learning_rate: 0.05
+    num_boost_round: 250
+    min_child_samples: 50
+    reg_lambda: 1.0
+  - name: slow
+    num_leaves: 31
+    learning_rate: 0.03
+    num_boost_round: 400
+    min_child_samples: 20
+    reg_lambda: 1.0
+  - name: wide
+    num_leaves: 63
+    learning_rate: 0.05
+    num_boost_round: 250
+    min_child_samples: 50
+    reg_lambda: 1.0
+
+blend_alphas:
+  - 0.0
+  - 0.25
+  - 0.5
+  - 0.75
+  - 1.0
+
+ablation_feature_sets:
+  - base_only
+  - without_item_knn
+  - without_user_profile
+  - without_business_profile
+  - without_review_aspect
+  - full
+
+primary_metric: avg_hr
+prediction_batch_size: 50000
+bootstrap_samples: 2000
