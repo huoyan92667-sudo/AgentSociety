@@ -1,0 +1,13 @@
+schema_version: 1
+profile_version: 1.0.0
+source_scope: selected_user_interactions
+aspect_half_life_days: 365
+minimum_aspect_evidence: 3
+minimum_aspect_users: 2
+aspect_confidence_saturation: 5.0
+aspect_user_saturation: 3.0
+conflict_ratio_threshold: 0.3
+rating_reliability_saturation: 20
+aspect_reliability_saturation: 20
+bayesian_prior_count: 20
+cache_max_entries: 10000

@@ -8,7 +8,8 @@ from typing import Sequence
 
 from yelp_agent.agent.llm import OpenAICompatibleLLM
 from yelp_agent.agent.tools import AgentToolbox
-from yelp_agent.config import load_config
+from yelp_agent.business_profiles.store import BusinessKnowledgeStore
+from yelp_agent.config import load_business_profile_config, load_config
 from yelp_agent.profiles.store import UserProfileStore
 from yelp_agent.rankers.agent_ranker import AgentRanker
 from yelp_agent.rankers.agent_runner import run_agent_ranker
@@ -68,6 +69,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/features/user_profiles/v1"),
     )
     parser.add_argument(
+        "--business-profiles",
+        type=Path,
+        default=Path("data/features/business_profiles/v1"),
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT_DIR,
@@ -95,6 +101,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.limit is not None and args.output_dir == DEFAULT_OUTPUT_DIR:
         raise SystemExit("--limit requires an explicit --output-dir")
     config = load_config(args.config_dir)
+    business_profile_config = load_business_profile_config(args.config_dir)
     runtime = build_frozen_hybrid_runtime(
         config,
         HybridSourcePaths(
@@ -109,11 +116,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.weights,
     )
     with UserProfileStore(args.profiles) as profile_store:
+        business_profile_store = BusinessKnowledgeStore.from_artifacts(
+            args.business_profiles,
+            config=business_profile_config,
+        )
         toolbox = AgentToolbox(
             runtime.assembly.data_view,
             hybrid_ranker=runtime.ranker,
             quality_store=runtime.assembly.quality_store,
             profile_store=profile_store,
+            business_profile_store=business_profile_store,
         )
         agent_ranker = AgentRanker(
             hybrid_ranker=runtime.ranker,

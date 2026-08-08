@@ -305,6 +305,24 @@ class UserProfileConfig(ConfigModel):
     artifact_batch_size: int = Field(gt=0)
 
 
+class BusinessProfileConfig(ConfigModel):
+    """Settings for point-in-time shared business knowledge."""
+
+    schema_version: Literal[1]
+    profile_version: Literal["1.0.0"]
+    source_scope: Literal["selected_user_interactions"]
+    aspect_half_life_days: int = Field(gt=0)
+    minimum_aspect_evidence: int = Field(gt=0)
+    minimum_aspect_users: int = Field(gt=0)
+    aspect_confidence_saturation: float = Field(gt=0)
+    aspect_user_saturation: float = Field(gt=0)
+    conflict_ratio_threshold: float = Field(gt=0, le=0.5)
+    rating_reliability_saturation: int = Field(gt=0)
+    aspect_reliability_saturation: int = Field(gt=0)
+    bayesian_prior_count: int = Field(gt=0)
+    cache_max_entries: int = Field(gt=0)
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -478,6 +496,17 @@ def load_user_profile_config(
 
     root = Path(config_dir)
     return UserProfileConfig.model_validate(_read_yaml(root / "user_profiles.yaml"))
+
+
+def load_business_profile_config(
+    config_dir: str | Path = "configs",
+) -> BusinessProfileConfig:
+    """Load shared business-knowledge settings."""
+
+    root = Path(config_dir)
+    return BusinessProfileConfig.model_validate(
+        _read_yaml(root / "business_profiles.yaml")
+    )
 
 
 def configuration_fingerprint(config: AppConfig) -> str:

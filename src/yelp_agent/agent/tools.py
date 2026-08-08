@@ -7,6 +7,8 @@ from typing import Any, Protocol
 
 from pydantic import Field
 
+from yelp_agent.business_profiles.schema import BusinessProfileV1
+from yelp_agent.business_profiles.store import BusinessKnowledgeError
 from yelp_agent.data.temporal_view import TemporalDataError, TemporalDataView
 from yelp_agent.features.quality import BusinessQuality
 from yelp_agent.models import (
@@ -68,6 +70,12 @@ class BusinessDetailsResult(StrictModel):
     businesses: list[BusinessDetails]
 
 
+class BusinessProfilesResult(StrictModel):
+    task_id: str = Field(min_length=1)
+    cutoff_time: datetime
+    businesses: list[BusinessProfileV1]
+
+
 class HybridRankingResult(StrictModel):
     task_id: str = Field(min_length=1)
     ranking: list[str]
@@ -92,6 +100,14 @@ class _UserProfileStore(Protocol):
     def get(self, user_id: str, cutoff_time: datetime) -> UserProfileV1: ...
 
 
+class _BusinessProfileStore(Protocol):
+    def get(
+        self,
+        business_ids: list[str],
+        cutoff_time: datetime,
+    ) -> dict[str, BusinessProfileV1]: ...
+
+
 class AgentToolbox:
     """Load shared read-only data once, then bind tools to one frozen task."""
 
@@ -102,11 +118,13 @@ class AgentToolbox:
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
         profile_store: _UserProfileStore | None = None,
+        business_profile_store: _BusinessProfileStore | None = None,
     ) -> None:
         self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
         self._profile_store = profile_store
+        self._business_profile_store = business_profile_store
 
     def for_task(self, task: RecommendationTask) -> "TaskAgentTools":
         """Create an isolated tool session authorized for exactly one task."""
@@ -117,11 +135,12 @@ class AgentToolbox:
             hybrid_ranker=self._hybrid_ranker,
             quality_store=self._quality_store,
             profile_store=self._profile_store,
+            business_profile_store=self._business_profile_store,
         )
 
 
 class TaskAgentTools:
-    """Four read-only Agent tools constrained to a single frozen task."""
+    """Read-only Agent tools constrained to a single frozen task."""
 
     def __init__(
         self,
@@ -131,12 +150,14 @@ class TaskAgentTools:
         hybrid_ranker: _HybridRanker,
         quality_store: _QualityStore,
         profile_store: _UserProfileStore | None = None,
+        business_profile_store: _BusinessProfileStore | None = None,
     ) -> None:
         self._task = task
         self._data_view = data_view
         self._hybrid_ranker = hybrid_ranker
         self._quality_store = quality_store
         self._profile_store = profile_store
+        self._business_profile_store = business_profile_store
         self._call_count = 0
 
     @property
@@ -291,6 +312,44 @@ class TaskAgentTools:
         if profile.user_id != self._task.user_id:
             raise AgentToolError("Hybrid profile user does not match bound task")
         return profile
+
+    def get_business_profiles(
+        self,
+        business_ids: list[str],
+        cutoff_time: datetime,
+    ) -> BusinessProfilesResult:
+        """Return shared point-in-time knowledge for authorized candidates."""
+
+        self._call_count += 1
+        self._validate_cutoff(cutoff_time)
+        if not business_ids:
+            raise AgentToolError("business_ids cannot be empty")
+        if len(set(business_ids)) != len(business_ids):
+            raise AgentToolError("business_ids must be unique")
+        outside = sorted(
+            set(business_ids).difference(self._task.candidate_business_ids)
+        )
+        if outside:
+            raise AgentToolError(
+                "Business request is outside the bound candidates: "
+                f"{outside[:3]}"
+            )
+        if self._business_profile_store is None:
+            raise AgentToolError("Business profile store is not configured")
+        try:
+            profiles = self._business_profile_store.get(
+                business_ids,
+                cutoff_time,
+            )
+        except BusinessKnowledgeError as exc:
+            raise AgentToolError(str(exc)) from exc
+        if set(profiles) != set(business_ids):
+            raise AgentToolError("Business profile store returned incomplete results")
+        return BusinessProfilesResult(
+            task_id=self._task.task_id,
+            cutoff_time=cutoff_time,
+            businesses=[profiles[business_id] for business_id in business_ids],
+        )
 
     def get_hybrid_ranking(
         self,

@@ -7,7 +7,9 @@ import pandas as pd
 import pytest
 
 from yelp_agent.agent.tools import AgentToolbox, AgentToolError
-from yelp_agent.data.temporal_view import TemporalDataView
+from yelp_agent.business_profiles.store import BusinessKnowledgeStore
+from yelp_agent.config import load_business_profile_config
+from yelp_agent.data.temporal_view import BusinessRecord, TemporalDataView
 from yelp_agent.features.quality import BusinessQuality
 from yelp_agent.models import (
     Prediction,
@@ -22,6 +24,7 @@ from yelp_agent.profiles.schema import (
 )
 from yelp_agent.rankers.hybrid_ranker import HybridTaskScore
 
+PROJECT_CONFIG_DIR = Path(__file__).parents[1] / "configs"
 
 class UnusedRanker:
     pass
@@ -375,5 +378,53 @@ def test_hybrid_ranking_tool_requires_the_complete_bound_candidate_set(
             "another-user",
             task.candidate_business_ids,
             task.cutoff_time,
+        )
+    assert session.call_count == 3
+
+
+def test_business_profile_tool_is_cutoff_and_candidate_scoped(
+    tmp_path: Path,
+) -> None:
+    businesses, interactions, histories, task = _write_agent_tool_fixture(
+        tmp_path
+    )
+    candidate = task.candidate_business_ids[0]
+    business_profile_store = BusinessKnowledgeStore.from_records(
+        businesses=(
+            BusinessRecord(
+                business_id=candidate,
+                name="Candidate Profile",
+                address="1 Test Street",
+                city="Philadelphia",
+                state="PA",
+                postal_code="19101",
+                latitude=39.95,
+                longitude=-75.16,
+                categories=("Restaurants", "Test Cuisine"),
+                attributes_json="{}",
+            ),
+        ),
+        rating_events=(),
+        aspect_events=(),
+        config=load_business_profile_config(PROJECT_CONFIG_DIR),
+    )
+    session = AgentToolbox(
+        TemporalDataView(businesses, interactions, interactions),
+        hybrid_ranker=FixedRanker(),
+        quality_store=FixedQualityStore(),
+        business_profile_store=business_profile_store,
+    ).for_task(task)
+
+    result = session.get_business_profiles([candidate], task.cutoff_time)
+
+    assert result.task_id == task.task_id
+    assert result.businesses[0].business_id == candidate
+    assert result.businesses[0].cutoff_time == task.cutoff_time
+    with pytest.raises(AgentToolError, match="outside the bound candidates"):
+        session.get_business_profiles(["history-high"], task.cutoff_time)
+    with pytest.raises(AgentToolError, match="cutoff_time"):
+        session.get_business_profiles(
+            [candidate],
+            pd.Timestamp("2030-01-01").to_pydatetime(),
         )
     assert session.call_count == 3
