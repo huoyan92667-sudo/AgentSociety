@@ -2,8 +2,8 @@
 
 ## 状态
 
-- 第 1–11 步已经完成，历史实现、实验产物和 Git 提交不倒改。
-- 当前开发步骤是第 12 步：时点安全 Item-KNN。
+- 第 1–17 步已经完成，历史实现、实验产物和 Git 提交不倒改。
+- 当前开发步骤是第 18 步：`RecommendationRequest` 与 Query-aware 静态推荐。
 - 后续开发一次只执行一个编号步骤。
 - validation 用于开发和选择配置；冻结前不使用 test 调参。
 - 未经用户明确确认，不调用真实 LLM。
@@ -47,3 +47,11 @@
 - Controlled Reranking 与 Full Retrieval 必须分开报告。
 - Item-KNN 不要求对所有用户都有提升，但必须报告它相对 Category/Text 提供的新增召回信息。
 - 当前仓库没有单独的 Final Blind Holdout 数据产物；实现保留排除用户接口，最终评测政策在第 35 步前统一。
+
+## 第 18 步进展与边界
+
+- 已建立请求 Schema、硬约束/软偏好/查证/澄清政策和规则基线。
+- 已为本地模型、Embedding 或 OpenAI-compatible 语义解析保留 `RequestSignalExtractor` seam。
+- 已实现 Hybrid V2、Query-only、Hybrid+Query 的统一静态接口和外部相关性评测契约。
+- 当前只有 21 条人工种子 Query 和一个无标签真实数据演示；没有真实 Query 点击标签，不能宣称 Query-aware 效果提升。
+- 批量 LLM 生成与真实 API 调用需要用户再次明确确认；提升路线记录在 `docs/roadmap/step18_query_aware_future_improvements.md`。

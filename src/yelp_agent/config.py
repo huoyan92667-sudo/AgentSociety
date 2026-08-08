@@ -433,6 +433,19 @@ class HybridV2BConfig(ConfigModel):
         return self
 
 
+class QueryAwareConfig(ConfigModel):
+    """Frozen static Query-aware policy; semantic runtime remains opt-in."""
+
+    schema_version: Literal[1]
+    request_schema_version: Literal[1]
+    rule_parser_version: Literal["rule-based-v1.0.0"]
+    semantic_runtime: Literal["disabled"]
+    rrf_constant: float = Field(gt=0)
+    query_rrf_weight: float = Field(ge=0)
+    strict_unknown_hard_constraints: Literal[True]
+    benchmark_path: str = Field(min_length=1)
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -599,6 +612,15 @@ def load_hybrid_v2_b_config(
 
     root = Path(config_dir)
     return HybridV2BConfig.model_validate(_read_yaml(root / "hybrid_v2_b.yaml"))
+
+
+def load_query_aware_config(
+    config_dir: str | Path = "configs",
+) -> QueryAwareConfig:
+    """Load Step 18 request parsing and static rank-fusion settings."""
+
+    root = Path(config_dir)
+    return QueryAwareConfig.model_validate(_read_yaml(root / "query_aware.yaml"))
 
 
 def load_review_aspect_settings(

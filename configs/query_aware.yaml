@@ -1,0 +1,14 @@
+schema_version: 1
+request_schema_version: 1
+rule_parser_version: rule-based-v1.0.0
+
+# Step 18 has a deterministic runtime. A semantic adapter may be injected later,
+# but enabling a provider is deliberately not a hidden configuration switch.
+semantic_runtime: disabled
+
+# Static rank fusion never combines raw LambdaMART and Query scores directly.
+rrf_constant: 60.0
+query_rrf_weight: 1.0
+strict_unknown_hard_constraints: true
+
+benchmark_path: benchmarks/query_aware_v1/seed_queries.jsonl

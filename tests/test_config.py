@@ -12,6 +12,7 @@ from yelp_agent.config import (
     load_hybrid_v2_b_config,
     load_item_knn_config,
     load_llm_environment,
+    load_query_aware_config,
     load_retrieval_config,
     load_rolling_training_config,
 )
@@ -62,6 +63,12 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert hybrid_v2_b.fair_comparison_feature_set == "without_business_profile"
     assert len(hybrid_v2_b.parameter_trials) == 4
     assert hybrid_v2_b.blend_alphas == [0.0, 0.25, 0.5, 0.75, 1.0]
+
+    query_aware = load_query_aware_config(PROJECT_CONFIG_DIR)
+    assert query_aware.request_schema_version == 1
+    assert query_aware.rule_parser_version == "rule-based-v1.0.0"
+    assert query_aware.query_rrf_weight == 1.0
+    assert query_aware.semantic_runtime == "disabled"
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
