@@ -323,6 +323,58 @@ class BusinessProfileConfig(ConfigModel):
     cache_max_entries: int = Field(gt=0)
 
 
+class HybridV2Config(ConfigModel):
+    """Small, frozen search space for Hybrid V2-A learning-to-rank."""
+
+    schema_version: Literal[1]
+    model_version: Literal["2.0.0-a"]
+    random_seed: int
+    hard_negative_count: int = Field(ge=1)
+    profile_similar_negative_count: int = Field(ge=1)
+    random_negative_count: int = Field(ge=1)
+    regularization_c_candidates: list[float]
+    blend_alphas: list[float]
+    primary_metric: Literal["avg_hr"]
+    feature_batch_size: int = Field(ge=100)
+
+    @model_validator(mode="after")
+    def validate_search_space(self) -> HybridV2Config:
+        negative_count = (
+            self.hard_negative_count
+            + self.profile_similar_negative_count
+            + self.random_negative_count
+        )
+        if negative_count != 20:
+            raise ValueError("Hybrid V2-A must select exactly 20 negatives per task")
+        if (
+            not self.regularization_c_candidates
+            or any(value <= 0 for value in self.regularization_c_candidates)
+            or len(set(self.regularization_c_candidates))
+            != len(self.regularization_c_candidates)
+            or self.regularization_c_candidates
+            != sorted(self.regularization_c_candidates)
+        ):
+            raise ValueError("regularization C candidates must be unique and sorted")
+        if (
+            not self.blend_alphas
+            or any(value < 0 or value > 1 for value in self.blend_alphas)
+            or len(set(self.blend_alphas)) != len(self.blend_alphas)
+            or self.blend_alphas != sorted(self.blend_alphas)
+            or self.blend_alphas[0] != 0
+            or self.blend_alphas[-1] != 1
+        ):
+            raise ValueError("blend alphas must be unique, sorted, and span 0 to 1")
+        return self
+
+    @property
+    def negative_count(self) -> int:
+        return (
+            self.hard_negative_count
+            + self.profile_similar_negative_count
+            + self.random_negative_count
+        )
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -471,6 +523,15 @@ def load_item_knn_config(
     return ItemKNNConfig.model_validate(
         _read_yaml(root / "item_knn.yaml")
     )
+
+
+def load_hybrid_v2_config(
+    config_dir: str | Path = "configs",
+) -> HybridV2Config:
+    """Load the intentionally small Hybrid V2-A model search space."""
+
+    root = Path(config_dir)
+    return HybridV2Config.model_validate(_read_yaml(root / "hybrid_v2.yaml"))
 
 
 def load_review_aspect_settings(
