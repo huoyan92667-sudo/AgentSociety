@@ -1,0 +1,29 @@
+schema_version: 1
+analyzer_version: 1.0.0
+calibrator_version: 1.0.0
+
+candidate_calibrators:
+  - logistic
+  - isotonic
+primary_metric: brier_score
+tie_break_metric: expected_calibration_error
+
+# Existing deterministic user-level 5-fold policy remains the source of folds.
+random_seed: 42
+maximum_iterations: 2000
+ece_bin_count: 10
+coverage_points:
+  - 0.1
+  - 0.25
+  - 0.5
+  - 0.75
+  - 1.0
+
+# Human-readable uncertainty reasons. Margin/support thresholds are learned as
+# quantiles on the calibration data and frozen with the model.
+sparse_history_count_max: 8
+unseen_category_min: 0.5
+feature_disagreement_min: 0.5
+small_top_margin_quantile: 0.25
+weak_collaborative_support_quantile: 0.25
+low_profile_reliability_max: 0.4

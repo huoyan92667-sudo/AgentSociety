@@ -446,6 +446,40 @@ class QueryAwareConfig(ConfigModel):
     benchmark_path: str = Field(min_length=1)
 
 
+class DecisionReadinessConfig(ConfigModel):
+    """Step 19 calibration and explainable uncertainty thresholds."""
+
+    schema_version: Literal[1]
+    analyzer_version: Literal["1.0.0"]
+    calibrator_version: Literal["1.0.0"]
+    candidate_calibrators: list[Literal["logistic", "isotonic"]]
+    primary_metric: Literal["brier_score"]
+    tie_break_metric: Literal["expected_calibration_error"]
+    random_seed: int
+    maximum_iterations: int = Field(ge=100)
+    ece_bin_count: int = Field(ge=2, le=50)
+    coverage_points: list[float]
+    sparse_history_count_max: int = Field(ge=1)
+    unseen_category_min: float = Field(ge=0, le=1)
+    feature_disagreement_min: float = Field(ge=0, le=1)
+    small_top_margin_quantile: float = Field(gt=0, lt=1)
+    weak_collaborative_support_quantile: float = Field(gt=0, lt=1)
+    low_profile_reliability_max: float = Field(ge=0, le=1)
+
+    @model_validator(mode="after")
+    def validate_protocol(self) -> DecisionReadinessConfig:
+        if self.candidate_calibrators != ["logistic", "isotonic"]:
+            raise ValueError("Step 19 must compare logistic then isotonic")
+        if (
+            not self.coverage_points
+            or self.coverage_points != sorted(set(self.coverage_points))
+            or self.coverage_points[-1] != 1.0
+            or any(value <= 0 or value > 1 for value in self.coverage_points)
+        ):
+            raise ValueError("coverage_points must be unique, sorted, and end at 1")
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -621,6 +655,17 @@ def load_query_aware_config(
 
     root = Path(config_dir)
     return QueryAwareConfig.model_validate(_read_yaml(root / "query_aware.yaml"))
+
+
+def load_decision_readiness_config(
+    config_dir: str | Path = "configs",
+) -> DecisionReadinessConfig:
+    """Load only Step 19 settings."""
+
+    root = Path(config_dir)
+    return DecisionReadinessConfig.model_validate(
+        _read_yaml(root / "decision_readiness.yaml")
+    )
 
 
 def load_review_aspect_settings(

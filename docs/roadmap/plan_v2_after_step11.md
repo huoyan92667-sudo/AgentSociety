@@ -2,8 +2,8 @@
 
 ## 状态
 
-- 第 1–17 步已经完成，历史实现、实验产物和 Git 提交不倒改。
-- 当前开发步骤是第 18 步：`RecommendationRequest` 与 Query-aware 静态推荐。
+- 第 1–19 步已经完成，历史实现、实验产物和 Git 提交不倒改。
+- 当前下一开发步骤是第 20 步：扩展 Agent 场景 Benchmark。
 - 后续开发一次只执行一个编号步骤。
 - validation 用于开发和选择配置；冻结前不使用 test 调参。
 - 未经用户明确确认，不调用真实 LLM。
@@ -48,10 +48,13 @@
 - Item-KNN 不要求对所有用户都有提升，但必须报告它相对 Category/Text 提供的新增召回信息。
 - 当前仓库没有单独的 Final Blind Holdout 数据产物；实现保留排除用户接口，最终评测政策在第 35 步前统一。
 
-## 第 18 步进展与边界
+## 第 18–19 步进展与边界
 
 - 已建立请求 Schema、硬约束/软偏好/查证/澄清政策和规则基线。
 - 已为本地模型、Embedding 或 OpenAI-compatible 语义解析保留 `RequestSignalExtractor` seam。
 - 已实现 Hybrid V2、Query-only、Hybrid+Query 的统一静态接口和外部相关性评测契约。
-- 当前只有 21 条人工种子 Query 和一个无标签真实数据演示；没有真实 Query 点击标签，不能宣称 Query-aware 效果提升。
-- 批量 LLM 生成与真实 API 调用需要用户再次明确确认；提升路线记录在 `docs/roadmap/step18_query_aware_future_improvements.md`。
+- 已冻结 500 条 Query Parser Benchmark；它有结构化解析标签，但没有 Query × 商家相关性标签，不能宣称 Query-aware 排名提升。
+- 已实现 `DecisionReadinessAnalyzer`，统一输出任务类型、信息缺口、Hybrid V2-B Top-1 校准置信度和排名不确定原因。
+- 已在 5000 个 Validation 任务上按用户做 5 折校准，只使用答案揭晓前可见的特征；Test 未参与拟合或选择。
+- Query-aware 置信度会明确返回不可用，不会拿下一商家预测概率冒充 Query 相关性概率。
+- 第 19 步的实际结果、限制和复现方法记录在 `docs/experiments/step19_decision_readiness.md`。

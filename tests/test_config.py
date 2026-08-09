@@ -9,6 +9,7 @@ from yelp_agent.config import (
     build_resolved_configuration,
     configuration_fingerprint,
     load_config,
+    load_decision_readiness_config,
     load_hybrid_v2_b_config,
     load_item_knn_config,
     load_llm_environment,
@@ -70,6 +71,11 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert query_aware.query_rrf_weight == 1.0
     assert query_aware.semantic_runtime == "disabled"
     assert query_aware.benchmark_path == "benchmarks/query_aware_v2/queries_500.jsonl"
+
+    readiness = load_decision_readiness_config(PROJECT_CONFIG_DIR)
+    assert readiness.candidate_calibrators == ["logistic", "isotonic"]
+    assert readiness.coverage_points[-1] == 1.0
+    assert readiness.analyzer_version == "1.0.0"
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(
