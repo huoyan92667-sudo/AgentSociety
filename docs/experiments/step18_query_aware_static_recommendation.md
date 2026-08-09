@@ -141,7 +141,7 @@ RecommendationRequestParser(
 SEMANTIC_EXTRACTOR_FAILED:<version>:<error_type>
 ```
 
-当前 `configs/query_aware.yaml` 将 `semantic_runtime` 固定为 `disabled`，本步骤没有调用 DeepSeek 或其他真实 LLM。
+当前 `configs/query_aware.yaml` 将在线 `semantic_runtime` 固定为 `disabled`，所以推荐运行时不会调用 DeepSeek。后续经过用户明确确认，项目使用 DeepSeek 离线生成了 Query Benchmark V2；离线数据生成和在线请求解析是两条独立链路。
 
 ## 7. 静态排序
 
@@ -175,7 +175,7 @@ Aspect 分数会按照置信度向 0.5 收缩，数据不足返回 unknown，不
 
 ## 8. 受控 Query 数据协议
 
-当前冻结了 21 条人工种子请求：
+最初冻结了 21 条人工种子请求：
 
 ```text
 Development：12
@@ -197,7 +197,21 @@ uses_future_review = false
 
 同一 frame family 不能同时进入 Development 和 Validation，避免把同一模板的改写随机拆开造成虚高。
 
-规则解析器在这 21 条种子上的 Exact Match、Condition Precision/Recall/F1 均为 1.0。该结果只说明代码与当前人工种子一致；数据量很小且词表由这些场景开发，不能解释为真实 Query 泛化能力。
+这 21 条现在只作为快速冒烟测试。正式的 V2 Benchmark 使用 100 个结构化语义场景，每个场景由 DeepSeek 改写为 3 条中文和 2 条英文，共 500 条：
+
+```text
+Development：400
+Validation：100
+```
+
+保存位置：
+
+```text
+benchmarks/query_aware_v2/queries_500.jsonl
+benchmarks/query_aware_v2/manifest.json
+```
+
+规则解析器在 21 条种子上的结构化指标均为 1.0，但在 V2 上 Exact Match 只有 13.4%、Condition F1 为 45.56%。这正好证明少量定制句式的 100% 不能代表真实 Query 泛化能力。生成方式、Token、质量检查和分项结果见 `docs/experiments/step18_query_benchmark_v2_500.md`。
 
 ## 9. 真实 Yelp 数据链路验证
 
@@ -259,9 +273,11 @@ src/yelp_agent/query/ranking.py
 src/yelp_agent/query/adapters.py
 src/yelp_agent/query/engine.py
 src/yelp_agent/query/benchmark.py
+src/yelp_agent/query/generation.py
 src/yelp_agent/query/evaluation.py
 configs/query_aware.yaml
 scripts/evaluate_query_request_parser.py
+scripts/generate_query_benchmark.py
 scripts/run_query_aware_demo.py
 ```
 

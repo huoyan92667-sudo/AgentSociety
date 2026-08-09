@@ -69,6 +69,7 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert query_aware.rule_parser_version == "rule-based-v1.0.0"
     assert query_aware.query_rrf_weight == 1.0
     assert query_aware.semantic_runtime == "disabled"
+    assert query_aware.benchmark_path == "benchmarks/query_aware_v2/queries_500.jsonl"
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(

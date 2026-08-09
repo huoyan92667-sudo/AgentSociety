@@ -11,4 +11,6 @@ rrf_constant: 60.0
 query_rrf_weight: 1.0
 strict_unknown_hard_constraints: true
 
-benchmark_path: benchmarks/query_aware_v1/seed_queries.jsonl
+# The original 21 human-written cases remain a fast smoke test. The configured
+# benchmark is the frozen, API-generated 500-query V2 corpus.
+benchmark_path: benchmarks/query_aware_v2/queries_500.jsonl

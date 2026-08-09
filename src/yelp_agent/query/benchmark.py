@@ -62,7 +62,9 @@ class QueryBenchmarkCase(StrictModel):
         if (self.user_latitude is None) != (self.user_longitude is None):
             raise ValueError("benchmark coordinates must be both present or absent")
         generated = self.generator_kind == "openai_compatible"
-        if generated != bool(self.generator_model and self.generator_prompt_sha256):
+        has_model = self.generator_model is not None
+        has_prompt_hash = self.generator_prompt_sha256 is not None
+        if has_model != has_prompt_hash or generated != has_model:
             raise ValueError(
                 "model-generated cases require model and prompt hash metadata"
             )
@@ -161,6 +163,9 @@ def load_query_benchmark(path: str | Path) -> tuple[QueryBenchmarkCase, ...]:
     ids = [case.case_id for case in cases]
     if len(set(ids)) != len(ids):
         raise ValueError("Query benchmark case IDs must be unique")
+    texts = [case.query_text.strip().casefold() for case in cases]
+    if len(set(texts)) != len(texts):
+        raise ValueError("Query benchmark texts must be unique")
     family_splits: dict[str, set[str]] = {}
     for case in cases:
         family_splits.setdefault(case.frame_family, set()).add(case.split)

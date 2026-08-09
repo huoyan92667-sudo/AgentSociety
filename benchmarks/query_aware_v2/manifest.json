@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "generator_kind": "openai_compatible",
+  "generator_model": "deepseek-v4-flash",
+  "case_count": 500,
+  "semantic_frame_count": 100,
+  "cases_per_frame": 5,
+  "split_counts": {
+    "development": 400,
+    "validation": 100
+  },
+  "language_counts": {
+    "en-US": 200,
+    "zh-CN": 300
+  },
+  "difficulty_counts": {
+    "clarification": 100,
+    "multi_constraint": 200,
+    "negation_priority": 100,
+    "simple": 100
+  },
+  "api_batch_count": 5,
+  "api_attempt_count": 5,
+  "input_tokens": 9167,
+  "output_tokens": 22621,
+  "total_tokens": 31788,
+  "total_latency_ms": 111861.5514000121,
+  "dataset_sha256": "a0c14ddf80157bc30b63fc8dc96dce4276795b0551b12a4e10339ae779351d92",
+  "contains_specific_business": false,
+  "contains_future_review": false
+}

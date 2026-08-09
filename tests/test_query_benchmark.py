@@ -117,3 +117,25 @@ def test_benchmark_schema_forbids_target_business_leakage() -> None:
                 "target_business_id": "secret-target",
             }
         )
+
+
+def test_benchmark_generation_metadata_must_be_complete() -> None:
+    with pytest.raises(ValidationError, match="model-generated cases require"):
+        QueryBenchmarkCase.model_validate(
+            {
+                "case_id": "incomplete-metadata",
+                "split": "validation",
+                "frame_family": "metadata",
+                "language": "en-US",
+                "query_text": "I want a restaurant.",
+                "expected_intent": "recommendation_request",
+                "expected_conditions": [],
+                "expected_party_size": None,
+                "expected_missing_fields": ["desired_category"],
+                "generator_kind": "human_seed",
+                "generator_model": "model-that-should-not-be-here",
+                "generator_prompt_sha256": None,
+                "uses_specific_business": False,
+                "uses_future_review": False,
+            }
+        )

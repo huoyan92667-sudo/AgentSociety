@@ -2,7 +2,7 @@
 
 ## 1. 当前基线不能解决什么
 
-当前规则解析器是高精度、低成本、可解释的下限，但不具备真正开放域语义理解能力。21 条人工种子只用于固定接口和防止明显回归，不能代表真实用户表达分布。
+当前规则解析器是低成本、可解释的下限，但不具备真正开放域语义理解能力。21 条人工种子只用于固定接口和防止明显回归；现已增加 500 条 DeepSeek 改写 Benchmark，当前规则在其上的 Condition F1 为 45.56%。该数据仍是合成数据，不能代表完整的真实用户表达分布。
 
 当前项目没有真实的：
 
@@ -14,7 +14,7 @@
 
 因此当前真实 Yelp 示例只能证明工程链路可运行，不能证明 Hybrid+Query 在真实用户效用上优于 Hybrid V2 或 Query-only。
 
-## 2. 优先级 P0：扩充 Synthetic Query Benchmark V2
+## 2. 优先级 P0：扩充 Synthetic Query Benchmark V2（首批已完成）
 
 ### 2.1 先定义语义框架，再生成文本
 
@@ -66,14 +66,14 @@
 
 不能让同一个模型同时成为唯一生成器和唯一裁判。
 
-### 2.4 建议规模与切分
+### 2.4 当前规模与切分
 
-建议先完成：
+已经完成：
 
 ```text
-100–150 个独立 semantic frames
-每个 frame 生成 5–8 种说法
-总计约 500–1000 条 Query
+100 个独立 semantic frames
+每个 frame 生成 5 种说法
+总计 500 条 Query
 ```
 
 必须按 frame family 切分，而不是随机按句子切分：
@@ -161,7 +161,7 @@ src/yelp_agent/query/extractors/openai_compatible.py
 - Fake LLM 覆盖非 JSON、遗漏、冲突、超时和异常；
 - 失败返回规则基线并记录 `parse_warnings`。
 
-未经用户再次明确确认，不运行真实 API 批量生成。
+2026-08-09 用户已明确确认本次 500 条 Benchmark 生成，并已完成真实 API 调用。以后重新生成或扩大数据集仍需再次明确确认。
 
 ## 4. 优先级 P2：解析器融合与置信度校准
 
@@ -268,9 +268,9 @@ RequestPatch(
 ## 9. 推荐执行顺序
 
 ```text
-1. 冻结 100–150 个 semantic frames
-2. 经确认后用 DeepSeek/Codex 生成 500–1000 条改写
-3. 自动审核 + 第二模型审核 + 人工抽样
+1. 已冻结首批 100 个 semantic frames
+2. 已经确认并用 DeepSeek 生成 500 条改写
+3. 下一步：第二模型语义审核 + 人工困难样本抽样
 4. 实现本地语义 Adapter
 5. 实现 DeepSeek challenger
 6. 在相同 Benchmark 上比较 Rule / Local / DeepSeek
