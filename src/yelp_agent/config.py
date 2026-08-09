@@ -524,6 +524,33 @@ class AgentBenchmarkConfig(ConfigModel):
         return self
 
 
+class AgentEvaluationConfig(ConfigModel):
+    """Frozen Step 21 metric semantics and source boundaries."""
+
+    schema_version: Literal[1]
+    contract_version: Literal["1.0.0"]
+    benchmark_version: Literal["1.0.0"]
+    ranking_cutoffs: list[int]
+    full_retrieval_cutoffs: list[int]
+    evidence_cutoffs: list[int]
+    percentile_method: Literal["linear"]
+    missing_observation_policy: Literal["explicit_status"]
+    agent_ranking_relevance: Literal["acceptable_business_ids"]
+    full_retrieval_source: Literal["step11_full_retrieval_benchmark"]
+    post_clarification_utility: Literal["ndcg_at_5_delta"]
+    strict_complete_run_coverage: Literal[True]
+
+    @model_validator(mode="after")
+    def validate_agent_evaluation(self) -> AgentEvaluationConfig:
+        if self.ranking_cutoffs != [1, 3, 5]:
+            raise ValueError("Step 21 ranking cutoffs are frozen at 1/3/5")
+        if self.full_retrieval_cutoffs != [50, 100, 500]:
+            raise ValueError("Step 21 retrieval cutoffs are frozen at 50/100/500")
+        if self.evidence_cutoffs != [1, 3, 5]:
+            raise ValueError("Step 21 evidence cutoffs are frozen at 1/3/5")
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -720,6 +747,17 @@ def load_agent_benchmark_config(
     root = Path(config_dir)
     return AgentBenchmarkConfig.model_validate(
         _read_yaml(root / "agent_benchmark.yaml")
+    )
+
+
+def load_agent_evaluation_config(
+    config_dir: str | Path = "configs",
+) -> AgentEvaluationConfig:
+    """Load only the frozen Step 21 evaluation contract settings."""
+
+    root = Path(config_dir)
+    return AgentEvaluationConfig.model_validate(
+        _read_yaml(root / "agent_evaluation.yaml")
     )
 
 

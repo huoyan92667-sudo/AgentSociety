@@ -2,8 +2,8 @@
 
 ## 状态
 
-- 第 1–20 步已经完成，历史实现、实验产物和 Git 提交不倒改。
-- 当前下一开发步骤是第 21 步：前置固定完整评测契约。
+- 第 1–21 步已经完成，历史实现、实验产物和 Git 提交不倒改。
+- 当前下一开发步骤是第 22 步：实现通用受控 Agent Harness。
 - 后续开发一次只执行一个编号步骤。
 - validation 用于开发和选择配置；冻结前不使用 test 调参。
 - 未经用户明确确认，不调用真实 LLM。
@@ -69,3 +69,13 @@
 - 当前没有调用真实 LLM；OpenAI-compatible Adapter 只接收可见问句且必须显式注入。
 - 第 19 步规则基线的 Task Type Accuracy 为 73.40%，Information Gap F1 为 63.24%，作为后续 Agent 改进起点而非最终分数。
 - 完整结果和复现方法记录在 `docs/experiments/step20_agent_scenario_benchmark.md`。
+
+## 第 21 步进展与边界
+
+- 已冻结 `AgentScenarioRun`、Turn、Action、Tool Call、Clarification、Evidence 和 Claim 的统一输出协议。
+- 已固定 46 项指标的来源、公式、聚合方向、适用范围和 `not_applicable / unavailable` 语义。
+- 已实现总体、Development/Validation 和七类场景的统一评测与稳定产物 I/O。
+- 已锁定 Scripted User Turn 触发条件，未触发却释放或触发后缺失都会记录协议违例。
+- 已明确 Agent 场景只有 acceptable-set 排序标签；Recall@50/100/500 必须来自第 11 步 Full Retrieval，不能从 20 商家作用域伪造。
+- 已将配置、指标定义和第 20 步四类冻结产物的 SHA256 写入 `benchmarks/agent_scenarios_v1/evaluation_contract.json`。
+- 当前没有 Agent Harness、Router、Review RAG 或真实 LLM 场景运行；完整说明见 `docs/evaluation/step21_agent_evaluation_contract_v1.md`。

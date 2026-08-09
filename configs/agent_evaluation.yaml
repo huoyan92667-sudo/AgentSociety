@@ -1,0 +1,14 @@
+schema_version: 1
+contract_version: 1.0.0
+benchmark_version: 1.0.0
+
+ranking_cutoffs: [1, 3, 5]
+full_retrieval_cutoffs: [50, 100, 500]
+evidence_cutoffs: [1, 3, 5]
+
+percentile_method: linear
+missing_observation_policy: explicit_status
+agent_ranking_relevance: acceptable_business_ids
+full_retrieval_source: step11_full_retrieval_benchmark
+post_clarification_utility: ndcg_at_5_delta
+strict_complete_run_coverage: true
