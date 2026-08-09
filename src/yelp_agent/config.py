@@ -480,6 +480,50 @@ class DecisionReadinessConfig(ConfigModel):
         return self
 
 
+class AgentBenchmarkConfig(ConfigModel):
+    """Step 20 scenario counts, source thresholds, and rewrite policy."""
+
+    schema_version: Literal[1]
+    benchmark_version: Literal["1.0.0"]
+    random_seed: int
+    development_count: int = Field(ge=1)
+    validation_count: int = Field(ge=1)
+    category_counts: dict[str, int]
+    candidate_scope_size: int = Field(ge=2)
+    maximum_evidence_labels_per_business: int = Field(ge=1, le=20)
+    minimum_review_evidence_confidence: float = Field(ge=0, le=1)
+    minimum_profile_history: int = Field(ge=1)
+    minimum_profile_reliability: float = Field(ge=0, le=1)
+    minimum_cutoff_year: int = Field(ge=2000, le=2100)
+    rewriter: Literal["disabled", "fake", "openai_compatible"]
+    english_fraction: float = Field(ge=0, le=1)
+
+    @model_validator(mode="after")
+    def validate_agent_benchmark(self) -> AgentBenchmarkConfig:
+        expected = {
+            "hard_constraint",
+            "profile_conflict",
+            "information_gap",
+            "business_detail",
+            "candidate_comparison",
+            "multi_turn_feedback",
+            "evidence_uncertainty",
+        }
+        if set(self.category_counts) != expected:
+            raise ValueError("Step 20 must define exactly the seven scenario categories")
+        if any(count < 5 or count % 5 for count in self.category_counts.values()):
+            raise ValueError("each scenario-category count must be a positive multiple of 5")
+        if sum(self.category_counts.values()) != (
+            self.development_count + self.validation_count
+        ):
+            raise ValueError("scenario-category counts must equal the split total")
+        if self.validation_count * 5 != (
+            self.development_count + self.validation_count
+        ):
+            raise ValueError("Step 20 uses an exact 80/20 development split")
+        return self
+
+
 class LegacyTestConfig(ConfigModel):
     name: str = Field(min_length=1)
     status: Literal["previously_observed"]
@@ -665,6 +709,17 @@ def load_decision_readiness_config(
     root = Path(config_dir)
     return DecisionReadinessConfig.model_validate(
         _read_yaml(root / "decision_readiness.yaml")
+    )
+
+
+def load_agent_benchmark_config(
+    config_dir: str | Path = "configs",
+) -> AgentBenchmarkConfig:
+    """Load only Step 20 settings."""
+
+    root = Path(config_dir)
+    return AgentBenchmarkConfig.model_validate(
+        _read_yaml(root / "agent_benchmark.yaml")
     )
 
 

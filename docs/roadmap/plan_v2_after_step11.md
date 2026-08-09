@@ -2,8 +2,8 @@
 
 ## 状态
 
-- 第 1–19 步已经完成，历史实现、实验产物和 Git 提交不倒改。
-- 当前下一开发步骤是第 20 步：扩展 Agent 场景 Benchmark。
+- 第 1–20 步已经完成，历史实现、实验产物和 Git 提交不倒改。
+- 当前下一开发步骤是第 21 步：前置固定完整评测契约。
 - 后续开发一次只执行一个编号步骤。
 - validation 用于开发和选择配置；冻结前不使用 test 调参。
 - 未经用户明确确认，不调用真实 LLM。
@@ -58,3 +58,14 @@
 - 已在 5000 个 Validation 任务上按用户做 5 折校准，只使用答案揭晓前可见的特征；Test 未参与拟合或选择。
 - Query-aware 置信度会明确返回不可用，不会拿下一商家预测概率冒充 Query 相关性概率。
 - 第 19 步的实际结果、限制和复现方法记录在 `docs/experiments/step19_decision_readiness.md`。
+
+## 第 20 步进展与边界
+
+- 已冻结 500 个 Agent 场景：400 Development、100 Validation，覆盖 A–G 七类能力。
+- 已物理隔离 Agent 可见题目与评测器隐藏答案，并冻结动作、商家作用域、脚本回答、证据标签和不确定性政策。
+- 共保存 545 条证据标签和 250 个脚本化后续用户 Turn；Review 证据严格早于场景 cutoff。
+- Development/Validation 的用户、核心商家和模板族互不重叠；没有读取 Test 来源任务。
+- 100 个场景复用第 18 步 Query 表达并保留 DeepSeek 数据血缘，其余 400 个由确定性模板生成。
+- 当前没有调用真实 LLM；OpenAI-compatible Adapter 只接收可见问句且必须显式注入。
+- 第 19 步规则基线的 Task Type Accuracy 为 73.40%，Information Gap F1 为 63.24%，作为后续 Agent 改进起点而非最终分数。
+- 完整结果和复现方法记录在 `docs/experiments/step20_agent_scenario_benchmark.md`。

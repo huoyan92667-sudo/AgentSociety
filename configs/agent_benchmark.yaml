@@ -1,0 +1,26 @@
+schema_version: 1
+benchmark_version: 1.0.0
+random_seed: 42
+development_count: 400
+validation_count: 100
+
+category_counts:
+  hard_constraint: 100
+  profile_conflict: 70
+  information_gap: 70
+  business_detail: 80
+  candidate_comparison: 60
+  multi_turn_feedback: 60
+  evidence_uncertainty: 60
+
+candidate_scope_size: 20
+maximum_evidence_labels_per_business: 4
+minimum_review_evidence_confidence: 0.85
+minimum_profile_history: 10
+minimum_profile_reliability: 0.2
+minimum_cutoff_year: 2018
+
+# Language rewriting is deliberately disabled in the frozen default run.
+# Fake and OpenAI-compatible adapters are injectable through the builder seam.
+rewriter: disabled
+english_fraction: 0.4

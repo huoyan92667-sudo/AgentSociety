@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "benchmark_version": "1.0.0",
+  "scenario_count": 500,
+  "split_counts": {
+    "development": 400,
+    "validation": 100
+  },
+  "category_counts": {
+    "business_detail": 80,
+    "candidate_comparison": 60,
+    "evidence_uncertainty": 60,
+    "hard_constraint": 100,
+    "information_gap": 70,
+    "multi_turn_feedback": 60,
+    "profile_conflict": 70
+  },
+  "language_counts": {
+    "en-US": 200,
+    "zh-CN": 300
+  },
+  "source_sha256": {
+    "businesses": "1f6c0ce93c87c33131e47804d6c946897b7b6dd8aa20ee62fa74eba3ef0d86dc",
+    "rating_events": "d3e30d80b56ecaadda9aff6769b9571cb4e684e7683bac805edb756fca29fbb1",
+    "aspect_records": "47f2f15f547b8849d32a6de81ad7284c9dbea861e5ec097b251838b799f7abc2",
+    "profile_snapshots": "4221f4683d35d134d14004154bb1562fc69899f42b92870fe7dcc6fbf6eedda0",
+    "preference_signals": "0cf8628368e461ce5d6c1cfeb3c5be71f28615445fa8b80192efd06a58edc975",
+    "task_profile_map": "49c2663cf83724702e5f3445486cb15a36344256899b0440785ead1c7ccf098a",
+    "query_benchmark": "a0c14ddf80157bc30b63fc8dc96dce4276795b0551b12a4e10339ae779351d92"
+  },
+  "configuration_sha256": "61a9e54a594b1fa9332a4fb87b4dea8aeaaa0b0cbd4d4006e0b1443e7fa3437b",
+  "output_sha256": {
+    "visible": "5f9f1d02c870a709c5547c3603e50d4ba5565ec71221216d9a1aa091b56b6c1c",
+    "ground_truth": "204823c28c82b92bdad76a3201e3672d095cc53251445a2c76eb97c92e71990c",
+    "evidence": "09a6e80ccee9bc26738e2abc5b34002d1176c736eb77f8ee334583c3c5f6e376",
+    "audit": "a343cd97f2e16b93fc542a469f973c624462416dabc16caa636bc832b6879044"
+  },
+  "generator_kinds": [
+    "deterministic",
+    "openai_compatible"
+  ],
+  "contains_test_source_tasks": false,
+  "hidden_labels_visible_to_agent": false,
+  "llm_determined_hidden_labels": false
+}

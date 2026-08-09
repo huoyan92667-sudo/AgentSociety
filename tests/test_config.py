@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from yelp_agent.config import (
     build_resolved_configuration,
     configuration_fingerprint,
+    load_agent_benchmark_config,
     load_config,
     load_decision_readiness_config,
     load_hybrid_v2_b_config,
@@ -76,6 +77,12 @@ def test_default_project_configuration_loads_mvp_defaults() -> None:
     assert readiness.candidate_calibrators == ["logistic", "isotonic"]
     assert readiness.coverage_points[-1] == 1.0
     assert readiness.analyzer_version == "1.0.0"
+
+    agent_benchmark = load_agent_benchmark_config(PROJECT_CONFIG_DIR)
+    assert sum(agent_benchmark.category_counts.values()) == 500
+    assert agent_benchmark.development_count == 400
+    assert agent_benchmark.validation_count == 100
+    assert agent_benchmark.rewriter == "disabled"
 
 
 def test_candidate_buckets_must_describe_one_target_and_nineteen_negatives(

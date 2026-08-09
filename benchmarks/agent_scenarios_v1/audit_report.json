@@ -1,0 +1,44 @@
+{
+  "scenario_count": 500,
+  "split_counts": {
+    "development": 400,
+    "validation": 100
+  },
+  "category_counts": {
+    "business_detail": 80,
+    "candidate_comparison": 60,
+    "evidence_uncertainty": 60,
+    "hard_constraint": 100,
+    "information_gap": 70,
+    "multi_turn_feedback": 60,
+    "profile_conflict": 70
+  },
+  "language_counts": {
+    "en-US": 200,
+    "zh-CN": 300
+  },
+  "task_type_counts": {
+    "business_detail_question": 40,
+    "candidate_comparison": 60,
+    "official_policy_question": 40,
+    "recommendation_request": 290,
+    "review_experience_question": 70
+  },
+  "source_query_reuse_count": 100,
+  "scripted_user_turn_count": 250,
+  "evidence_label_count": 545,
+  "relevant_review_label_count": 385,
+  "out_of_scope_label_count": 130,
+  "unique_scenario_ids": true,
+  "visible_hidden_ids_aligned": true,
+  "unique_visible_queries": true,
+  "development_validation_users_disjoint": true,
+  "development_validation_businesses_disjoint": true,
+  "development_validation_frame_families_disjoint": true,
+  "evidence_before_cutoff": true,
+  "evidence_scope_isolated": true,
+  "test_source_tasks_absent": true,
+  "hidden_fields_absent_from_visible": true,
+  "language_distribution_matches_config": true,
+  "deterministic_generation_ready": true
+}

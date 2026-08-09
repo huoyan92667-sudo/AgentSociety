@@ -1,2 +1,6 @@
 docs/experiments/v0/* text eol=lf
 docs/evaluation/* text eol=lf
+benchmarks/agent_scenarios_v1/*.json text eol=lf
+benchmarks/agent_scenarios_v1/visible/*.jsonl text eol=lf
+benchmarks/agent_scenarios_v1/hidden/*.jsonl text eol=lf
+benchmarks/agent_scenarios_v1/hidden/*.parquet binary
