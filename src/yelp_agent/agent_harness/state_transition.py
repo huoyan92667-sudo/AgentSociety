@@ -27,7 +27,7 @@ def record_execution(
     """Apply one validated executor result and its accounting atomically."""
 
     observations = state.observations
-    if outcome.status == "completed" and outcome.observation is not None:
+    if outcome.observation is not None:
         observations = observations + [
             build_observation(
                 state=state,

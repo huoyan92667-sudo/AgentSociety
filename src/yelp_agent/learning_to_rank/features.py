@@ -18,6 +18,8 @@ from pydantic import Field, model_validator
 
 from yelp_agent.config import BusinessProfileConfig
 from yelp_agent.models import StrictModel, UnitScore
+from yelp_agent.business_profiles.schema import BusinessProfileV1
+from yelp_agent.profiles.schema import UserProfileV1
 
 BASE_FEATURES = (
     "retrieval_fusion_score",
@@ -596,6 +598,127 @@ def _feature_row(
         "fold": profile.fold,
         **values,
     }
+
+
+class _FrozenBusinessProfileView:
+    """Present stored profiles through the same feature seam as offline events."""
+
+    def __init__(
+        self,
+        profiles: dict[str, BusinessProfileV1],
+        config: BusinessProfileConfig,
+    ) -> None:
+        self._profiles = profiles
+        self.config = config
+        self.categories = {
+            business_id: tuple(profile.categories)
+            for business_id, profile in profiles.items()
+        }
+
+    def profile_features(
+        self,
+        business_id: str,
+        cutoff: datetime,
+    ) -> tuple[float, float, float, float, float]:
+        profile = self._profiles[business_id]
+        if profile.cutoff_time != cutoff:
+            raise HybridV2FeatureError("business profile cutoff does not match request")
+        evidence = profile.evidence_summary
+        rating_factor = 1.0 - math.exp(
+            -evidence.rating_count / self.config.rating_reliability_saturation
+        )
+        aspect_factor = 1.0 - math.exp(
+            -evidence.aspect_evidence_count
+            / self.config.aspect_reliability_saturation
+        )
+        coverage = evidence.known_aspect_count / 14.0
+        return (
+            math.log1p(evidence.rating_count),
+            rating_factor,
+            aspect_factor,
+            coverage,
+            profile.profile_reliability,
+        )
+
+    def aspect_point(
+        self,
+        business_id: str,
+        aspect: str,
+        cutoff: datetime,
+    ) -> _AspectPoint | None:
+        profile = self._profiles[business_id]
+        if profile.cutoff_time != cutoff:
+            raise HybridV2FeatureError("business profile cutoff does not match request")
+        summary = profile.aspect_summaries.get(aspect)  # type: ignore[arg-type]
+        if summary is None or summary.status == "unknown":
+            return None
+        return _AspectPoint(
+            positive_ratio=float(summary.weighted_positive_ratio),
+            negative_ratio=float(summary.weighted_negative_ratio),
+            confidence=summary.confidence,
+        )
+
+
+def build_online_hybrid_v2_features(
+    *,
+    request_id: str,
+    profile: UserProfileV1,
+    business_profiles: dict[str, BusinessProfileV1],
+    candidates: list[dict[str, object]],
+    weights: HybridV1Weights,
+    broad_categories: set[str],
+    business_profile_config: BusinessProfileConfig,
+) -> list[dict[str, object]]:
+    """Build the exact frozen feature contract for one live Agent request."""
+
+    if not candidates:
+        raise HybridV2FeatureError("online candidates cannot be empty")
+    business_ids = [str(row.get("business_id") or "") for row in candidates]
+    if any(not value for value in business_ids) or len(set(business_ids)) != len(
+        business_ids
+    ):
+        raise HybridV2FeatureError("online candidate IDs must be nonempty and unique")
+    if set(business_ids) != set(business_profiles):
+        raise HybridV2FeatureError("business profiles must exactly match candidates")
+    if any(item.cutoff_time != profile.cutoff_time for item in business_profiles.values()):
+        raise HybridV2FeatureError("online profile cutoffs must match")
+    signals = profile.preference_signals()
+    task_profile = _TaskProfile(
+        user_id=profile.user_id,
+        cutoff_time=profile.cutoff_time,
+        history_length=profile.history_length,
+        average_rating=profile.average_rating,
+        reliability=profile.reliability,
+        sample_weight=1.0,
+        fold=None,
+        category_signals={
+            signal.value: _Signal(signal.score, signal.confidence)
+            for signal in signals
+            if signal.kind == "category"
+        },
+        aspect_signals={
+            signal.value: _Signal(signal.score, signal.confidence)
+            for signal in signals
+            if signal.kind == "aspect"
+        },
+    )
+    business_view = _FrozenBusinessProfileView(
+        business_profiles,
+        business_profile_config,
+    )
+    rows: list[dict[str, object]] = []
+    for candidate in candidates:
+        source = {"task_id": request_id, **candidate}
+        rows.append(
+            _feature_row(
+                source,
+                task_profile,
+                business_view,  # type: ignore[arg-type]
+                weights,
+                broad_categories,
+            )
+        )
+    return rows
 
 
 def build_hybrid_v2_features(

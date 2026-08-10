@@ -116,10 +116,11 @@ def _has_category(candidate: QueryAwareCandidate, value: object) -> bool:
     return any(category.casefold() == expected for category in candidate.categories)
 
 
-def _filter_failures(
+def hard_constraint_failures(
     request: RecommendationRequest,
     candidate: QueryAwareCandidate,
 ) -> list[str]:
+    """Return deterministic failure codes for cutoff-safe hard constraints."""
     failures: list[str] = []
     required_categories = [
         condition
@@ -244,7 +245,7 @@ class QueryAwareStaticRanker:
         ] = []
         excluded: list[ExcludedQueryCandidate] = []
         for candidate in candidates:
-            failures = _filter_failures(request, candidate)
+            failures = hard_constraint_failures(request, candidate)
             if failures:
                 excluded.append(
                     ExcludedQueryCandidate(

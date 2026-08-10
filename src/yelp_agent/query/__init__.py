@@ -19,6 +19,7 @@ from yelp_agent.query.ranking import (
     QueryAwareCandidate,
     QueryAwareRankingResult,
     QueryAwareStaticRanker,
+    hard_constraint_failures,
 )
 from yelp_agent.query.schema import (
     QueryParseInput,
@@ -45,4 +46,5 @@ __all__ = [
     "build_rule_based_request_parser",
     "candidate_from_business_profile",
     "evaluate_query_aware_recommendation",
+    "hard_constraint_failures",
 ]

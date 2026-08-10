@@ -1,0 +1,133 @@
+"""Input and output contracts for the real Step 23 deterministic tools."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import Field, field_validator
+
+from yelp_agent.business_profiles.schema import BusinessProfileV1
+from yelp_agent.learning_to_rank.runtime import HybridV2ScoredCandidate
+from yelp_agent.models import StrictModel
+from yelp_agent.profiles.schema import UserProfileV1
+
+
+class EmptyToolInput(StrictModel):
+    """A tool whose identity and cutoff come exclusively from Agent state."""
+
+
+class UserProfileOutput(StrictModel):
+    profile: UserProfileV1
+
+
+class SessionMemoryOutput(StrictModel):
+    session_id: str = Field(min_length=1)
+    turn_index: int = Field(ge=1)
+    observations: list[dict[str, Any]]
+
+
+class BusinessIdsInput(StrictModel):
+    business_ids: list[str] = Field(min_length=1, max_length=100)
+
+    @field_validator("business_ids")
+    @classmethod
+    def validate_unique_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("business_ids must be unique")
+        if any(not value or value != value.strip() for value in values):
+            raise ValueError("business_ids must be nonempty and trimmed")
+        return values
+
+
+class CandidateBusinessIdsInput(BusinessIdsInput):
+    business_ids: list[str] = Field(min_length=1, max_length=500)
+
+
+class BusinessDetail(StrictModel):
+    business_id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    address: str
+    city: str
+    state: str
+    postal_code: str
+    latitude: float | None = None
+    longitude: float | None = None
+    categories: list[str]
+    structured_attributes: dict[str, Any]
+    quality_score: float = Field(ge=0, le=1)
+    review_count: int = Field(ge=0)
+
+
+class BusinessDetailsOutput(StrictModel):
+    businesses: list[BusinessDetail]
+
+
+class BusinessProfilesOutput(StrictModel):
+    profiles: list[BusinessProfileV1]
+
+
+class RetrievalCandidateOutput(StrictModel):
+    business_id: str = Field(min_length=1)
+    rank: int = Field(ge=1)
+    fusion_score: float = Field(gt=0)
+    route_count: int = Field(ge=1)
+    quality_rank: int | None = Field(default=None, ge=1)
+    quality_score: float | None = Field(default=None, ge=0, le=1)
+    category_rank: int | None = Field(default=None, ge=1)
+    category_score: float | None = Field(default=None, ge=0, le=1)
+    text_rank: int | None = Field(default=None, ge=1)
+    text_score: float | None = Field(default=None, ge=0, le=1)
+    location_rank: int | None = Field(default=None, ge=1)
+    location_score: float | None = Field(default=None, ge=0, le=1)
+    distance_km: float | None = Field(default=None, ge=0)
+    item_knn_rank: int | None = Field(default=None, ge=1)
+    item_knn_positive_score: float = Field(ge=0)
+    item_knn_negative_evidence: float = Field(ge=0)
+    item_knn_positive_support_count: int = Field(ge=0)
+    item_knn_negative_support_count: int = Field(ge=0)
+    item_knn_positive_neighbor_count: int = Field(ge=0)
+    item_knn_negative_neighbor_count: int = Field(ge=0)
+    item_knn_missing: bool
+
+
+class CandidateRetrievalOutput(StrictModel):
+    candidate_business_ids: list[str]
+    candidates: list[RetrievalCandidateOutput]
+    catalog_size: int = Field(ge=0)
+    eligible_candidate_count: int = Field(ge=0)
+    excluded_history_businesses: int = Field(ge=0)
+    route_result_counts: dict[str, int]
+
+
+class ExcludedBusiness(StrictModel):
+    business_id: str = Field(min_length=1)
+    reason_codes: list[str] = Field(min_length=1)
+
+
+class ConstraintOutput(StrictModel):
+    candidate_business_ids: list[str]
+    excluded: list[ExcludedBusiness]
+
+
+class CompareBusinessesInput(BusinessIdsInput):
+    business_ids: list[str] = Field(min_length=2, max_length=10)
+
+
+class ComparedBusiness(StrictModel):
+    business_id: str = Field(min_length=1)
+    rank: int = Field(ge=1)
+    query_score: float = Field(ge=0, le=1)
+    matched_fields: list[str]
+    unmatched_fields: list[str]
+    unknown_fields: list[str]
+
+
+class BusinessComparisonOutput(StrictModel):
+    ranking: list[str]
+    compared: list[ComparedBusiness]
+    excluded: list[ExcludedBusiness]
+
+
+class HybridRankingOutput(StrictModel):
+    ranking: list[str] = Field(min_length=1)
+    scored_candidates: list[HybridV2ScoredCandidate] = Field(min_length=1)

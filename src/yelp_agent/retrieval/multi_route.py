@@ -47,7 +47,7 @@ class RetrievalTaskContext(StrictModel):
     """A label-free recommendation moment used by candidate retrievers."""
 
     task_id: str = Field(min_length=1)
-    split: Literal["train", "validation", "test"]
+    split: Literal["train", "validation", "test", "development"]
     user_id: str = Field(min_length=1)
     cutoff_time: datetime
     history_count: int = Field(ge=1)
