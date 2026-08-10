@@ -22,6 +22,9 @@ def build_rule_agent(
     budget: HarnessBudget | None = None,
     display_limit: int = 3,
     agent_version: str = "step24-rule-agent-v1",
+    semantic_enabled: bool = False,
+    semantic_candidate_limit: int = 30,
+    fusion_alpha: float = 0.0,
     clock: Clock | None = None,
 ) -> AgentHarness:
     """Connect the Step 18/22/23/24 modules behind one runner interface."""
@@ -29,11 +32,20 @@ def build_rule_agent(
     return AgentHarness(
         agent_version=agent_version,
         interpreter=RuleBasedRequestInterpreter(),
-        action_policy=RuleBasedActionPolicy(display_limit=display_limit),
-        router=RuleRouter(display_limit=display_limit),
+        action_policy=RuleBasedActionPolicy(
+            display_limit=display_limit,
+            semantic_enabled=semantic_enabled,
+            fusion_alpha=fusion_alpha,
+        ),
+        router=RuleRouter(
+            display_limit=display_limit,
+            semantic_enabled=semantic_enabled,
+            semantic_candidate_limit=semantic_candidate_limit,
+            fusion_alpha=fusion_alpha,
+        ),
         executor=RegistryActionExecutor(
             registry,
-            fallback=TerminalActionExecutor(),
+            fallback=TerminalActionExecutor(fusion_alpha=fusion_alpha),
         ),
         fallback_handler=fallback_handler,
         budget=budget,

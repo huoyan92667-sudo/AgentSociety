@@ -2,6 +2,7 @@
 
 from .business import GetBusinessDetailsTool, GetBusinessProfileTool
 from .constraints import ApplyConstraintsTool, BusinessProfileCandidateReader
+from .embedding import ComputeEmbeddingMatchTool
 from .comparison import CompareBusinessesTool
 from .memory import GetSessionMemoryTool
 from .profile import GetUserProfileTool
@@ -18,4 +19,5 @@ __all__ = [
     "BusinessProfileCandidateReader",
     "CompareBusinessesTool",
     "GetHybridRankingTool",
+    "ComputeEmbeddingMatchTool",
 ]

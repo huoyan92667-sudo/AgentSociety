@@ -172,6 +172,76 @@ def test_policy_exposes_one_recommendation_stage_at_a_time() -> None:
     )
 
 
+def test_step25_router_calls_embedding_after_hybrid_and_uses_fused_prefix() -> None:
+    _, _, filtered, ranked, _ = _recommendation_states()
+    router = RuleRouter(
+        display_limit=3,
+        semantic_enabled=True,
+        semantic_candidate_limit=3,
+        fusion_alpha=0.6,
+    )
+    policy = RuleBasedActionPolicy(
+        display_limit=3,
+        semantic_enabled=True,
+        fusion_alpha=0.6,
+    )
+
+    assert policy.allowed_actions(ranked) == ("rank_candidates", "safe_fallback")
+    decision = router.choose_action(ranked)
+    assert decision.tool_name == "COMPUTE_EMBEDDING_MATCH"
+    assert decision.arguments == {"business_ids": ["b2", "b1", "b3"]}
+
+    semantic = ranked.model_copy(
+        update={
+            "observations": ranked.observations
+            + [
+                _observation(
+                    "5",
+                    4,
+                    "rank_candidates",
+                    "COMPUTE_EMBEDDING_MATCH",
+                    {
+                        "matches": [
+                            {"business_id": "b3", "semantic_rank": 1},
+                            {"business_id": "b1", "semantic_rank": 2},
+                            {"business_id": "b2", "semantic_rank": 3},
+                        ]
+                    },
+                )
+            ]
+        }
+    )
+    details = router.choose_action(semantic)
+
+    assert details.tool_name == "GET_BUSINESS_DETAILS"
+    assert details.arguments == {"business_ids": ["b3", "b1", "b2"]}
+
+
+def test_step25_router_default_semantic_scope_is_hybrid_top_30() -> None:
+    _, _, _, ranked, _ = _recommendation_states()
+    hybrid_ranking = [f"business-{index:02d}" for index in range(40)]
+    state = ranked.model_copy(
+        update={
+            "business_scope": hybrid_ranking,
+            "observations": ranked.observations[:-1]
+            + [
+                _observation(
+                    "6",
+                    3,
+                    "rank_candidates",
+                    "GET_HYBRID_RANKING",
+                    {"ranking": hybrid_ranking},
+                )
+            ],
+        }
+    )
+
+    decision = RuleRouter(semantic_enabled=True).choose_action(state)
+
+    assert decision.tool_name == "COMPUTE_EMBEDDING_MATCH"
+    assert decision.arguments == {"business_ids": hybrid_ranking[:30]}
+
+
 def test_step24_interpreter_recognizes_open_category_recommendations() -> None:
     state = _state("For 6 people near 19103, it must be Lounges.")
 

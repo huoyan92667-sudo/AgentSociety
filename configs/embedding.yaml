@@ -1,0 +1,26 @@
+schema_version: 1
+embedding_version: 2.0.0
+provider: dashscope
+agent_version: step25-rule-agent-static-embedding-v2
+
+# qwen3.7-text-embedding is called through the configured remote API.
+# No local model, PyTorch, Transformers, or GPU runtime is installed.
+dimension: 1024
+batch_size: 20
+timeout_seconds: 90
+max_retries: 2
+
+# Only the Hybrid prefix is semantically rescored. The remaining tail keeps
+# its exact Hybrid V2 order, bounding API usage and rank movement.
+candidate_limit: 30
+max_total_tokens_per_turn: 12000
+fusion_alpha: 0.3
+
+query_instruction: >-
+  Represent a Yelp user request for retrieving Philadelphia businesses that
+  satisfy the current category, occasion, atmosphere, price, and experience
+  preferences.
+business_document_version: business-static-semantic-v2.0.0
+cache_relative_path: data/features/semantic_embeddings/v2
+price_cny_per_1000_input_tokens: 0.0005
+output_type: dense

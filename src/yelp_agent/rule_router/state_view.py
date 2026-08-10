@@ -15,6 +15,7 @@ from yelp_agent.decision_readiness.schema import (
 )
 from yelp_agent.models import StrictModel
 from yelp_agent.reviews.schema import ASPECT_NAMES, AspectName
+from yelp_agent.semantic_embedding import fuse_hybrid_and_semantic
 
 
 class RemainingBudgetFacts(StrictModel):
@@ -60,6 +61,7 @@ class RouteFacts(StrictModel):
     candidate_ids: list[str]
     retrieved_candidate_ids: list[str]
     ranked_business_ids: list[str]
+    semantic_ranks_by_business: dict[str, int]
     detailed_business_ids: list[str]
     profiled_business_ids: list[str]
     compared_business_ids: list[str]
@@ -67,11 +69,21 @@ class RouteFacts(StrictModel):
     candidate_retrieval: RouteToolFact | None = None
     constraint_filter: RouteToolFact | None = None
     hybrid_ranking: RouteToolFact | None = None
+    semantic_match: RouteToolFact | None = None
     business_details: RouteToolFact | None = None
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
     last_tool: RouteToolFact | None = None
     remaining: RemainingBudgetFacts
+
+    def final_ranking(self, *, fusion_alpha: float) -> list[str]:
+        """Apply the frozen fusion policy to visible evidence only."""
+
+        return fuse_hybrid_and_semantic(
+            self.ranked_business_ids,
+            self.semantic_ranks_by_business,
+            alpha=fusion_alpha,
+        )
 
     @classmethod
     def from_state(cls, state: AgentState) -> Self:
@@ -87,6 +99,11 @@ class RouteFacts(StrictModel):
         ranking = _latest_tool(
             tools,
             "GET_HYBRID_RANKING",
+            turn_index=state.current_turn,
+        )
+        semantic_match = _latest_tool(
+            tools,
+            "COMPUTE_EMBEDDING_MATCH",
             turn_index=state.current_turn,
         )
         details = _latest_tool(tools, "GET_BUSINESS_DETAILS")
@@ -164,6 +181,7 @@ class RouteFacts(StrictModel):
             ranked_business_ids=_string_list(
                 _tool_data(ranking).get("ranking")
             ),
+            semantic_ranks_by_business=_semantic_ranks(semantic_match),
             detailed_business_ids=_accumulated_record_ids(
                 tools,
                 tool_name="GET_BUSINESS_DETAILS",
@@ -183,6 +201,7 @@ class RouteFacts(StrictModel):
             candidate_retrieval=_route_tool_fact(retrieval),
             constraint_filter=_route_tool_fact(constraint_filter),
             hybrid_ranking=_route_tool_fact(ranking),
+            semantic_match=_route_tool_fact(semantic_match),
             business_details=_route_tool_fact(details),
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),
@@ -275,6 +294,21 @@ def _record_ids(value: object) -> list[str]:
         business_id = item.get("business_id")
         if isinstance(business_id, str) and business_id not in result:
             result.append(business_id)
+    return result
+
+
+def _semantic_ranks(tool: _NormalizedTool | None) -> dict[str, int]:
+    rows = _tool_data(tool).get("matches")
+    if not isinstance(rows, list):
+        return {}
+    result: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        business_id = row.get("business_id")
+        rank = row.get("semantic_rank")
+        if isinstance(business_id, str) and isinstance(rank, int):
+            result[business_id] = rank
     return result
 
 

@@ -11,10 +11,20 @@ from .state_view import RouteFacts
 class RuleBasedActionPolicy:
     """Return only actions that are safe and useful in the current state."""
 
-    def __init__(self, *, display_limit: int = 3) -> None:
+    def __init__(
+        self,
+        *,
+        display_limit: int = 3,
+        semantic_enabled: bool = False,
+        fusion_alpha: float = 0.0,
+    ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
         self._display_limit = display_limit
+        self._semantic_enabled = semantic_enabled
+        if not 0 <= fusion_alpha <= 1:
+            raise ValueError("fusion alpha must be between zero and one")
+        self._fusion_alpha = fusion_alpha
 
     def allowed_actions(self, state: AgentState) -> tuple[AgentAction, ...]:
         facts = RouteFacts.from_state(state)
@@ -68,7 +78,15 @@ class RuleBasedActionPolicy:
             return ("apply_hard_constraints", "safe_fallback")
         if facts.hybrid_ranking is None:
             return ("rank_candidates", "safe_fallback")
-        display_ids = facts.ranked_business_ids[: self._display_limit]
+        if (
+            self._semantic_enabled
+            and facts.semantic_match is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            return ("rank_candidates", "safe_fallback")
+        display_ids = facts.final_ranking(
+            fusion_alpha=self._fusion_alpha
+        )[: self._display_limit]
         if not set(display_ids).issubset(facts.detailed_business_ids):
             return ("get_business_details", "safe_fallback")
         return ("return_recommendation", "safe_fallback")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections.abc import Mapping
 from pathlib import Path
 
 from yelp_agent.agent_harness import AgentHarness, load_agent_harness_config
@@ -27,6 +28,14 @@ from yelp_agent.learning_to_rank.features import HybridV1Weights
 from yelp_agent.profiles.store import UserProfileStore
 from yelp_agent.ranking.assembly import HybridSourcePaths, build_frozen_hybrid_runtime
 from yelp_agent.retrieval import MultiRouteRetriever
+from yelp_agent.semantic_embedding import (
+    CachedEmbeddingGateway,
+    DashScopeEmbeddingEncoder,
+    SemanticEmbeddingMatcher,
+    SqliteEmbeddingCache,
+    load_dashscope_embedding_environment,
+    load_semantic_embedding_config,
+)
 
 from .config import load_rule_router_config
 from .factory import build_rule_agent
@@ -164,6 +173,9 @@ class RuleAgentRuntime:
 
 def build_real_rule_agent_runtime(
     sources: RuleAgentSourcePaths,
+    *,
+    embedding_config_path: str | Path | None = None,
+    embedding_environment: Mapping[str, str] | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -229,20 +241,71 @@ def build_real_rule_agent_runtime(
             broad_categories=set(app_config.data.broad_categories),
             business_profile_config=business_config,
         )
+        embedding_match = None
+        semantic_config = None
+        if embedding_config_path is not None:
+            semantic_config = load_semantic_embedding_config(embedding_config_path)
+            environment = load_dashscope_embedding_environment(
+                embedding_environment
+            )
+            if environment.enabled:
+                encoder = DashScopeEmbeddingEncoder.from_environment(
+                    semantic_config,
+                    environment,
+                )
+                cache = SqliteEmbeddingCache(
+                    sources.project_root / semantic_config.cache_relative_path
+                )
+                embedding_match = SemanticEmbeddingMatcher(
+                    businesses=data_view,
+                    gateway=CachedEmbeddingGateway(
+                        encoder=encoder,
+                        cache=cache,
+                        config=semantic_config,
+                    ),
+                    config=semantic_config,
+                )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
             retriever=retriever,
             history_reader=data_view,
             hybrid_ranking=ranking_service,
+            embedding_match=embedding_match,
             runtime_config=tool_config,
         )
         harness = build_rule_agent(
             registry=registry,
             fallback_handler=HybridV2FallbackHandler(ranking_service),
-            budget=harness_config.budget,
+            budget=(
+                harness_config.budget.model_copy(
+                    update={
+                        "max_total_tokens": max(
+                            harness_config.budget.max_total_tokens,
+                            semantic_config.max_total_tokens_per_turn,
+                        )
+                    }
+                )
+                if embedding_match is not None and semantic_config is not None
+                else harness_config.budget
+            ),
             display_limit=rule_config.display_limit,
-            agent_version=rule_config.agent_version,
+            agent_version=(
+                semantic_config.agent_version
+                if embedding_match is not None and semantic_config is not None
+                else rule_config.agent_version
+            ),
+            semantic_enabled=embedding_match is not None,
+            semantic_candidate_limit=(
+                semantic_config.candidate_limit
+                if semantic_config is not None
+                else 30
+            ),
+            fusion_alpha=(
+                semantic_config.fusion_alpha
+                if embedding_match is not None and semantic_config is not None
+                else 0.0
+            ),
         )
     except Exception:
         user_profiles.close()

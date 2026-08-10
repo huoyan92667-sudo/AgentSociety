@@ -747,7 +747,7 @@ def test_agent_tool_runtime_config_is_explicit_and_bounded() -> None:
     assert config.registry_version == "1.0.0"
     assert config.cache_max_entries == 512
     assert config.max_retry_attempts == 2
-    assert config.max_timeout_ms == 30_000
+    assert config.max_timeout_ms == 90_000
 
 
 def test_request_cache_reuses_a_safe_read_and_reports_cache_hit() -> None:

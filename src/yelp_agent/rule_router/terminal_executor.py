@@ -42,6 +42,11 @@ _GAP_LIST_ADAPTER = TypeAdapter(list[InformationGap])
 class TerminalActionExecutor:
     """Execute terminal actions without inventing businesses or evidence."""
 
+    def __init__(self, *, fusion_alpha: float = 0.0) -> None:
+        if not 0 <= fusion_alpha <= 1:
+            raise ValueError("fusion alpha must be between zero and one")
+        self._fusion_alpha = fusion_alpha
+
     def execute(
         self,
         state: AgentState,
@@ -126,8 +131,8 @@ class TerminalActionExecutor:
             reported_conflict="constraint_conflict" in gaps,
         )
 
-    @staticmethod
     def _recommendation(
+        self,
         state: AgentState,
         decision: AgentDecision,
     ) -> ActionOutcome:
@@ -143,7 +148,7 @@ class TerminalActionExecutor:
                 failure_reason="recommendation_business_ids_invalid",
             )
         business_ids = list(raw_ids)
-        ranking = facts.ranked_business_ids
+        ranking = facts.final_ranking(fusion_alpha=self._fusion_alpha)
         if not ranking or business_ids != ranking[: len(business_ids)]:
             return ActionOutcome(
                 status="failed",

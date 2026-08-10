@@ -6,6 +6,7 @@ from .adapters import (
     ApplyConstraintsTool,
     BusinessProfileCandidateReader,
     CompareBusinessesTool,
+    ComputeEmbeddingMatchTool,
     ExpandCandidatesTool,
     GetBusinessDetailsTool,
     GetBusinessProfileTool,
@@ -51,6 +52,7 @@ def build_step23_tool_registry(
     retriever: object,
     history_reader: object,
     hybrid_ranking: object,
+    embedding_match: object | None = None,
     runtime_config: AgentToolRuntimeConfig | None = None,
 ) -> AgentToolRegistry:
     """Build the complete catalog while leaving future tools explicitly disabled."""
@@ -66,12 +68,16 @@ def build_step23_tool_registry(
             GetBusinessDetailsTool(business_profiles),  # type: ignore[arg-type]
             GetBusinessProfileTool(business_profiles),  # type: ignore[arg-type]
             CompareBusinessesTool(candidate_reader),
-            _future_tool(
-                name="COMPUTE_EMBEDDING_MATCH",
-                step=25,
-                kind="semantic",
-                actions=("rank_candidates",),
-                summary="Compute semantic request-candidate similarity.",
+            (
+                ComputeEmbeddingMatchTool(embedding_match)  # type: ignore[arg-type]
+                if embedding_match is not None
+                else _future_tool(
+                    name="COMPUTE_EMBEDDING_MATCH",
+                    step=25,
+                    kind="semantic",
+                    actions=("rank_candidates",),
+                    summary="Compute semantic request-candidate similarity.",
+                )
             ),
             _future_tool(
                 name="COMPUTE_CROSS_ENCODER_MATCH",

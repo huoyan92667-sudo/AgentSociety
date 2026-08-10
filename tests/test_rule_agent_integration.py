@@ -41,6 +41,10 @@ class _Businesses(StrictModel):
     businesses: list[dict[str, object]]
 
 
+class _SemanticMatches(StrictModel):
+    matches: list[dict[str, object]]
+
+
 class _SessionMemory(StrictModel):
     session_id: str
     turn_index: int
@@ -56,11 +60,12 @@ class _Tool:
         input_model: type[StrictModel],
         output_model: type[StrictModel],
         data: dict[str, object],
+        kind: str = "deterministic",
     ) -> None:
         self.definition = ToolDefinition(
             name=name,
             version="test-v1",
-            kind="deterministic",
+            kind=kind,  # type: ignore[arg-type]
             allowed_actions=(action,),
             input_model=input_model,
             output_model=output_model,
@@ -93,10 +98,9 @@ class _Tool:
         )
 
 
-def _registry() -> AgentToolRegistry:
+def _registry(*, semantic: bool = False) -> AgentToolRegistry:
     ids = ["b1", "b2", "b3"]
-    return AgentToolRegistry(
-        [
+    tools = [
             _Tool(
                 name="GET_SESSION_MEMORY",
                 action="apply_feedback",
@@ -146,7 +150,24 @@ def _registry() -> AgentToolRegistry:
                 },
             ),
         ]
-    )
+    if semantic:
+        tools.append(
+            _Tool(
+                name="COMPUTE_EMBEDDING_MATCH",
+                action="rank_candidates",
+                input_model=_Ids,
+                output_model=_SemanticMatches,
+                kind="semantic",
+                data={
+                    "matches": [
+                        {"business_id": "b3", "semantic_rank": 1},
+                        {"business_id": "b1", "semantic_rank": 2},
+                        {"business_id": "b2", "semantic_rank": 3},
+                    ]
+                },
+            )
+        )
+    return AgentToolRegistry(tools)
 
 
 def test_assembled_rule_agent_completes_the_recommendation_chain() -> None:
@@ -175,6 +196,40 @@ def test_assembled_rule_agent_completes_the_recommendation_chain() -> None:
     ]
     assert result.run.turns[0].candidate_ranking == ["b2", "b1", "b3"]
     assert result.run.turns[0].recommended_business_ids == ["b2", "b1", "b3"]
+
+
+def test_step25_agent_calls_semantic_tool_and_returns_fused_ranking() -> None:
+    harness = build_rule_agent(
+        registry=_registry(semantic=True),
+        clock=FakeClock(),
+        semantic_enabled=True,
+        semantic_candidate_limit=3,
+        fusion_alpha=0.6,
+        agent_version="step25-test",
+    )
+    scenario = VisibleAgentScenario(
+        scenario_id="8" * 64,
+        split="development",
+        language="en-US",
+        user_id="user-1",
+        session_id="session-1",
+        cutoff_time=datetime(2022, 1, 1),
+        query_text="I only want a steakhouse",
+    )
+
+    result = harness.start(scenario)
+
+    assert result.run is not None
+    assert result.run.fallback is False
+    assert [call.tool_name for call in result.run.turns[0].tool_calls] == [
+        "EXPAND_CANDIDATES",
+        "APPLY_CONSTRAINTS",
+        "GET_HYBRID_RANKING",
+        "COMPUTE_EMBEDDING_MATCH",
+        "GET_BUSINESS_DETAILS",
+    ]
+    assert result.run.turns[0].candidate_ranking == ["b3", "b1", "b2"]
+    assert result.run.turns[0].recommended_business_ids == ["b3", "b1", "b2"]
 
 
 def test_assembled_rule_agent_pauses_and_resumes_after_location_reply() -> None:

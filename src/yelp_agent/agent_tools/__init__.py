@@ -16,6 +16,7 @@ from .adapters import (
     GetHybridRankingTool,
     GetSessionMemoryTool,
     GetUserProfileTool,
+    ComputeEmbeddingMatchTool,
 )
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
 from .schema import ToolExecutionContext, ToolObservation
@@ -31,6 +32,7 @@ __all__ = [
     "BusinessProfileCandidateReader",
     "CompareBusinessesTool",
     "GetHybridRankingTool",
+    "ComputeEmbeddingMatchTool",
     "RegistryActionExecutor",
     "PermanentToolError",
     "RetryableToolError",

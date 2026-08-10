@@ -238,6 +238,11 @@ def _runtime_metrics(
         len(turn.tool_calls) for run in runs for turn in run.turns
     )
     turn_count = sum(len(run.turns) for run in runs)
+    tool_calls = [
+        call for run in runs for turn in run.turns for call in turn.tool_calls
+    ]
+    semantic_calls = [call for call in tool_calls if call.tool_kind == "semantic"]
+    semantic_input_tokens = sum(call.input_tokens or 0 for call in semantic_calls)
     return {
         "scenario_count": scenario_count,
         "turn_count": turn_count,
@@ -248,6 +253,13 @@ def _runtime_metrics(
         "average_turns_per_scenario": turn_count / scenario_count,
         "llm_call_count": 0,
         "llm_cost_usd": 0.0,
+        "semantic_tool_call_count": len(semantic_calls),
+        "semantic_input_tokens": semantic_input_tokens,
+        "semantic_cache_hit_rate": (
+            sum(call.cache_hit for call in semantic_calls) / len(semantic_calls)
+            if semantic_calls
+            else 0.0
+        ),
     }
 
 

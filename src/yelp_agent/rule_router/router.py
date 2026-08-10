@@ -11,10 +11,24 @@ from .state_view import RouteFacts
 class RuleRouter:
     """Choose exactly one structured action from visible state facts."""
 
-    def __init__(self, *, display_limit: int = 3) -> None:
+    def __init__(
+        self,
+        *,
+        display_limit: int = 3,
+        semantic_enabled: bool = False,
+        semantic_candidate_limit: int = 30,
+        fusion_alpha: float = 0.0,
+    ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
         self._display_limit = display_limit
+        if not 1 <= semantic_candidate_limit <= 500:
+            raise ValueError("semantic candidate limit must be between 1 and 500")
+        if not 0 <= fusion_alpha <= 1:
+            raise ValueError("fusion alpha must be between zero and one")
+        self._semantic_enabled = semantic_enabled
+        self._semantic_candidate_limit = semantic_candidate_limit
+        self._fusion_alpha = fusion_alpha
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -81,7 +95,24 @@ class RuleRouter:
                 tool_name="GET_HYBRID_RANKING",
                 tool_kind="deterministic",
             )
-        display_ids = facts.ranked_business_ids[: self._display_limit]
+        if (
+            self._semantic_enabled
+            and facts.semantic_match is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            return AgentDecision(
+                action="rank_candidates",
+                arguments={
+                    "business_ids": facts.ranked_business_ids[
+                        : self._semantic_candidate_limit
+                    ]
+                },
+                reason_code="SEMANTIC_MATCH_REQUIRED",
+                tool_name="COMPUTE_EMBEDDING_MATCH",
+                tool_kind="semantic",
+            )
+        final_ranking = facts.final_ranking(fusion_alpha=self._fusion_alpha)
+        display_ids = final_ranking[: self._display_limit]
         missing_details = [
             business_id
             for business_id in display_ids

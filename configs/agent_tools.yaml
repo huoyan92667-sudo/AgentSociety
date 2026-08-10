@@ -1,4 +1,4 @@
 registry_version: 1.0.0
 cache_max_entries: 512
 max_retry_attempts: 2
-max_timeout_ms: 30000
+max_timeout_ms: 90000

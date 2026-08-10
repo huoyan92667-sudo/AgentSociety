@@ -10,6 +10,10 @@ from yelp_agent.business_profiles.schema import BusinessProfileV1
 from yelp_agent.learning_to_rank.runtime import HybridV2ScoredCandidate
 from yelp_agent.models import StrictModel
 from yelp_agent.profiles.schema import UserProfileV1
+from yelp_agent.semantic_embedding.schema import (
+    EmbeddingUsage,
+    SemanticBusinessMatch,
+)
 
 
 class EmptyToolInput(StrictModel):
@@ -131,3 +135,14 @@ class BusinessComparisonOutput(StrictModel):
 class HybridRankingOutput(StrictModel):
     ranking: list[str] = Field(min_length=1)
     scored_candidates: list[HybridV2ScoredCandidate] = Field(min_length=1)
+
+
+class EmbeddingMatchOutput(StrictModel):
+    """Semantic evidence; final ordering remains a deterministic policy decision."""
+
+    query_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provider: str = Field(min_length=1)
+    model: str = Field(min_length=1)
+    dimension: int = Field(gt=0)
+    matches: list[SemanticBusinessMatch] = Field(min_length=1)
+    usage: EmbeddingUsage
