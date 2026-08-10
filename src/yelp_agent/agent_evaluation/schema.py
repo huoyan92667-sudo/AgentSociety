@@ -10,8 +10,8 @@ from yelp_agent.agent_benchmark.schema import (
     AgentAction,
     EvidenceSourceType,
     InformationGap,
-    ScenarioTaskType,
 )
+from yelp_agent.decision_readiness.schema import TaskType
 from yelp_agent.models import StrictModel
 
 
@@ -123,7 +123,9 @@ class AgentTurnTrace(StrictModel):
     """Observable output for one user turn; never contains hidden labels."""
 
     turn_index: int = Field(ge=1)
-    predicted_task_type: ScenarioTaskType
+    # Runtime parsing can honestly return ``unknown``. Hidden benchmark labels
+    # remain restricted to the six supported task types.
+    predicted_task_type: TaskType
     detected_information_gaps: list[InformationGap] = Field(default_factory=list)
     actions: list[AgentActionTrace] = Field(default_factory=list)
     tool_calls: list[ToolCallTrace] = Field(default_factory=list)

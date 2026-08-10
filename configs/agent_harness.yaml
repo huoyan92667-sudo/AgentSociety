@@ -1,0 +1,10 @@
+schema_version: 1
+agent_version: step22-controlled-harness-v1
+
+budget:
+  max_steps: 10
+  max_tool_calls: 5
+  max_semantic_calls: 1
+  max_rag_calls: 2
+  max_total_tokens: 12000
+  timeout_ms: 90000
