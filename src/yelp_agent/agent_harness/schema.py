@@ -101,7 +101,7 @@ class AgentDecision(StrictModel):
 
 
 class AgentObservation(StrictModel):
-    """A durable, visible-only result produced by one successful action."""
+    """A durable, visible-only result produced by one executed action."""
 
     observation_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     turn_index: int = Field(ge=1)
