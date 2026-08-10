@@ -863,6 +863,39 @@ def test_benchmark_driver_releases_hidden_reply_only_after_trigger_action() -> N
     assert len(driven.result.run.turns) == 2
 
 
+def test_benchmark_driver_releases_feedback_after_a_completed_recommendation() -> None:
+    harness = AgentHarness(
+        agent_version="fake-agent-v1",
+        interpreter=RuleBasedRequestInterpreter(),
+        action_policy=_ReturnPolicy(),
+        router=_ReturnRouter(),
+        executor=_ReturnExecutor(),
+        clock=_FixedClock(),
+    )
+    scripted_turn = ScriptedUserTurn(
+        turn_index=2,
+        trigger_action="return_recommendation",
+        query_text="That is too far. Please suggest another option.",
+        expected_task_type="feedback_refinement",
+        expected_information_gaps=[],
+        added_conditions=[],
+        state_updates={},
+        rejected_business_ids=["business-1"],
+        expected_allowed_actions=["return_recommendation"],
+    )
+
+    driven = BenchmarkSessionDriver().drive(
+        harness,
+        _scenario(),
+        [scripted_turn],
+    )
+
+    assert driven.stop_reason == "completed"
+    assert driven.released_turn_indices == [2]
+    assert driven.result.run is not None
+    assert len(driven.result.run.turns) == 2
+
+
 class _EmptyScopePolicy:
     def allowed_actions(self, state):
         return (

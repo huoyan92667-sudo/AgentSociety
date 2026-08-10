@@ -105,6 +105,24 @@ class AgentHarness:
 
         if session.status != "awaiting_user":
             raise ValueError("only an awaiting_user session can be resumed")
+        return self._continue_with_user_turn(session, user_turn)
+
+    def follow_up(
+        self,
+        session: AgentSession,
+        user_turn: UserTurnInput,
+    ) -> HarnessResult:
+        """Start a new turn after a completed response in the same session."""
+
+        if session.status != "completed":
+            raise ValueError("only a completed session can receive a follow-up")
+        return self._continue_with_user_turn(session, user_turn)
+
+    def _continue_with_user_turn(
+        self,
+        session: AgentSession,
+        user_turn: UserTurnInput,
+    ) -> HarnessResult:
         interpretation = self._interpreter.interpret(
             QueryParseInput(
                 user_id=session.user_id,
@@ -124,9 +142,13 @@ class AgentHarness:
                 "request": interpretation.request,
                 "readiness": interpretation.readiness,
                 "available_actions": [],
-                "semantic_call_count": (
-                    session.semantic_call_count + interpretation.semantic_calls
-                ),
+                # Step/tool/model limits are per user turn. Durable traces keep
+                # session-wide accounting for evaluation without preventing a
+                # legitimate later feedback turn from running.
+                "step_count": 0,
+                "tool_call_count": 0,
+                "semantic_call_count": interpretation.semantic_calls,
+                "rag_call_count": 0,
                 "input_tokens": session.input_tokens
                 + (interpretation.input_tokens or 0),
                 "output_tokens": session.output_tokens

@@ -14,6 +14,7 @@ from yelp_agent.decision_readiness.schema import (
     TaskType,
 )
 from yelp_agent.models import StrictModel
+from yelp_agent.reviews.schema import ASPECT_NAMES, AspectName
 
 
 class RemainingBudgetFacts(StrictModel):
@@ -45,6 +46,14 @@ class RouteFacts(StrictModel):
     conflict_fields: list[str]
     ranking_confidence: float | None = Field(default=None, ge=0, le=1)
     ranking_uncertainty_reasons: list[RankingUncertaintyReason]
+    requested_aspects: list[AspectName]
+    known_aspects_by_business: dict[str, list[AspectName]]
+    conflicting_aspects_by_business: dict[str, list[AspectName]]
+    structured_evidence_sufficient: bool
+    structured_evidence_conflict: bool
+    feedback_applied: bool
+    reject_previous_recommendation: bool
+    previous_recommended_business_ids: list[str]
     hard_constraints_required: bool
     referenced_business_ids: list[str]
     business_scope_known: bool
@@ -82,10 +91,37 @@ class RouteFacts(StrictModel):
         )
         details = _latest_tool(tools, "GET_BUSINESS_DETAILS")
         profiles = _latest_tool(tools, "GET_BUSINESS_PROFILE")
+        known_aspects, conflicting_aspects = _profile_aspect_facts(tools)
+        requested_aspects = [
+            condition.field
+            for condition in state.request.conditions
+            if condition.field in ASPECT_NAMES
+        ]
+        referenced_ids = list(state.request.referenced_business_ids)
+        structured_sufficient = bool(
+            requested_aspects
+            and referenced_ids
+            and all(
+                all(
+                    aspect in known_aspects.get(business_id, [])
+                    for aspect in requested_aspects
+                )
+                for business_id in referenced_ids
+            )
+        )
         comparison = _latest_tool(
             tools,
             "COMPARE_BUSINESSES",
             turn_index=state.current_turn,
+        )
+        previous_recommended = (
+            [] if not state.turns else list(state.turns[-1].recommended_business_ids)
+        )
+        feedback_applied = any(
+            observation.turn_index == state.current_turn
+            and observation.action == "apply_feedback"
+            and observation.payload.get("feedback_applied") is True
+            for observation in state.observations
         )
         last_tool = tools[-1] if tools else None
         return cls(
@@ -104,6 +140,20 @@ class RouteFacts(StrictModel):
                 if state.readiness.ranking_confidence is None
                 else list(state.readiness.ranking_confidence.uncertainty_reasons)
             ),
+            requested_aspects=requested_aspects,
+            known_aspects_by_business=known_aspects,
+            conflicting_aspects_by_business=conflicting_aspects,
+            structured_evidence_sufficient=structured_sufficient,
+            structured_evidence_conflict=any(
+                aspect in conflicting_aspects.get(business_id, [])
+                for business_id in referenced_ids
+                for aspect in requested_aspects
+            ),
+            feedback_applied=feedback_applied,
+            reject_previous_recommendation=_rejects_previous_recommendation(
+                state.request.query_text
+            ),
+            previous_recommended_business_ids=previous_recommended,
             hard_constraints_required=bool(state.request.hard_constraints),
             referenced_business_ids=list(state.request.referenced_business_ids),
             business_scope_known=state.business_scope_known,
@@ -245,3 +295,57 @@ def _accumulated_record_ids(
             if business_id not in result:
                 result.append(business_id)
     return result
+
+
+def _profile_aspect_facts(
+    tools: list[_NormalizedTool],
+) -> tuple[dict[str, list[AspectName]], dict[str, list[AspectName]]]:
+    known: dict[str, list[AspectName]] = {}
+    conflicting: dict[str, list[AspectName]] = {}
+    for _, payload in tools:
+        if payload.tool_name != "GET_BUSINESS_PROFILE" or payload.status not in {
+            "success",
+            "partial",
+        }:
+            continue
+        profiles = payload.data.get("profiles")
+        if not isinstance(profiles, list):
+            continue
+        for profile in profiles:
+            if not isinstance(profile, dict):
+                continue
+            business_id = profile.get("business_id")
+            summaries = profile.get("aspect_summaries")
+            if not isinstance(business_id, str) or not isinstance(summaries, dict):
+                continue
+            known[business_id] = []
+            conflicting[business_id] = []
+            for aspect in ASPECT_NAMES:
+                summary = summaries.get(aspect)
+                if not isinstance(summary, dict) or summary.get("status") != "known":
+                    continue
+                known[business_id].append(aspect)
+                if summary.get("conflict") is True:
+                    conflicting[business_id].append(aspect)
+    return known, conflicting
+
+
+def _rejects_previous_recommendation(query_text: str) -> bool:
+    text = query_text.casefold()
+    markers = (
+        "too expensive",
+        "too far",
+        "too noisy",
+        "another",
+        "something else",
+        "replace that",
+        "replace it",
+        "太贵",
+        "太远",
+        "太吵",
+        "换一家",
+        "换一个",
+        "不要刚才",
+        "重新推荐",
+    )
+    return any(marker in text for marker in markers)

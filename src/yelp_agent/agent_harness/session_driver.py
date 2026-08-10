@@ -40,13 +40,13 @@ class BenchmarkSessionDriver:
         released: list[int] = []
         ordered = sorted(scripted_turns, key=lambda item: item.turn_index)
         for scripted_turn in ordered:
-            if result.session.status == "completed" or result.session.status == "fallback":
+            if result.session.status == "fallback":
                 return BenchmarkSessionResult(
                     result=result,
                     released_turn_indices=released,
                     stop_reason="agent_not_awaiting_user",
                 )
-            if result.session.status != "awaiting_user":
+            if result.session.status not in {"awaiting_user", "completed"}:
                 return BenchmarkSessionResult(
                     result=result,
                     released_turn_indices=released,
@@ -66,20 +66,21 @@ class BenchmarkSessionDriver:
                 )
             latitude = scripted_turn.state_updates.get("user_latitude")
             longitude = scripted_turn.state_updates.get("user_longitude")
-            result = harness.resume(
-                result.session,
-                UserTurnInput(
-                    query_text=scripted_turn.query_text,
-                    user_latitude=(
-                        float(latitude) if isinstance(latitude, (int, float)) else None
-                    ),
-                    user_longitude=(
-                        float(longitude)
-                        if isinstance(longitude, (int, float))
-                        else None
-                    ),
+            user_turn = UserTurnInput(
+                query_text=scripted_turn.query_text,
+                user_latitude=(
+                    float(latitude) if isinstance(latitude, (int, float)) else None
+                ),
+                user_longitude=(
+                    float(longitude)
+                    if isinstance(longitude, (int, float))
+                    else None
                 ),
             )
+            if result.session.status == "awaiting_user":
+                result = harness.resume(result.session, user_turn)
+            else:
+                result = harness.follow_up(result.session, user_turn)
             released.append(scripted_turn.turn_index)
         stop_reason = (
             "completed"

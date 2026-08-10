@@ -112,7 +112,10 @@ def outcome_violation(
     new_scope = (
         None if outcome.business_scope is None else set(outcome.business_scope)
     )
-    if decision.action == "apply_hard_constraints" and state.business_scope_known:
+    if (
+        decision.action in {"apply_hard_constraints", "apply_feedback"}
+        and state.business_scope_known
+    ):
         if new_scope is None or not new_scope.issubset(current_scope):
             return "invalid_hard_constraint_scope"
     elif (
