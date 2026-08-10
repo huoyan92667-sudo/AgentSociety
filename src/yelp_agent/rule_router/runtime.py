@@ -31,9 +31,11 @@ from yelp_agent.retrieval import MultiRouteRetriever
 from yelp_agent.semantic_embedding import (
     CachedEmbeddingGateway,
     DashScopeEmbeddingEncoder,
+    LocalQwenEmbeddingEncoder,
     SemanticEmbeddingMatcher,
     SqliteEmbeddingCache,
     load_dashscope_embedding_environment,
+    load_local_embedding_environment,
     load_semantic_embedding_config,
 )
 
@@ -153,10 +155,12 @@ class RuleAgentRuntime:
         sources: RuleAgentSourcePaths,
         harness: AgentHarness,
         user_profiles: UserProfileStore,
+        embedding_encoder: object | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
         self._user_profiles = user_profiles
+        self._embedding_encoder = embedding_encoder
         self._closed = False
 
     def __enter__(self) -> RuleAgentRuntime:
@@ -168,6 +172,9 @@ class RuleAgentRuntime:
     def close(self) -> None:
         if not self._closed:
             self._user_profiles.close()
+            close = getattr(self._embedding_encoder, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -225,6 +232,7 @@ def build_real_rule_agent_runtime(
         item_knn_store=item_knn,
     )
     user_profiles = UserProfileStore(sources.user_profile_root)
+    encoder = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -245,26 +253,40 @@ def build_real_rule_agent_runtime(
         semantic_config = None
         if embedding_config_path is not None:
             semantic_config = load_semantic_embedding_config(embedding_config_path)
-            environment = load_dashscope_embedding_environment(
-                embedding_environment
+            if semantic_config.provider == "dashscope":
+                environment = load_dashscope_embedding_environment(
+                    embedding_environment
+                )
+                if environment.enabled:
+                    encoder = DashScopeEmbeddingEncoder.from_environment(
+                        semantic_config,
+                        environment,
+                    )
+            else:
+                local_environment = load_local_embedding_environment(
+                    embedding_environment
+                )
+                if local_environment.enabled:
+                    encoder = LocalQwenEmbeddingEncoder.from_environment(
+                        semantic_config,
+                        local_environment,
+                    )
+            if encoder is None:
+                raise ValueError(
+                    f"{semantic_config.provider} embedding environment is not configured"
+                )
+            cache = SqliteEmbeddingCache(
+                sources.project_root / semantic_config.cache_relative_path
             )
-            if environment.enabled:
-                encoder = DashScopeEmbeddingEncoder.from_environment(
-                    semantic_config,
-                    environment,
-                )
-                cache = SqliteEmbeddingCache(
-                    sources.project_root / semantic_config.cache_relative_path
-                )
-                embedding_match = SemanticEmbeddingMatcher(
-                    businesses=data_view,
-                    gateway=CachedEmbeddingGateway(
-                        encoder=encoder,
-                        cache=cache,
-                        config=semantic_config,
-                    ),
+            embedding_match = SemanticEmbeddingMatcher(
+                businesses=data_view,
+                gateway=CachedEmbeddingGateway(
+                    encoder=encoder,
+                    cache=cache,
                     config=semantic_config,
-                )
+                ),
+                config=semantic_config,
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -308,10 +330,14 @@ def build_real_rule_agent_runtime(
             ),
         )
     except Exception:
+        close = getattr(encoder, "close", None)
+        if callable(close):
+            close()
         user_profiles.close()
         raise
     return RuleAgentRuntime(
         sources=sources,
         harness=harness,
         user_profiles=user_profiles,
+        embedding_encoder=encoder,
     )

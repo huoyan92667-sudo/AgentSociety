@@ -26,6 +26,10 @@ dev = [
     "pytest>=8.3,<9",
     "pytest-cov>=6,<7",
 ]
+local-embedding = [
+    "torch>=2.10,<2.12",
+    "transformers>=4.51,<6",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

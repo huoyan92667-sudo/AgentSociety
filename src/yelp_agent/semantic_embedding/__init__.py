@@ -3,8 +3,10 @@
 from .cache import CachedEmbedding, SqliteEmbeddingCache
 from .config import (
     DashScopeEmbeddingEnvironment,
+    LocalEmbeddingEnvironment,
     SemanticEmbeddingConfig,
     load_dashscope_embedding_environment,
+    load_local_embedding_environment,
     load_semantic_embedding_config,
 )
 from .documents import build_business_document, build_query_document
@@ -20,9 +22,12 @@ from .encoder import (
     EncodedBatch,
 )
 from .fusion import fuse_hybrid_and_semantic
+from .local_encoder import LocalQwenEmbeddingEncoder
 from .matcher import CachedEmbeddingGateway, SemanticEmbeddingMatcher
 from .schema import (
     EmbeddingUsage,
+    EmbeddingUsageEvent,
+    EmbeddingUsageSummary,
     SemanticBusinessMatch,
     SemanticDocument,
     SemanticMatchResult,
@@ -36,7 +41,11 @@ __all__ = [
     "EmbeddingEncoder",
     "EmbeddingProviderError",
     "EmbeddingUsage",
+    "EmbeddingUsageEvent",
+    "EmbeddingUsageSummary",
     "EncodedBatch",
+    "LocalEmbeddingEnvironment",
+    "LocalQwenEmbeddingEncoder",
     "SemanticBusinessMatch",
     "SemanticDocument",
     "SemanticEmbeddingConfig",
@@ -50,5 +59,6 @@ __all__ = [
     "compare_tfidf_and_embedding",
     "fuse_hybrid_and_semantic",
     "load_dashscope_embedding_environment",
+    "load_local_embedding_environment",
     "load_semantic_embedding_config",
 ]

@@ -1,12 +1,12 @@
 schema_version: 1
 embedding_version: 2.0.0
-provider: dashscope
+provider: local
 agent_version: step25-rule-agent-static-embedding-v2
 
-# qwen3.7-text-embedding is called through the configured remote API.
-# No local model, PyTorch, Transformers, or GPU runtime is installed.
+# Local Qwen3-Embedding-0.6B runs in an isolated persistent Python worker.
 dimension: 1024
-batch_size: 20
+batch_size: 16
+max_sequence_length: 512
 timeout_seconds: 90
 max_retries: 2
 
@@ -22,5 +22,5 @@ query_instruction: >-
   preferences.
 business_document_version: business-static-semantic-v2.0.0
 cache_relative_path: data/features/semantic_embeddings/v2
-price_cny_per_1000_input_tokens: 0.0005
+price_cny_per_1000_input_tokens: 0.0
 output_type: dense

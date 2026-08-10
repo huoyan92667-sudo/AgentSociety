@@ -1,4 +1,4 @@
-"""Deep semantic matching Module with local cache and remote encoding hidden."""
+"""Semantic matching with the encoder provider hidden behind one cache seam."""
 
 from __future__ import annotations
 
@@ -20,6 +20,7 @@ from .encoder import EmbeddingEncoder
 from .schema import (
     EmbeddingInputType,
     EmbeddingUsage,
+    EmbeddingUsageEvent,
     SemanticBusinessMatch,
     SemanticDocument,
     SemanticMatchResult,
@@ -52,6 +53,7 @@ class CachedEmbeddingGateway:
         documents: Sequence[SemanticDocument],
         *,
         input_type: EmbeddingInputType,
+        usage_scope: str = "unscoped",
     ) -> tuple[list[np.ndarray], EmbeddingUsage]:
         if not documents:
             raise ValueError("documents cannot be empty")
@@ -62,8 +64,10 @@ class CachedEmbeddingGateway:
             if key not in cached:
                 missing_by_key.setdefault(key, document)
         input_tokens = 0
+        encoder_calls = 0
         api_calls = 0
         provider_latency_ms = 0.0
+        truncated_text_count = 0
         missing_items = list(missing_by_key.items())
         for offset in range(0, len(missing_items), self.encoder.batch_size):
             batch = missing_items[offset : offset + self.encoder.batch_size]
@@ -73,12 +77,24 @@ class CachedEmbeddingGateway:
             )
             if response.model != self.encoder.model:
                 raise ValueError("embedding response model does not match configured model")
-            api_calls += 1
+            encoder_calls += 1
+            api_calls += int(self.encoder.provider != "local")
             input_tokens += response.input_tokens
             provider_latency_ms += response.latency_ms
+            truncated_text_count += response.truncated_text_count
             records: list[CachedEmbedding] = []
-            token_share = response.input_tokens // max(1, len(batch))
-            for (key, document), vector in zip(batch, response.vectors, strict=True):
+            token_counts = response.per_text_input_tokens
+            if token_counts is None:
+                quotient, remainder = divmod(response.input_tokens, len(batch))
+                token_counts = tuple(
+                    quotient + int(index < remainder) for index in range(len(batch))
+                )
+            for (key, document), vector, token_count in zip(
+                batch,
+                response.vectors,
+                token_counts,
+                strict=True,
+            ):
                 normalized = _normalize(vector)
                 record = CachedEmbedding(
                     cache_key=key,
@@ -92,20 +108,22 @@ class CachedEmbeddingGateway:
                     document_version=document.document_version,
                     text_sha256=document.text_sha256,
                     vector=normalized,
-                    input_tokens=token_share,
+                    input_tokens=token_count,
                 )
                 records.append(record)
                 cached[key] = record
             self.cache.put_many(records)
         vectors = [cached[key].vector for key in keys]
-        self.cache.write_manifest(
-            model=self.encoder.model,
-            dimension=self.encoder.dimension,
-        )
+        logical_input_tokens = sum(cached[key].input_tokens for key in keys)
+        cache_saved_tokens = max(0, logical_input_tokens - input_tokens)
         misses = len(missing_by_key)
-        return vectors, EmbeddingUsage(
+        usage = EmbeddingUsage(
+            encoder_calls=encoder_calls,
             api_calls=api_calls,
             input_tokens=input_tokens,
+            logical_input_tokens=logical_input_tokens,
+            cache_saved_tokens=cache_saved_tokens,
+            truncated_text_count=truncated_text_count,
             cache_hits=len(documents) - misses,
             cache_misses=misses,
             estimated_cost_cny=(
@@ -115,6 +133,31 @@ class CachedEmbeddingGateway:
             ),
             provider_latency_ms=provider_latency_ms,
         )
+        self.cache.record_usage(
+            EmbeddingUsageEvent(
+                usage_scope=usage_scope,
+                provider=self.encoder.provider,
+                model=self.encoder.model,
+                input_type=input_type,
+                requested_text_count=len(documents),
+                unique_text_count=len(set(keys)),
+                cache_hits=usage.cache_hits,
+                cache_misses=usage.cache_misses,
+                logical_input_tokens=logical_input_tokens,
+                encoded_input_tokens=input_tokens,
+                cache_saved_tokens=cache_saved_tokens,
+                truncated_text_count=truncated_text_count,
+                encoder_calls=encoder_calls,
+                api_calls=api_calls,
+                latency_ms=provider_latency_ms,
+            )
+        )
+        self.cache.write_manifest(
+            provider=self.encoder.provider,
+            model=self.encoder.model,
+            dimension=self.encoder.dimension,
+        )
+        return vectors, usage
 
     def _cache_key(
         self,
@@ -157,6 +200,7 @@ class SemanticEmbeddingMatcher:
         query_text: str,
         business_ids: Sequence[str],
         cutoff_time: datetime,
+        usage_scope: str | None = None,
     ) -> SemanticMatchResult:
         ids = list(business_ids)
         if not ids or len(ids) != len(set(ids)):
@@ -173,10 +217,14 @@ class SemanticEmbeddingMatcher:
             )
             for business in businesses
         ]
-        query_vectors, query_usage = self._gateway.embed([query], input_type="query")
+        scope = usage_scope or query.text_sha256
+        query_vectors, query_usage = self._gateway.embed(
+            [query], input_type="query", usage_scope=scope
+        )
         business_vectors, business_usage = self._gateway.embed(
             business_documents,
             input_type="document",
+            usage_scope=scope,
         )
         query_vector = query_vectors[0]
         scores = [
@@ -201,11 +249,25 @@ class SemanticEmbeddingMatcher:
         return SemanticMatchResult(
             query_sha256=query.text_sha256,
             model=self._gateway.encoder.model,
+            provider=self._gateway.encoder.provider,
             dimension=self._gateway.encoder.dimension,
             matches=matches,
             usage=EmbeddingUsage(
+                encoder_calls=query_usage.encoder_calls + business_usage.encoder_calls,
                 api_calls=query_usage.api_calls + business_usage.api_calls,
                 input_tokens=query_usage.input_tokens + business_usage.input_tokens,
+                logical_input_tokens=(
+                    query_usage.logical_input_tokens
+                    + business_usage.logical_input_tokens
+                ),
+                cache_saved_tokens=(
+                    query_usage.cache_saved_tokens
+                    + business_usage.cache_saved_tokens
+                ),
+                truncated_text_count=(
+                    query_usage.truncated_text_count
+                    + business_usage.truncated_text_count
+                ),
                 cache_hits=query_usage.cache_hits + business_usage.cache_hits,
                 cache_misses=query_usage.cache_misses + business_usage.cache_misses,
                 estimated_cost_cny=(

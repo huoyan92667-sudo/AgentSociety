@@ -40,6 +40,18 @@ class EncodedBatch:
     input_tokens: int
     request_id: str | None
     latency_ms: float
+    per_text_input_tokens: tuple[int, ...] | None = None
+    truncated_text_count: int = 0
+
+    def __post_init__(self) -> None:
+        if self.per_text_input_tokens is None:
+            return
+        if len(self.per_text_input_tokens) != len(self.vectors):
+            raise ValueError("per-text token counts must match encoded vectors")
+        if any(value < 0 for value in self.per_text_input_tokens):
+            raise ValueError("per-text token counts cannot be negative")
+        if sum(self.per_text_input_tokens) != self.input_tokens:
+            raise ValueError("per-text token counts must sum to input_tokens")
 
 
 class EmbeddingEncoder(Protocol):

@@ -1,4 +1,4 @@
-"""Persistent local cache for vectors returned by the remote provider."""
+"""Persistent local cache and usage ledger for semantic vectors."""
 
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ from typing import Iterable
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
+
+from .schema import EmbeddingUsageEvent, EmbeddingUsageSummary
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,6 +61,29 @@ class SqliteEmbeddingCache:
                     text_sha256 TEXT NOT NULL,
                     vector BLOB NOT NULL,
                     input_tokens INTEGER NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS embedding_usage_events (
+                    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    usage_scope TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    input_type TEXT NOT NULL,
+                    requested_text_count INTEGER NOT NULL,
+                    unique_text_count INTEGER NOT NULL,
+                    cache_hits INTEGER NOT NULL,
+                    cache_misses INTEGER NOT NULL,
+                    logical_input_tokens INTEGER NOT NULL,
+                    encoded_input_tokens INTEGER NOT NULL,
+                    cache_saved_tokens INTEGER NOT NULL,
+                    truncated_text_count INTEGER NOT NULL,
+                    encoder_calls INTEGER NOT NULL,
+                    api_calls INTEGER NOT NULL,
+                    latency_ms REAL NOT NULL,
                     created_at TEXT NOT NULL
                 )
                 """
@@ -138,13 +163,78 @@ class SqliteEmbeddingCache:
         with self._connect() as connection:
             return int(connection.execute("SELECT count(*) FROM embeddings").fetchone()[0])
 
-    def write_manifest(self, *, model: str, dimension: int) -> Path:
+    def record_usage(self, event: EmbeddingUsageEvent) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO embedding_usage_events (
+                    usage_scope, provider, model, input_type,
+                    requested_text_count, unique_text_count,
+                    cache_hits, cache_misses,
+                    logical_input_tokens, encoded_input_tokens,
+                    cache_saved_tokens, truncated_text_count,
+                    encoder_calls, api_calls, latency_ms, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    event.usage_scope,
+                    event.provider,
+                    event.model,
+                    event.input_type,
+                    event.requested_text_count,
+                    event.unique_text_count,
+                    event.cache_hits,
+                    event.cache_misses,
+                    event.logical_input_tokens,
+                    event.encoded_input_tokens,
+                    event.cache_saved_tokens,
+                    event.truncated_text_count,
+                    event.encoder_calls,
+                    event.api_calls,
+                    event.latency_ms,
+                    datetime.now(UTC).isoformat(),
+                ),
+            )
+
+    def usage_summary(self, *, usage_scope: str | None = None) -> EmbeddingUsageSummary:
+        where = "" if usage_scope is None else " WHERE usage_scope = ?"
+        parameters: tuple[str, ...] = () if usage_scope is None else (usage_scope,)
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT count(*), "
+                "coalesce(sum(requested_text_count), 0), "
+                "coalesce(sum(cache_hits), 0), coalesce(sum(cache_misses), 0), "
+                "coalesce(sum(logical_input_tokens), 0), "
+                "coalesce(sum(encoded_input_tokens), 0), "
+                "coalesce(sum(cache_saved_tokens), 0), "
+                "coalesce(sum(truncated_text_count), 0), "
+                "coalesce(sum(encoder_calls), 0), coalesce(sum(api_calls), 0), "
+                "coalesce(sum(latency_ms), 0) "
+                f"FROM embedding_usage_events{where}",
+                parameters,
+            ).fetchone()
+        return EmbeddingUsageSummary(
+            event_count=int(row[0]),
+            requested_text_count=int(row[1]),
+            cache_hits=int(row[2]),
+            cache_misses=int(row[3]),
+            logical_input_tokens=int(row[4]),
+            encoded_input_tokens=int(row[5]),
+            cache_saved_tokens=int(row[6]),
+            truncated_text_count=int(row[7]),
+            encoder_calls=int(row[8]),
+            api_calls=int(row[9]),
+            latency_ms=float(row[10]),
+        )
+
+    def write_manifest(self, *, provider: str, model: str, dimension: int) -> Path:
         payload = {
             "schema_version": 1,
-            "provider": "dashscope",
+            "provider": provider,
             "model": model,
             "dimension": dimension,
             "record_count": self.count(),
+            "usage": self.usage_summary().model_dump(),
             "raw_text_persisted": False,
             "cache_file": self.path.name,
         }

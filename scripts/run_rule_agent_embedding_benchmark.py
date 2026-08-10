@@ -10,7 +10,6 @@ from yelp_agent.rule_router import (
     build_real_rule_agent_runtime,
     run_rule_agent_benchmark,
 )
-from yelp_agent.semantic_embedding import load_dashscope_embedding_environment
 
 
 def main() -> None:
@@ -24,12 +23,6 @@ def main() -> None:
     )
     args = parser.parse_args()
     root = args.project_root.resolve()
-    environment = load_dashscope_embedding_environment()
-    if not environment.enabled:
-        raise SystemExit(
-            "Step 25 requires DASHSCOPE_API_KEY, DASHSCOPE_BASE_URL, "
-            "and DASHSCOPE_MODEL"
-        )
     sources = RuleAgentSourcePaths.from_project_root(root)
     output = args.output_root or root / "runs" / "rule_agent_embedding_v2" / args.split
 

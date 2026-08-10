@@ -20,6 +20,7 @@ class SemanticMatchService(Protocol):
         query_text: str,
         business_ids: Sequence[str],
         cutoff_time: datetime,
+        usage_scope: str | None = None,
     ) -> SemanticMatchResult: ...
 
 
@@ -70,6 +71,7 @@ class ComputeEmbeddingMatchTool:
                 query_text=query_text,
                 business_ids=arguments.business_ids,
                 cutoff_time=context.cutoff_time,
+                usage_scope=context.request_id,
             )
         except EmbeddingProviderError as exc:
             if exc.retryable:
@@ -83,9 +85,13 @@ class ComputeEmbeddingMatchTool:
             output_tokens=0,
             cache_hit=result.usage.cache_misses == 0,
             warnings=(
-                []
-                if result.usage.api_calls > 0
-                else ["all embedding vectors served from local cache"]
+                ["all embedding vectors served from local cache"]
+                if result.usage.cache_misses == 0
+                else (
+                    ["embedding vectors computed by the local model"]
+                    if result.provider == "local"
+                    else []
+                )
             ),
         )
 

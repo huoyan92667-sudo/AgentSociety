@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -18,6 +19,7 @@ from yelp_agent.semantic_embedding import (
     DashScopeEmbeddingEncoder,
     EmbeddingUsage,
     EncodedBatch,
+    LocalEmbeddingEnvironment,
     SemanticBusinessMatch,
     SemanticEmbeddingConfig,
     SemanticEmbeddingMatcher,
@@ -29,10 +31,12 @@ from yelp_agent.semantic_embedding import (
     load_dashscope_embedding_environment,
     load_semantic_embedding_config,
 )
+from yelp_agent.semantic_embedding.local_encoder import _sanitize_text
 
 
 def _config() -> SemanticEmbeddingConfig:
     return SemanticEmbeddingConfig(
+        provider="dashscope",
         agent_version="test-semantic-agent",
         dimension=256,
         batch_size=20,
@@ -43,6 +47,7 @@ def _config() -> SemanticEmbeddingConfig:
         query_instruction="Retrieve matching Yelp businesses.",
         business_document_version="test-business-static-doc-v2",
         cache_relative_path="data/features/test-embedding",
+        price_cny_per_1000_input_tokens=0.0005,
     )
 
 
@@ -133,10 +138,32 @@ def test_production_config_freezes_static_v2_top_30_and_safe_budget() -> None:
     config = load_semantic_embedding_config(project_root / "configs" / "embedding.yaml")
 
     assert config.embedding_version == "2.0.0"
+    assert config.provider == "local"
+    assert config.batch_size == 16
+    assert config.max_sequence_length == 512
     assert config.candidate_limit == 30
     assert config.max_total_tokens_per_turn == 12_000
     assert config.business_document_version == "business-static-semantic-v2.0.0"
     assert config.cache_relative_path == "data/features/semantic_embeddings/v2"
+    assert config.price_cny_per_1000_input_tokens == 0
+
+
+def test_local_environment_validates_model_files_and_sanitizes_legacy_text(
+    tmp_path: Path,
+) -> None:
+    model_path = tmp_path / "local-model"
+    model_path.mkdir()
+    for filename in ("config.json", "model.safetensors", "tokenizer.json"):
+        (model_path / filename).touch()
+
+    environment = LocalEmbeddingEnvironment(
+        model_path=model_path,
+        python_executable=Path(sys.executable),
+        device="cpu",
+    )
+
+    assert environment.enabled
+    assert _sanitize_text("broken\udca2name") == "broken?name"
 
 
 def test_business_document_is_static_and_contains_no_dynamic_evidence() -> None:
@@ -209,6 +236,13 @@ def test_matcher_reuses_static_business_vectors_across_cutoffs(tmp_path: Path) -
     assert all(item.cutoff_time == later_cutoff for item in second.matches)
     assert reader.requests == ["dentist", "steak", "dentist", "steak"]
     assert cache.count() == 3
+    usage = cache.usage_summary()
+    assert usage.event_count == 4
+    assert usage.encoded_input_tokens == 15
+    assert usage.logical_input_tokens == 30
+    assert usage.cache_saved_tokens == 15
+    assert usage.encoder_calls == 2
+    assert usage.api_calls == 2
     assert b"A romantic steakhouse for a date" not in cache.path.read_bytes()
     exported = cache.export_parquet(tmp_path / "embedding_cache.parquet")
     assert exported.is_file()
@@ -262,11 +296,20 @@ def test_dashscope_encoder_sends_query_parameters_and_validates_dimension() -> N
 
 
 class FixedSemanticService:
-    def match(self, *, query_text: str, business_ids: list[str], cutoff_time: datetime) -> SemanticMatchResult:
+    def match(
+        self,
+        *,
+        query_text: str,
+        business_ids: list[str],
+        cutoff_time: datetime,
+        usage_scope: str | None = None,
+    ) -> SemanticMatchResult:
         assert query_text == "romantic steakhouse"
+        assert usage_scope == "f" * 64
         return SemanticMatchResult(
             query_sha256="c" * 64,
             model="fake-qwen-embedding",
+            provider="dashscope",
             dimension=256,
             matches=[
                 SemanticBusinessMatch(
@@ -328,6 +371,7 @@ def test_tfidf_embedding_comparison_is_explicitly_label_free() -> None:
     result = SemanticMatchResult(
         query_sha256="c" * 64,
         model="fake-qwen-embedding",
+        provider="dashscope",
         dimension=256,
         matches=[
             SemanticBusinessMatch(
