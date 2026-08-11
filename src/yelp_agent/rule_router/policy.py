@@ -21,6 +21,7 @@ class RuleBasedActionPolicy:
         cross_encoder_beta: float = 0.0,
         review_rag_enabled: bool = False,
         evidence_aggregation_enabled: bool = False,
+        semantic_ranking_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -35,6 +36,7 @@ class RuleBasedActionPolicy:
         self._cross_encoder_beta = cross_encoder_beta
         self._review_rag_enabled = review_rag_enabled
         self._evidence_aggregation_enabled = evidence_aggregation_enabled
+        self._semantic_ranking_enabled = semantic_ranking_enabled
 
     def allowed_actions(self, state: AgentState) -> tuple[AgentAction, ...]:
         facts = RouteFacts.from_state(state)
@@ -133,6 +135,12 @@ class RuleBasedActionPolicy:
         if (
             self._cross_encoder_enabled
             and facts.cross_encoder_match is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            return ("rank_candidates", "safe_fallback")
+        if (
+            self._semantic_ranking_enabled
+            and facts.semantic_ranking is None
             and facts.remaining.semantic_calls > 0
         ):
             return ("rank_candidates", "safe_fallback")

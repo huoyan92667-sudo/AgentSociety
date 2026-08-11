@@ -35,6 +35,7 @@ def build_rule_agent(
     cross_encoder_beta: float = 0.0,
     review_rag_enabled: bool = False,
     evidence_aggregation_enabled: bool = False,
+    semantic_ranking_enabled: bool = False,
     semantic_enhancer: ControlledSemanticEnhancer | None = None,
     answer_composer: GroundedAnswerComposer | None = None,
     answer_evidence_limit: int = 12,
@@ -57,6 +58,7 @@ def build_rule_agent(
             cross_encoder_beta=cross_encoder_beta,
             review_rag_enabled=review_rag_enabled,
             evidence_aggregation_enabled=evidence_aggregation_enabled,
+            semantic_ranking_enabled=semantic_ranking_enabled,
         ),
         router=RuleRouter(
             display_limit=display_limit,
@@ -68,6 +70,7 @@ def build_rule_agent(
             cross_encoder_beta=cross_encoder_beta,
             review_rag_enabled=review_rag_enabled,
             evidence_aggregation_enabled=evidence_aggregation_enabled,
+            semantic_ranking_enabled=semantic_ranking_enabled,
         ),
         executor=RegistryActionExecutor(
             registry,

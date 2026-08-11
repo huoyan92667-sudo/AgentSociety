@@ -72,6 +72,7 @@ class RouteFacts(StrictModel):
     ranked_business_ids: list[str]
     semantic_ranks_by_business: dict[str, int]
     cross_encoder_ranks_by_business: dict[str, int]
+    semantic_ranking_ids: list[str]
     detailed_business_ids: list[str]
     profiled_business_ids: list[str]
     compared_business_ids: list[str]
@@ -81,6 +82,7 @@ class RouteFacts(StrictModel):
     hybrid_ranking: RouteToolFact | None = None
     semantic_match: RouteToolFact | None = None
     cross_encoder_match: RouteToolFact | None = None
+    semantic_ranking: RouteToolFact | None = None
     business_details: RouteToolFact | None = None
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
@@ -106,11 +108,16 @@ class RouteFacts(StrictModel):
     ) -> list[str]:
         """Apply Step-25 then Step-26 fusion, preserving every unscored tail."""
 
-        return fuse_ranking_and_cross_encoder(
+        step26 = fuse_ranking_and_cross_encoder(
             self.embedding_ranking(fusion_alpha=fusion_alpha),
             self.cross_encoder_ranks_by_business,
             beta=cross_encoder_beta,
         )
+        if self.semantic_ranking_ids:
+            if set(self.semantic_ranking_ids) != set(step26):
+                raise ValueError("Step-30 ranking escaped the Step-26 scope")
+            return list(self.semantic_ranking_ids)
+        return step26
 
     @classmethod
     def from_state(cls, state: AgentState) -> Self:
@@ -136,6 +143,11 @@ class RouteFacts(StrictModel):
         cross_encoder_match = _latest_tool(
             tools,
             "COMPUTE_CROSS_ENCODER_MATCH",
+            turn_index=state.current_turn,
+        )
+        semantic_ranking = _latest_tool(
+            tools,
+            "APPLY_SEMANTIC_RANKING",
             turn_index=state.current_turn,
         )
         details = _latest_tool(tools, "GET_BUSINESS_DETAILS")
@@ -261,6 +273,9 @@ class RouteFacts(StrictModel):
             cross_encoder_ranks_by_business=_cross_encoder_ranks(
                 cross_encoder_match
             ),
+            semantic_ranking_ids=_string_list(
+                _tool_data(semantic_ranking).get("ranking")
+            ),
             detailed_business_ids=_accumulated_record_ids(
                 tools,
                 tool_name="GET_BUSINESS_DETAILS",
@@ -282,6 +297,7 @@ class RouteFacts(StrictModel):
             hybrid_ranking=_route_tool_fact(ranking),
             semantic_match=_route_tool_fact(semantic_match),
             cross_encoder_match=_route_tool_fact(cross_encoder_match),
+            semantic_ranking=_route_tool_fact(semantic_ranking),
             business_details=_route_tool_fact(details),
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),

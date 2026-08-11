@@ -23,6 +23,7 @@ class RuleRouter:
         cross_encoder_beta: float = 0.0,
         review_rag_enabled: bool = False,
         evidence_aggregation_enabled: bool = False,
+        semantic_ranking_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -43,6 +44,7 @@ class RuleRouter:
         self._cross_encoder_beta = cross_encoder_beta
         self._review_rag_enabled = review_rag_enabled
         self._evidence_aggregation_enabled = evidence_aggregation_enabled
+        self._semantic_ranking_enabled = semantic_ranking_enabled
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -142,6 +144,22 @@ class RuleRouter:
                 },
                 reason_code="CROSS_ENCODER_MATCH_REQUIRED",
                 tool_name="COMPUTE_CROSS_ENCODER_MATCH",
+                tool_kind="semantic",
+            )
+        if (
+            self._semantic_ranking_enabled
+            and facts.semantic_ranking is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            step26_ranking = facts.final_ranking(
+                fusion_alpha=self._fusion_alpha,
+                cross_encoder_beta=self._cross_encoder_beta,
+            )
+            return AgentDecision(
+                action="rank_candidates",
+                arguments={"business_ids": step26_ranking},
+                reason_code="STRUCTURED_SEMANTIC_RANKING_REQUIRED",
+                tool_name="APPLY_SEMANTIC_RANKING",
                 tool_kind="semantic",
             )
         final_ranking = facts.final_ranking(

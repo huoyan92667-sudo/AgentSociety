@@ -65,6 +65,11 @@ from yelp_agent.semantic_embedding import (
     load_local_embedding_environment,
     load_semantic_embedding_config,
 )
+from yelp_agent.semantic_ranking import (
+    SemanticRankingEngine,
+    load_semantic_ranking_config,
+    load_semantic_ranking_policy,
+)
 
 from .config import load_rule_router_config
 from .factory import build_rule_agent
@@ -198,6 +203,7 @@ class RuleAgentRuntime:
         review_embedding_encoder: object | None = None,
         review_store: object | None = None,
         controlled_llm: ControlledLLMRuntime | None = None,
+        semantic_ranking: SemanticRankingEngine | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -207,6 +213,7 @@ class RuleAgentRuntime:
         self._review_embedding_encoder = review_embedding_encoder
         self._review_store = review_store
         self.controlled_llm = controlled_llm
+        self.semantic_ranking = semantic_ranking
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -248,6 +255,7 @@ def build_real_rule_agent_runtime(
     evidence_aggregation_config_path: str | Path | None = None,
     controlled_llm_config_path: str | Path | None = None,
     controlled_llm_environment: Mapping[str, str] | None = None,
+    semantic_ranking_config_path: str | Path | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -302,6 +310,7 @@ def build_real_rule_agent_runtime(
     review_encoder = None
     review_store = None
     controlled_llm = None
+    semantic_ranking = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -456,6 +465,28 @@ def build_real_rule_agent_runtime(
                 config=controlled_config,
                 environment=controlled_llm_environment,
             )
+        semantic_ranking_config = None
+        if semantic_ranking_config_path is not None:
+            if embedding_match is None or cross_reranker is None:
+                raise ValueError(
+                    "Step 30 semantic ranking requires Step 25 and Step 26 runtimes"
+                )
+            semantic_ranking_config = load_semantic_ranking_config(
+                semantic_ranking_config_path
+            )
+            if semantic_ranking_config.enabled:
+                semantic_ranking_policy = load_semantic_ranking_policy(
+                    sources.project_root,
+                    semantic_ranking_config,
+                )
+                semantic_ranking = SemanticRankingEngine(
+                    profiles=business_profiles,
+                    embedding_matcher=embedding_match,
+                    cross_encoder_reranker=cross_reranker,
+                    policy=semantic_ranking_policy,
+                    mode=semantic_ranking_config.mode,
+                    candidate_limit=semantic_ranking_config.candidate_limit,
+                )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -466,8 +497,12 @@ def build_real_rule_agent_runtime(
             cross_encoder_reranker=cross_reranker,
             review_search=review_search,
             evidence_aggregator=evidence_aggregator,
+            semantic_ranking=semantic_ranking,
             embedding_alpha=(
                 semantic_config.fusion_alpha if semantic_config is not None else 0.0
+            ),
+            cross_encoder_beta=(
+                cross_policy.fusion_beta if cross_policy is not None else 0.0
             ),
             runtime_config=tool_config,
         )
@@ -510,6 +545,13 @@ def build_real_rule_agent_runtime(
                     "max_semantic_calls": max(base_budget.max_semantic_calls, 4),
                 }
             )
+        if semantic_ranking is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_tool_calls": max(base_budget.max_tool_calls, 7),
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 3),
+                }
+            )
         harness = build_rule_agent(
             registry=registry,
             fallback_handler=fallback_handler,
@@ -539,6 +581,7 @@ def build_real_rule_agent_runtime(
             ),
             review_rag_enabled=review_search is not None,
             evidence_aggregation_enabled=evidence_aggregator is not None,
+            semantic_ranking_enabled=semantic_ranking is not None,
             semantic_enhancer=(
                 None
                 if controlled_llm is None
@@ -555,7 +598,10 @@ def build_real_rule_agent_runtime(
                 else controlled_config.answer.maximum_evidence_items
             ),
             agent_version=(
-                controlled_config.agent_version
+                semantic_ranking_config.agent_version
+                if semantic_ranking is not None
+                and semantic_ranking_config is not None
+                else controlled_config.agent_version
                 if controlled_llm is not None and controlled_config is not None
                 else evidence_config.agent_version
                 if evidence_aggregator is not None and evidence_config is not None
@@ -595,4 +641,5 @@ def build_real_rule_agent_runtime(
         review_embedding_encoder=review_encoder,
         review_store=review_store,
         controlled_llm=controlled_llm,
+        semantic_ranking=semantic_ranking,
     )

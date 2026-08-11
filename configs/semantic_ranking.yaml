@@ -1,0 +1,9 @@
+schema_version: 1
+agent_version: step30-controlled-semantic-ranking-protected-v1
+enabled: true
+mode: protected
+candidate_limit: 20
+policy_relative_path: configs/semantic_ranking_policy.json
+diagnostics_relative_path: runs/semantic_ranking_v1/diagnostics.jsonl
+tuning_split: development
+validation_used_for_selection: false

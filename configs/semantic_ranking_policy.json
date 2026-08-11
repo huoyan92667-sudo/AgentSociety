@@ -1,0 +1,33 @@
+{
+  "candidate_limit": 20,
+  "cross_encoder_weight": 0.5,
+  "development_metrics": {
+    "harm_rate": 0.042105263157894736,
+    "hr_at_1": 0.06315789473684211,
+    "hr_at_3": 0.11578947368421053,
+    "hr_at_5": 0.1368421052631579,
+    "improvement_rate": 0.042105263157894736,
+    "mean_movement": 2.291578947368421,
+    "mrr": 0.10054258176616405,
+    "ndcg_at_5": 0.10359208820625015
+  },
+  "development_scenario_count": 95,
+  "displacement_margin": 0.2,
+  "embedding_weight": 0.4,
+  "evidence_floor": 0.5,
+  "maximum_downward_move": 3,
+  "maximum_fusion_alpha": 1.0,
+  "maximum_upward_move": 5,
+  "minimum_intent_confidence": 0.0,
+  "objective": "HR@5",
+  "protected_top_k": 3,
+  "schema_version": 1,
+  "structured_weight": 0.1,
+  "tie_breakers": [
+    "MRR",
+    "HR@1",
+    "harm_rate",
+    "mean_movement"
+  ],
+  "validation_used_for_selection": false
+}

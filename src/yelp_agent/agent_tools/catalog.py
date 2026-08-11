@@ -16,6 +16,7 @@ from .adapters import (
     GetUserProfileTool,
     SearchBusinessReviewsTool,
     AggregateReviewEvidenceTool,
+    ApplySemanticRankingTool,
 )
 from .config import AgentToolRuntimeConfig
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
@@ -59,7 +60,9 @@ def build_step23_tool_registry(
     cross_encoder_reranker: object | None = None,
     review_search: object | None = None,
     evidence_aggregator: object | None = None,
+    semantic_ranking: object | None = None,
     embedding_alpha: float = 0.0,
+    cross_encoder_beta: float = 0.0,
     runtime_config: AgentToolRuntimeConfig | None = None,
 ) -> AgentToolRegistry:
     """Build the complete catalog while leaving future tools explicitly disabled."""
@@ -98,6 +101,21 @@ def build_step23_tool_registry(
                     kind="semantic",
                     actions=("rank_candidates",),
                     summary="Rerank a small candidate set with a cross-encoder.",
+                )
+            ),
+            (
+                ApplySemanticRankingTool(
+                    semantic_ranking,  # type: ignore[arg-type]
+                    embedding_alpha=embedding_alpha,
+                    cross_encoder_beta=cross_encoder_beta,
+                )
+                if semantic_ranking is not None
+                else _future_tool(
+                    name="APPLY_SEMANTIC_RANKING",
+                    step=30,
+                    kind="semantic",
+                    actions=("rank_candidates",),
+                    summary="Apply structured semantics with optional rank protection.",
                 )
             ),
             (

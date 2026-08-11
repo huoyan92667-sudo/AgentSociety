@@ -11,6 +11,7 @@ from .retrieval import ExpandCandidatesTool
 from .ranking import GetHybridRankingTool
 from .review_rag import SearchBusinessReviewsTool
 from .evidence import AggregateReviewEvidenceTool
+from .semantic_ranking import ApplySemanticRankingTool
 
 __all__ = [
     "GetBusinessDetailsTool",
@@ -26,4 +27,5 @@ __all__ = [
     "ComputeCrossEncoderMatchTool",
     "SearchBusinessReviewsTool",
     "AggregateReviewEvidenceTool",
+    "ApplySemanticRankingTool",
 ]

@@ -20,6 +20,7 @@ from .adapters import (
     ComputeCrossEncoderMatchTool,
     SearchBusinessReviewsTool,
     AggregateReviewEvidenceTool,
+    ApplySemanticRankingTool,
 )
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
 from .schema import ToolExecutionContext, ToolObservation
@@ -39,6 +40,7 @@ __all__ = [
     "ComputeCrossEncoderMatchTool",
     "SearchBusinessReviewsTool",
     "AggregateReviewEvidenceTool",
+    "ApplySemanticRankingTool",
     "RegistryActionExecutor",
     "PermanentToolError",
     "RetryableToolError",

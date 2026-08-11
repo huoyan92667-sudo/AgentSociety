@@ -20,6 +20,7 @@ from yelp_agent.cross_encoder.schema import (
 )
 from yelp_agent.review_rag.schema import ReviewSearchResult
 from yelp_agent.evidence_aggregation.schema import EvidenceAssessment
+from yelp_agent.semantic_ranking import SemanticRankingResult
 
 
 class EmptyToolInput(StrictModel):
@@ -181,3 +182,7 @@ class CrossEncoderMatchOutput(StrictModel):
     model: str = Field(min_length=1)
     matches: list[CrossEncoderBusinessMatch] = Field(min_length=1)
     usage: CrossEncoderUsage
+
+
+class SemanticRankingOutput(SemanticRankingResult):
+    """Named Agent-tool output preserving the Step-30 ranking contract."""
