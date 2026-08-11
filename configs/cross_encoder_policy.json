@@ -1,0 +1,20 @@
+{
+  "candidate_limit": 20,
+  "development_metrics": {
+    "hr_at_1": 0.06179775280898876,
+    "hr_at_3": 0.09550561797752809,
+    "hr_at_5": 0.10674157303370786,
+    "mrr": 0.09021091537163896
+  },
+  "development_scenario_count": 178,
+  "display_limit": 5,
+  "fusion_beta": 1.0,
+  "objective": "HR@5",
+  "schema_version": 1,
+  "tie_breakers": [
+    "MRR",
+    "HR@1",
+    "candidate_limit",
+    "fusion_beta"
+  ]
+}

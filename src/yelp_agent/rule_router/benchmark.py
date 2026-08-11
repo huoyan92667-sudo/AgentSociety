@@ -89,6 +89,7 @@ def run_rule_agent_benchmark(
     output_root: str | Path,
     split: BenchmarkSplit = "all",
     progress: Callable[[int, int, VisibleAgentScenario], None] | None = None,
+    scenario_ids: set[str] | None = None,
 ) -> RuleAgentBenchmarkResult:
     """Run visible inputs, release hidden turns on trigger, then evaluate offline."""
 
@@ -97,6 +98,16 @@ def run_rule_agent_benchmark(
     visible = _select(
         load_visible_scenarios(root / "visible" / "scenarios.jsonl"), split
     )
+    if scenario_ids is not None:
+        known = {item.scenario_id for item in visible}
+        unknown = scenario_ids - known
+        if unknown:
+            raise ValueError(
+                f"requested scenario IDs are outside split {split}: {sorted(unknown)[:3]}"
+            )
+        visible = tuple(item for item in visible if item.scenario_id in scenario_ids)
+        if not visible:
+            raise ValueError("scenario ID filter selected no benchmark scenarios")
     visible_ids = {item.scenario_id for item in visible}
     truth = tuple(
         item
@@ -153,6 +164,62 @@ def run_rule_agent_benchmark(
         report=report,
         output=output,
         split=split,
+    )
+
+
+def replace_rule_agent_benchmark_outputs(
+    *,
+    base_root: str | Path,
+    replacement_root: str | Path,
+    benchmark_root: str | Path,
+    output_root: str | Path,
+) -> RuleAgentBenchmarkResult:
+    """Replace explicitly rerun scenarios and reevaluate the complete benchmark."""
+
+    base_path = Path(base_root)
+    replacement_path = Path(replacement_root)
+    base_runs = {
+        item.scenario_id: item
+        for item in load_agent_scenario_runs(base_path / "scenario_runs.jsonl")
+    }
+    replacements = {
+        item.scenario_id: item
+        for item in load_agent_scenario_runs(replacement_path / "scenario_runs.jsonl")
+    }
+    if not replacements or not set(replacements).issubset(base_runs):
+        raise ValueError("replacement scenarios must be a nonempty subset of base runs")
+    base_driver = {
+        str(item["scenario_id"]): item
+        for item in _load_jsonl(base_path / "driver_results.jsonl")
+    }
+    replacement_driver = {
+        str(item["scenario_id"]): item
+        for item in _load_jsonl(replacement_path / "driver_results.jsonl")
+    }
+    if set(replacements) != set(replacement_driver):
+        raise ValueError("replacement runs and driver rows do not align")
+    base_runs.update(replacements)
+    base_driver.update(replacement_driver)
+    root = Path(benchmark_root)
+    visible = load_visible_scenarios(root / "visible" / "scenarios.jsonl")
+    truth = load_scenario_ground_truth(root / "hidden" / "ground_truth.jsonl")
+    evidence = load_evidence_labels(root / "hidden" / "evidence_labels.parquet")
+    if set(base_runs) != {item.scenario_id for item in visible}:
+        raise ValueError("patched runs do not cover the complete benchmark")
+    ordered_runs = tuple(base_runs[key] for key in sorted(base_runs))
+    ordered_driver = tuple(base_driver[key] for key in sorted(base_driver))
+    report = evaluate_agent_scenario_runs(
+        ordered_runs,
+        visible_scenarios=visible,
+        ground_truth=truth,
+        evidence_labels=evidence,
+    )
+    return _publish_results(
+        runs=ordered_runs,
+        driver_rows=ordered_driver,
+        report=report,
+        output=Path(output_root),
+        split="all",
     )
 
 

@@ -176,6 +176,38 @@ def test_harness_pauses_for_clarification_and_resumes_same_session() -> None:
     assert resumed.session.request.desired_categories == ["Steakhouses"]
 
 
+def test_resume_resets_per_turn_token_budget_but_keeps_session_total() -> None:
+    harness = AgentHarness(
+        agent_version="fake-agent-v1",
+        interpreter=RuleBasedRequestInterpreter(),
+        action_policy=_GapAwarePolicy(),
+        router=_FirstAllowedRouter(),
+        executor=_ClarifyThenReturnExecutor(),
+        budget=HarnessBudget(max_total_tokens=100),
+        clock=_FixedClock(),
+    )
+    paused = harness.start(
+        _scenario().model_copy(update={"query_text": "Find a steakhouse within 5 km"})
+    )
+    previous = paused.session.model_copy(
+        update={"input_tokens": 90, "turn_input_tokens": 90}
+    )
+
+    resumed = harness.resume(
+        previous,
+        UserTurnInput(
+            query_text="I am near Philadelphia City Hall.",
+            user_latitude=39.9526,
+            user_longitude=-75.1652,
+        ),
+    )
+
+    assert resumed.run is not None
+    assert resumed.run.fallback is False
+    assert resumed.session.input_tokens == 90
+    assert resumed.session.turn_input_tokens == 0
+
+
 class _MultiStepPolicy:
     def allowed_actions(self, state):
         return (

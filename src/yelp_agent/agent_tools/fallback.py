@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from yelp_agent.agent_harness.schema import ActionOutcome, AgentSession
+from yelp_agent.cross_encoder import fuse_ranking_and_cross_encoder
+from yelp_agent.semantic_embedding import fuse_hybrid_and_semantic
 
 from .adapters.ranking import HybridRankingService
 
@@ -84,3 +86,66 @@ class HybridV2FallbackHandler:
             if isinstance(rows, list):
                 return [dict(row) for row in rows if isinstance(row, dict)]
         return []
+
+
+class RankingCascadeFallbackHandler(HybridV2FallbackHandler):
+    """Fall back Cross-Encoder -> Step 25 -> Hybrid without losing a batch."""
+
+    def __init__(
+        self,
+        ranking_service: HybridRankingService,
+        *,
+        display_limit: int,
+        embedding_alpha: float,
+        cross_encoder_beta: float,
+    ) -> None:
+        super().__init__(ranking_service)
+        self._display_limit = display_limit
+        self._embedding_alpha = embedding_alpha
+        self._cross_encoder_beta = cross_encoder_beta
+
+    def fallback(self, state: AgentSession, reason: str) -> ActionOutcome:
+        baseline = super().fallback(state, reason)
+        ranking = list(baseline.candidate_ranking)
+        if ranking:
+            semantic = self._ranks(state, "COMPUTE_EMBEDDING_MATCH", "semantic_rank")
+            cross = self._ranks(
+                state, "COMPUTE_CROSS_ENCODER_MATCH", "cross_encoder_rank"
+            )
+            try:
+                ranking = fuse_hybrid_and_semantic(
+                    ranking, semantic, alpha=self._embedding_alpha
+                )
+                ranking = fuse_ranking_and_cross_encoder(
+                    ranking, cross, beta=self._cross_encoder_beta
+                )
+            except ValueError:
+                # Malformed optional evidence must never destroy the valid Hybrid order.
+                ranking = list(baseline.candidate_ranking)
+        return ActionOutcome(
+            status="completed",
+            response_kind="fallback",
+            candidate_ranking=ranking,
+            recommended_business_ids=ranking[: self._display_limit],
+        )
+
+    @staticmethod
+    def _ranks(
+        state: AgentSession, tool_name: str, rank_field: str
+    ) -> dict[str, int]:
+        for observation in reversed(state.observations):
+            payload = observation.payload
+            if payload.get("tool_name") != tool_name:
+                continue
+            data = payload.get("data")
+            rows = data.get("matches") if isinstance(data, dict) else None
+            if not isinstance(rows, list):
+                return {}
+            return {
+                str(row["business_id"]): int(row[rank_field])
+                for row in rows
+                if isinstance(row, dict)
+                and isinstance(row.get("business_id"), str)
+                and isinstance(row.get(rank_field), int)
+            }
+        return {}

@@ -203,6 +203,10 @@ class AgentSession(StrictModel):
     rag_call_count: int = Field(default=0, ge=0)
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+    # Session totals above are reported to evaluation. These two counters are
+    # reset on every user turn and are the only values used for per-turn budget.
+    turn_input_tokens: int = Field(default=0, ge=0)
+    turn_output_tokens: int = Field(default=0, ge=0)
     token_usage_observed: bool = False
     cost_usd: float = Field(default=0, ge=0)
     started_at_ms: float = Field(ge=0)

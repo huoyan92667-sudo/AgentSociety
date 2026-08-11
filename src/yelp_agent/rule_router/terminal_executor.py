@@ -42,10 +42,18 @@ _GAP_LIST_ADAPTER = TypeAdapter(list[InformationGap])
 class TerminalActionExecutor:
     """Execute terminal actions without inventing businesses or evidence."""
 
-    def __init__(self, *, fusion_alpha: float = 0.0) -> None:
+    def __init__(
+        self,
+        *,
+        fusion_alpha: float = 0.0,
+        cross_encoder_beta: float = 0.0,
+    ) -> None:
         if not 0 <= fusion_alpha <= 1:
             raise ValueError("fusion alpha must be between zero and one")
         self._fusion_alpha = fusion_alpha
+        if not 0 <= cross_encoder_beta <= 1:
+            raise ValueError("Cross-Encoder beta must be between zero and one")
+        self._cross_encoder_beta = cross_encoder_beta
 
     def execute(
         self,
@@ -148,7 +156,10 @@ class TerminalActionExecutor:
                 failure_reason="recommendation_business_ids_invalid",
             )
         business_ids = list(raw_ids)
-        ranking = facts.final_ranking(fusion_alpha=self._fusion_alpha)
+        ranking = facts.final_ranking(
+            fusion_alpha=self._fusion_alpha,
+            cross_encoder_beta=self._cross_encoder_beta,
+        )
         if not ranking or business_ids != ranking[: len(business_ids)]:
             return ActionOutcome(
                 status="failed",

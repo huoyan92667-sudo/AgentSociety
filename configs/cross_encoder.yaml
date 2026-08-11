@@ -1,0 +1,18 @@
+schema_version: 1
+cross_encoder_version: 1.0.0
+provider: local
+agent_version: step26-rule-agent-cross-encoder-v1
+
+# Qwen3-Reranker-0.6B is loaded by an isolated persistent local worker.
+batch_size: 8
+max_sequence_length: 512
+timeout_seconds: 90
+max_total_tokens_per_turn: 12000
+
+instruction: >-
+  Given a Yelp user request, judge whether the candidate business matches the
+  requested category, occasion, atmosphere, price, and experience preferences.
+  Use only facts present in the static business document.
+business_document_version: business-static-semantic-v2.0.0
+cache_relative_path: data/features/cross_encoder/v1
+policy_relative_path: configs/cross_encoder_policy.json

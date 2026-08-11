@@ -23,7 +23,7 @@ def pre_loop_violation(state: AgentSession, *, elapsed_ms: float) -> str | None:
         return "max_steps_exceeded"
     if state.semantic_call_count > state.budget.max_semantic_calls:
         return "max_semantic_calls_exceeded"
-    if state.input_tokens + state.output_tokens > state.budget.max_total_tokens:
+    if state.turn_input_tokens + state.turn_output_tokens > state.budget.max_total_tokens:
         return "max_total_tokens_exceeded"
     return None
 
@@ -69,7 +69,7 @@ def _decision_budget_violation(
         return "max_rag_calls_exceeded"
     if (
         decision.tool_kind == "semantic"
-        and state.input_tokens + state.output_tokens
+        and state.turn_input_tokens + state.turn_output_tokens
         >= state.budget.max_total_tokens
     ):
         return "max_total_tokens_exceeded"

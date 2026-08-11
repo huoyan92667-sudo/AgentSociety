@@ -7,6 +7,7 @@ from .adapters import (
     BusinessProfileCandidateReader,
     CompareBusinessesTool,
     ComputeEmbeddingMatchTool,
+    ComputeCrossEncoderMatchTool,
     ExpandCandidatesTool,
     GetBusinessDetailsTool,
     GetBusinessProfileTool,
@@ -53,6 +54,8 @@ def build_step23_tool_registry(
     history_reader: object,
     hybrid_ranking: object,
     embedding_match: object | None = None,
+    cross_encoder_reranker: object | None = None,
+    embedding_alpha: float = 0.0,
     runtime_config: AgentToolRuntimeConfig | None = None,
 ) -> AgentToolRegistry:
     """Build the complete catalog while leaving future tools explicitly disabled."""
@@ -79,12 +82,19 @@ def build_step23_tool_registry(
                     summary="Compute semantic request-candidate similarity.",
                 )
             ),
-            _future_tool(
-                name="COMPUTE_CROSS_ENCODER_MATCH",
-                step=26,
-                kind="semantic",
-                actions=("rank_candidates",),
-                summary="Rerank a small candidate set with a cross-encoder.",
+            (
+                ComputeCrossEncoderMatchTool(
+                    cross_encoder_reranker,  # type: ignore[arg-type]
+                    embedding_alpha=embedding_alpha,
+                )
+                if cross_encoder_reranker is not None
+                else _future_tool(
+                    name="COMPUTE_CROSS_ENCODER_MATCH",
+                    step=26,
+                    kind="semantic",
+                    actions=("rank_candidates",),
+                    summary="Rerank a small candidate set with a cross-encoder.",
+                )
             ),
             _future_tool(
                 name="SEARCH_BUSINESS_REVIEWS",

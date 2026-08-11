@@ -3,6 +3,7 @@
 from .benchmark import (
     RuleAgentBenchmarkResult,
     merge_rule_agent_benchmark_outputs,
+    replace_rule_agent_benchmark_outputs,
     run_rule_agent_benchmark,
 )
 from .config import RuleRouterConfig, load_rule_router_config
@@ -33,4 +34,5 @@ __all__ = [
     "build_real_rule_agent_runtime",
     "run_rule_agent_benchmark",
     "merge_rule_agent_benchmark_outputs",
+    "replace_rule_agent_benchmark_outputs",
 ]

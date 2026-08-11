@@ -9,9 +9,18 @@ from pathlib import Path
 from yelp_agent.agent_harness import AgentHarness, load_agent_harness_config
 from yelp_agent.agent_tools import (
     HybridV2FallbackHandler,
+    RankingCascadeFallbackHandler,
     OnlineHybridV2RankingService,
     build_step23_tool_registry,
     load_agent_tool_runtime_config,
+)
+from yelp_agent.cross_encoder import (
+    CachedCrossEncoderReranker,
+    LocalQwenCrossEncoder,
+    SqliteCrossEncoderCache,
+    load_cross_encoder_config,
+    load_cross_encoder_policy,
+    load_local_cross_encoder_environment,
 )
 from yelp_agent.business_profiles import BusinessKnowledgeStore
 from yelp_agent.collaborative import TemporalItemKNNStore
@@ -156,11 +165,13 @@ class RuleAgentRuntime:
         harness: AgentHarness,
         user_profiles: UserProfileStore,
         embedding_encoder: object | None = None,
+        cross_encoder: object | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
         self._user_profiles = user_profiles
         self._embedding_encoder = embedding_encoder
+        self._cross_encoder = cross_encoder
         self._closed = False
 
     def __enter__(self) -> RuleAgentRuntime:
@@ -175,6 +186,9 @@ class RuleAgentRuntime:
             close = getattr(self._embedding_encoder, "close", None)
             if callable(close):
                 close()
+            close = getattr(self._cross_encoder, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -183,6 +197,8 @@ def build_real_rule_agent_runtime(
     *,
     embedding_config_path: str | Path | None = None,
     embedding_environment: Mapping[str, str] | None = None,
+    cross_encoder_config_path: str | Path | None = None,
+    cross_encoder_environment: Mapping[str, str] | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -233,6 +249,7 @@ def build_real_rule_agent_runtime(
     )
     user_profiles = UserProfileStore(sources.user_profile_root)
     encoder = None
+    cross_encoder = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -287,6 +304,34 @@ def build_real_rule_agent_runtime(
                 ),
                 config=semantic_config,
             )
+        cross_reranker = None
+        cross_config = None
+        cross_policy = None
+        if cross_encoder_config_path is not None:
+            if embedding_match is None or semantic_config is None:
+                raise ValueError(
+                    "Step 26 Cross-Encoder requires the Step 25 embedding runtime"
+                )
+            cross_config = load_cross_encoder_config(cross_encoder_config_path)
+            cross_policy = load_cross_encoder_policy(
+                sources.project_root, cross_config
+            )
+            cross_environment = load_local_cross_encoder_environment(
+                cross_encoder_environment
+            )
+            if not cross_environment.enabled:
+                raise ValueError("local Cross-Encoder environment is not configured")
+            cross_encoder = LocalQwenCrossEncoder.from_environment(
+                cross_config, cross_environment
+            )
+            cross_reranker = CachedCrossEncoderReranker(
+                businesses=data_view,
+                scorer=cross_encoder,
+                cache=SqliteCrossEncoderCache(
+                    sources.project_root / cross_config.cache_relative_path
+                ),
+                config=cross_config,
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -294,26 +339,58 @@ def build_real_rule_agent_runtime(
             history_reader=data_view,
             hybrid_ranking=ranking_service,
             embedding_match=embedding_match,
+            cross_encoder_reranker=cross_reranker,
+            embedding_alpha=(
+                semantic_config.fusion_alpha if semantic_config is not None else 0.0
+            ),
             runtime_config=tool_config,
         )
+        fallback_handler = (
+            RankingCascadeFallbackHandler(
+                ranking_service,
+                display_limit=cross_policy.display_limit,
+                embedding_alpha=semantic_config.fusion_alpha,
+                cross_encoder_beta=cross_policy.fusion_beta,
+            )
+            if cross_reranker is not None
+            and cross_policy is not None
+            and semantic_config is not None
+            else HybridV2FallbackHandler(ranking_service)
+        )
+        base_budget = harness_config.budget
+        if embedding_match is not None and semantic_config is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_total_tokens": max(
+                        base_budget.max_total_tokens,
+                        semantic_config.max_total_tokens_per_turn,
+                    )
+                }
+            )
+        if cross_reranker is not None and cross_config is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_tool_calls": max(base_budget.max_tool_calls, 6),
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 2),
+                    "max_total_tokens": max(
+                        base_budget.max_total_tokens,
+                        cross_config.max_total_tokens_per_turn,
+                    ),
+                }
+            )
         harness = build_rule_agent(
             registry=registry,
-            fallback_handler=HybridV2FallbackHandler(ranking_service),
-            budget=(
-                harness_config.budget.model_copy(
-                    update={
-                        "max_total_tokens": max(
-                            harness_config.budget.max_total_tokens,
-                            semantic_config.max_total_tokens_per_turn,
-                        )
-                    }
-                )
-                if embedding_match is not None and semantic_config is not None
-                else harness_config.budget
+            fallback_handler=fallback_handler,
+            budget=base_budget,
+            display_limit=(
+                cross_policy.display_limit
+                if cross_policy is not None
+                else rule_config.display_limit
             ),
-            display_limit=rule_config.display_limit,
             agent_version=(
-                semantic_config.agent_version
+                cross_config.agent_version
+                if cross_reranker is not None and cross_config is not None
+                else semantic_config.agent_version
                 if embedding_match is not None and semantic_config is not None
                 else rule_config.agent_version
             ),
@@ -328,9 +405,19 @@ def build_real_rule_agent_runtime(
                 if embedding_match is not None and semantic_config is not None
                 else 0.0
             ),
+            cross_encoder_enabled=cross_reranker is not None,
+            cross_encoder_candidate_limit=(
+                cross_policy.candidate_limit if cross_policy is not None else 20
+            ),
+            cross_encoder_beta=(
+                cross_policy.fusion_beta if cross_policy is not None else 0.0
+            ),
         )
     except Exception:
         close = getattr(encoder, "close", None)
+        if callable(close):
+            close()
+        close = getattr(cross_encoder, "close", None)
         if callable(close):
             close()
         user_profiles.close()
@@ -340,4 +427,5 @@ def build_real_rule_agent_runtime(
         harness=harness,
         user_profiles=user_profiles,
         embedding_encoder=encoder,
+        cross_encoder=cross_encoder,
     )

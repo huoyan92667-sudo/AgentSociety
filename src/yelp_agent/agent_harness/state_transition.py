@@ -39,11 +39,15 @@ def record_execution(
     metadata = outcome.tool_result
     input_tokens = state.input_tokens
     output_tokens = state.output_tokens
+    turn_input_tokens = state.turn_input_tokens
+    turn_output_tokens = state.turn_output_tokens
     token_usage_observed = state.token_usage_observed
     cost_usd = state.cost_usd
     if metadata is not None and metadata.input_tokens is not None:
         input_tokens += metadata.input_tokens
         output_tokens += metadata.output_tokens or 0
+        turn_input_tokens += metadata.input_tokens
+        turn_output_tokens += metadata.output_tokens or 0
         token_usage_observed = True
     if metadata is not None and metadata.cost_usd is not None:
         cost_usd += metadata.cost_usd
@@ -72,6 +76,8 @@ def record_execution(
             + int(decision.tool_kind == "review_rag"),
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
+            "turn_input_tokens": turn_input_tokens,
+            "turn_output_tokens": turn_output_tokens,
             "token_usage_observed": token_usage_observed,
             "cost_usd": cost_usd,
         }

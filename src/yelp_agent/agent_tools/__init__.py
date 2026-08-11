@@ -2,7 +2,7 @@
 
 from .executor import RegistryActionExecutor
 from .errors import PermanentToolError, RetryableToolError
-from .fallback import HybridV2FallbackHandler
+from .fallback import HybridV2FallbackHandler, RankingCascadeFallbackHandler
 from .assembly import OnlineHybridV2RankingService
 from .catalog import build_step23_tool_registry
 from .config import AgentToolRuntimeConfig, load_agent_tool_runtime_config
@@ -17,6 +17,7 @@ from .adapters import (
     GetSessionMemoryTool,
     GetUserProfileTool,
     ComputeEmbeddingMatchTool,
+    ComputeCrossEncoderMatchTool,
 )
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
 from .schema import ToolExecutionContext, ToolObservation
@@ -33,10 +34,12 @@ __all__ = [
     "CompareBusinessesTool",
     "GetHybridRankingTool",
     "ComputeEmbeddingMatchTool",
+    "ComputeCrossEncoderMatchTool",
     "RegistryActionExecutor",
     "PermanentToolError",
     "RetryableToolError",
     "HybridV2FallbackHandler",
+    "RankingCascadeFallbackHandler",
     "OnlineHybridV2RankingService",
     "build_step23_tool_registry",
     "AgentToolRuntimeConfig",

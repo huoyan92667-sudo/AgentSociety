@@ -8,6 +8,7 @@ from pydantic import Field
 
 from yelp_agent.agent_harness.schema import AgentObservation, AgentState
 from yelp_agent.agent_tools.schema import ToolObservation, ToolStatus
+from yelp_agent.cross_encoder import fuse_ranking_and_cross_encoder
 from yelp_agent.decision_readiness.schema import (
     InformationGap,
     RankingUncertaintyReason,
@@ -62,6 +63,7 @@ class RouteFacts(StrictModel):
     retrieved_candidate_ids: list[str]
     ranked_business_ids: list[str]
     semantic_ranks_by_business: dict[str, int]
+    cross_encoder_ranks_by_business: dict[str, int]
     detailed_business_ids: list[str]
     profiled_business_ids: list[str]
     compared_business_ids: list[str]
@@ -70,19 +72,34 @@ class RouteFacts(StrictModel):
     constraint_filter: RouteToolFact | None = None
     hybrid_ranking: RouteToolFact | None = None
     semantic_match: RouteToolFact | None = None
+    cross_encoder_match: RouteToolFact | None = None
     business_details: RouteToolFact | None = None
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
     last_tool: RouteToolFact | None = None
     remaining: RemainingBudgetFacts
 
-    def final_ranking(self, *, fusion_alpha: float) -> list[str]:
-        """Apply the frozen fusion policy to visible evidence only."""
+    def embedding_ranking(self, *, fusion_alpha: float) -> list[str]:
+        """Return the frozen Step-25 ranking from visible evidence only."""
 
         return fuse_hybrid_and_semantic(
             self.ranked_business_ids,
             self.semantic_ranks_by_business,
             alpha=fusion_alpha,
+        )
+
+    def final_ranking(
+        self,
+        *,
+        fusion_alpha: float,
+        cross_encoder_beta: float = 0.0,
+    ) -> list[str]:
+        """Apply Step-25 then Step-26 fusion, preserving every unscored tail."""
+
+        return fuse_ranking_and_cross_encoder(
+            self.embedding_ranking(fusion_alpha=fusion_alpha),
+            self.cross_encoder_ranks_by_business,
+            beta=cross_encoder_beta,
         )
 
     @classmethod
@@ -104,6 +121,11 @@ class RouteFacts(StrictModel):
         semantic_match = _latest_tool(
             tools,
             "COMPUTE_EMBEDDING_MATCH",
+            turn_index=state.current_turn,
+        )
+        cross_encoder_match = _latest_tool(
+            tools,
+            "COMPUTE_CROSS_ENCODER_MATCH",
             turn_index=state.current_turn,
         )
         details = _latest_tool(tools, "GET_BUSINESS_DETAILS")
@@ -182,6 +204,9 @@ class RouteFacts(StrictModel):
                 _tool_data(ranking).get("ranking")
             ),
             semantic_ranks_by_business=_semantic_ranks(semantic_match),
+            cross_encoder_ranks_by_business=_cross_encoder_ranks(
+                cross_encoder_match
+            ),
             detailed_business_ids=_accumulated_record_ids(
                 tools,
                 tool_name="GET_BUSINESS_DETAILS",
@@ -202,6 +227,7 @@ class RouteFacts(StrictModel):
             constraint_filter=_route_tool_fact(constraint_filter),
             hybrid_ranking=_route_tool_fact(ranking),
             semantic_match=_route_tool_fact(semantic_match),
+            cross_encoder_match=_route_tool_fact(cross_encoder_match),
             business_details=_route_tool_fact(details),
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),
@@ -223,8 +249,8 @@ class RouteFacts(StrictModel):
                 tokens=max(
                     0,
                     state.budget.max_total_tokens
-                    - state.input_tokens
-                    - state.output_tokens,
+                    - state.turn_input_tokens
+                    - state.turn_output_tokens,
                 ),
             ),
         )
@@ -307,6 +333,21 @@ def _semantic_ranks(tool: _NormalizedTool | None) -> dict[str, int]:
             continue
         business_id = row.get("business_id")
         rank = row.get("semantic_rank")
+        if isinstance(business_id, str) and isinstance(rank, int):
+            result[business_id] = rank
+    return result
+
+
+def _cross_encoder_ranks(tool: _NormalizedTool | None) -> dict[str, int]:
+    rows = _tool_data(tool).get("matches")
+    if not isinstance(rows, list):
+        return {}
+    result: dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        business_id = row.get("business_id")
+        rank = row.get("cross_encoder_rank")
         if isinstance(business_id, str) and isinstance(rank, int):
             result[business_id] = rank
     return result

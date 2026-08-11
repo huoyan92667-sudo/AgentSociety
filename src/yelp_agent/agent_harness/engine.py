@@ -90,6 +90,8 @@ class AgentHarness:
             semantic_call_count=interpretation.semantic_calls,
             input_tokens=interpretation.input_tokens or 0,
             output_tokens=interpretation.output_tokens or 0,
+            turn_input_tokens=interpretation.input_tokens or 0,
+            turn_output_tokens=interpretation.output_tokens or 0,
             token_usage_observed=interpretation.input_tokens is not None,
             cost_usd=interpretation.cost_usd or 0,
             started_at_ms=started_at_ms,
@@ -153,6 +155,8 @@ class AgentHarness:
                 + (interpretation.input_tokens or 0),
                 "output_tokens": session.output_tokens
                 + (interpretation.output_tokens or 0),
+                "turn_input_tokens": interpretation.input_tokens or 0,
+                "turn_output_tokens": interpretation.output_tokens or 0,
                 "token_usage_observed": session.token_usage_observed
                 or interpretation.input_tokens is not None,
                 "cost_usd": session.cost_usd + (interpretation.cost_usd or 0),
@@ -261,7 +265,10 @@ class AgentHarness:
             )
             recorder.absorb(outcome)
 
-            if state.input_tokens + state.output_tokens > state.budget.max_total_tokens:
+            if (
+                state.turn_input_tokens + state.turn_output_tokens
+                > state.budget.max_total_tokens
+            ):
                 fallback_reason = "max_total_tokens_exceeded"
             elif outcome.status == "failed":
                 fallback_reason = outcome.failure_reason or "action_failed"

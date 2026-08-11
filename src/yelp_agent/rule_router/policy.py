@@ -17,6 +17,8 @@ class RuleBasedActionPolicy:
         display_limit: int = 3,
         semantic_enabled: bool = False,
         fusion_alpha: float = 0.0,
+        cross_encoder_enabled: bool = False,
+        cross_encoder_beta: float = 0.0,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -25,6 +27,10 @@ class RuleBasedActionPolicy:
         if not 0 <= fusion_alpha <= 1:
             raise ValueError("fusion alpha must be between zero and one")
         self._fusion_alpha = fusion_alpha
+        self._cross_encoder_enabled = cross_encoder_enabled
+        if not 0 <= cross_encoder_beta <= 1:
+            raise ValueError("Cross-Encoder beta must be between zero and one")
+        self._cross_encoder_beta = cross_encoder_beta
 
     def allowed_actions(self, state: AgentState) -> tuple[AgentAction, ...]:
         facts = RouteFacts.from_state(state)
@@ -84,8 +90,15 @@ class RuleBasedActionPolicy:
             and facts.remaining.semantic_calls > 0
         ):
             return ("rank_candidates", "safe_fallback")
+        if (
+            self._cross_encoder_enabled
+            and facts.cross_encoder_match is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            return ("rank_candidates", "safe_fallback")
         display_ids = facts.final_ranking(
-            fusion_alpha=self._fusion_alpha
+            fusion_alpha=self._fusion_alpha,
+            cross_encoder_beta=self._cross_encoder_beta,
         )[: self._display_limit]
         if not set(display_ids).issubset(facts.detailed_business_ids):
             return ("get_business_details", "safe_fallback")

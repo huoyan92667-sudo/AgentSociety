@@ -14,6 +14,10 @@ from yelp_agent.semantic_embedding.schema import (
     EmbeddingUsage,
     SemanticBusinessMatch,
 )
+from yelp_agent.cross_encoder.schema import (
+    CrossEncoderBusinessMatch,
+    CrossEncoderUsage,
+)
 
 
 class EmptyToolInput(StrictModel):
@@ -146,3 +150,13 @@ class EmbeddingMatchOutput(StrictModel):
     dimension: int = Field(gt=0)
     matches: list[SemanticBusinessMatch] = Field(min_length=1)
     usage: EmbeddingUsage
+
+
+class CrossEncoderMatchOutput(StrictModel):
+    """Fine-grained evidence; final ordering remains code-enforced fusion."""
+
+    query_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provider: str = Field(min_length=1)
+    model: str = Field(min_length=1)
+    matches: list[CrossEncoderBusinessMatch] = Field(min_length=1)
+    usage: CrossEncoderUsage

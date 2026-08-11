@@ -18,6 +18,9 @@ class RuleRouter:
         semantic_enabled: bool = False,
         semantic_candidate_limit: int = 30,
         fusion_alpha: float = 0.0,
+        cross_encoder_enabled: bool = False,
+        cross_encoder_candidate_limit: int = 20,
+        cross_encoder_beta: float = 0.0,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -29,6 +32,13 @@ class RuleRouter:
         self._semantic_enabled = semantic_enabled
         self._semantic_candidate_limit = semantic_candidate_limit
         self._fusion_alpha = fusion_alpha
+        if not 1 <= cross_encoder_candidate_limit <= 100:
+            raise ValueError("Cross-Encoder candidate limit must be between 1 and 100")
+        if not 0 <= cross_encoder_beta <= 1:
+            raise ValueError("Cross-Encoder beta must be between zero and one")
+        self._cross_encoder_enabled = cross_encoder_enabled
+        self._cross_encoder_candidate_limit = cross_encoder_candidate_limit
+        self._cross_encoder_beta = cross_encoder_beta
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -111,7 +121,29 @@ class RuleRouter:
                 tool_name="COMPUTE_EMBEDDING_MATCH",
                 tool_kind="semantic",
             )
-        final_ranking = facts.final_ranking(fusion_alpha=self._fusion_alpha)
+        if (
+            self._cross_encoder_enabled
+            and facts.cross_encoder_match is None
+            and facts.remaining.semantic_calls > 0
+        ):
+            step25_ranking = facts.embedding_ranking(
+                fusion_alpha=self._fusion_alpha
+            )
+            return AgentDecision(
+                action="rank_candidates",
+                arguments={
+                    "business_ids": step25_ranking[
+                        : self._cross_encoder_candidate_limit
+                    ]
+                },
+                reason_code="CROSS_ENCODER_MATCH_REQUIRED",
+                tool_name="COMPUTE_CROSS_ENCODER_MATCH",
+                tool_kind="semantic",
+            )
+        final_ranking = facts.final_ranking(
+            fusion_alpha=self._fusion_alpha,
+            cross_encoder_beta=self._cross_encoder_beta,
+        )
         display_ids = final_ranking[: self._display_limit]
         missing_details = [
             business_id
