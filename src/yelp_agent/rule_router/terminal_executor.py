@@ -2,19 +2,28 @@
 
 from __future__ import annotations
 
+from pydantic import TypeAdapter, ValidationError
+
 from yelp_agent.agent_evaluation.schema import (
     ClarificationQuestionTrace,
     EvidenceReference,
     ResponseClaimTrace,
 )
-from yelp_agent.agent_harness.schema import ActionOutcome, AgentDecision, AgentState
+from yelp_agent.agent_harness.schema import (
+    ActionOutcome,
+    AgentDecision,
+    AgentState,
+    ModelResultMetadata,
+)
 from yelp_agent.agent_tools.schema import ToolObservation
-from pydantic import TypeAdapter, ValidationError
-
+from yelp_agent.controlled_llm import (
+    AnswerCompositionInput,
+    AnswerEvidenceItem,
+    GroundedAnswerComposer,
+)
 from yelp_agent.decision_readiness.schema import InformationGap
 
 from .state_view import RouteFacts
-
 
 _QUESTIONS: dict[str, dict[InformationGap, str]] = {
     "zh-CN": {
@@ -47,6 +56,8 @@ class TerminalActionExecutor:
         *,
         fusion_alpha: float = 0.0,
         cross_encoder_beta: float = 0.0,
+        answer_composer: GroundedAnswerComposer | None = None,
+        answer_evidence_limit: int = 12,
     ) -> None:
         if not 0 <= fusion_alpha <= 1:
             raise ValueError("fusion alpha must be between zero and one")
@@ -54,6 +65,8 @@ class TerminalActionExecutor:
         if not 0 <= cross_encoder_beta <= 1:
             raise ValueError("Cross-Encoder beta must be between zero and one")
         self._cross_encoder_beta = cross_encoder_beta
+        self._answer_composer = answer_composer
+        self._answer_evidence_limit = answer_evidence_limit
 
     def execute(
         self,
@@ -67,12 +80,87 @@ class TerminalActionExecutor:
         if decision.action == "return_recommendation":
             return self._recommendation(state, decision)
         if decision.action == "return_grounded_answer":
-            return self._grounded_answer(state, decision)
+            return self._compose_answer(
+                state,
+                self._grounded_answer(state, decision),
+            )
         if decision.action == "return_uncertain_answer":
-            return self._uncertain_answer(state, decision)
+            return self._compose_answer(
+                state,
+                self._uncertain_answer(state, decision),
+            )
         return ActionOutcome(
             status="failed",
             failure_reason=f"unsupported_terminal_action:{decision.action}",
+        )
+
+    def _compose_answer(
+        self,
+        state: AgentState,
+        baseline: ActionOutcome,
+    ) -> ActionOutcome:
+        if (
+            self._answer_composer is None
+            or baseline.status != "completed"
+            or baseline.response_kind not in {"grounded_answer", "uncertain_answer"}
+            or not baseline.claims
+        ):
+            return baseline
+        allowed = list(
+            dict.fromkeys(
+                [
+                    *state.business_scope,
+                    *state.request.referenced_business_ids,
+                    *[
+                        claim.business_id
+                        for claim in baseline.claims
+                        if claim.business_id is not None
+                    ],
+                ]
+            )
+        )
+        evidence = [
+            AnswerEvidenceItem(evidence_code=f"E{index}", claim=claim)
+            for index, claim in enumerate(
+                baseline.claims[: self._answer_evidence_limit],
+                start=1,
+            )
+        ]
+        composed = self._answer_composer.compose(
+            AnswerCompositionInput(
+                context_id=state.scenario_id,
+                turn_index=state.current_turn,
+                query_text=state.request.query_text,
+                language=state.language,
+                task_type=state.readiness.task_type,
+                response_kind=baseline.response_kind,  # type: ignore[arg-type]
+                allowed_business_ids=allowed,
+                evidence=evidence,
+                reported_conflict=baseline.reported_conflict,
+                reported_evidence_recency=baseline.reported_evidence_recency,
+                recommended_official_verification=(
+                    baseline.recommended_official_verification
+                ),
+            )
+        )
+        trace = composed.trace
+        return baseline.model_copy(
+            update={
+                "claims": composed.claims,
+                "model_result": ModelResultMetadata(
+                    capability="answer_composition",
+                    status=composed.status,
+                    provider_called=trace.provider_called,
+                    input_tokens=(
+                        trace.input_tokens if trace.provider_called else None
+                    ),
+                    output_tokens=(
+                        trace.output_tokens if trace.provider_called else None
+                    ),
+                    cost_usd=None,
+                    cache_hit=trace.cache_hit,
+                ),
+            }
         )
 
     @staticmethod

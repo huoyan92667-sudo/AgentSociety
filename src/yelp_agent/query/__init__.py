@@ -13,6 +13,7 @@ from yelp_agent.query.parser import (
     RequestSignalExtractor,
     RuleBasedRequestSignalExtractor,
     build_rule_based_request_parser,
+    condition_from_signal,
 )
 from yelp_agent.query.ranking import (
     CandidateAspectEvidence,
@@ -45,6 +46,7 @@ __all__ = [
     "RuleBasedRequestSignalExtractor",
     "build_rule_based_request_parser",
     "candidate_from_business_profile",
+    "condition_from_signal",
     "evaluate_query_aware_recommendation",
     "hard_constraint_failures",
 ]

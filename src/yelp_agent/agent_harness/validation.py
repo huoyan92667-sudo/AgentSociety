@@ -7,7 +7,6 @@ from collections.abc import Sequence
 from .schema import ActionOutcome, AgentDecision, AgentSession
 from .trace_recorder import call_signature
 
-
 _TERMINAL_RESPONSE_BY_ACTION = {
     "ask_clarification": "clarification",
     "return_recommendation": "recommendation",
@@ -93,6 +92,8 @@ def outcome_violation(
         return "nonterminal_action_returned_response"
     if decision.tool_name is None and outcome.tool_result is not None:
         return "unexpected_tool_result"
+    if outcome.model_result is not None and expected_response is None:
+        return "unexpected_model_result"
     evidence = (
         [] if outcome.tool_result is None else outcome.tool_result.retrieved_evidence
     )

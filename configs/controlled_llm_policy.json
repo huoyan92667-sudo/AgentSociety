@@ -1,0 +1,261 @@
+{
+  "agent_version": "step29-controlled-llm-v1",
+  "answer_prompt_version": "step29-answer-v1",
+  "development_agent_summary": {
+    "metrics": {
+      "action_accuracy": {
+        "denominator": 720.0,
+        "numerator": 569.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.7902777777777777
+      },
+      "citation_correctness": {
+        "denominator": 492.0,
+        "numerator": 366.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.7439024390243902
+      },
+      "conflict_detection_accuracy": {
+        "denominator": 144.0,
+        "numerator": 126.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.875
+      },
+      "direct_return_precision": {
+        "denominator": 516.0,
+        "numerator": 392.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.7596899224806202
+      },
+      "fallback_rate": {
+        "denominator": 400.0,
+        "numerator": 1.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.0025
+      },
+      "grounded_answer_rate": {
+        "denominator": 158.0,
+        "numerator": 146.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.9240506329113924
+      },
+      "hr_at_5": {
+        "denominator": 184.0,
+        "numerator": 26.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.14130434782608695
+      },
+      "mean_latency_ms": {
+        "denominator": 400.0,
+        "numerator": 1061398.8078000396,
+        "reason": null,
+        "status": "measured",
+        "unit": "milliseconds",
+        "value": 2653.497019500099
+      },
+      "missing_field_detection_precision": {
+        "denominator": 64.0,
+        "numerator": 39.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.609375
+      },
+      "missing_field_detection_recall": {
+        "denominator": 66.0,
+        "numerator": 39.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.5909090909090909
+      },
+      "mrr": {
+        "denominator": 184.0,
+        "numerator": 19.115102186371317,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.10388642492593107
+      },
+      "official_policy_caution_accuracy": {
+        "denominator": 32.0,
+        "numerator": 32.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 1.0
+      },
+      "tool_selection_accuracy": {
+        "denominator": 2134.0,
+        "numerator": 1662.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.7788191190253045
+      },
+      "unsupported_claim_rate": {
+        "denominator": 246.0,
+        "numerator": 21.0,
+        "reason": null,
+        "status": "measured",
+        "unit": "ratio",
+        "value": 0.08536585365853659
+      }
+    },
+    "runtime_metrics": {
+      "agent_versions": [
+        "step29-controlled-llm-v1"
+      ],
+      "average_steps_per_scenario": 7.11,
+      "average_tool_calls_per_scenario": 5.335,
+      "average_turns_per_scenario": 1.4375,
+      "evidence_aggregation_tool_call_count": 100,
+      "llm_by_capability": {
+        "answer_composition": {
+          "cache_hit_count": 122,
+          "failure_count": 3,
+          "input_tokens": 1513,
+          "logical_call_count": 124,
+          "mean_latency_ms": 2140.8105500013335,
+          "output_tokens": 324,
+          "provider_call_count": 2,
+          "success_count": 121,
+          "total_tokens": 1837,
+          "usage_unknown_count": 0
+        },
+        "semantic_interpretation": {
+          "cache_hit_count": 349,
+          "failure_count": 3,
+          "input_tokens": 58666,
+          "logical_call_count": 575,
+          "mean_latency_ms": 2248.9795597572174,
+          "output_tokens": 26144,
+          "provider_call_count": 82,
+          "success_count": 428,
+          "total_tokens": 84810,
+          "usage_unknown_count": 0
+        }
+      },
+      "llm_cache_hit_count": 471,
+      "llm_call_count": 84,
+      "llm_cost_usd": 0.0,
+      "llm_failure_count": 6,
+      "llm_input_tokens": 60179,
+      "llm_output_tokens": 26468,
+      "llm_total_tokens": 86647,
+      "llm_usage_unknown_count": 0,
+      "review_rag_cache_hit_rate": 0.5,
+      "review_rag_input_tokens": 0,
+      "review_rag_tool_call_count": 200,
+      "review_search_tool_call_count": 100,
+      "scenario_count": 400,
+      "semantic_cache_hit_rate": 0.9511173184357542,
+      "semantic_input_tokens": 141275,
+      "semantic_tool_call_count": 716,
+      "step_count": 2844,
+      "tool_call_count": 2134,
+      "turn_count": 575
+    },
+    "scenario_count": 400
+  },
+  "policy_status": "frozen_before_validation",
+  "schema_version": 1,
+  "selected_semantic_threshold": 0.78,
+  "selection_split": "development",
+  "semantic_prompt_version": "step29-semantic-v1",
+  "semantic_tuning": {
+    "baseline": {
+      "condition_f1": 0.4647256438969765,
+      "condition_precision": 0.6326219512195121,
+      "condition_recall": 0.3672566371681416,
+      "exact_match_rate": 0.14,
+      "missing_fields_exact_match_rate": 0.605
+    },
+    "candidates": [
+      {
+        "cache_hit_count": 106,
+        "condition_f1": 0.5123711340206186,
+        "condition_precision": 0.6135802469135803,
+        "condition_recall": 0.4398230088495575,
+        "exact_match_rate": 0.23,
+        "minimum_signal_confidence": 0.72,
+        "missing_fields_exact_match_rate": 0.7125
+      },
+      {
+        "cache_hit_count": 106,
+        "condition_f1": 0.5123711340206186,
+        "condition_precision": 0.6135802469135803,
+        "condition_recall": 0.4398230088495575,
+        "exact_match_rate": 0.23,
+        "minimum_signal_confidence": 0.78,
+        "missing_fields_exact_match_rate": 0.7125
+      },
+      {
+        "cache_hit_count": 106,
+        "condition_f1": 0.5093749999999999,
+        "condition_precision": 0.6189873417721519,
+        "condition_recall": 0.4327433628318584,
+        "exact_match_rate": 0.22,
+        "minimum_signal_confidence": 0.82,
+        "missing_fields_exact_match_rate": 0.7125
+      },
+      {
+        "cache_hit_count": 106,
+        "condition_f1": 0.5093749999999999,
+        "condition_precision": 0.6189873417721519,
+        "condition_recall": 0.4327433628318584,
+        "exact_match_rate": 0.22,
+        "minimum_signal_confidence": 0.86,
+        "missing_fields_exact_match_rate": 0.7125
+      },
+      {
+        "cache_hit_count": 106,
+        "condition_f1": 0.5093749999999999,
+        "condition_precision": 0.6189873417721519,
+        "condition_recall": 0.4327433628318584,
+        "exact_match_rate": 0.22,
+        "minimum_signal_confidence": 0.9,
+        "missing_fields_exact_match_rate": 0.7125
+      }
+    ],
+    "schema_version": 1,
+    "selected": {
+      "cache_hit_count": 106,
+      "condition_f1": 0.5123711340206186,
+      "condition_precision": 0.6135802469135803,
+      "condition_recall": 0.4398230088495575,
+      "exact_match_rate": 0.23,
+      "minimum_signal_confidence": 0.78,
+      "missing_fields_exact_match_rate": 0.7125
+    },
+    "selection_objective": [
+      "condition_f1",
+      "exact_match_rate",
+      "condition_precision",
+      "higher_threshold"
+    ],
+    "selection_split": "development",
+    "validation_used_for_selection": false
+  },
+  "source_sha256": {
+    "configs/controlled_llm.yaml": "e1e7f88e6afed8ceb89ec61732b32b728080ab233a0a687dc1b90c47a2c4608f",
+    "src/yelp_agent/controlled_llm/answer.py": "e4bcefa115adec6db1e1b87c0329b51d32f0e3f192755245ec0c8da9452759be",
+    "src/yelp_agent/controlled_llm/schema.py": "dd8030063608518b9712d581193b003966f7dd6b1246137341007f4a7b23d7b8",
+    "src/yelp_agent/controlled_llm/semantic.py": "71e48c84b9e7c22d651abb0e39b3e3a026084d1d7eb7a2d05ac3b23d208bd114"
+  },
+  "validation_used_for_selection": false
+}

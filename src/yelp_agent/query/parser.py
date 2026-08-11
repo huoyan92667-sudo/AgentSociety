@@ -370,7 +370,7 @@ class RuleBasedRequestSignalExtractor:
         return tuple(signals)
 
 
-def _condition_from_signal(
+def condition_from_signal(
     signal: ExtractedRequestSignal,
     *,
     has_user_location: bool,
@@ -381,9 +381,14 @@ def _condition_from_signal(
         unknown_policy: UnknownPolicy = "exclude" if filterable else "not_applicable"
         missing = None
     elif signal.field == "distance_km":
-        enforcement = "filter" if has_user_location else "clarify"
-        unknown_policy = "exclude" if has_user_location else "ask"
-        missing = None if has_user_location else "user_location"
+        if signal.importance == "mandatory":
+            enforcement = "filter" if has_user_location else "clarify"
+            unknown_policy = "exclude" if has_user_location else "ask"
+            missing = None if has_user_location else "user_location"
+        else:
+            enforcement = "rank"
+            unknown_policy = "allow_with_warning"
+            missing = None
     elif signal.field == "budget_per_person":
         # Yelp exposes coarse price tiers, not a reliable per-person amount.
         enforcement = "clarify"
@@ -451,7 +456,7 @@ class RecommendationRequestParser:
             if key in seen:
                 continue
             seen.add(key)
-            condition, missing_field = _condition_from_signal(
+            condition, missing_field = condition_from_signal(
                 signal,
                 has_user_location=value.user_latitude is not None,
             )

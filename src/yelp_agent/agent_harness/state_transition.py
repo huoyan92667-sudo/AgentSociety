@@ -36,7 +36,7 @@ def record_execution(
                 payload=outcome.observation,
             )
         ]
-    metadata = outcome.tool_result
+    metadata = outcome.tool_result or outcome.model_result
     input_tokens = state.input_tokens
     output_tokens = state.output_tokens
     turn_input_tokens = state.turn_input_tokens
@@ -71,7 +71,11 @@ def record_execution(
             "tool_call_count": state.tool_call_count
             + int(decision.tool_name is not None),
             "semantic_call_count": state.semantic_call_count
-            + int(decision.tool_kind == "semantic"),
+            + int(decision.tool_kind == "semantic")
+            + int(
+                outcome.model_result is not None
+                and outcome.model_result.provider_called
+            ),
             "rag_call_count": state.rag_call_count
             + int(decision.tool_kind == "review_rag"),
             "input_tokens": input_tokens,

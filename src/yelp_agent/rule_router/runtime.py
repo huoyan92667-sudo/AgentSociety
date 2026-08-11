@@ -2,25 +2,18 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Self
 
 from yelp_agent.agent_harness import AgentHarness, load_agent_harness_config
 from yelp_agent.agent_tools import (
     HybridV2FallbackHandler,
-    RankingCascadeFallbackHandler,
     OnlineHybridV2RankingService,
+    RankingCascadeFallbackHandler,
     build_step23_tool_registry,
     load_agent_tool_runtime_config,
-)
-from yelp_agent.cross_encoder import (
-    CachedCrossEncoderReranker,
-    LocalQwenCrossEncoder,
-    SqliteCrossEncoderCache,
-    load_cross_encoder_config,
-    load_cross_encoder_policy,
-    load_local_cross_encoder_environment,
 )
 from yelp_agent.business_profiles import BusinessKnowledgeStore
 from yelp_agent.collaborative import TemporalItemKNNStore
@@ -31,6 +24,24 @@ from yelp_agent.config import (
     load_retrieval_config,
     load_review_aspect_settings,
 )
+from yelp_agent.controlled_llm import (
+    ControlledLLMRuntime,
+    build_controlled_llm_runtime,
+    load_controlled_llm_config,
+)
+from yelp_agent.cross_encoder import (
+    CachedCrossEncoderReranker,
+    LocalQwenCrossEncoder,
+    SqliteCrossEncoderCache,
+    load_cross_encoder_config,
+    load_cross_encoder_policy,
+    load_local_cross_encoder_environment,
+)
+from yelp_agent.evidence_aggregation import (
+    EvidenceAggregator,
+    load_evidence_aggregation_config,
+    load_evidence_aggregation_policy,
+)
 from yelp_agent.features.category import TemporalCategoryStore
 from yelp_agent.features.text import TemporalTextStore
 from yelp_agent.learning_to_rank import FrozenLambdaMARTRanker
@@ -38,6 +49,12 @@ from yelp_agent.learning_to_rank.features import HybridV1Weights
 from yelp_agent.profiles.store import UserProfileStore
 from yelp_agent.ranking.assembly import HybridSourcePaths, build_frozen_hybrid_runtime
 from yelp_agent.retrieval import MultiRouteRetriever
+from yelp_agent.review_rag import (
+    ReviewRAGStore,
+    ReviewRetriever,
+    load_review_rag_config,
+    load_review_rag_policy,
+)
 from yelp_agent.semantic_embedding import (
     CachedEmbeddingGateway,
     DashScopeEmbeddingEncoder,
@@ -47,17 +64,6 @@ from yelp_agent.semantic_embedding import (
     load_dashscope_embedding_environment,
     load_local_embedding_environment,
     load_semantic_embedding_config,
-)
-from yelp_agent.review_rag import (
-    ReviewRAGStore,
-    ReviewRetriever,
-    load_review_rag_config,
-    load_review_rag_policy,
-)
-from yelp_agent.evidence_aggregation import (
-    EvidenceAggregator,
-    load_evidence_aggregation_config,
-    load_evidence_aggregation_policy,
 )
 
 from .config import load_rule_router_config
@@ -191,6 +197,7 @@ class RuleAgentRuntime:
         cross_encoder: object | None = None,
         review_embedding_encoder: object | None = None,
         review_store: object | None = None,
+        controlled_llm: ControlledLLMRuntime | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -199,9 +206,10 @@ class RuleAgentRuntime:
         self._cross_encoder = cross_encoder
         self._review_embedding_encoder = review_embedding_encoder
         self._review_store = review_store
+        self.controlled_llm = controlled_llm
         self._closed = False
 
-    def __enter__(self) -> RuleAgentRuntime:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *args: object) -> None:
@@ -222,6 +230,9 @@ class RuleAgentRuntime:
             close = getattr(self._review_store, "close", None)
             if callable(close):
                 close()
+            close = getattr(self.controlled_llm, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -235,6 +246,8 @@ def build_real_rule_agent_runtime(
     review_rag_config_path: str | Path | None = None,
     review_embedding_environment: Mapping[str, str] | None = None,
     evidence_aggregation_config_path: str | Path | None = None,
+    controlled_llm_config_path: str | Path | None = None,
+    controlled_llm_environment: Mapping[str, str] | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -288,6 +301,7 @@ def build_real_rule_agent_runtime(
     cross_encoder = None
     review_encoder = None
     review_store = None
+    controlled_llm = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -432,6 +446,16 @@ def build_real_rule_agent_runtime(
                     evidence_config,
                 )
             )
+        controlled_config = None
+        if controlled_llm_config_path is not None:
+            controlled_config = load_controlled_llm_config(
+                controlled_llm_config_path
+            )
+            controlled_llm = build_controlled_llm_runtime(
+                project_root=sources.project_root,
+                config=controlled_config,
+                environment=controlled_llm_environment,
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -480,6 +504,12 @@ def build_real_rule_agent_runtime(
                     ),
                 }
             )
+        if controlled_llm is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 4),
+                }
+            )
         harness = build_rule_agent(
             registry=registry,
             fallback_handler=fallback_handler,
@@ -509,8 +539,25 @@ def build_real_rule_agent_runtime(
             ),
             review_rag_enabled=review_search is not None,
             evidence_aggregation_enabled=evidence_aggregator is not None,
+            semantic_enhancer=(
+                None
+                if controlled_llm is None
+                else controlled_llm.semantic_enhancer
+            ),
+            answer_composer=(
+                None
+                if controlled_llm is None
+                else controlled_llm.answer_composer
+            ),
+            answer_evidence_limit=(
+                12
+                if controlled_config is None
+                else controlled_config.answer.maximum_evidence_items
+            ),
             agent_version=(
-                evidence_config.agent_version
+                controlled_config.agent_version
+                if controlled_llm is not None and controlled_config is not None
+                else evidence_config.agent_version
                 if evidence_aggregator is not None and evidence_config is not None
                 else review_config.agent_version
                 if review_search is not None and review_config is not None
@@ -534,6 +581,9 @@ def build_real_rule_agent_runtime(
         close = getattr(review_store, "close", None)
         if callable(close):
             close()
+        close = getattr(controlled_llm, "close", None)
+        if callable(close):
+            close()
         user_profiles.close()
         raise
     return RuleAgentRuntime(
@@ -544,4 +594,5 @@ def build_real_rule_agent_runtime(
         cross_encoder=cross_encoder,
         review_embedding_encoder=review_encoder,
         review_store=review_store,
+        controlled_llm=controlled_llm,
     )

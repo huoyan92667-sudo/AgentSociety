@@ -9,6 +9,11 @@ from yelp_agent.agent_harness import (
 )
 from yelp_agent.agent_harness.interfaces import Clock, FallbackHandler
 from yelp_agent.agent_tools import AgentToolRegistry, RegistryActionExecutor
+from yelp_agent.controlled_llm import (
+    ControlledRequestInterpreter,
+    ControlledSemanticEnhancer,
+    GroundedAnswerComposer,
+)
 
 from .policy import RuleBasedActionPolicy
 from .router import RuleRouter
@@ -30,13 +35,20 @@ def build_rule_agent(
     cross_encoder_beta: float = 0.0,
     review_rag_enabled: bool = False,
     evidence_aggregation_enabled: bool = False,
+    semantic_enhancer: ControlledSemanticEnhancer | None = None,
+    answer_composer: GroundedAnswerComposer | None = None,
+    answer_evidence_limit: int = 12,
     clock: Clock | None = None,
 ) -> AgentHarness:
     """Connect the Step 18/22/23/24 modules behind one runner interface."""
 
     return AgentHarness(
         agent_version=agent_version,
-        interpreter=RuleBasedRequestInterpreter(),
+        interpreter=(
+            ControlledRequestInterpreter(semantic_enhancer)
+            if semantic_enhancer is not None
+            else RuleBasedRequestInterpreter()
+        ),
         action_policy=RuleBasedActionPolicy(
             display_limit=display_limit,
             semantic_enabled=semantic_enabled,
@@ -62,6 +74,8 @@ def build_rule_agent(
             fallback=TerminalActionExecutor(
                 fusion_alpha=fusion_alpha,
                 cross_encoder_beta=cross_encoder_beta,
+                answer_composer=answer_composer,
+                answer_evidence_limit=answer_evidence_limit,
             ),
         ),
         fallback_handler=fallback_handler,

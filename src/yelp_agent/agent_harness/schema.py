@@ -12,14 +12,13 @@ from yelp_agent.agent_evaluation.schema import (
     AgentScenarioRun,
     AgentTurnTrace,
     ClarificationQuestionTrace,
-    RetrievedEvidenceTrace,
     ResponseClaimTrace,
+    RetrievedEvidenceTrace,
     ToolKind,
 )
 from yelp_agent.decision_readiness import DecisionReadiness
 from yelp_agent.models import StrictModel
 from yelp_agent.query import RecommendationRequest
-
 
 type HarnessStatus = Literal["running", "awaiting_user", "completed", "fallback"]
 type OutcomeStatus = Literal["completed", "failed"]
@@ -126,6 +125,28 @@ class ToolResultMetadata(StrictModel):
         return self
 
 
+class ModelResultMetadata(StrictModel):
+    """Accounting for a controlled model used inside a terminal action."""
+
+    capability: Literal["answer_composition"]
+    status: Literal[
+        "success", "skipped", "disabled", "provider_failure", "invalid_output"
+    ]
+    provider_called: bool
+    input_tokens: int | None = Field(default=None, ge=0)
+    output_tokens: int | None = Field(default=None, ge=0)
+    cost_usd: float | None = Field(default=None, ge=0)
+    cache_hit: bool = False
+
+    @model_validator(mode="after")
+    def validate_usage(self) -> ModelResultMetadata:
+        if (self.input_tokens is None) != (self.output_tokens is None):
+            raise ValueError("model token counts must appear together")
+        if self.cache_hit and self.provider_called:
+            raise ValueError("cached model results cannot call the provider")
+        return self
+
+
 class ActionOutcome(StrictModel):
     """Structured executor result; raw provider objects never enter state."""
 
@@ -147,6 +168,7 @@ class ActionOutcome(StrictModel):
     reported_evidence_recency: bool = False
     recommended_official_verification: bool = False
     tool_result: ToolResultMetadata | None = None
+    model_result: ModelResultMetadata | None = None
     business_scope: list[str] | None = None
     failure_reason: str | None = None
 
@@ -156,6 +178,8 @@ class ActionOutcome(StrictModel):
             raise ValueError("failed outcomes require failure_reason")
         if self.status == "completed" and self.failure_reason is not None:
             raise ValueError("completed outcomes cannot include failure_reason")
+        if self.tool_result is not None and self.model_result is not None:
+            raise ValueError("an outcome cannot be both a tool and model result")
         if len(self.candidate_ranking) != len(set(self.candidate_ranking)):
             raise ValueError("candidate ranking must contain unique IDs")
         if self.business_scope is not None and len(self.business_scope) != len(

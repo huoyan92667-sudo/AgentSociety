@@ -422,6 +422,7 @@ class AgentHarness:
         return ActionOutcome(
             status="failed",
             tool_result=outcome.tool_result,
+            model_result=outcome.model_result,
             failure_reason=reason,
         )
 

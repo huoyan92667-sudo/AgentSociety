@@ -1,0 +1,43 @@
+schema_version: 1
+agent_version: step29-answer-only-v1
+temperature: 0
+timeout_seconds: 90
+max_retries: 0
+thinking: disabled
+response_format_json: true
+cache_relative_path: runs/controlled_llm_v1/cache.sqlite3
+maximum_provider_calls_per_turn: 2
+semantic:
+  enabled: false
+  mode: never
+  prompt_version: step29-semantic-v1
+  max_output_tokens: 900
+  minimum_signal_confidence: 0.78
+  minimum_task_type_confidence: 0.82
+  call_for_task_types:
+    - candidate_comparison
+    - review_experience_question
+    - feedback_refinement
+  complex_markers:
+    - 但是
+    - 不过
+    - 而且
+    - 除了
+    - 相比
+    - 哪家
+    - 第一家
+    - 第二家
+    - but
+    - however
+    - except
+    - compared
+    - which one
+answer:
+  enabled: true
+  prompt_version: step29-answer-v1
+  max_output_tokens: 1200
+  compose_grounded_answers: true
+  compose_uncertain_answers: true
+  maximum_evidence_items: 12
+tuning_split: development
+validation_used_for_selection: false
