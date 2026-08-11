@@ -1,4 +1,4 @@
-"""Thin CLI for the Step 25 Rule Agent plus DashScope Embedding benchmark."""
+"""Thin CLI for the Step 25 Rule Agent plus configured Embedding benchmark."""
 
 from __future__ import annotations
 

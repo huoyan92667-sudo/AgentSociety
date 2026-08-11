@@ -108,3 +108,36 @@ EXPAND_CANDIDATES
 ```
 
 该场景正常完成，Embedding 仅新增 55 个 query Token，商家文档全部命中缓存；`api_calls=0`，费用为 0。模型进程由 `RuleAgentRuntime` 统一持有并在运行结束时关闭。只要显式传入 Embedding 配置但本地模型环境缺失，程序会立即报错，不会悄悄退化成第 24 步基线。
+
+## 25.7 正式 500 场景结果
+
+在冻结代码和配置后，按 `400 development + 100 validation` 完成了正式实验。Step 24 和 Step 25 使用同一批可见场景，隐藏标签只在离线评测器和对比脚本中读取。
+
+| 指标 | Step 24 Hybrid | Step 25 Embedding | 变化 |
+|---|---:|---:|---:|
+| HR@1 | 0.43% | 2.61% | +2.17 个百分点 |
+| HR@3 | 3.48% | 5.65% | +2.17 个百分点 |
+| HR@5 | 4.78% | 7.83% | +3.04 个百分点 |
+| MRR | 0.0368 | 0.0569 | +0.0201 |
+| NDCG@5 | 0.0113 | 0.0206 | +0.0093 |
+| valid_candidate_rate | 0.915% | 0.916% | 基本不变 |
+| 平均延迟 | 2009.1 ms | 2239.5 ms | +230.4 ms |
+| P95 延迟 | 6202.0 ms | 7179.0 ms | +977.1 ms |
+
+在 286 个可以同时比较正确候选排名的推荐场景中，Embedding 让正确候选排名提高 25 次、下降 9 次、不变 159 次，另有 93 次正确候选没有进入当前候选排名。Top-30 内部顺序变化率为 99.30%，语义工具 466 次调用全部成功，没有发生 Embedding 回退。
+
+这说明第 25 步确实改善了“已经召回的候选如何排序”：Top-1/3/5、MRR 和 NDCG@5 都提升。但 `valid_candidate_rate` 几乎不变，说明 Embedding 不能解决正确商家根本没有被召回的问题；召回瓶颈仍要在后续专门改进。与此同时，延迟增加约 230 ms，后续需要用更小候选、批量 query、量化或更快的本地模型继续优化。
+
+完整产物：
+
+- `runs/rule_agent_embedding_v2/development/`
+- `runs/rule_agent_embedding_v2/validation/`
+- `runs/rule_agent_embedding_v2/metrics.json`
+- `runs/rule_agent_embedding_v2/reranking_comparison.json`
+- `runs/rule_agent_embedding_v2/reranking_comparison.md`
+
+可重复运行对比：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\compare_rule_agent_reranking.py
+```
