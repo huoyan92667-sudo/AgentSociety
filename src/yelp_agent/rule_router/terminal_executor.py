@@ -178,13 +178,17 @@ class TerminalActionExecutor:
         decision: AgentDecision,
     ) -> ActionOutcome:
         if state.readiness.task_type == "review_experience_question":
-            claims = self._review_claims(state, decision)
+            claims = self._aggregation_claims(state, decision)
+            if not claims:
+                claims = self._review_claims(state, decision)
             if not claims:
                 claims = self._profile_or_comparison_claims(state, decision)
         elif state.readiness.task_type == "candidate_comparison" and _latest_tool_data(
             state, "SEARCH_BUSINESS_REVIEWS"
         ).get("hits"):
-            claims = self._review_claims(state, decision)
+            claims = self._aggregation_claims(state, decision)
+            if not claims:
+                claims = self._review_claims(state, decision)
         elif state.readiness.task_type == "business_detail_question":
             claims = self._detail_claims(state, decision)
         else:
@@ -200,10 +204,17 @@ class TerminalActionExecutor:
             response_kind="grounded_answer",
             claims=claims,
             reported_conflict=(
-                facts.structured_evidence_conflict or facts.review_evidence_conflict
+                facts.structured_evidence_conflict
+                or facts.evidence_aggregation_conflict
+                or facts.review_evidence_conflict
             ),
             reported_evidence_recency=(
-                bool(_latest_tool_data(state, "SEARCH_BUSINESS_REVIEWS").get("hits"))
+                bool(
+                    _latest_tool_data(state, "AGGREGATE_REVIEW_EVIDENCE").get(
+                        "businesses"
+                    )
+                )
+                or bool(_latest_tool_data(state, "SEARCH_BUSINESS_REVIEWS").get("hits"))
                 or any("latest_evidence_time" in claim.text for claim in claims)
             ),
         )
@@ -213,18 +224,34 @@ class TerminalActionExecutor:
         state: AgentState,
         decision: AgentDecision,
     ) -> ActionOutcome:
-        del state
+        facts = RouteFacts.from_state(state)
+        claims = _aggregation_claims_from_data(state, decision)
+        aggregation = _latest_tool_data(state, "AGGREGATE_REVIEW_EVIDENCE")
         return ActionOutcome(
             status="completed",
             response_kind="uncertain_answer",
+            claims=claims,
             reported_conflict=(
                 decision.reason_code
                 in {"CONSTRAINT_CONFLICT", "CONFLICTING_REVIEW_EVIDENCE"}
+                or facts.evidence_aggregation_conflict
             ),
+            reported_evidence_recency=any(
+                isinstance(item, dict) and item.get("latest_evidence_time") is not None
+                for item in aggregation.get("businesses", [])
+            ) if isinstance(aggregation.get("businesses"), list) else False,
             recommended_official_verification=(
                 decision.arguments.get("recommended_official_verification") is True
+                or aggregation.get("recommend_official_verification") is True
             ),
         )
+
+    @staticmethod
+    def _aggregation_claims(
+        state: AgentState,
+        decision: AgentDecision,
+    ) -> list[ResponseClaimTrace]:
+        return _aggregation_claims_from_data(state, decision)
 
     @staticmethod
     def _detail_claims(
@@ -398,6 +425,83 @@ def _latest_tool_data(state: AgentState, tool_name: str) -> dict[str, object]:
         if payload.tool_name == tool_name and payload.status in {"success", "partial"}:
             return dict(payload.data)
     return {}
+
+
+def _aggregation_claims_from_data(
+    state: AgentState,
+    decision: AgentDecision,
+) -> list[ResponseClaimTrace]:
+    data = _latest_tool_data(state, "AGGREGATE_REVIEW_EVIDENCE")
+    rows = data.get("businesses")
+    if not isinstance(rows, list):
+        return []
+    requested = decision.arguments.get("business_ids")
+    requested_ids = (
+        [value for value in requested if isinstance(value, str)]
+        if isinstance(requested, list)
+        else state.request.referenced_business_ids
+    )
+    by_id = {
+        str(row.get("business_id")): row
+        for row in rows
+        if isinstance(row, dict) and isinstance(row.get("business_id"), str)
+    }
+    claims: list[ResponseClaimTrace] = []
+    for business_id in requested_ids:
+        business = by_id.get(business_id)
+        aspects = None if business is None else business.get("aspects")
+        if not isinstance(aspects, list):
+            continue
+        for row in aspects:
+            if not isinstance(row, dict):
+                continue
+            review_ids = row.get("citation_review_ids")
+            citations = (
+                [value for value in review_ids if isinstance(value, str)]
+                if isinstance(review_ids, list)
+                else []
+            )
+            if not citations:
+                continue
+            condition_rows = row.get("condition_groups")
+            condition_tags = [
+                str(item["condition_tag"])
+                for item in condition_rows or []
+                if isinstance(item, dict) and isinstance(item.get("condition_tag"), str)
+            ]
+            latest = str(row.get("latest_evidence_time") or "unknown")[:10]
+            aspect = str(row.get("aspect") or "unknown")
+            text = (
+                f"{business_id}: aggregated_review_evidence aspect={aspect}; "
+                f"consensus={row.get('consensus')}; "
+                f"confidence={row.get('confidence_level')} "
+                f"({float(row.get('confidence_score') or 0.0):.4f}); "
+                f"support={int(row.get('support_count') or 0)}, "
+                f"contradict={int(row.get('contradiction_count') or 0)}, "
+                f"neutral={int(row.get('neutral_count') or 0)}, "
+                f"unique_users={int(row.get('unique_user_count') or 0)}; "
+                f"latest_evidence_time={latest}"
+            )
+            if condition_tags:
+                text += f"; explicit_conditions={','.join(condition_tags)}"
+            if row.get("requires_caveat") is True:
+                text += "; conclusion_requires_caveat=true"
+            claims.append(
+                ResponseClaimTrace(
+                    claim_id=f"aggregate:{business_id}:{aspect}",
+                    text=text,
+                    business_id=business_id,
+                    evidence_refs=[
+                        EvidenceReference(
+                            business_id=business_id,
+                            source_type="review",
+                            review_id=review_id,
+                        )
+                        for review_id in citations
+                    ],
+                )
+            )
+    return claims
 
 
 def _comparison_claims(

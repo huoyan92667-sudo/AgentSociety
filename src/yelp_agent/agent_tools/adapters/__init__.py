@@ -10,6 +10,7 @@ from .profile import GetUserProfileTool
 from .retrieval import ExpandCandidatesTool
 from .ranking import GetHybridRankingTool
 from .review_rag import SearchBusinessReviewsTool
+from .evidence import AggregateReviewEvidenceTool
 
 __all__ = [
     "GetBusinessDetailsTool",
@@ -24,4 +25,5 @@ __all__ = [
     "ComputeEmbeddingMatchTool",
     "ComputeCrossEncoderMatchTool",
     "SearchBusinessReviewsTool",
+    "AggregateReviewEvidenceTool",
 ]

@@ -56,6 +56,10 @@ class RouteFacts(StrictModel):
     review_evidence_count: int = Field(ge=0)
     review_evidence_business_ids: list[str]
     review_evidence_conflict: bool
+    aggregated_evidence_business_ids: list[str]
+    evidence_aggregation_sufficient: bool
+    evidence_aggregation_conflict: bool
+    evidence_aggregation_has_atoms: bool
     explicit_uncertainty_request: bool
     feedback_applied: bool
     reject_previous_recommendation: bool
@@ -81,6 +85,7 @@ class RouteFacts(StrictModel):
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
     review_search: RouteToolFact | None = None
+    evidence_aggregation: RouteToolFact | None = None
     last_tool: RouteToolFact | None = None
     remaining: RemainingBudgetFacts
 
@@ -141,6 +146,12 @@ class RouteFacts(StrictModel):
             turn_index=state.current_turn,
         )
         review_hits = _review_hits(review_search)
+        evidence_aggregation = _latest_tool(
+            tools,
+            "AGGREGATE_REVIEW_EVIDENCE",
+            turn_index=state.current_turn,
+        )
+        aggregate_businesses = _aggregation_businesses(evidence_aggregation)
         known_aspects, conflicting_aspects = _profile_aspect_facts(tools)
         requested_aspects = [
             condition.field
@@ -208,6 +219,26 @@ class RouteFacts(StrictModel):
                 )
             ),
             review_evidence_conflict=_review_conflict(review_hits),
+            aggregated_evidence_business_ids=[
+                str(item["business_id"])
+                for item in aggregate_businesses
+                if isinstance(item.get("business_id"), str)
+            ],
+            evidence_aggregation_sufficient=bool(aggregate_businesses)
+            and all(
+                item.get("overall_response_mode") == "grounded"
+                for item in aggregate_businesses
+            ),
+            evidence_aggregation_conflict=any(
+                item.get("has_conflict") is True for item in aggregate_businesses
+            ),
+            evidence_aggregation_has_atoms=any(
+                isinstance(aspect, dict) and int(aspect.get("evidence_count") or 0) > 0
+                for item in aggregate_businesses
+                for aspect in (
+                    item.get("aspects") if isinstance(item.get("aspects"), list) else []
+                )
+            ),
             explicit_uncertainty_request=_asks_for_uncertainty(
                 state.request.query_text
             ),
@@ -255,6 +286,7 @@ class RouteFacts(StrictModel):
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),
             review_search=_route_tool_fact(review_search),
+            evidence_aggregation=_route_tool_fact(evidence_aggregation),
             last_tool=_route_tool_fact(last_tool),
             remaining=RemainingBudgetFacts(
                 steps=max(0, state.budget.max_steps - state.step_count),
@@ -379,6 +411,15 @@ def _cross_encoder_ranks(tool: _NormalizedTool | None) -> dict[str, int]:
 
 def _review_hits(tool: _NormalizedTool | None) -> list[dict[str, object]]:
     rows = _tool_data(tool).get("hits")
+    if not isinstance(rows, list):
+        return []
+    return [dict(row) for row in rows if isinstance(row, dict)]
+
+
+def _aggregation_businesses(
+    tool: _NormalizedTool | None,
+) -> list[dict[str, object]]:
+    rows = _tool_data(tool).get("businesses")
     if not isinstance(rows, list):
         return []
     return [dict(row) for row in rows if isinstance(row, dict)]

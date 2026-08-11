@@ -270,6 +270,7 @@ class ReviewRetriever:
                     segment_id=segment.segment_id,
                     review_id=segment.review_id,
                     business_id=business_id,
+                    user_id=segment.user_id,
                     review_time=segment.review_time,
                     stars=segment.stars,
                     useful=segment.useful,
@@ -279,6 +280,7 @@ class ReviewRetriever:
                     aspect_sentiments=list(
                         dict.fromkeys(item.sentiment for item in evidence)
                     ),
+                    aspect_evidence=list(evidence),
                     aspect_rank=routes.aspect_ranks.get(segment.segment_id),
                     bm25_rank=routes.bm25_ranks.get(segment.segment_id),
                     embedding_rank=routes.embedding_ranks.get(segment.segment_id),

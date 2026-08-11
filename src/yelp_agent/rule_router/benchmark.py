@@ -310,6 +310,12 @@ def _runtime_metrics(
     ]
     semantic_calls = [call for call in tool_calls if call.tool_kind == "semantic"]
     review_calls = [call for call in tool_calls if call.tool_kind == "review_rag"]
+    review_search_calls = [
+        call for call in review_calls if call.tool_name == "SEARCH_BUSINESS_REVIEWS"
+    ]
+    aggregation_calls = [
+        call for call in review_calls if call.tool_name == "AGGREGATE_REVIEW_EVIDENCE"
+    ]
     semantic_input_tokens = sum(call.input_tokens or 0 for call in semantic_calls)
     return {
         "scenario_count": scenario_count,
@@ -329,6 +335,8 @@ def _runtime_metrics(
             else 0.0
         ),
         "review_rag_tool_call_count": len(review_calls),
+        "review_search_tool_call_count": len(review_search_calls),
+        "evidence_aggregation_tool_call_count": len(aggregation_calls),
         "review_rag_input_tokens": sum(call.input_tokens or 0 for call in review_calls),
         "review_rag_cache_hit_rate": (
             sum(call.cache_hit for call in review_calls) / len(review_calls)
@@ -466,6 +474,10 @@ def _markdown_summary(
             "| `llm_cost_usd` | 0.0000 |",
             "| `review_rag_tool_call_count` | "
             f"{int(runtime_metrics['review_rag_tool_call_count'])} |",
+            "| `review_search_tool_call_count` | "
+            f"{int(runtime_metrics['review_search_tool_call_count'])} |",
+            "| `evidence_aggregation_tool_call_count` | "
+            f"{int(runtime_metrics['evidence_aggregation_tool_call_count'])} |",
             "| `review_rag_input_tokens` | "
             f"{int(runtime_metrics['review_rag_input_tokens'])} |",
         ]

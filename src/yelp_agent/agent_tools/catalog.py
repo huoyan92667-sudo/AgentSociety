@@ -15,6 +15,7 @@ from .adapters import (
     GetSessionMemoryTool,
     GetUserProfileTool,
     SearchBusinessReviewsTool,
+    AggregateReviewEvidenceTool,
 )
 from .config import AgentToolRuntimeConfig
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
@@ -57,6 +58,7 @@ def build_step23_tool_registry(
     embedding_match: object | None = None,
     cross_encoder_reranker: object | None = None,
     review_search: object | None = None,
+    evidence_aggregator: object | None = None,
     embedding_alpha: float = 0.0,
     runtime_config: AgentToolRuntimeConfig | None = None,
 ) -> AgentToolRegistry:
@@ -109,12 +111,16 @@ def build_step23_tool_registry(
                     summary="Search time-safe reviews for one locked business.",
                 )
             ),
-            _future_tool(
-                name="AGGREGATE_REVIEW_EVIDENCE",
-                step=28,
-                kind="review_rag",
-                actions=("retrieve_business_reviews",),
-                summary="Aggregate supporting and conflicting review evidence.",
+            (
+                AggregateReviewEvidenceTool(evidence_aggregator)  # type: ignore[arg-type]
+                if evidence_aggregator is not None
+                else _future_tool(
+                    name="AGGREGATE_REVIEW_EVIDENCE",
+                    step=28,
+                    kind="review_rag",
+                    actions=("retrieve_business_reviews",),
+                    summary="Aggregate supporting and conflicting review evidence.",
+                )
             ),
             _future_tool(
                 name="ASSESS_LLM_SEMANTICS",

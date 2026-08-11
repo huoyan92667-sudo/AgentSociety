@@ -19,6 +19,7 @@ from yelp_agent.cross_encoder.schema import (
     CrossEncoderUsage,
 )
 from yelp_agent.review_rag.schema import ReviewSearchResult
+from yelp_agent.evidence_aggregation.schema import EvidenceAssessment
 
 
 class EmptyToolInput(StrictModel):
@@ -131,6 +132,14 @@ class SearchBusinessReviewsInput(BusinessIdsInput):
 
 class SearchBusinessReviewsOutput(ReviewSearchResult):
     """Named Agent-tool output while preserving the Review RAG contract."""
+
+
+class AggregateReviewEvidenceInput(BusinessIdsInput):
+    business_ids: list[str] = Field(min_length=1, max_length=10)
+
+
+class AggregateReviewEvidenceOutput(EvidenceAssessment):
+    """Named Agent-tool output preserving the aggregation contract."""
 
 
 class ComparedBusiness(StrictModel):

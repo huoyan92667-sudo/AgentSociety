@@ -54,6 +54,11 @@ from yelp_agent.review_rag import (
     load_review_rag_config,
     load_review_rag_policy,
 )
+from yelp_agent.evidence_aggregation import (
+    EvidenceAggregator,
+    load_evidence_aggregation_config,
+    load_evidence_aggregation_policy,
+)
 
 from .config import load_rule_router_config
 from .factory import build_rule_agent
@@ -229,6 +234,7 @@ def build_real_rule_agent_runtime(
     cross_encoder_environment: Mapping[str, str] | None = None,
     review_rag_config_path: str | Path | None = None,
     review_embedding_environment: Mapping[str, str] | None = None,
+    evidence_aggregation_config_path: str | Path | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -366,6 +372,8 @@ def build_real_rule_agent_runtime(
             )
         review_search = None
         review_config = None
+        evidence_aggregator = None
+        evidence_config = None
         if review_rag_config_path is not None:
             review_config = load_review_rag_config(review_rag_config_path)
             required_review_files = (
@@ -410,6 +418,20 @@ def build_real_rule_agent_runtime(
                     config=review_semantic_config,
                 ),
             )
+        if evidence_aggregation_config_path is not None:
+            if review_search is None:
+                raise ValueError(
+                    "Step 28 evidence aggregation requires the Step 27 Review RAG runtime"
+                )
+            evidence_config = load_evidence_aggregation_config(
+                evidence_aggregation_config_path
+            )
+            evidence_aggregator = EvidenceAggregator(
+                load_evidence_aggregation_policy(
+                    sources.project_root,
+                    evidence_config,
+                )
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -419,6 +441,7 @@ def build_real_rule_agent_runtime(
             embedding_match=embedding_match,
             cross_encoder_reranker=cross_reranker,
             review_search=review_search,
+            evidence_aggregator=evidence_aggregator,
             embedding_alpha=(
                 semantic_config.fusion_alpha if semantic_config is not None else 0.0
             ),
@@ -485,8 +508,11 @@ def build_real_rule_agent_runtime(
                 cross_policy.fusion_beta if cross_policy is not None else 0.0
             ),
             review_rag_enabled=review_search is not None,
+            evidence_aggregation_enabled=evidence_aggregator is not None,
             agent_version=(
-                review_config.agent_version
+                evidence_config.agent_version
+                if evidence_aggregator is not None and evidence_config is not None
+                else review_config.agent_version
                 if review_search is not None and review_config is not None
                 else cross_config.agent_version
                 if cross_reranker is not None and cross_config is not None

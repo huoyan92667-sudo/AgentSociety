@@ -112,6 +112,124 @@ def test_review_rag_router_retrieves_then_returns_cited_answer() -> None:
     assert router.choose_action(searched).action == "return_grounded_answer"
 
 
+def test_step28_router_searches_aggregates_then_answers() -> None:
+    state = _state(
+        "What do reviews say about this business's quiet environment?",
+        referenced_business_ids=["b1"],
+    ).model_copy(update={"business_scope_known": True, "business_scope": ["b1"]})
+    router = RuleRouter(
+        review_rag_enabled=True,
+        evidence_aggregation_enabled=True,
+    )
+    policy = RuleBasedActionPolicy(
+        review_rag_enabled=True,
+        evidence_aggregation_enabled=True,
+    )
+    searched = state.model_copy(
+        update={
+            "observations": [
+                _observation(
+                    "e",
+                    1,
+                    "retrieve_business_reviews",
+                    "SEARCH_BUSINESS_REVIEWS",
+                    {
+                        "hits": [
+                            {
+                                "business_id": "b1",
+                                "review_id": "r1",
+                                "matched_aspects": ["quiet_environment"],
+                                "aspect_sentiments": ["positive"],
+                            }
+                        ]
+                    },
+                )
+            ]
+        }
+    )
+    aggregate_decision = router.choose_action(searched)
+    assert policy.allowed_actions(searched) == (
+        "retrieve_business_reviews",
+        "safe_fallback",
+    )
+    assert aggregate_decision.tool_name == "AGGREGATE_REVIEW_EVIDENCE"
+    aggregated = searched.model_copy(
+        update={
+            "observations": searched.observations
+            + [
+                _observation(
+                    "f",
+                    2,
+                    "retrieve_business_reviews",
+                    "AGGREGATE_REVIEW_EVIDENCE",
+                    {
+                        "businesses": [
+                            {
+                                "business_id": "b1",
+                                "overall_response_mode": "grounded",
+                                "has_conflict": False,
+                                "aspects": [
+                                    {
+                                        "aspect": "quiet_environment",
+                                        "evidence_count": 1,
+                                    }
+                                ],
+                            }
+                        ]
+                    },
+                )
+            ]
+        }
+    )
+    assert policy.allowed_actions(aggregated) == (
+        "return_grounded_answer",
+        "safe_fallback",
+    )
+    assert router.choose_action(aggregated).reason_code == (
+        "AGGREGATED_REVIEW_EVIDENCE_SUFFICIENT"
+    )
+
+
+def test_step28_conflict_returns_uncertain_answer() -> None:
+    state = _state(
+        "Reviews conflict about the quiet environment.",
+        referenced_business_ids=["b1"],
+    ).model_copy(update={"business_scope_known": True, "business_scope": ["b1"]})
+    observations = [
+        _observation(
+            "e",
+            1,
+            "retrieve_business_reviews",
+            "SEARCH_BUSINESS_REVIEWS",
+            {"hits": [{"business_id": "b1", "review_id": "r1"}]},
+        ),
+        _observation(
+            "f",
+            2,
+            "retrieve_business_reviews",
+            "AGGREGATE_REVIEW_EVIDENCE",
+            {
+                "businesses": [
+                    {
+                        "business_id": "b1",
+                        "overall_response_mode": "uncertain",
+                        "has_conflict": True,
+                        "aspects": [
+                            {"aspect": "quiet_environment", "evidence_count": 2}
+                        ],
+                    }
+                ]
+            },
+        ),
+    ]
+    decision = RuleRouter(
+        review_rag_enabled=True,
+        evidence_aggregation_enabled=True,
+    ).choose_action(state.model_copy(update={"observations": observations}))
+    assert decision.action == "return_uncertain_answer"
+    assert decision.reason_code == "CONFLICTING_REVIEW_EVIDENCE"
+
+
 def _recommendation_states() -> tuple[
     AgentSession,
     AgentSession,

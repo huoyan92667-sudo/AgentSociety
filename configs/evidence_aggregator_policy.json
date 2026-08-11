@@ -1,0 +1,19 @@
+{
+  "conflict_minimum_count_per_side": 1,
+  "conflict_minority_mass_share": 0.15,
+  "consensus_mass_share": 0.67,
+  "diversity_target_users": 3,
+  "grounded_minimum_evidence": 1,
+  "grounded_minimum_unique_users": 1,
+  "high_confidence_threshold": 0.2,
+  "maximum_citations_per_aspect": 3,
+  "medium_confidence_threshold": 0.08,
+  "minimum_extraction_confidence": 0.8,
+  "minimum_relevance": 0.05,
+  "policy_version": "dev-sensitive-conflict-v1",
+  "recency_half_life_days": 730,
+  "sample_prior": 3.0,
+  "schema_version": 1,
+  "selection_split": "development",
+  "validation_used_for_tuning": false
+}

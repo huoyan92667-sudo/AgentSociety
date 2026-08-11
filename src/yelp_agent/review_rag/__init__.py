@@ -19,6 +19,7 @@ from .schema import (
     ReviewSearchRequest,
     ReviewSearchResult,
     ReviewSegment,
+    SegmentAspectEvidence,
 )
 from .store import ReviewRAGStore
 from .tuning import (
@@ -41,6 +42,7 @@ __all__ = [
     "ReviewSearchRequest",
     "ReviewSearchResult",
     "ReviewSegment",
+    "SegmentAspectEvidence",
     "audit_review_rag_artifacts",
     "build_review_rag_artifacts",
     "load_review_rag_config",

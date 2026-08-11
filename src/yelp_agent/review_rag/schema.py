@@ -88,6 +88,7 @@ class ReviewEvidenceHit(StrictModel):
     segment_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     review_id: str = Field(min_length=1)
     business_id: str = Field(min_length=1)
+    user_id: str = Field(min_length=1)
     review_time: datetime
     stars: float = Field(ge=1, le=5)
     useful: int = Field(ge=0)
@@ -95,6 +96,7 @@ class ReviewEvidenceHit(StrictModel):
     text_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     matched_aspects: list[AspectName] = Field(default_factory=list)
     aspect_sentiments: list[AspectSentiment] = Field(default_factory=list)
+    aspect_evidence: list[SegmentAspectEvidence] = Field(default_factory=list)
     aspect_rank: int | None = Field(default=None, ge=1)
     bm25_rank: int | None = Field(default=None, ge=1)
     embedding_rank: int | None = Field(default=None, ge=1)

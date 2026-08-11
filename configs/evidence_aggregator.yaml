@@ -1,0 +1,4 @@
+schema_version: 1
+aggregation_version: 1.0.0
+agent_version: step28-evidence-aggregator-v1
+policy_relative_path: configs/evidence_aggregator_policy.json

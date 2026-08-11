@@ -22,6 +22,7 @@ class RuleRouter:
         cross_encoder_candidate_limit: int = 20,
         cross_encoder_beta: float = 0.0,
         review_rag_enabled: bool = False,
+        evidence_aggregation_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -41,6 +42,7 @@ class RuleRouter:
         self._cross_encoder_candidate_limit = cross_encoder_candidate_limit
         self._cross_encoder_beta = cross_encoder_beta
         self._review_rag_enabled = review_rag_enabled
+        self._evidence_aggregation_enabled = evidence_aggregation_enabled
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -203,6 +205,42 @@ class RuleRouter:
                     arguments={"reason": "no_review_evidence_before_cutoff"},
                     reason_code="NO_REVIEW_EVIDENCE",
                 )
+            if (
+                self._evidence_aggregation_enabled
+                and facts.evidence_aggregation is None
+            ):
+                return AgentDecision(
+                    action="retrieve_business_reviews",
+                    arguments={"business_ids": facts.referenced_business_ids},
+                    reason_code="REVIEW_EVIDENCE_AGGREGATION_REQUIRED",
+                    tool_name="AGGREGATE_REVIEW_EVIDENCE",
+                    tool_kind="review_rag",
+                )
+            if self._evidence_aggregation_enabled:
+                if not facts.evidence_aggregation_has_atoms:
+                    return AgentDecision(
+                        action="return_uncertain_answer",
+                        arguments={"reason": "no_aspect_evidence_before_cutoff"},
+                        reason_code="NO_REVIEW_EVIDENCE",
+                    )
+                if (
+                    facts.evidence_aggregation_conflict
+                    or not facts.evidence_aggregation_sufficient
+                ):
+                    return AgentDecision(
+                        action="return_uncertain_answer",
+                        arguments={"reason": "aggregated_review_evidence_uncertain"},
+                        reason_code=(
+                            "CONFLICTING_REVIEW_EVIDENCE"
+                            if facts.evidence_aggregation_conflict
+                            else "SPARSE_REVIEW_EVIDENCE"
+                        ),
+                    )
+                return AgentDecision(
+                    action="return_grounded_answer",
+                    arguments={"business_ids": facts.referenced_business_ids},
+                    reason_code="AGGREGATED_REVIEW_EVIDENCE_SUFFICIENT",
+                )
             if facts.review_evidence_conflict or facts.explicit_uncertainty_request:
                 return AgentDecision(
                     action="return_uncertain_answer",
@@ -287,6 +325,19 @@ class RuleRouter:
                 arguments={"business_ids": facts.referenced_business_ids, "top_k": 5},
                 reason_code="COMPARISON_REVIEW_EVIDENCE_REQUIRED",
                 tool_name="SEARCH_BUSINESS_REVIEWS",
+                tool_kind="review_rag",
+            )
+        if (
+            self._evidence_aggregation_enabled
+            and facts.review_search is not None
+            and facts.review_evidence_count > 0
+            and facts.evidence_aggregation is None
+        ):
+            return AgentDecision(
+                action="retrieve_business_reviews",
+                arguments={"business_ids": facts.referenced_business_ids},
+                reason_code="COMPARISON_EVIDENCE_AGGREGATION_REQUIRED",
+                tool_name="AGGREGATE_REVIEW_EVIDENCE",
                 tool_kind="review_rag",
             )
         if facts.comparison is None:
