@@ -18,6 +18,7 @@ from yelp_agent.cross_encoder.schema import (
     CrossEncoderBusinessMatch,
     CrossEncoderUsage,
 )
+from yelp_agent.review_rag.schema import ReviewSearchResult
 
 
 class EmptyToolInput(StrictModel):
@@ -119,6 +120,17 @@ class ConstraintOutput(StrictModel):
 
 class CompareBusinessesInput(BusinessIdsInput):
     business_ids: list[str] = Field(min_length=2, max_length=10)
+
+
+class SearchBusinessReviewsInput(BusinessIdsInput):
+    """A locked business scope; Review RAG always returns at most Top-5."""
+
+    business_ids: list[str] = Field(min_length=1, max_length=10)
+    top_k: int = Field(default=5, ge=1, le=5)
+
+
+class SearchBusinessReviewsOutput(ReviewSearchResult):
+    """Named Agent-tool output while preserving the Review RAG contract."""
 
 
 class ComparedBusiness(StrictModel):

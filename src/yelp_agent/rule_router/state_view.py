@@ -53,6 +53,10 @@ class RouteFacts(StrictModel):
     conflicting_aspects_by_business: dict[str, list[AspectName]]
     structured_evidence_sufficient: bool
     structured_evidence_conflict: bool
+    review_evidence_count: int = Field(ge=0)
+    review_evidence_business_ids: list[str]
+    review_evidence_conflict: bool
+    explicit_uncertainty_request: bool
     feedback_applied: bool
     reject_previous_recommendation: bool
     previous_recommended_business_ids: list[str]
@@ -76,6 +80,7 @@ class RouteFacts(StrictModel):
     business_details: RouteToolFact | None = None
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
+    review_search: RouteToolFact | None = None
     last_tool: RouteToolFact | None = None
     remaining: RemainingBudgetFacts
 
@@ -130,6 +135,12 @@ class RouteFacts(StrictModel):
         )
         details = _latest_tool(tools, "GET_BUSINESS_DETAILS")
         profiles = _latest_tool(tools, "GET_BUSINESS_PROFILE")
+        review_search = _latest_tool(
+            tools,
+            "SEARCH_BUSINESS_REVIEWS",
+            turn_index=state.current_turn,
+        )
+        review_hits = _review_hits(review_search)
         known_aspects, conflicting_aspects = _profile_aspect_facts(tools)
         requested_aspects = [
             condition.field
@@ -188,6 +199,18 @@ class RouteFacts(StrictModel):
                 for business_id in referenced_ids
                 for aspect in requested_aspects
             ),
+            review_evidence_count=len(review_hits),
+            review_evidence_business_ids=list(
+                dict.fromkeys(
+                    str(item["business_id"])
+                    for item in review_hits
+                    if isinstance(item.get("business_id"), str)
+                )
+            ),
+            review_evidence_conflict=_review_conflict(review_hits),
+            explicit_uncertainty_request=_asks_for_uncertainty(
+                state.request.query_text
+            ),
             feedback_applied=feedback_applied,
             reject_previous_recommendation=_rejects_previous_recommendation(
                 state.request.query_text
@@ -231,6 +254,7 @@ class RouteFacts(StrictModel):
             business_details=_route_tool_fact(details),
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),
+            review_search=_route_tool_fact(review_search),
             last_tool=_route_tool_fact(last_tool),
             remaining=RemainingBudgetFacts(
                 steps=max(0, state.budget.max_steps - state.step_count),
@@ -351,6 +375,50 @@ def _cross_encoder_ranks(tool: _NormalizedTool | None) -> dict[str, int]:
         if isinstance(business_id, str) and isinstance(rank, int):
             result[business_id] = rank
     return result
+
+
+def _review_hits(tool: _NormalizedTool | None) -> list[dict[str, object]]:
+    rows = _tool_data(tool).get("hits")
+    if not isinstance(rows, list):
+        return []
+    return [dict(row) for row in rows if isinstance(row, dict)]
+
+
+def _review_conflict(hits: list[dict[str, object]]) -> bool:
+    by_business_aspect: dict[tuple[str, str], set[str]] = {}
+    for hit in hits:
+        business_id = hit.get("business_id")
+        aspects = hit.get("matched_aspects")
+        sentiments = hit.get("aspect_sentiments")
+        if not isinstance(business_id, str) or not isinstance(aspects, list):
+            continue
+        values = {
+            str(value)
+            for value in sentiments or []
+            if value in {"positive", "negative"}
+        }
+        for aspect in aspects:
+            if isinstance(aspect, str):
+                by_business_aspect.setdefault((business_id, aspect), set()).update(values)
+    return any(values == {"positive", "negative"} for values in by_business_aspect.values())
+
+
+def _asks_for_uncertainty(query_text: str) -> bool:
+    text = query_text.casefold()
+    return any(
+        marker in text
+        for marker in (
+            "only a few",
+            "very few",
+            "conflicting",
+            "mixed reviews",
+            "can we be sure",
+            "能确定吗",
+            "很少评论",
+            "说法不一",
+            "相互矛盾",
+        )
+    )
 
 
 def _accumulated_record_ids(

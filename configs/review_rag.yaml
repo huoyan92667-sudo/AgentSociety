@@ -1,0 +1,27 @@
+schema_version: 1
+rag_version: 1.0.0
+agent_version: step27-rule-agent-review-rag-v1
+
+segment_max_chars: 900
+segment_min_chars: 20
+max_segments_per_review: 8
+parquet_batch_size: 5000
+minimum_aspect_confidence: 0.85
+
+bm25_candidate_limit: 60
+aspect_candidate_limit: 60
+embedding_candidate_limit: 30
+max_store_segments_per_business: 20000
+bm25_k1: 1.5
+bm25_b: 0.75
+
+embedding_dimension: 1024
+embedding_batch_size: 16
+embedding_max_sequence_length: 512
+query_instruction: >-
+  Represent a Yelp question for retrieving review passages about one explicitly
+  scoped business and the requested experience aspect. Prefer passages that
+  directly support, contradict, or qualify the user's question.
+review_document_version: review-passage-v1.0.0
+embedding_cache_relative_path: data/features/review_rag/v1/embedding_cache
+policy_relative_path: configs/review_rag_policy.json

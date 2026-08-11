@@ -1,0 +1,11 @@
+{
+  "aspect_weight": 1.5,
+  "bm25_weight": 0.75,
+  "embedding_weight": 1.0,
+  "policy_version": "dev-aspect-heavy-v1",
+  "rrf_k": 60,
+  "schema_version": 1,
+  "selection_split": "development",
+  "top_k": 5,
+  "validation_used_for_tuning": false
+}

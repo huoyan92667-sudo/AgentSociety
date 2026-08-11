@@ -9,6 +9,7 @@ from .memory import GetSessionMemoryTool
 from .profile import GetUserProfileTool
 from .retrieval import ExpandCandidatesTool
 from .ranking import GetHybridRankingTool
+from .review_rag import SearchBusinessReviewsTool
 
 __all__ = [
     "GetBusinessDetailsTool",
@@ -22,4 +23,5 @@ __all__ = [
     "GetHybridRankingTool",
     "ComputeEmbeddingMatchTool",
     "ComputeCrossEncoderMatchTool",
+    "SearchBusinessReviewsTool",
 ]

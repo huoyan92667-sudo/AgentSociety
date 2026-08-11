@@ -18,6 +18,7 @@ from .adapters import (
     GetUserProfileTool,
     ComputeEmbeddingMatchTool,
     ComputeCrossEncoderMatchTool,
+    SearchBusinessReviewsTool,
 )
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
 from .schema import ToolExecutionContext, ToolObservation
@@ -35,6 +36,7 @@ __all__ = [
     "GetHybridRankingTool",
     "ComputeEmbeddingMatchTool",
     "ComputeCrossEncoderMatchTool",
+    "SearchBusinessReviewsTool",
     "RegistryActionExecutor",
     "PermanentToolError",
     "RetryableToolError",

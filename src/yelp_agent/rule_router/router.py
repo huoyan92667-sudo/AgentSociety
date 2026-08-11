@@ -21,6 +21,7 @@ class RuleRouter:
         cross_encoder_enabled: bool = False,
         cross_encoder_candidate_limit: int = 20,
         cross_encoder_beta: float = 0.0,
+        review_rag_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -39,6 +40,7 @@ class RuleRouter:
         self._cross_encoder_enabled = cross_encoder_enabled
         self._cross_encoder_candidate_limit = cross_encoder_candidate_limit
         self._cross_encoder_beta = cross_encoder_beta
+        self._review_rag_enabled = review_rag_enabled
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -185,8 +187,33 @@ class RuleRouter:
             reason_code="STRUCTURED_EVIDENCE_SUFFICIENT",
         )
 
-    @staticmethod
-    def _review_experience_decision(facts: RouteFacts) -> AgentDecision:
+    def _review_experience_decision(self, facts: RouteFacts) -> AgentDecision:
+        if self._review_rag_enabled and facts.review_search is None:
+            return AgentDecision(
+                action="retrieve_business_reviews",
+                arguments={"business_ids": facts.referenced_business_ids, "top_k": 5},
+                reason_code="UNSTRUCTURED_EVIDENCE_REQUIRED",
+                tool_name="SEARCH_BUSINESS_REVIEWS",
+                tool_kind="review_rag",
+            )
+        if self._review_rag_enabled:
+            if facts.review_evidence_count == 0:
+                return AgentDecision(
+                    action="return_uncertain_answer",
+                    arguments={"reason": "no_review_evidence_before_cutoff"},
+                    reason_code="NO_REVIEW_EVIDENCE",
+                )
+            if facts.review_evidence_conflict or facts.explicit_uncertainty_request:
+                return AgentDecision(
+                    action="return_uncertain_answer",
+                    arguments={"reason": "review_evidence_uncertain"},
+                    reason_code="CONFLICTING_REVIEW_EVIDENCE",
+                )
+            return AgentDecision(
+                action="return_grounded_answer",
+                arguments={"business_ids": facts.referenced_business_ids},
+                reason_code="REVIEW_EVIDENCE_SUFFICIENT",
+            )
         missing = [
             business_id
             for business_id in facts.referenced_business_ids
@@ -236,8 +263,7 @@ class RuleRouter:
             reason_code="OFFICIAL_VERIFICATION_REQUIRED",
         )
 
-    @staticmethod
-    def _comparison_decision(facts: RouteFacts) -> AgentDecision:
+    def _comparison_decision(self, facts: RouteFacts) -> AgentDecision:
         missing = [
             business_id
             for business_id in facts.referenced_business_ids
@@ -250,6 +276,18 @@ class RuleRouter:
                 reason_code="BUSINESS_PROFILE_REQUIRED",
                 tool_name="GET_BUSINESS_PROFILE",
                 tool_kind="deterministic",
+            )
+        if (
+            self._review_rag_enabled
+            and facts.requested_aspects
+            and facts.review_search is None
+        ):
+            return AgentDecision(
+                action="retrieve_business_reviews",
+                arguments={"business_ids": facts.referenced_business_ids, "top_k": 5},
+                reason_code="COMPARISON_REVIEW_EVIDENCE_REQUIRED",
+                tool_name="SEARCH_BUSINESS_REVIEWS",
+                tool_kind="review_rag",
             )
         if facts.comparison is None:
             return AgentDecision(

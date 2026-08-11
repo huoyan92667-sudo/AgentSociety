@@ -29,6 +29,7 @@ from yelp_agent.config import (
     load_config,
     load_item_knn_config,
     load_retrieval_config,
+    load_review_aspect_settings,
 )
 from yelp_agent.features.category import TemporalCategoryStore
 from yelp_agent.features.text import TemporalTextStore
@@ -46,6 +47,12 @@ from yelp_agent.semantic_embedding import (
     load_dashscope_embedding_environment,
     load_local_embedding_environment,
     load_semantic_embedding_config,
+)
+from yelp_agent.review_rag import (
+    ReviewRAGStore,
+    ReviewRetriever,
+    load_review_rag_config,
+    load_review_rag_policy,
 )
 
 from .config import load_rule_router_config
@@ -75,6 +82,8 @@ class RuleAgentSourcePaths:
     rule_router_config: Path
     agent_harness_config: Path
     agent_tools_config: Path
+    review_aspects: Path
+    review_rag_root: Path
 
     @classmethod
     def from_project_root(cls, project_root: str | Path) -> RuleAgentSourcePaths:
@@ -110,6 +119,15 @@ class RuleAgentSourcePaths:
             rule_router_config=config_dir / "rule_router.yaml",
             agent_harness_config=config_dir / "agent_harness.yaml",
             agent_tools_config=config_dir / "agent_tools.yaml",
+            review_aspects=(
+                root
+                / "data"
+                / "features"
+                / "review_aspects"
+                / "development"
+                / "aspect_records.parquet"
+            ),
+            review_rag_root=root / "data" / "features" / "review_rag" / "v1",
         )
 
     def required_files(self) -> tuple[Path, ...]:
@@ -166,12 +184,16 @@ class RuleAgentRuntime:
         user_profiles: UserProfileStore,
         embedding_encoder: object | None = None,
         cross_encoder: object | None = None,
+        review_embedding_encoder: object | None = None,
+        review_store: object | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
         self._user_profiles = user_profiles
         self._embedding_encoder = embedding_encoder
         self._cross_encoder = cross_encoder
+        self._review_embedding_encoder = review_embedding_encoder
+        self._review_store = review_store
         self._closed = False
 
     def __enter__(self) -> RuleAgentRuntime:
@@ -189,6 +211,12 @@ class RuleAgentRuntime:
             close = getattr(self._cross_encoder, "close", None)
             if callable(close):
                 close()
+            close = getattr(self._review_embedding_encoder, "close", None)
+            if callable(close):
+                close()
+            close = getattr(self._review_store, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -199,6 +227,8 @@ def build_real_rule_agent_runtime(
     embedding_environment: Mapping[str, str] | None = None,
     cross_encoder_config_path: str | Path | None = None,
     cross_encoder_environment: Mapping[str, str] | None = None,
+    review_rag_config_path: str | Path | None = None,
+    review_embedding_environment: Mapping[str, str] | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -250,6 +280,8 @@ def build_real_rule_agent_runtime(
     user_profiles = UserProfileStore(sources.user_profile_root)
     encoder = None
     cross_encoder = None
+    review_encoder = None
+    review_store = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -332,6 +364,52 @@ def build_real_rule_agent_runtime(
                 ),
                 config=cross_config,
             )
+        review_search = None
+        review_config = None
+        if review_rag_config_path is not None:
+            review_config = load_review_rag_config(review_rag_config_path)
+            required_review_files = (
+                sources.review_rag_root / "review_segments.parquet",
+                sources.review_rag_root / "manifest.json",
+                sources.review_aspects,
+                sources.project_root / review_config.policy_relative_path,
+            )
+            missing_review = [path for path in required_review_files if not path.is_file()]
+            if missing_review:
+                raise FileNotFoundError(
+                    "Review RAG inputs are incomplete:\n"
+                    + "\n".join(f"- {path}" for path in missing_review)
+                )
+            review_environment = load_local_embedding_environment(
+                review_embedding_environment or embedding_environment
+            )
+            if not review_environment.enabled:
+                raise ValueError("local Review RAG embedding environment is not configured")
+            review_semantic_config = review_config.semantic_config()
+            review_encoder = LocalQwenEmbeddingEncoder.from_environment(
+                review_semantic_config,
+                review_environment,
+            )
+            review_store = ReviewRAGStore(
+                sources.review_rag_root / "review_segments.parquet",
+                sources.review_aspects,
+                review_config,
+            )
+            _, review_vocabulary = load_review_aspect_settings(sources.config_dir)
+            review_search = ReviewRetriever(
+                store=review_store,
+                config=review_config,
+                policy=load_review_rag_policy(sources.project_root, review_config),
+                vocabulary=review_vocabulary,
+                embedding_gateway=CachedEmbeddingGateway(
+                    encoder=review_encoder,
+                    cache=SqliteEmbeddingCache(
+                        sources.project_root
+                        / review_config.embedding_cache_relative_path
+                    ),
+                    config=review_semantic_config,
+                ),
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -340,6 +418,7 @@ def build_real_rule_agent_runtime(
             hybrid_ranking=ranking_service,
             embedding_match=embedding_match,
             cross_encoder_reranker=cross_reranker,
+            review_search=review_search,
             embedding_alpha=(
                 semantic_config.fusion_alpha if semantic_config is not None else 0.0
             ),
@@ -387,13 +466,6 @@ def build_real_rule_agent_runtime(
                 if cross_policy is not None
                 else rule_config.display_limit
             ),
-            agent_version=(
-                cross_config.agent_version
-                if cross_reranker is not None and cross_config is not None
-                else semantic_config.agent_version
-                if embedding_match is not None and semantic_config is not None
-                else rule_config.agent_version
-            ),
             semantic_enabled=embedding_match is not None,
             semantic_candidate_limit=(
                 semantic_config.candidate_limit
@@ -412,12 +484,28 @@ def build_real_rule_agent_runtime(
             cross_encoder_beta=(
                 cross_policy.fusion_beta if cross_policy is not None else 0.0
             ),
+            review_rag_enabled=review_search is not None,
+            agent_version=(
+                review_config.agent_version
+                if review_search is not None and review_config is not None
+                else cross_config.agent_version
+                if cross_reranker is not None and cross_config is not None
+                else semantic_config.agent_version
+                if embedding_match is not None and semantic_config is not None
+                else rule_config.agent_version
+            ),
         )
     except Exception:
         close = getattr(encoder, "close", None)
         if callable(close):
             close()
         close = getattr(cross_encoder, "close", None)
+        if callable(close):
+            close()
+        close = getattr(review_encoder, "close", None)
+        if callable(close):
+            close()
+        close = getattr(review_store, "close", None)
         if callable(close):
             close()
         user_profiles.close()
@@ -428,4 +516,6 @@ def build_real_rule_agent_runtime(
         user_profiles=user_profiles,
         embedding_encoder=encoder,
         cross_encoder=cross_encoder,
+        review_embedding_encoder=review_encoder,
+        review_store=review_store,
     )

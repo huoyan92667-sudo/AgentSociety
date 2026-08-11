@@ -28,6 +28,7 @@ def build_rule_agent(
     cross_encoder_enabled: bool = False,
     cross_encoder_candidate_limit: int = 20,
     cross_encoder_beta: float = 0.0,
+    review_rag_enabled: bool = False,
     clock: Clock | None = None,
 ) -> AgentHarness:
     """Connect the Step 18/22/23/24 modules behind one runner interface."""
@@ -41,6 +42,7 @@ def build_rule_agent(
             fusion_alpha=fusion_alpha,
             cross_encoder_enabled=cross_encoder_enabled,
             cross_encoder_beta=cross_encoder_beta,
+            review_rag_enabled=review_rag_enabled,
         ),
         router=RuleRouter(
             display_limit=display_limit,
@@ -50,6 +52,7 @@ def build_rule_agent(
             cross_encoder_enabled=cross_encoder_enabled,
             cross_encoder_candidate_limit=cross_encoder_candidate_limit,
             cross_encoder_beta=cross_encoder_beta,
+            review_rag_enabled=review_rag_enabled,
         ),
         executor=RegistryActionExecutor(
             registry,

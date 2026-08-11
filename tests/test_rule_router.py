@@ -66,6 +66,52 @@ def _observation(
     )
 
 
+def test_review_rag_router_retrieves_then_returns_cited_answer() -> None:
+    state = _state(
+        "What do reviews say about this business's quiet environment?",
+        referenced_business_ids=["b1"],
+    ).model_copy(update={"business_scope_known": True, "business_scope": ["b1"]})
+    router = RuleRouter(review_rag_enabled=True)
+    policy = RuleBasedActionPolicy(review_rag_enabled=True)
+
+    assert policy.allowed_actions(state) == (
+        "retrieve_business_reviews",
+        "safe_fallback",
+    )
+    decision = router.choose_action(state)
+    assert decision.action == "retrieve_business_reviews"
+    assert decision.tool_name == "SEARCH_BUSINESS_REVIEWS"
+    assert decision.arguments == {"business_ids": ["b1"], "top_k": 5}
+
+    searched = state.model_copy(
+        update={
+            "observations": [
+                _observation(
+                    "e",
+                    1,
+                    "retrieve_business_reviews",
+                    "SEARCH_BUSINESS_REVIEWS",
+                    {
+                        "hits": [
+                            {
+                                "business_id": "b1",
+                                "review_id": "r1",
+                                "matched_aspects": ["quiet_environment"],
+                                "aspect_sentiments": ["positive"],
+                            }
+                        ]
+                    },
+                )
+            ]
+        }
+    )
+    assert policy.allowed_actions(searched) == (
+        "return_grounded_answer",
+        "safe_fallback",
+    )
+    assert router.choose_action(searched).action == "return_grounded_answer"
+
+
 def _recommendation_states() -> tuple[
     AgentSession,
     AgentSession,

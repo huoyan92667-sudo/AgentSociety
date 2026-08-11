@@ -177,7 +177,15 @@ class TerminalActionExecutor:
         state: AgentState,
         decision: AgentDecision,
     ) -> ActionOutcome:
-        if state.readiness.task_type == "business_detail_question":
+        if state.readiness.task_type == "review_experience_question":
+            claims = self._review_claims(state, decision)
+            if not claims:
+                claims = self._profile_or_comparison_claims(state, decision)
+        elif state.readiness.task_type == "candidate_comparison" and _latest_tool_data(
+            state, "SEARCH_BUSINESS_REVIEWS"
+        ).get("hits"):
+            claims = self._review_claims(state, decision)
+        elif state.readiness.task_type == "business_detail_question":
             claims = self._detail_claims(state, decision)
         else:
             claims = self._profile_or_comparison_claims(state, decision)
@@ -191,9 +199,12 @@ class TerminalActionExecutor:
             status="completed",
             response_kind="grounded_answer",
             claims=claims,
-            reported_conflict=facts.structured_evidence_conflict,
-            reported_evidence_recency=any(
-                "latest_evidence_time" in claim.text for claim in claims
+            reported_conflict=(
+                facts.structured_evidence_conflict or facts.review_evidence_conflict
+            ),
+            reported_evidence_recency=(
+                bool(_latest_tool_data(state, "SEARCH_BUSINESS_REVIEWS").get("hits"))
+                or any("latest_evidence_time" in claim.text for claim in claims)
             ),
         )
 
@@ -206,7 +217,10 @@ class TerminalActionExecutor:
         return ActionOutcome(
             status="completed",
             response_kind="uncertain_answer",
-            reported_conflict=(decision.reason_code == "CONSTRAINT_CONFLICT"),
+            reported_conflict=(
+                decision.reason_code
+                in {"CONSTRAINT_CONFLICT", "CONFLICTING_REVIEW_EVIDENCE"}
+            ),
             recommended_official_verification=(
                 decision.arguments.get("recommended_official_verification") is True
             ),
@@ -253,6 +267,60 @@ class TerminalActionExecutor:
                             source_type="business_attribute",
                             source_field="categories",
                         )
+                    ],
+                )
+            )
+        return claims
+
+    @staticmethod
+    def _review_claims(
+        state: AgentState,
+        decision: AgentDecision,
+    ) -> list[ResponseClaimTrace]:
+        data = _latest_tool_data(state, "SEARCH_BUSINESS_REVIEWS")
+        rows = data.get("hits")
+        if not isinstance(rows, list):
+            return []
+        requested = decision.arguments.get("business_ids")
+        business_ids = (
+            [value for value in requested if isinstance(value, str)]
+            if isinstance(requested, list)
+            else state.request.referenced_business_ids
+        )
+        claims: list[ResponseClaimTrace] = []
+        for business_id in business_ids:
+            candidates = [
+                row
+                for row in rows
+                if isinstance(row, dict)
+                and row.get("business_id") == business_id
+                and isinstance(row.get("review_id"), str)
+            ]
+            selected = [
+                row for row in candidates if row.get("matched_aspects")
+            ][:2] or candidates[:1]
+            if not selected:
+                continue
+            snippets = [
+                " ".join(str(row.get("text") or "").split())[:240]
+                for row in selected
+            ]
+            dates = [str(row.get("review_time") or "")[:10] for row in selected]
+            claims.append(
+                ResponseClaimTrace(
+                    claim_id=f"review:{business_id}:{selected[0]['review_id']}",
+                    text=(
+                        f"{business_id}: cutoff-safe review evidence ({', '.join(dates)}): "
+                        + " | ".join(snippets)
+                    ),
+                    business_id=business_id,
+                    evidence_refs=[
+                        EvidenceReference(
+                            business_id=business_id,
+                            source_type="review",
+                            review_id=str(row["review_id"]),
+                        )
+                        for row in selected
                     ],
                 )
             )

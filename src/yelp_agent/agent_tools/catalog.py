@@ -14,6 +14,7 @@ from .adapters import (
     GetHybridRankingTool,
     GetSessionMemoryTool,
     GetUserProfileTool,
+    SearchBusinessReviewsTool,
 )
 from .config import AgentToolRuntimeConfig
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
@@ -55,6 +56,7 @@ def build_step23_tool_registry(
     hybrid_ranking: object,
     embedding_match: object | None = None,
     cross_encoder_reranker: object | None = None,
+    review_search: object | None = None,
     embedding_alpha: float = 0.0,
     runtime_config: AgentToolRuntimeConfig | None = None,
 ) -> AgentToolRegistry:
@@ -96,12 +98,16 @@ def build_step23_tool_registry(
                     summary="Rerank a small candidate set with a cross-encoder.",
                 )
             ),
-            _future_tool(
-                name="SEARCH_BUSINESS_REVIEWS",
-                step=27,
-                kind="review_rag",
-                actions=("retrieve_business_reviews",),
-                summary="Search time-safe reviews for one locked business.",
+            (
+                SearchBusinessReviewsTool(review_search)  # type: ignore[arg-type]
+                if review_search is not None
+                else _future_tool(
+                    name="SEARCH_BUSINESS_REVIEWS",
+                    step=27,
+                    kind="review_rag",
+                    actions=("retrieve_business_reviews",),
+                    summary="Search time-safe reviews for one locked business.",
+                )
             ),
             _future_tool(
                 name="AGGREGATE_REVIEW_EVIDENCE",

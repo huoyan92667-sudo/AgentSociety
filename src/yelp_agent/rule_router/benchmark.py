@@ -296,7 +296,7 @@ def _load_jsonl(path: Path) -> list[dict[str, object]]:
 
 def _runtime_metrics(
     runs: Sequence[AgentScenarioRun],
-) -> dict[str, int | float]:
+) -> dict[str, object]:
     scenario_count = len(runs)
     step_count = sum(
         len(turn.actions) for run in runs for turn in run.turns
@@ -309,6 +309,7 @@ def _runtime_metrics(
         call for run in runs for turn in run.turns for call in turn.tool_calls
     ]
     semantic_calls = [call for call in tool_calls if call.tool_kind == "semantic"]
+    review_calls = [call for call in tool_calls if call.tool_kind == "review_rag"]
     semantic_input_tokens = sum(call.input_tokens or 0 for call in semantic_calls)
     return {
         "scenario_count": scenario_count,
@@ -327,6 +328,14 @@ def _runtime_metrics(
             if semantic_calls
             else 0.0
         ),
+        "review_rag_tool_call_count": len(review_calls),
+        "review_rag_input_tokens": sum(call.input_tokens or 0 for call in review_calls),
+        "review_rag_cache_hit_rate": (
+            sum(call.cache_hit for call in review_calls) / len(review_calls)
+            if review_calls
+            else 0.0
+        ),
+        "agent_versions": sorted({run.agent_version for run in runs}),
     }
 
 
@@ -401,7 +410,7 @@ def _markdown_summary(
     *,
     split: BenchmarkSplit,
     failure_count: int,
-    runtime_metrics: dict[str, int | float],
+    runtime_metrics: dict[str, object],
 ) -> str:
     key_metrics = (
         "action_accuracy",
@@ -418,15 +427,25 @@ def _markdown_summary(
         "empty_result_rate",
         "mean_latency_ms",
         "p95_latency_ms",
+        "review_retrieval_recall_at_1",
+        "review_retrieval_recall_at_3",
+        "review_retrieval_recall_at_5",
+        "evidence_precision_at_5",
+        "business_scope_isolation_rate",
+        "citation_correctness",
     )
     lines = [
-        "# 第 24 步 Rule Agent V1 实验摘要",
+        "# Agent Scenario 实验摘要",
         "",
         f"- 评测范围：`{split}`",
         f"- 场景数：{report.scenario_count}",
         f"- 含违规或回退的场景：{failure_count}",
         "- Router：确定性规则，不调用 LLM",
-        "- Review RAG：未实现（计划第 27 步）",
+        (
+            "- Review RAG：已启用本地 Business-scoped Top-5 检索"
+            if int(runtime_metrics["review_rag_tool_call_count"]) > 0
+            else "- Review RAG：未启用"
+        ),
         "- 官网实时核验：未实现，因此相关问题保守回答",
         "",
         "## 核心指标",
@@ -445,6 +464,10 @@ def _markdown_summary(
             f"{float(runtime_metrics['average_turns_per_scenario']):.4f} |",
             "| `llm_call_count` | 0 |",
             "| `llm_cost_usd` | 0.0000 |",
+            "| `review_rag_tool_call_count` | "
+            f"{int(runtime_metrics['review_rag_tool_call_count'])} |",
+            "| `review_rag_input_tokens` | "
+            f"{int(runtime_metrics['review_rag_input_tokens'])} |",
         ]
     )
     lines.extend(
@@ -452,9 +475,9 @@ def _markdown_summary(
             "",
             "## 解释",
             "",
-            "本结果是后续 Constrained LLM Router 与 Cost-aware LLM Router 的零 LLM 基线。",
-            "Review 证据检索和官网核验尚未安装，所以对应场景的低分属于已知能力边界，",
-            "不会通过伪造评论引用或把静态 Yelp 字段说成实时政策来抬高指标。",
+            "本结果仍是后续 Constrained LLM Router 与 Cost-aware LLM Router 的零 LLM 基线。",
+            "Review RAG 是否启用由运行时工具轨迹如实报告；官网实时核验仍未安装，",
+            "不会把历史 Yelp 评论说成当前官方政策。",
             "",
         ]
     )

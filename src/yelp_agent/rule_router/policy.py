@@ -19,6 +19,7 @@ class RuleBasedActionPolicy:
         fusion_alpha: float = 0.0,
         cross_encoder_enabled: bool = False,
         cross_encoder_beta: float = 0.0,
+        review_rag_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -31,6 +32,7 @@ class RuleBasedActionPolicy:
         if not 0 <= cross_encoder_beta <= 1:
             raise ValueError("Cross-Encoder beta must be between zero and one")
         self._cross_encoder_beta = cross_encoder_beta
+        self._review_rag_enabled = review_rag_enabled
 
     def allowed_actions(self, state: AgentState) -> tuple[AgentAction, ...]:
         facts = RouteFacts.from_state(state)
@@ -47,6 +49,15 @@ class RuleBasedActionPolicy:
                 return ("get_business_details", "safe_fallback")
             return ("return_grounded_answer", "safe_fallback")
         if facts.task_type == "review_experience_question":
+            if self._review_rag_enabled:
+                if facts.review_search is None:
+                    return ("retrieve_business_reviews", "safe_fallback")
+                if facts.review_evidence_count == 0 or (
+                    facts.review_evidence_conflict
+                    or facts.explicit_uncertainty_request
+                ):
+                    return ("return_uncertain_answer", "safe_fallback")
+                return ("return_grounded_answer", "safe_fallback")
             if not set(facts.referenced_business_ids).issubset(
                 facts.profiled_business_ids
             ):
@@ -65,6 +76,12 @@ class RuleBasedActionPolicy:
                 facts.profiled_business_ids
             ):
                 return ("get_business_details", "safe_fallback")
+            if (
+                self._review_rag_enabled
+                and facts.requested_aspects
+                and facts.review_search is None
+            ):
+                return ("retrieve_business_reviews", "safe_fallback")
             if facts.comparison is None:
                 return ("compare_candidates", "safe_fallback")
             if facts.comparison_ranking:
