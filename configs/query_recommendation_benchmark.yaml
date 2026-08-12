@@ -1,0 +1,45 @@
+schema_version: 1
+
+selection:
+  schema_version: 1
+  benchmark_version: 1.0.0
+  seed: 42
+  development_count: 400
+  validation_count: 100
+  minimum_target_stars: 4.0
+  minimum_target_pre_cutoff_reviews: 1
+  aspect_source_scope: selected_user_interactions
+
+frames:
+  seed: 42
+  development_family_counts:
+    category_only: 64
+    category_distance: 64
+    category_price: 48
+    category_single_aspect: 80
+    category_two_aspects: 64
+    category_distance_aspect: 48
+    occasion_context: 32
+  validation_family_counts:
+    category_only: 16
+    category_distance: 16
+    category_price: 12
+    category_single_aspect: 20
+    category_two_aspects: 16
+    category_distance_aspect: 12
+    occasion_context: 8
+  development_language_counts:
+    zh-CN: 240
+    en-US: 160
+  validation_language_counts:
+    zh-CN: 60
+    en-US: 40
+
+generation:
+  batch_size: 20
+  timeout_seconds: 90
+  max_retries: 1
+  max_output_tokens: 12000
+  maximum_generation_attempts: 2
+  temperature: 0.0
+  thinking: disabled
