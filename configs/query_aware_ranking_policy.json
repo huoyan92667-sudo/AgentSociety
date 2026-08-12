@@ -1,0 +1,69 @@
+{
+  "coarse_diagnostic_limit": 100,
+  "development_case_count": 400,
+  "development_metrics": {
+    "avg_hr_1_3_5_10": 0.15,
+    "hr_at_1": 0.0725,
+    "hr_at_10": 0.2275,
+    "hr_at_3": 0.1275,
+    "hr_at_5": 0.1725,
+    "mean_latency_ms": 0.0,
+    "mrr": 0.1269031969423335,
+    "ndcg_at_10": 0.14102447104155222,
+    "ndcg_at_5": 0.1237425139867467,
+    "p95_latency_ms": 0.0,
+    "recall_at_100": 0.5325,
+    "recall_at_50": 0.3975,
+    "recall_at_500": 0.8675
+  },
+  "display_limit": 5,
+  "embedding_signal_weight": 0.2,
+  "internal_result_limit": 10,
+  "objective": "AvgHR@1,3,5,10",
+  "policy_version": "1.0.0",
+  "query_retrieval_signal_weight": 0.8,
+  "schema_version": 1,
+  "selected_query_weight": 0.5,
+  "semantic_candidate_limit": 30,
+  "semantic_policy": {
+    "candidate_limit": 30,
+    "cross_encoder_weight": 0.5,
+    "development_metrics": {
+      "harm_rate": 0.042105263157894736,
+      "hr_at_1": 0.06315789473684211,
+      "hr_at_3": 0.11578947368421053,
+      "hr_at_5": 0.1368421052631579,
+      "improvement_rate": 0.042105263157894736,
+      "mean_movement": 2.291578947368421,
+      "mrr": 0.10054258176616405,
+      "ndcg_at_5": 0.10359208820625015
+    },
+    "development_scenario_count": 95,
+    "displacement_margin": 0.2,
+    "embedding_weight": 0.4,
+    "evidence_floor": 0.5,
+    "maximum_downward_move": 3,
+    "maximum_fusion_alpha": 1.0,
+    "maximum_upward_move": 5,
+    "minimum_intent_confidence": 0.0,
+    "objective": "HR@5",
+    "protected_top_k": 3,
+    "schema_version": 1,
+    "structured_weight": 0.1,
+    "tie_breakers": [
+      "MRR",
+      "HR@1",
+      "harm_rate",
+      "mean_movement"
+    ],
+    "validation_used_for_selection": false
+  },
+  "tie_breakers": [
+    "MRR",
+    "HR@1",
+    "NDCG@10",
+    "lower_query_weight"
+  ],
+  "union_candidate_limit": 1000,
+  "validation_used_for_selection": false
+}

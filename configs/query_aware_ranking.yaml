@@ -1,0 +1,20 @@
+schema_version: 1
+agent_version: step33-query-aware-ranking-v1
+
+# Protect the final History Top-500 and Query Top-500 until model scoring.
+union_candidate_limit: 1000
+coarse_diagnostic_limit: 100
+semantic_candidate_limit: 30
+internal_result_limit: 10
+display_limit: 5
+
+# Only development labels may select among these coarse fusion settings.
+query_weight_candidates: [0.25, 0.50, 0.75]
+query_retrieval_signal_weight: 0.80
+embedding_signal_weight: 0.20
+
+# Reuse the Step-30 protected semantic policy, extending only its prefix to 30.
+semantic_policy_source: configs/semantic_ranking_policy.json
+policy_relative_path: configs/query_aware_ranking_policy.json
+tuning_split: development
+validation_used_for_selection: false
