@@ -149,6 +149,34 @@ def test_unknown_threshold_is_applied_per_aspect_to_directional_evidence() -> No
     assert quiet.confidence == 0.0
 
 
+def test_narrow_aspect_reader_matches_the_complete_profile_at_the_same_cutoff() -> None:
+    store = BusinessKnowledgeStore.from_records(
+        businesses=(_business("business-a"),),
+        rating_events=(),
+        aspect_events=(
+            _aspect("quiet-1", "user-1", "positive", datetime(2020, 1, 1)),
+            _aspect("quiet-2", "user-2", "positive", datetime(2020, 1, 2)),
+            _aspect("quiet-3", "user-3", "negative", datetime(2020, 1, 3)),
+        ),
+        config=load_business_profile_config(PROJECT_CONFIG_DIR),
+    )
+    cutoff = datetime(2021, 1, 1)
+
+    narrow = store.get_aspects(
+        ["business-a"],
+        ["quiet_environment"],
+        cutoff,
+    )
+    complete = store.get(["business-a"], cutoff)
+
+    assert store.source_scope == "selected_user_interactions"
+    assert narrow["business-a"] == {
+        "quiet_environment": complete["business-a"].aspect_summaries[
+            "quiet_environment"
+        ]
+    }
+
+
 def test_conflicting_reviews_are_flagged_without_leaking_to_another_business() -> None:
     conflict_events = tuple(
         _aspect(

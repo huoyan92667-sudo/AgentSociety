@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import Field, field_validator
 
@@ -99,6 +99,20 @@ class RetrievalCandidateOutput(StrictModel):
     item_knn_positive_neighbor_count: int = Field(ge=0)
     item_knn_negative_neighbor_count: int = Field(ge=0)
     item_knn_missing: bool
+    history_rank: int | None = Field(default=None, ge=1)
+    history_fusion_score: float | None = Field(default=None, ge=0)
+    query_rank: int | None = Field(default=None, ge=1)
+    query_fusion_score: float | None = Field(default=None, ge=0)
+    query_category_rank: int | None = Field(default=None, ge=1)
+    query_category_score: float | None = Field(default=None, ge=0, le=1)
+    query_embedding_rank: int | None = Field(default=None, ge=1)
+    query_embedding_score: float | None = Field(default=None, ge=0, le=1)
+    query_aspect_rank: int | None = Field(default=None, ge=1)
+    query_aspect_score: float | None = Field(default=None, ge=0, le=1)
+    query_location_rank: int | None = Field(default=None, ge=1)
+    query_location_score: float | None = Field(default=None, ge=0, le=1)
+    query_distance_km: float | None = Field(default=None, ge=0)
+    source_channels: list[Literal["history", "query"]] = Field(default_factory=list)
 
 
 class CandidateRetrievalOutput(StrictModel):
@@ -108,6 +122,17 @@ class CandidateRetrievalOutput(StrictModel):
     eligible_candidate_count: int = Field(ge=0)
     excluded_history_businesses: int = Field(ge=0)
     route_result_counts: dict[str, int]
+    retrieval_mode: Literal[
+        "history_only",
+        "dual_channel",
+        "history_fallback",
+    ] = "history_only"
+    history_candidate_count: int = Field(default=0, ge=0)
+    query_candidate_count: int = Field(default=0, ge=0)
+    overlap_count: int = Field(default=0, ge=0)
+    query_pre_cutoff_business_count: int = Field(default=0, ge=0)
+    query_eligible_business_count: int = Field(default=0, ge=0)
+    query_warnings: list[str] = Field(default_factory=list)
 
 
 class ExcludedBusiness(StrictModel):

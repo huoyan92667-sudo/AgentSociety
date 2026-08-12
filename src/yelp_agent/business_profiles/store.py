@@ -103,6 +103,12 @@ class BusinessKnowledgeStore:
             OrderedDict()
         )
 
+    @property
+    def source_scope(self) -> str:
+        """Declare the frozen evidence population backing every Aspect summary."""
+
+        return self._config.source_scope
+
     @classmethod
     def from_records(
         cls,
@@ -504,5 +510,42 @@ class BusinessKnowledgeStore:
             raise BusinessKnowledgeError(f"Unknown business IDs: {unknown[:3]}")
         return {
             business_id: self._cached_profile(business_id, cutoff_time)
+            for business_id in business_ids
+        }
+
+    def get_aspects(
+        self,
+        business_ids: list[str],
+        aspects: list[AspectName],
+        cutoff_time: datetime,
+    ) -> dict[str, dict[AspectName, BusinessAspectSummary]]:
+        """Return only requested cutoff-safe Aspect summaries.
+
+        Query retrieval normally needs one or two aspects across the full business
+        catalog.  This narrow batch method avoids constructing quality statistics
+        and every frozen aspect for every business while retaining the exact same
+        evidence and cutoff semantics as :meth:`get`.
+        """
+
+        if not business_ids:
+            raise ValueError("business_ids cannot be empty")
+        if len(set(business_ids)) != len(business_ids):
+            raise ValueError("business_ids must be unique")
+        if not aspects:
+            raise ValueError("aspects cannot be empty")
+        if len(set(aspects)) != len(aspects):
+            raise ValueError("aspects must be unique")
+        if any(aspect not in ASPECT_NAMES for aspect in aspects):
+            raise ValueError("aspects must use the frozen Aspect taxonomy")
+        if not isinstance(cutoff_time, datetime):
+            raise TypeError("cutoff_time must be a datetime")
+        unknown = sorted(set(business_ids).difference(self._businesses))
+        if unknown:
+            raise BusinessKnowledgeError(f"Unknown business IDs: {unknown[:3]}")
+        return {
+            business_id: {
+                aspect: self._aspect_summary(business_id, aspect, cutoff_time)
+                for aspect in aspects
+            }
             for business_id in business_ids
         }

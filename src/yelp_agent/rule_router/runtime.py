@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Self
+from typing import Literal, Self
 
 from yelp_agent.agent_harness import AgentHarness, load_agent_harness_config
 from yelp_agent.agent_tools import (
@@ -49,6 +49,11 @@ from yelp_agent.learning_to_rank.features import HybridV1Weights
 from yelp_agent.profiles.store import UserProfileStore
 from yelp_agent.ranking.assembly import HybridSourcePaths, build_frozen_hybrid_runtime
 from yelp_agent.retrieval import MultiRouteRetriever
+from yelp_agent.query_retrieval import (
+    DualChannelFusion,
+    QueryCandidateRetriever,
+    load_query_retrieval_config,
+)
 from yelp_agent.review_rag import (
     ReviewRAGStore,
     ReviewRetriever,
@@ -180,6 +185,7 @@ class RuleAgentSourcePaths:
             self.config_dir / "retrieval.yaml",
             self.config_dir / "item_knn.yaml",
             self.config_dir / "business_profiles.yaml",
+            self.config_dir / "query_retrieval.yaml",
         )
 
     def validate(self) -> None:
@@ -204,6 +210,7 @@ class RuleAgentRuntime:
         review_store: object | None = None,
         controlled_llm: ControlledLLMRuntime | None = None,
         semantic_ranking: SemanticRankingEngine | None = None,
+        query_retrieval: QueryCandidateRetriever | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -214,6 +221,7 @@ class RuleAgentRuntime:
         self._review_store = review_store
         self.controlled_llm = controlled_llm
         self.semantic_ranking = semantic_ranking
+        self.query_retrieval = query_retrieval
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -256,6 +264,7 @@ def build_real_rule_agent_runtime(
     controlled_llm_config_path: str | Path | None = None,
     controlled_llm_environment: Mapping[str, str] | None = None,
     semantic_ranking_config_path: str | Path | None = None,
+    query_retrieval_mode: Literal["config", "history_only"] = "config",
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -267,6 +276,9 @@ def build_real_rule_agent_runtime(
     rule_config = load_rule_router_config(sources.rule_router_config)
     harness_config = load_agent_harness_config(sources.agent_harness_config)
     tool_config = load_agent_tool_runtime_config(sources.agent_tools_config)
+    query_retrieval_config = load_query_retrieval_config(
+        sources.config_dir / "query_retrieval.yaml"
+    )
 
     frozen_hybrid = build_frozen_hybrid_runtime(
         app_config,
@@ -487,6 +499,19 @@ def build_real_rule_agent_runtime(
                     mode=semantic_ranking_config.mode,
                     candidate_limit=semantic_ranking_config.candidate_limit,
                 )
+        query_retrieval = None
+        dual_channel_fusion = None
+        if (
+            query_retrieval_mode == "config"
+            and query_retrieval_config.enabled
+        ):
+            query_retrieval = QueryCandidateRetriever(
+                catalog=data_view,
+                profiles=business_profiles,
+                embedding_matcher=embedding_match,
+                config=query_retrieval_config,
+            )
+            dual_channel_fusion = DualChannelFusion(query_retrieval_config)
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -498,6 +523,8 @@ def build_real_rule_agent_runtime(
             review_search=review_search,
             evidence_aggregator=evidence_aggregator,
             semantic_ranking=semantic_ranking,
+            query_retriever=query_retrieval,
+            dual_channel_fusion=dual_channel_fusion,
             embedding_alpha=(
                 semantic_config.fusion_alpha if semantic_config is not None else 0.0
             ),
@@ -598,7 +625,9 @@ def build_real_rule_agent_runtime(
                 else controlled_config.answer.maximum_evidence_items
             ),
             agent_version=(
-                semantic_ranking_config.agent_version
+                query_retrieval_config.agent_version
+                if query_retrieval is not None
+                else semantic_ranking_config.agent_version
                 if semantic_ranking is not None
                 and semantic_ranking_config is not None
                 else controlled_config.agent_version
@@ -642,4 +671,5 @@ def build_real_rule_agent_runtime(
         review_store=review_store,
         controlled_llm=controlled_llm,
         semantic_ranking=semantic_ranking,
+        query_retrieval=query_retrieval,
     )

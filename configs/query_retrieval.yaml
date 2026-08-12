@@ -1,0 +1,24 @@
+schema_version: 1
+agent_version: step31-dual-channel-query-recall-v1
+enabled: true
+
+# Query Recall searches the complete cutoff-eligible Philadelphia catalog.
+candidate_limit: 500
+per_route_limit: 500
+rrf_constant: 60.0
+
+# Transparent baseline weights. These are not tuned against a Query relevance
+# benchmark; that benchmark belongs to the next project step.
+category_weight: 1.0
+embedding_weight: 1.0
+aspect_weight: 1.0
+location_weight: 1.0
+location_scale_km: 10.0
+
+# Fuse the existing five-route history channel with current-request retrieval.
+dual_history_weight: 1.0
+dual_query_weight: 1.0
+
+# Deliberately limited to Aspect evidence extracted from the selected 5,000
+# users. Missing evidence stays unknown and never becomes a negative label.
+aspect_source_scope: selected_user_interactions

@@ -61,6 +61,8 @@ def build_step23_tool_registry(
     review_search: object | None = None,
     evidence_aggregator: object | None = None,
     semantic_ranking: object | None = None,
+    query_retriever: object | None = None,
+    dual_channel_fusion: object | None = None,
     embedding_alpha: float = 0.0,
     cross_encoder_beta: float = 0.0,
     runtime_config: AgentToolRuntimeConfig | None = None,
@@ -72,7 +74,12 @@ def build_step23_tool_registry(
         [
             GetSessionMemoryTool(),
             GetUserProfileTool(user_profiles),  # type: ignore[arg-type]
-            ExpandCandidatesTool(retriever, history_reader),  # type: ignore[arg-type]
+            ExpandCandidatesTool(
+                retriever,  # type: ignore[arg-type]
+                history_reader,  # type: ignore[arg-type]
+                query_retriever=query_retriever,  # type: ignore[arg-type]
+                dual_fusion=dual_channel_fusion,  # type: ignore[arg-type]
+            ),
             ApplyConstraintsTool(candidate_reader),
             GetHybridRankingTool(hybrid_ranking),  # type: ignore[arg-type]
             GetBusinessDetailsTool(business_profiles),  # type: ignore[arg-type]
