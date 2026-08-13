@@ -15,6 +15,10 @@ from yelp_agent.semantic_embedding import EmbeddingProviderError
 
 from ..errors import PermanentToolError, RetryableToolError
 from ..registry import ToolDefinition
+from ..request_context import (
+    query_text_from_tool_context,
+    request_conditions_from_tool_context,
+)
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import (
     SearchBusinessReviewsInput,
@@ -58,19 +62,15 @@ class SearchBusinessReviewsTool:
         arguments: SearchBusinessReviewsInput,
         context: ToolExecutionContext,
     ) -> ToolObservation:
-        request = context.state_snapshot.get("request")
-        if not isinstance(request, dict):
-            raise PermanentToolError("visible request is missing")
-        query_text = request.get("query_text")
-        conditions = request.get("conditions")
-        if not isinstance(query_text, str) or not query_text.strip():
-            raise PermanentToolError("visible request query text is missing")
+        try:
+            query_text = query_text_from_tool_context(context)
+            conditions = request_conditions_from_tool_context(context)
+        except (TypeError, ValueError) as exc:
+            raise PermanentToolError(str(exc)) from None
         aspects: list[str] = []
-        if isinstance(conditions, list):
-            for condition in conditions:
-                field = condition.get("field") if isinstance(condition, dict) else None
-                if field in ASPECT_NAMES and field not in aspects:
-                    aspects.append(str(field))
+        for condition in conditions:
+            if condition.field in ASPECT_NAMES and condition.field not in aspects:
+                aspects.append(str(condition.field))
         for aspect in infer_review_aspects(query_text):
             if aspect not in aspects:
                 aspects.append(aspect)

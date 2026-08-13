@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from yelp_agent.query import RecommendationRequest
+from yelp_agent.query.schema import RequestCondition
 from yelp_agent.session_memory.effective_request import effective_request_from_snapshot
 
 from .schema import ToolExecutionContext
@@ -56,3 +57,22 @@ def rejected_business_ids_from_tool_context(
     if not isinstance(values, list):
         return set()
     return {str(value) for value in values if isinstance(value, str)}
+
+
+def request_conditions_from_tool_context(
+    context: ToolExecutionContext,
+) -> list[RequestCondition]:
+    """Read conditions while preserving legacy narrow semantic-tool snapshots."""
+
+    effective = effective_request_from_snapshot(context.state_snapshot)
+    if effective is not None:
+        return list(effective.request.conditions)
+    raw = context.state_snapshot.get("request")
+    values = raw.get("conditions") if isinstance(raw, dict) else None
+    if not isinstance(values, list):
+        return []
+    return [
+        RequestCondition.model_validate(value)
+        for value in values
+        if isinstance(value, dict)
+    ]

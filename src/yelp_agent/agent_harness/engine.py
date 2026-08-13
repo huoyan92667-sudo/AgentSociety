@@ -25,7 +25,11 @@ from .schema import (
     HarnessResult,
     UserTurnInput,
 )
-from .state_transition import record_decision, record_execution
+from .state_transition import (
+    apply_routed_task_type,
+    record_decision,
+    record_execution,
+)
 from .trace_recorder import TurnTraceRecorder
 from .validation import decision_rejection, outcome_violation, pre_loop_violation
 
@@ -243,6 +247,8 @@ class AgentHarness:
                 )
                 recorder.absorb(outcome)
                 break
+
+            state = apply_routed_task_type(state, decision)
 
             if decision.action == "safe_fallback":
                 fallback_reason = "router_requested_fallback"

@@ -7,13 +7,35 @@ from .trace_recorder import build_observation, call_signature
 from yelp_agent.session_memory.reducer import record_memory_observation
 
 
+def apply_routed_task_type(
+    state: AgentSession,
+    decision: AgentDecision,
+) -> AgentSession:
+    """Apply only a validated, enum-bounded Router task correction."""
+
+    task_type = decision.routed_task_type
+    if task_type is None or task_type == state.readiness.task_type:
+        return state
+    memory = state.memory
+    if memory is not None:
+        memory = memory.model_copy(update={"current_task_type": task_type})
+    return state.model_copy(
+        update={
+            "readiness": state.readiness.model_copy(update={"task_type": task_type}),
+            "memory": memory,
+        }
+    )
+
+
 def record_decision(state: AgentSession, decision: AgentDecision) -> AgentSession:
     """Record a Router choice that was rejected before execution."""
 
+    accounting = _router_accounting(state, decision)
     return state.model_copy(
         update={
             "action_history": state.action_history + [decision],
             "step_count": state.step_count + 1,
+            **accounting,
         }
     )
 
@@ -52,6 +74,13 @@ def record_execution(
         token_usage_observed = True
     if metadata is not None and metadata.cost_usd is not None:
         cost_usd += metadata.cost_usd
+    router = decision.router_trace
+    if router is not None and router.input_tokens is not None:
+        input_tokens += router.input_tokens
+        output_tokens += router.output_tokens or 0
+        turn_input_tokens += router.input_tokens
+        turn_output_tokens += router.output_tokens or 0
+        token_usage_observed = True
     signature = call_signature(state, decision)
     signatures = state.executed_call_signatures
     if signature is not None:
@@ -84,6 +113,7 @@ def record_execution(
             + int(decision.tool_name is not None),
             "semantic_call_count": state.semantic_call_count
             + int(decision.tool_kind == "semantic")
+            + int(router is not None and router.provider_called)
             + int(
                 outcome.model_result is not None
                 and outcome.model_result.provider_called
@@ -98,3 +128,32 @@ def record_execution(
             "cost_usd": cost_usd,
         }
     )
+
+
+def _router_accounting(
+    state: AgentSession,
+    decision: AgentDecision,
+) -> dict[str, object]:
+    trace = decision.router_trace
+    if trace is None:
+        return {}
+    input_tokens = state.input_tokens
+    output_tokens = state.output_tokens
+    turn_input_tokens = state.turn_input_tokens
+    turn_output_tokens = state.turn_output_tokens
+    observed = state.token_usage_observed
+    if trace.input_tokens is not None:
+        input_tokens += trace.input_tokens
+        output_tokens += trace.output_tokens or 0
+        turn_input_tokens += trace.input_tokens
+        turn_output_tokens += trace.output_tokens or 0
+        observed = True
+    return {
+        "semantic_call_count": state.semantic_call_count
+        + int(trace.provider_called),
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "turn_input_tokens": turn_input_tokens,
+        "turn_output_tokens": turn_output_tokens,
+        "token_usage_observed": observed,
+    }

@@ -1,0 +1,9 @@
+schema_version: 1
+agent_version: step35-constrained-llm-agent-v1
+budget:
+  max_steps: 12
+  max_tool_calls: 8
+  max_semantic_calls: 12
+  max_rag_calls: 2
+  max_total_tokens: 100000
+  timeout_ms: 180000

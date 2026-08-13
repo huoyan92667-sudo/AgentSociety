@@ -37,6 +37,7 @@ class ControlledLLMUsageLedger:
             "semantic_interpretation",
             "answer_composition",
             "memory_update",
+            "router_decision",
         ):
             rows = [item for item in self._traces if item.capability == capability]
             called = [item for item in rows if item.provider_called]

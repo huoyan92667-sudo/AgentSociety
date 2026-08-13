@@ -10,11 +10,14 @@ from yelp_agent.evidence_aggregation import (
     EvidenceAssessment,
     aggregation_query_facts,
 )
-from yelp_agent.query.schema import RequestCondition
 from yelp_agent.review_rag import ReviewSearchResult
 
 from ..errors import PermanentToolError
 from ..registry import ToolDefinition
+from ..request_context import (
+    query_text_from_tool_context,
+    request_conditions_from_tool_context,
+)
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import (
     AggregateReviewEvidenceInput,
@@ -64,23 +67,20 @@ class AggregateReviewEvidenceTool:
         search_result = _latest_review_search(context)
         if search_result.business_ids != arguments.business_ids:
             raise PermanentToolError("aggregation scope must match Review search scope")
-        request_payload = context.state_snapshot.get("request")
         readiness = context.state_snapshot.get("readiness")
-        if not isinstance(request_payload, dict) or not isinstance(readiness, dict):
+        if not isinstance(readiness, dict):
             raise PermanentToolError("visible request or readiness state is missing")
-        query_text = request_payload.get("query_text")
-        conditions = request_payload.get("conditions")
+        try:
+            query_text = query_text_from_tool_context(context)
+            conditions = request_conditions_from_tool_context(context)
+        except (TypeError, ValueError) as exc:
+            raise PermanentToolError(str(exc)) from None
         task_type = readiness.get("task_type")
-        if not isinstance(query_text, str) or not isinstance(task_type, str):
+        if not isinstance(task_type, str):
             raise PermanentToolError("query text or task type is missing")
-        parsed_conditions = [
-            RequestCondition.model_validate(value)
-            for value in conditions or []
-            if isinstance(value, dict)
-        ]
         aspects, polarity, explicit_uncertainty = aggregation_query_facts(
             query_text,
-            parsed_conditions,
+            conditions,
         )
         assessment = self._aggregator.aggregate(
             EvidenceAggregationRequest(

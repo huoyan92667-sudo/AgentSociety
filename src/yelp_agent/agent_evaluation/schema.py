@@ -40,6 +40,60 @@ class AgentActionTrace(StrictModel):
     action: AgentAction
     status: ActionStatus
     reason_code: str = Field(min_length=1, max_length=100)
+    router_decision: RouterDecisionTrace | None = None
+
+
+class RouterDecisionTrace(StrictModel):
+    """Sanitized accounting for one constrained Router decision."""
+
+    schema_version: Literal[1] = 1
+    router_kind: Literal[
+        "constrained_llm",
+        "single_choice_bypass",
+        "rule_fallback",
+    ]
+    status: Literal[
+        "success",
+        "skipped",
+        "disabled",
+        "provider_failure",
+        "invalid_output",
+        "low_confidence",
+    ]
+    allowed_choice_ids: list[str] = Field(default_factory=list)
+    proposed_choice_id: str | None = None
+    selected_choice_id: str = Field(min_length=1, max_length=100)
+    input_task_type: TaskType | None = None
+    selected_task_type: TaskType | None = None
+    selection_confidence: float | None = Field(default=None, ge=0, le=1)
+    model: str | None = None
+    provider_called: bool = False
+    cache_hit: bool = False
+    latency_ms: float = Field(default=0, ge=0)
+    attempt_count: int = Field(default=0, ge=0)
+    input_tokens: int | None = Field(default=None, ge=0)
+    output_tokens: int | None = Field(default=None, ge=0)
+    total_tokens: int | None = Field(default=None, ge=0)
+    failure_reason: str | None = None
+    call_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_router_trace(self) -> RouterDecisionTrace:
+        if len(self.allowed_choice_ids) != len(set(self.allowed_choice_ids)):
+            raise ValueError("allowed Router choice IDs must be unique")
+        if len(self.call_ids) != len(set(self.call_ids)):
+            raise ValueError("Router call IDs must be unique")
+        if (self.input_tokens is None) != (self.output_tokens is None):
+            raise ValueError("Router input and output tokens must appear together")
+        if (
+            self.total_tokens is not None
+            and self.input_tokens is not None
+            and self.total_tokens != self.input_tokens + self.output_tokens
+        ):
+            raise ValueError("Router total tokens must equal input plus output")
+        if self.router_kind == "constrained_llm" and not self.call_ids:
+            raise ValueError("model Router traces require at least one call ID")
+        return self
 
 
 class ClarificationQuestionTrace(StrictModel):

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 from yelp_agent.agent_harness import AgentHarness, load_agent_harness_config
 from yelp_agent.agent_tools import (
@@ -83,6 +83,10 @@ from yelp_agent.session_memory.runtime import (
 
 from .config import load_rule_router_config
 from .factory import build_rule_agent
+from .router import RuleRouter
+
+if TYPE_CHECKING:
+    from yelp_agent.constrained_llm_router import ConstrainedLLMRouterRuntime
 
 
 @dataclass(frozen=True, slots=True)
@@ -217,6 +221,7 @@ class RuleAgentRuntime:
         semantic_ranking: SemanticRankingEngine | None = None,
         query_retrieval: QueryCandidateRetriever | None = None,
         session_memory: SessionMemoryRuntime | None = None,
+        constrained_router: ConstrainedLLMRouterRuntime | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -229,6 +234,7 @@ class RuleAgentRuntime:
         self.semantic_ranking = semantic_ranking
         self.query_retrieval = query_retrieval
         self.session_memory = session_memory
+        self.constrained_router = constrained_router
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -258,6 +264,9 @@ class RuleAgentRuntime:
             close = getattr(self.session_memory, "close", None)
             if callable(close):
                 close()
+            close = getattr(self.constrained_router, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -276,6 +285,9 @@ def build_real_rule_agent_runtime(
     session_memory_config_path: str | Path | None = None,
     session_memory_environment: Mapping[str, str] | None = None,
     semantic_ranking_config_path: str | Path | None = None,
+    constrained_router_config_path: str | Path | None = None,
+    constrained_router_environment: Mapping[str, str] | None = None,
+    agent_harness_config_path: str | Path | None = None,
     query_retrieval_mode: Literal["config", "history_only"] = "config",
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
@@ -286,7 +298,9 @@ def build_real_rule_agent_runtime(
     item_knn_config = load_item_knn_config(sources.config_dir)
     business_config = load_business_profile_config(sources.config_dir)
     rule_config = load_rule_router_config(sources.rule_router_config)
-    harness_config = load_agent_harness_config(sources.agent_harness_config)
+    harness_config = load_agent_harness_config(
+        agent_harness_config_path or sources.agent_harness_config
+    )
     tool_config = load_agent_tool_runtime_config(sources.agent_tools_config)
     query_retrieval_config = load_query_retrieval_config(
         sources.config_dir / "query_retrieval.yaml"
@@ -336,6 +350,7 @@ def build_real_rule_agent_runtime(
     controlled_llm = None
     session_memory = None
     semantic_ranking = None
+    constrained_router = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -607,15 +622,63 @@ def build_real_rule_agent_runtime(
                     "max_semantic_calls": max(base_budget.max_semantic_calls, 3),
                 }
             )
+        display_limit = (
+            cross_policy.display_limit
+            if cross_policy is not None
+            else rule_config.display_limit
+        )
+        if constrained_router_config_path is not None:
+            from yelp_agent.constrained_llm_router import (
+                build_constrained_llm_router_runtime,
+                load_constrained_llm_router_config,
+            )
+
+            constrained_config = load_constrained_llm_router_config(
+                constrained_router_config_path
+            )
+            fallback_router = RuleRouter(
+                display_limit=display_limit,
+                semantic_enabled=embedding_match is not None,
+                semantic_candidate_limit=(
+                    semantic_config.candidate_limit
+                    if semantic_config is not None
+                    else 30
+                ),
+                fusion_alpha=(
+                    semantic_config.fusion_alpha
+                    if embedding_match is not None and semantic_config is not None
+                    else 0.0
+                ),
+                cross_encoder_enabled=cross_reranker is not None,
+                cross_encoder_candidate_limit=(
+                    cross_policy.candidate_limit if cross_policy is not None else 20
+                ),
+                cross_encoder_beta=(
+                    cross_policy.fusion_beta if cross_policy is not None else 0.0
+                ),
+                review_rag_enabled=review_search is not None,
+                evidence_aggregation_enabled=evidence_aggregator is not None,
+                semantic_ranking_enabled=semantic_ranking is not None,
+            )
+            constrained_router = build_constrained_llm_router_runtime(
+                project_root=sources.project_root,
+                config=constrained_config,
+                fallback_router=fallback_router,
+                environment=(
+                    constrained_router_environment or controlled_llm_environment
+                ),
+            )
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 12),
+                    "max_steps": max(base_budget.max_steps, 12),
+                }
+            )
         harness = build_rule_agent(
             registry=registry,
             fallback_handler=fallback_handler,
             budget=base_budget,
-            display_limit=(
-                cross_policy.display_limit
-                if cross_policy is not None
-                else rule_config.display_limit
-            ),
+            display_limit=display_limit,
             semantic_enabled=embedding_match is not None,
             semantic_candidate_limit=(
                 semantic_config.candidate_limit
@@ -655,8 +718,18 @@ def build_real_rule_agent_runtime(
                 if controlled_config is None
                 else controlled_config.answer.maximum_evidence_items
             ),
+            action_policy=(
+                None
+                if constrained_router is None
+                else constrained_router.action_policy
+            ),
+            router=(
+                None if constrained_router is None else constrained_router.router
+            ),
             agent_version=(
-                memory_config.memory_version
+                constrained_config.agent_version
+                if constrained_router is not None
+                else memory_config.memory_version
                 if session_memory is not None
                 else query_retrieval_config.agent_version
                 if query_retrieval is not None
@@ -695,6 +768,9 @@ def build_real_rule_agent_runtime(
         close = getattr(session_memory, "close", None)
         if callable(close):
             close()
+        close = getattr(constrained_router, "close", None)
+        if callable(close):
+            close()
         user_profiles.close()
         raise
     return RuleAgentRuntime(
@@ -709,4 +785,5 @@ def build_real_rule_agent_runtime(
         semantic_ranking=semantic_ranking,
         query_retrieval=query_retrieval,
         session_memory=session_memory,
+        constrained_router=constrained_router,
     )

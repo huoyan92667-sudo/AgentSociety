@@ -140,6 +140,11 @@ class TurnTraceRecorder:
                 action=decision.action,
                 status=status,
                 reason_code=reason_code or decision.reason_code,
+                router_decision=(
+                    None
+                    if decision.router_trace is None
+                    else decision.router_trace.model_copy()
+                ),
             )
         )
         return step_index

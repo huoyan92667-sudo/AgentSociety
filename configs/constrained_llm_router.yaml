@@ -1,0 +1,17 @@
+schema_version: 1
+agent_version: step35-constrained-llm-router-v1
+prompt_version: step35-router-v1
+enabled: true
+temperature: 0
+timeout_seconds: 90
+max_retries: 0
+max_output_tokens: 300
+thinking: disabled
+response_format_json: true
+cache_relative_path: runs/constrained_llm_router_v1/cache.sqlite3
+minimum_confidence: 0.60
+repair_invalid_output_once: true
+bypass_single_choice: true
+maximum_choices: 10
+tuning_split: development
+validation_used_for_selection: false

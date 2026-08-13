@@ -23,6 +23,7 @@ type LLMCapability = Literal[
     "semantic_interpretation",
     "answer_composition",
     "memory_update",
+    "router_decision",
 ]
 type ControlledLLMStatus = Literal[
     "success",

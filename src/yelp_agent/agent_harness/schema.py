@@ -14,9 +14,11 @@ from yelp_agent.agent_evaluation.schema import (
     ClarificationQuestionTrace,
     ResponseClaimTrace,
     RetrievedEvidenceTrace,
+    RouterDecisionTrace,
     ToolKind,
 )
 from yelp_agent.decision_readiness import DecisionReadiness
+from yelp_agent.decision_readiness.schema import TaskType
 from yelp_agent.models import StrictModel
 from yelp_agent.query import RecommendationRequest
 from yelp_agent.session_memory.schema import (
@@ -99,6 +101,8 @@ class AgentDecision(StrictModel):
     reason_code: str = Field(min_length=1, max_length=100)
     tool_name: str | None = Field(default=None, pattern=r"^[A-Z][A-Z0-9_]*$")
     tool_kind: ToolKind | None = None
+    routed_task_type: TaskType | None = None
+    router_trace: RouterDecisionTrace | None = None
 
     @model_validator(mode="after")
     def validate_tool_identity(self) -> AgentDecision:
