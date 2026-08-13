@@ -25,6 +25,12 @@ def main() -> None:
     parser.add_argument("--code-root", type=Path, default=Path.cwd())
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument(
+        "--router-kind",
+        choices=("constrained", "rule"),
+        default="constrained",
+        help="Change only the Router while keeping the complete runtime fixed.",
+    )
+    parser.add_argument(
         "--split", choices=("development", "validation", "all"), required=True
     )
     parser.add_argument("--limit", type=int, default=None)
@@ -93,7 +99,11 @@ def main() -> None:
         controlled_llm_config_path=_resolve(data_root, args.controlled_llm_config),
         semantic_ranking_config_path=_resolve(data_root, args.semantic_ranking_config),
         session_memory_config_path=_resolve(data_root, args.memory_config),
-        constrained_router_config_path=_resolve(code_root, args.router_config),
+        constrained_router_config_path=(
+            _resolve(code_root, args.router_config)
+            if args.router_kind == "constrained"
+            else None
+        ),
         agent_harness_config_path=_resolve(code_root, args.harness_config),
     ) as runtime:
         result = run_rule_agent_benchmark(
@@ -108,24 +118,29 @@ def main() -> None:
             runtime.controlled_llm.ledger.write(output / "answer_llm")
         if runtime.session_memory is not None:
             runtime.session_memory.ledger.write(output / "memory_llm")
-        if runtime.constrained_router is None:
-            raise RuntimeError("constrained Router runtime was not assembled")
-        runtime.constrained_router.ledger.write(output / "router_llm")
-        runs = load_agent_scenario_runs(result.runs_path)
-        router_metrics_path, router_summary_path = write_router_report(
-            runs, output / "router"
-        )
-        router_usage = json.loads(router_metrics_path.read_text(encoding="utf-8"))
-        _augment_router_metrics(result.runtime_metrics_path, router_usage)
-        _write_total_usage(output, runtime, router_usage)
+        if args.router_kind == "constrained":
+            if runtime.constrained_router is None:
+                raise RuntimeError("constrained Router runtime was not assembled")
+            runtime.constrained_router.ledger.write(output / "router_llm")
+            runs = load_agent_scenario_runs(result.runs_path)
+            router_metrics_path, router_summary_path = write_router_report(
+                runs, output / "router"
+            )
+            router_usage = json.loads(
+                router_metrics_path.read_text(encoding="utf-8")
+            )
+            _augment_router_metrics(result.runtime_metrics_path, router_usage)
+            _write_total_usage(output, runtime, router_usage)
+            print(f"router_metrics={router_metrics_path}")
+            print(f"router_summary={router_summary_path}")
+        else:
+            _write_total_usage(output, runtime, {})
         if args.baseline_root is not None:
             _write_comparison(
                 output,
                 _resolve(code_root, args.baseline_root),
                 result.metrics_path,
             )
-        print(f"router_metrics={router_metrics_path}")
-        print(f"router_summary={router_summary_path}")
     print(f"runs={result.runs_path}")
     print(f"metrics={result.metrics_path}")
 
@@ -215,10 +230,16 @@ def _write_comparison(output: Path, baseline: Path, current_metrics: Path) -> No
         "action_accuracy",
         "tool_selection_accuracy",
         "invalid_action_rate",
-        "unnecessary_question_rate",
         "direct_return_precision",
+        "missing_field_detection_precision",
+        "missing_field_detection_recall",
+        "unnecessary_question_rate",
         "fallback_rate",
         "valid_candidate_rate",
+        "business_scope_isolation_rate",
+        "citation_correctness",
+        "mean_latency_ms",
+        "p95_latency_ms",
     )
     comparison = {}
     for key in keys:

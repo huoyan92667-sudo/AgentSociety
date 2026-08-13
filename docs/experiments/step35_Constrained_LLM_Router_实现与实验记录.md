@@ -240,28 +240,152 @@ Trace 和报告写入可以完整运行。
 
 产物保存在 `runs/step35_no_api_smoke/`，运行产物默认被 Git 忽略。
 
-## 10. 20 / 500 场景真实 API 实验状态
+## 10. 真实 API development 实验与 V1.1 修复
 
-20 场景运行命令已经实现，但本次尝试被系统数据外发安全审查拦截。
-原因是完整实验会把真实 Yelp Benchmark 中的用户查询、Session 最终请求和
-候选状态摘要发送给外部 DeepSeek。合成冒烟已经获准并完成，真实 Yelp 内容
-尚未发送。
+用户已明确授权把 Benchmark 用户查询、`EffectiveSessionRequest` 和候选状态摘要
+发送给 DeepSeek。Router 输入仍不包含 Ground Truth、隐藏标签、完整评论正文、
+API Key 或认证 Header。
 
-继续运行需要用户对以下内容给出专项授权：
+第一版 20 场景实验暴露了两个工程问题：
 
-> 同意把 Yelp Benchmark 的用户查询、EffectiveSessionRequest 和候选状态摘要
-> 发送给 DeepSeek，用于 20 个 development 场景和正式 500 场景 Router 实验。
+1. 规则解析器误报 `ambiguous_reference` 后，代码只提供“追问”一个选项，LLM
+   实际被绕过；
+2. 规则漏掉显式条件冲突时，候选动作中没有“询问冲突”，LLM 即使理解冲突也
+   无法选择正确动作。
 
-获得该授权后执行顺序固定为：
+V1.1 增加了代码受控的信息缺口修正，并把 Router 调用收紧为“每个用户回合开始
+时至多调用一次”。模型确定本轮任务和是否需要追问后，召回、过滤、Embedding、
+Cross-Encoder、语义融合、详情读取和最终返回继续由代码执行。这样不是取消 LLM
+决策，而是避免在已经确定的工具链中重复付费。
 
-1. development 20 场景；
-2. 检查非法动作、任务修正、Fallback、Token 和延迟；
-3. 不修改 validation 标签或评分规则；
-4. 固定配置运行 development + validation 共 500 场景；
-5. 与相同工具和排序模块下的 Rule Router 基线比较；
-6. 把真实指标和错误案例追加到本文档。
+同一组 20 个 development 场景修复前后如下：
 
-## 11. 本步仍未解决的能力
+| 指标 | V1 | V1.1 | 变化 |
+|---|---:|---:|---:|
+| 失败场景数 | 4 | 0 | -4 |
+| Tool Selection Accuracy | 79.31% | 80.77% | +1.46 pp |
+| Direct Return Precision | 52.38% | 65.52% | +13.14 pp |
+| Missing-field Precision | 25.00% | 100.00% | +75.00 pp |
+| Missing-field Recall | 33.33% | 66.67% | +33.34 pp |
+| Unnecessary Question Rate | 75.00% | 0.00% | -75.00 pp |
+| 平均场景延迟 | 15.28 s | 4.65 s | -10.63 s |
+| Router Provider 调用 | 151 | 16 | -135 |
+| Router Token | 171,449 | 18,271 | -153,178（-89.34%） |
+| Router Rule Fallback | 4 | 0 | -4 |
+
+V1.1 development 中共有 30 个逻辑模型决策，其中 14 个命中缓存、16 个真实调用；
+其余 166 个确定性后续动作由单选项直接执行。
+
+## 11. 正式 500 场景实验
+
+### 11.1 实验范围、对照组和因果限制
+
+正式实验覆盖 500 个场景，其中 development 400、validation 100；脚本最多还会
+释放 250 个后续用户回合。Constrained 组和 Rule 组使用相同的：
+
+- Query/History 多路召回；
+- Hybrid V2 与 LightGBM 排序；
+- 本地 Qwen3 Embedding 与 Qwen3 Reranker；
+- Review RAG、Evidence Aggregator 和语义融合；
+- Top-5 展示、Session Memory 和 Harness 预算。
+
+目标上的核心差异是 Router。Rule 对照在 API Key 和 Base URL 被显式清空的情况下运行，
+Memory/回答只允许读取已经存在的 DeepSeek 缓存，未命中时按规则安全回退；因此
+对照组新增外部 Provider 调用和 Token 均为 0。这个对照避免再次外发未授权的新
+Memory/回答上下文，但应准确称为 **Rule Router + cache-only Memory/Answer**。
+
+它是当前授权边界内最接近同配置的可复现对照，但不是严格的单变量因果 A/B：不同
+Router 会走出不同轨迹，进而形成不同的 Memory/回答缓存键。Constrained 组在这些新
+轨迹上发生了 31 次 Memory 和 107 次回答 Provider 调用；Rule 组缓存未命中时不能
+在线补齐。因此下表可以说明完整系统的实际差异，但不能把每一点变化全部归因给
+Router 本身。严格单变量实验需要额外授权两组都在线调用，或预先冻结一套共享的
+Memory/Answer 输出。
+
+### 11.2 总体结果
+
+| 指标 | Rule | Constrained LLM | 差值 |
+|---|---:|---:|---:|
+| Action Accuracy | 69.11% | 69.56% | +0.44 pp |
+| Tool Selection Accuracy | 78.68% | 78.80% | +0.12 pp |
+| Invalid Action Rate | 20.66% | 17.83% | -2.83 pp |
+| Direct Return Precision | 52.66% | 65.06% | +12.40 pp |
+| Missing-field Precision | 33.33% | 73.13% | +39.80 pp |
+| Missing-field Recall | 48.75% | 61.25% | +12.50 pp |
+| Unnecessary Question Rate | 66.67% | 26.87% | -39.80 pp |
+| Question Answerability Rate | 33.33% | 73.13% | +39.80 pp |
+| Fallback Rate | 0.20% | 0.00% | -0.20 pp |
+| Business Scope Isolation | 92.63% | 96.09% | +3.46 pp |
+| Citation Correctness | 76.16% | 78.23% | +2.07 pp |
+| 平均场景延迟 | 2.69 s | 5.66 s | +2.97 s |
+| P95 场景延迟 | 7.88 s | 14.77 s | +6.90 s |
+
+Validation 100 场景没有用于修改提示词或阈值。其关键结果同样成立：Action Accuracy
+从 70.00% 到 70.56%，Direct Return Precision 从 50.49% 到 61.94%，不必要追问率
+从 63.64% 降到 16.67%，Missing-field Precision 从 36.36% 到 83.33%；平均延迟
+从 2.90 秒增加到 5.84 秒。
+
+### 11.3 多轮执行结果
+
+500 个首轮场景之外共有 250 个隐藏后续回合。Rule 只释放 125 个，释放率 50.0%；
+Constrained LLM 释放 231 个，释放率 92.4%。失败场景从 105 降到 35：
+
+| 失败类别 | Rule | Constrained LLM |
+|---|---:|---:|
+| Multi-turn feedback | 60 | 0 |
+| Information gap | 34 | 24 |
+| Hard constraint | 6 | 6 |
+| Candidate comparison | 5 | 5 |
+| 合计 | 105 | 35 |
+
+这说明 Constrained Router 的主要价值不是提高静态排序准确率，而是让 Agent 在多轮
+反馈中继续执行正确流程，不再因为规则误判而提前追问或停住。
+
+### 11.4 Router 调用与 Token
+
+正式 500 场景实际产生 731 个用户回合和 4,033 个 Agent 动作：
+
+- 模型逻辑决策 674 次；
+- 真实 Provider 调用 644 次，缓存命中 30 次；
+- 其余 3,359 个确定性动作单选项直接执行；
+- 任务类型修正 26 次，information gap 修正 166 次；
+- Router 非法输出、低置信度回退和 Rule Router 回退均为 0；
+- Router 输入 / 输出 / 总 Token：759,960 / 20,065 / 780,025；
+- Router 平均 Provider 延迟：1,020.53 ms；
+- 连同 Memory 和回答生成，正式实验已知总 Token 为 931,287；另有 1 次回答调用
+  无法取得 usage，因此真实值略高于该数字。
+
+从 Step 35 开始至本次正式实验，所有成功写出台账的真实 Yelp 运行和两次合成冒烟
+至少记录了 1,246,658 Token。一次中途异常的 4 场景运行只写入缓存、没有保存
+Token 台账，因此项目总消耗只能报告“至少”，不能伪造精确值。
+
+### 11.5 指标口径注意事项
+
+`repeated_tool_call_rate` 在 Constrained 组显示为 13.79%，但旧评测器跨用户回合只用
+“工具名 + 参数哈希”判断重复，没有包含本轮 request ID。多轮反馈合法地重新召回或
+重新排序时会被误报。Harness 的真实防循环签名包含 request ID，因此没有执行同一
+请求下的原地重复工具调用。该指标本轮不作为 Router 优劣结论。
+
+`valid_candidate_rate` 约 1% 也不能解释为只有 1% 的推荐合法。旧指标把当前全目录
+Query 召回结果与早期冻结的 20 个 `business_scope` 求交；两者不是同一个候选宇宙。
+真正的运行时越界应看 `business_scope_isolation_rate` 和 Harness scope validator。
+
+### 11.6 真实修复案例与剩余错误
+
+场景 `025a729b...` 的用户明确要求“必须是酒吧，同时排除所有酒吧，并先澄清冲突”。
+V1 直接召回并推荐；V1.1 选择 `ask_clarification(CONSTRAINT_CONFLICT)`，用户回答
+“保留 Bars、去掉排除条件”后恢复召回和推荐。
+
+场景 `01cf800f...`、`05d0378e...` 和 `0a7ccc3d...` 包含“更便宜、再近一点、不要
+连锁店”等连续反馈。V1 会在中途把相对反馈误判成模糊指代；V1.1 均走完 4 轮，
+每一轮先由模型确定任务，后续工具链由代码执行。
+
+剩余 35 个失败中，典型问题是规则解析器先写入 `missing_party_size`，而 V1.1 只允许
+模型安全覆盖“有上一轮推荐时的 ambiguous_reference”和显式冲突，其他缺口仍是
+代码硬门。另有少数冻结标签本身可疑，例如用户已经说“每人不能超过 30 美元”，
+Ground Truth 仍要求 `missing_budget`。这些案例必须在后续 Benchmark V3 审核中
+单独修正，不能通过迎合错误标签来调 Router。
+
+## 12. 本步仍未解决的能力
 
 Constrained LLM Router 解决的是“下一步做什么”和“当前属于什么任务”，
 并不等于所有理解结果已经转化为候选分数。
@@ -270,6 +394,8 @@ Constrained LLM Router 解决的是“下一步做什么”和“当前属于什
 
 - 查询参考商家的真实价格、距离、安静程度；
 - 把“比第一家更便宜/更近/更安静”变成候选级强特征或过滤条件；
-- 在完整 500 场景实验后分析哪些错误来自 Router，哪些来自召回和排序；
+- Agent Benchmark 的动作正确性仍不能代替 Query Recommendation Benchmark 的
+  最终商家相关性、HR@1/3/5/10 和 query-conditioned compliance；
+- 需要把 Router 错误、语义解析错误、召回失败和排序失败进一步分层归因；
 - Cost-aware Router：简单状态优先规则，只有真正歧义时才调用 LLM；
 - 后续 Learned Router / Agentic RL 只能在稳定 Trace 和可靠 Benchmark 上进行。
