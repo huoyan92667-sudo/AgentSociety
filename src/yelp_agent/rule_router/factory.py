@@ -14,6 +14,8 @@ from yelp_agent.controlled_llm import (
     ControlledSemanticEnhancer,
     GroundedAnswerComposer,
 )
+from yelp_agent.session_memory.integration import MemoryAwareRequestInterpreter
+from yelp_agent.session_memory.manager import SessionMemoryManager
 
 from .policy import RuleBasedActionPolicy
 from .router import RuleRouter
@@ -37,6 +39,7 @@ def build_rule_agent(
     evidence_aggregation_enabled: bool = False,
     semantic_ranking_enabled: bool = False,
     semantic_enhancer: ControlledSemanticEnhancer | None = None,
+    session_memory_manager: SessionMemoryManager | None = None,
     answer_composer: GroundedAnswerComposer | None = None,
     answer_evidence_limit: int = 12,
     clock: Clock | None = None,
@@ -46,7 +49,9 @@ def build_rule_agent(
     return AgentHarness(
         agent_version=agent_version,
         interpreter=(
-            ControlledRequestInterpreter(semantic_enhancer)
+            MemoryAwareRequestInterpreter(session_memory_manager)
+            if session_memory_manager is not None
+            else ControlledRequestInterpreter(semantic_enhancer)
             if semantic_enhancer is not None
             else RuleBasedRequestInterpreter()
         ),

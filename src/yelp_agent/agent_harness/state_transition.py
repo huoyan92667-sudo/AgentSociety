@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .schema import ActionOutcome, AgentDecision, AgentSession
 from .trace_recorder import build_observation, call_signature
+from yelp_agent.session_memory.reducer import record_memory_observation
 
 
 def record_decision(state: AgentSession, decision: AgentDecision) -> AgentSession:
@@ -55,11 +56,22 @@ def record_execution(
     signatures = state.executed_call_signatures
     if signature is not None:
         signatures = signatures + [signature]
+    memory = record_memory_observation(
+        state.memory,
+        turn_index=state.current_turn,
+        business_scope=outcome.business_scope,
+        presented_business_ids=(
+            outcome.recommended_business_ids
+            if outcome.response_kind == "recommendation"
+            else None
+        ),
+    )
     return state.model_copy(
         update={
             "action_history": state.action_history + [decision],
             "observations": observations,
             "executed_call_signatures": signatures,
+            "memory": memory,
             "business_scope": (
                 state.business_scope
                 if outcome.business_scope is None

@@ -75,6 +75,11 @@ from yelp_agent.semantic_ranking import (
     load_semantic_ranking_config,
     load_semantic_ranking_policy,
 )
+from yelp_agent.session_memory.config import load_session_memory_config
+from yelp_agent.session_memory.runtime import (
+    SessionMemoryRuntime,
+    build_session_memory_runtime,
+)
 
 from .config import load_rule_router_config
 from .factory import build_rule_agent
@@ -211,6 +216,7 @@ class RuleAgentRuntime:
         controlled_llm: ControlledLLMRuntime | None = None,
         semantic_ranking: SemanticRankingEngine | None = None,
         query_retrieval: QueryCandidateRetriever | None = None,
+        session_memory: SessionMemoryRuntime | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -222,6 +228,7 @@ class RuleAgentRuntime:
         self.controlled_llm = controlled_llm
         self.semantic_ranking = semantic_ranking
         self.query_retrieval = query_retrieval
+        self.session_memory = session_memory
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -248,6 +255,9 @@ class RuleAgentRuntime:
             close = getattr(self.controlled_llm, "close", None)
             if callable(close):
                 close()
+            close = getattr(self.session_memory, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -263,6 +273,8 @@ def build_real_rule_agent_runtime(
     evidence_aggregation_config_path: str | Path | None = None,
     controlled_llm_config_path: str | Path | None = None,
     controlled_llm_environment: Mapping[str, str] | None = None,
+    session_memory_config_path: str | Path | None = None,
+    session_memory_environment: Mapping[str, str] | None = None,
     semantic_ranking_config_path: str | Path | None = None,
     query_retrieval_mode: Literal["config", "history_only"] = "config",
 ) -> RuleAgentRuntime:
@@ -322,6 +334,7 @@ def build_real_rule_agent_runtime(
     review_encoder = None
     review_store = None
     controlled_llm = None
+    session_memory = None
     semantic_ranking = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
@@ -512,6 +525,15 @@ def build_real_rule_agent_runtime(
                 config=query_retrieval_config,
             )
             dual_channel_fusion = DualChannelFusion(query_retrieval_config)
+        if session_memory_config_path is not None:
+            memory_config = load_session_memory_config(session_memory_config_path)
+            session_memory = build_session_memory_runtime(
+                project_root=sources.project_root,
+                config=memory_config,
+                environment=(
+                    session_memory_environment or controlled_llm_environment
+                ),
+            )
         registry = build_step23_tool_registry(
             user_profiles=user_profiles,
             business_profiles=business_profiles,
@@ -572,6 +594,12 @@ def build_real_rule_agent_runtime(
                     "max_semantic_calls": max(base_budget.max_semantic_calls, 4),
                 }
             )
+        if session_memory is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 4),
+                }
+            )
         if semantic_ranking is not None:
             base_budget = base_budget.model_copy(
                 update={
@@ -614,6 +642,9 @@ def build_real_rule_agent_runtime(
                 if controlled_llm is None
                 else controlled_llm.semantic_enhancer
             ),
+            session_memory_manager=(
+                None if session_memory is None else session_memory.manager
+            ),
             answer_composer=(
                 None
                 if controlled_llm is None
@@ -625,7 +656,9 @@ def build_real_rule_agent_runtime(
                 else controlled_config.answer.maximum_evidence_items
             ),
             agent_version=(
-                query_retrieval_config.agent_version
+                memory_config.memory_version
+                if session_memory is not None
+                else query_retrieval_config.agent_version
                 if query_retrieval is not None
                 else semantic_ranking_config.agent_version
                 if semantic_ranking is not None
@@ -659,6 +692,9 @@ def build_real_rule_agent_runtime(
         close = getattr(controlled_llm, "close", None)
         if callable(close):
             close()
+        close = getattr(session_memory, "close", None)
+        if callable(close):
+            close()
         user_profiles.close()
         raise
     return RuleAgentRuntime(
@@ -672,4 +708,5 @@ def build_real_rule_agent_runtime(
         controlled_llm=controlled_llm,
         semantic_ranking=semantic_ranking,
         query_retrieval=query_retrieval,
+        session_memory=session_memory,
     )

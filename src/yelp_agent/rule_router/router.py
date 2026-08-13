@@ -57,11 +57,14 @@ class RuleRouter:
             )
         if facts.task_type in {"recommendation_request", "feedback_refinement"}:
             if facts.task_type == "feedback_refinement" and not facts.feedback_applied:
-                rejected = (
-                    facts.previous_recommended_business_ids[:1]
-                    if facts.reject_previous_recommendation
-                    else []
-                )
+                rejected = [
+                    business_id
+                    for business_id in facts.rejected_business_ids
+                    if not facts.business_scope_known
+                    or business_id in facts.candidate_ids
+                ]
+                if not rejected and facts.reject_previous_recommendation:
+                    rejected = facts.previous_recommended_business_ids[:1]
                 return AgentDecision(
                     action="apply_feedback",
                     arguments={"rejected_business_ids": rejected},

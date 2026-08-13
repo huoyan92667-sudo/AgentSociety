@@ -15,6 +15,7 @@ from yelp_agent.agent_harness.schema import (
 
 from .registry import AgentToolRegistry
 from .schema import ToolExecutionContext, ToolObservation
+from yelp_agent.session_memory.context import compact_memory
 
 
 class RegistryActionExecutor:
@@ -81,7 +82,7 @@ class RegistryActionExecutor:
 
     @staticmethod
     def _visible_snapshot(state: AgentSession) -> dict[str, Any]:
-        return {
+        snapshot = {
             "scenario_id": state.scenario_id,
             "session_id": state.session_id,
             "split": state.split,
@@ -92,6 +93,11 @@ class RegistryActionExecutor:
             "readiness": state.readiness.model_dump(mode="json"),
             "observations": [item.model_dump(mode="json") for item in state.observations],
         }
+        if state.memory is not None:
+            snapshot["memory_context"] = compact_memory(state.memory).model_dump(
+                mode="json"
+            )
+        return snapshot
 
     @staticmethod
     def _to_outcome(

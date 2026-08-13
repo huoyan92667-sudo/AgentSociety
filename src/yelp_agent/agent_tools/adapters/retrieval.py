@@ -84,8 +84,9 @@ class ExpandCandidatesTool:
             history_count=len(history),
         )
         result = self._retriever.retrieve(task, include_route_provenance=True)
+        rejected = self._rejected_business_ids(context)
         if self._query_retriever is None or self._dual_fusion is None:
-            return self._history_observation(result)
+            return self._history_observation(result, rejected_business_ids=rejected)
         try:
             request = self._request(context)
             query = self._query_retriever.retrieve(
@@ -100,11 +101,14 @@ class ExpandCandidatesTool:
                 result,
                 retrieval_mode="history_fallback",
                 warnings=[f"QUERY_RETRIEVAL_FALLBACK:{type(exc).__name__}"],
+                rejected_business_ids=rejected,
             )
         history_by_id = {item.business_id: item for item in result.candidates}
         query_by_id = {item.business_id: item for item in query.candidates}
         rows = []
         for item in dual.candidates:
+            if item.business_id in rejected:
+                continue
             history_item = history_by_id.get(item.business_id)
             query_item = query_by_id.get(item.business_id)
             row = (
@@ -156,6 +160,7 @@ class ExpandCandidatesTool:
             "query_pre_cutoff_business_count": query.pre_cutoff_business_count,
             "query_eligible_business_count": query.eligible_business_count,
             "query_warnings": query.warnings,
+            "excluded_session_rejections": len(rejected),
         }
         if not rows:
             return ToolObservation(
@@ -187,9 +192,13 @@ class ExpandCandidatesTool:
         *,
         retrieval_mode: str = "history_only",
         warnings: list[str] | None = None,
+        rejected_business_ids: set[str] | None = None,
     ) -> ToolObservation:
+        rejected = rejected_business_ids or set()
         rows = []
         for candidate in result.candidates:
+            if candidate.business_id in rejected:
+                continue
             row = asdict(candidate)
             row.update(
                 {
@@ -209,6 +218,7 @@ class ExpandCandidatesTool:
             "retrieval_mode": retrieval_mode,
             "history_candidate_count": len(rows),
             "query_warnings": warnings or [],
+            "excluded_session_rejections": len(rejected),
         }
         if not rows:
             return ToolObservation(
@@ -240,6 +250,16 @@ class ExpandCandidatesTool:
                 if key in RecommendationRequest.model_fields
             }
         )
+
+    @staticmethod
+    def _rejected_business_ids(context: ToolExecutionContext) -> set[str]:
+        memory = context.state_snapshot.get("memory_context")
+        if not isinstance(memory, dict):
+            return set()
+        values = memory.get("rejected_business_ids")
+        if not isinstance(values, list):
+            return set()
+        return {str(value) for value in values if isinstance(value, str)}
 
     @staticmethod
     def _query_fields(

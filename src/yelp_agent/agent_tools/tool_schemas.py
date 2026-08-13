@@ -21,6 +21,7 @@ from yelp_agent.cross_encoder.schema import (
 from yelp_agent.review_rag.schema import ReviewSearchResult
 from yelp_agent.evidence_aggregation.schema import EvidenceAssessment
 from yelp_agent.semantic_ranking import SemanticRankingResult
+from yelp_agent.session_memory.schema import RouterMemoryContext
 
 
 class EmptyToolInput(StrictModel):
@@ -35,6 +36,7 @@ class SessionMemoryOutput(StrictModel):
     session_id: str = Field(min_length=1)
     turn_index: int = Field(ge=1)
     observations: list[dict[str, Any]]
+    memory_context: RouterMemoryContext | None = None
 
 
 class BusinessIdsInput(StrictModel):
@@ -133,6 +135,7 @@ class CandidateRetrievalOutput(StrictModel):
     query_pre_cutoff_business_count: int = Field(default=0, ge=0)
     query_eligible_business_count: int = Field(default=0, ge=0)
     query_warnings: list[str] = Field(default_factory=list)
+    excluded_session_rejections: int = Field(default=0, ge=0)
 
 
 class ExcludedBusiness(StrictModel):

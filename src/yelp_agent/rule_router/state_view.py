@@ -64,6 +64,7 @@ class RouteFacts(StrictModel):
     feedback_applied: bool
     reject_previous_recommendation: bool
     previous_recommended_business_ids: list[str]
+    rejected_business_ids: list[str]
     hard_constraints_required: bool
     referenced_business_ids: list[str]
     business_scope_known: bool
@@ -124,7 +125,11 @@ class RouteFacts(StrictModel):
         """Hide request, readiness, scope, and accounting representation details."""
 
         tools = _normalized_tools(state.observations)
-        retrieval = _latest_tool(tools, "EXPAND_CANDIDATES")
+        retrieval = _latest_tool(
+            tools,
+            "EXPAND_CANDIDATES",
+            turn_index=(state.current_turn if state.memory is not None else None),
+        )
         constraint_filter = _latest_tool(
             tools,
             "APPLY_CONSTRAINTS",
@@ -259,6 +264,11 @@ class RouteFacts(StrictModel):
                 state.request.query_text
             ),
             previous_recommended_business_ids=previous_recommended,
+            rejected_business_ids=(
+                []
+                if state.memory is None
+                else list(state.memory.rejected_business_ids)
+            ),
             hard_constraints_required=bool(state.request.hard_constraints),
             referenced_business_ids=list(state.request.referenced_business_ids),
             business_scope_known=state.business_scope_known,

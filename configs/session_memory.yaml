@@ -1,0 +1,17 @@
+schema_version: 1
+memory_version: step34-unified-memory-v1
+enabled: true
+prompt_version: step34-memory-proposal-v1
+temperature: 0
+timeout_seconds: 90
+max_retries: 2
+max_output_tokens: 1200
+thinking: disabled
+response_format_json: true
+cache_relative_path: runs/session_memory_v1/cache.sqlite3
+call_mode: followups_only
+rule_fallback_enabled: true
+minimum_task_type_confidence: 0.75
+minimum_patch_confidence: 0.65
+max_recent_turns: 8
+max_presented_sets: 5

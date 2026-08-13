@@ -86,8 +86,17 @@ class AgentHarness:
             cutoff_time=scenario.cutoff_time,
             request=interpretation.request,
             readiness=interpretation.readiness,
+            memory=interpretation.memory,
             budget=self._budget,
             semantic_call_count=interpretation.semantic_calls,
+            memory_provider_call_count=int(
+                interpretation.memory_extraction is not None
+                and interpretation.memory_extraction.provider_called
+            ),
+            memory_fallback_count=int(
+                interpretation.memory_extraction is not None
+                and interpretation.memory_extraction.status == "rule_fallback"
+            ),
             input_tokens=interpretation.input_tokens or 0,
             output_tokens=interpretation.output_tokens or 0,
             turn_input_tokens=interpretation.input_tokens or 0,
@@ -143,6 +152,7 @@ class AgentHarness:
                 "status": "running",
                 "request": interpretation.request,
                 "readiness": interpretation.readiness,
+                "memory": interpretation.memory,
                 "available_actions": [],
                 # Step/tool/model limits are per user turn. Durable traces keep
                 # session-wide accounting for evaluation without preventing a
@@ -150,6 +160,16 @@ class AgentHarness:
                 "step_count": 0,
                 "tool_call_count": 0,
                 "semantic_call_count": interpretation.semantic_calls,
+                "memory_provider_call_count": session.memory_provider_call_count
+                + int(
+                    interpretation.memory_extraction is not None
+                    and interpretation.memory_extraction.provider_called
+                ),
+                "memory_fallback_count": session.memory_fallback_count
+                + int(
+                    interpretation.memory_extraction is not None
+                    and interpretation.memory_extraction.status == "rule_fallback"
+                ),
                 "rag_call_count": 0,
                 "input_tokens": session.input_tokens
                 + (interpretation.input_tokens or 0),

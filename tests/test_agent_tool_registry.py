@@ -324,7 +324,42 @@ def test_session_memory_tool_returns_only_visible_prior_observations() -> None:
         "session_id": "session-1",
         "turn_index": 2,
         "observations": [{"payload": {"candidate_business_ids": ["b1"]}}],
+        "memory_context": None,
     }
+
+
+def test_session_memory_tool_prefers_compact_authoritative_context() -> None:
+    registry = AgentToolRegistry([GetSessionMemoryTool()])
+    context = _context().model_copy(
+        update={
+            "action": "apply_feedback",
+            "state_snapshot": {
+                "session_id": "session-1",
+                "turn_index": 2,
+                "observations": [{"payload": {"large": "legacy"}}],
+                "memory_context": {
+                    "revision": 2,
+                    "task_type": "feedback_refinement",
+                    "hard_constraints": [],
+                    "soft_preferences": [],
+                    "information_gaps": [],
+                    "rejected_business_ids": ["b1"],
+                    "last_presented_business_ids": ["b1", "b2"],
+                    "current_business_scope": ["b1", "b2"],
+                    "business_scope_known": True,
+                    "clarification_answers": {},
+                    "semantic_summary": "Find another restaurant.",
+                    "recent_turn_summaries": ["turn=2; task=feedback_refinement"],
+                },
+            },
+        }
+    )
+
+    result = registry.execute("GET_SESSION_MEMORY", {}, context)
+
+    assert result.status == "success"
+    assert result.data["observations"] == []
+    assert result.data["memory_context"]["rejected_business_ids"] == ["b1"]
 
 
 class _BusinessStoreThatMustNotRun:

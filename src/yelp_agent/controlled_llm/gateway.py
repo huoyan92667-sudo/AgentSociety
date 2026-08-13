@@ -70,6 +70,10 @@ class ControlledJSONCaller:
                     "model": model_name,
                     "prompt_version": prompt_version,
                     "prompt_sha256": prompt_hash,
+                    # The validated response is specific to both the prompt and
+                    # the visible input. Omitting this hash would incorrectly
+                    # reuse one user's memory proposal for another user.
+                    "input_sha256": input_hash,
                 }
             )
         )

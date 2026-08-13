@@ -19,6 +19,10 @@ from yelp_agent.agent_evaluation.schema import (
 from yelp_agent.decision_readiness import DecisionReadiness
 from yelp_agent.models import StrictModel
 from yelp_agent.query import RecommendationRequest
+from yelp_agent.session_memory.schema import (
+    MemoryExtractionTrace,
+    SessionMemory,
+)
 
 type HarnessStatus = Literal["running", "awaiting_user", "completed", "fallback"]
 type OutcomeStatus = Literal["completed", "failed"]
@@ -71,6 +75,8 @@ class TurnInterpretation(StrictModel):
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
     cost_usd: float | None = Field(default=None, ge=0)
+    memory: SessionMemory | None = None
+    memory_extraction: MemoryExtractionTrace | None = None
 
     @model_validator(mode="after")
     def validate_usage(self) -> TurnInterpretation:
@@ -80,6 +86,8 @@ class TurnInterpretation(StrictModel):
             value is not None for value in (self.input_tokens, self.cost_usd)
         ):
             raise ValueError("rule-only interpretation cannot report model usage")
+        if (self.memory is None) != (self.memory_extraction is None):
+            raise ValueError("memory and memory extraction trace must appear together")
         return self
 
 
@@ -213,6 +221,7 @@ class AgentSession(StrictModel):
     status: HarnessStatus = "running"
     request: RecommendationRequest
     readiness: DecisionReadiness
+    memory: SessionMemory | None = None
     available_actions: list[AgentAction] = Field(default_factory=list)
     observations: list[AgentObservation] = Field(default_factory=list)
     action_history: list[AgentDecision] = Field(default_factory=list)
@@ -224,6 +233,8 @@ class AgentSession(StrictModel):
     step_count: int = Field(default=0, ge=0)
     tool_call_count: int = Field(default=0, ge=0)
     semantic_call_count: int = Field(default=0, ge=0)
+    memory_provider_call_count: int = Field(default=0, ge=0)
+    memory_fallback_count: int = Field(default=0, ge=0)
     rag_call_count: int = Field(default=0, ge=0)
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
@@ -236,6 +247,19 @@ class AgentSession(StrictModel):
     started_at_ms: float = Field(ge=0)
     elapsed_ms: float = Field(default=0, ge=0)
     fallback_reason: str | None = None
+
+    @model_validator(mode="after")
+    def validate_memory_alignment(self) -> Self:
+        if self.memory is not None:
+            if self.memory.session_id != self.session_id:
+                raise ValueError("Agent session and memory session must align")
+            if self.memory.user_id != self.user_id:
+                raise ValueError("Agent session and memory user must align")
+            if self.memory.cutoff_time != self.cutoff_time:
+                raise ValueError("Agent session and memory cutoff must align")
+            if self.memory.current_request.request_id != self.request.request_id:
+                raise ValueError("Agent request must be the canonical memory request")
+        return self
 
     @field_validator("executed_call_signatures")
     @classmethod

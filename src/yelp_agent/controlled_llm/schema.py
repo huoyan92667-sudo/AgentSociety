@@ -19,7 +19,11 @@ from yelp_agent.query.schema import (
     RequirementImportance,
 )
 
-type LLMCapability = Literal["semantic_interpretation", "answer_composition"]
+type LLMCapability = Literal[
+    "semantic_interpretation",
+    "answer_composition",
+    "memory_update",
+]
 type ControlledLLMStatus = Literal[
     "success",
     "skipped",

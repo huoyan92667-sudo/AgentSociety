@@ -27,12 +27,22 @@ class GetSessionMemoryTool:
     ) -> ToolObservation:
         del arguments
         snapshot = context.state_snapshot
+        memory_context = snapshot.get("memory_context")
         return ToolObservation.success(
             tool_name=self.definition.name,
             data={
                 "session_id": str(snapshot.get("session_id") or "unknown-session"),
                 "turn_index": int(snapshot.get("turn_index") or 1),
-                "observations": list(snapshot.get("observations") or []),
+                # Canonical memory replaces the old unbounded observation dump.
+                # Legacy sessions without Step 34 keep the previous behavior.
+                "observations": (
+                    []
+                    if isinstance(memory_context, dict)
+                    else list(snapshot.get("observations") or [])
+                ),
+                "memory_context": (
+                    memory_context if isinstance(memory_context, dict) else None
+                ),
             },
             confidence=1.0,
         )

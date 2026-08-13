@@ -33,7 +33,11 @@ class ControlledLLMUsageLedger:
         known = [item for item in provider if item.total_tokens is not None]
         unknown = [item for item in provider if item.usage_unknown]
         by_capability: dict[str, dict[str, object]] = {}
-        for capability in ("semantic_interpretation", "answer_composition"):
+        for capability in (
+            "semantic_interpretation",
+            "answer_composition",
+            "memory_update",
+        ):
             rows = [item for item in self._traces if item.capability == capability]
             called = [item for item in rows if item.provider_called]
             by_capability[capability] = {
