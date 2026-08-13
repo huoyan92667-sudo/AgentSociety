@@ -114,7 +114,49 @@ Session 的 `cutoff_time` 固定不可修改。Memory Manager、引用解析器�
 
 这组数据的作用是证明纯规则的下限和短板。任务类型及新增条件只有约一半，说明第34步采用 LLM-first 语义抽取是必要的。
 
-没有直接执行250回合真实 API 全量实验：按最后一次冒烟粗略估算约需 `250 × 2882 ≈ 720,500` Token，并产生约12分钟的纯 API 等待时间。这会明显消耗用户额度。完整运行入口已经提供，用户明确决定消耗额度后可执行：
+## 7. 250回合 DeepSeek 全量实验
+
+在用户明确授权消耗 API 额度后，使用冻结的 `step34-memory-proposal-v1` Prompt、`deepseek-v4-flash`、`thinking=disabled` 和安全 Reducer，对全部250个后续用户回合执行了一次正式实验。运行过程中没有根据 validation 标签修改 Prompt、Schema 或规则。
+
+### 7.1 总体结果
+
+| 指标 | Rule baseline | DeepSeek + 安全 Reducer | 差值 |
+|---|---:|---:|---:|
+| 多轮脚本数 | 250 | 250 | 0 |
+| 任务类型准确率 | 45.60% | 95.60% | +50.00pp |
+| 信息缺口完全匹配 | 98.00% | 54.80% | -43.20pp |
+| 新增条件召回率 | 52.00% | 52.00% | 0.00pp |
+| 拒绝商家召回率 | 100.00% | 99.60% | -0.40pp |
+| 引用范围合法率 | 100.00% | 100.00% | 0.00pp |
+| Rule fallback rate | 100.00% | 8.00% | -92.00pp |
+
+DeepSeek 显著改善了任务类型识别，说明它确实能够理解“继续推荐、修改条件、追问详情”等多轮语义。引用范围合法率仍为100%，说明 LLM-first 没有绕过业务范围校验。
+
+### 7.2 Development 与 Validation
+
+| Split | 回合数 | 任务类型准确率 | 信息缺口完全匹配 | 新增条件召回率 | 拒绝商家召回率 | 引用合法率 | Rule fallback |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| development | 200 | 95.00% | 54.00% | 52.00% | 100.00% | 100.00% | 9.00% |
+| validation | 50 | 98.00% | 58.00% | 52.00% | 98.00% | 100.00% | 4.00% |
+
+Validation 只运行并报告一次，没有根据其结果反向调参。
+
+### 7.3 调用量与可靠性
+
+- 逻辑调用：250次；真实 Provider 调用：250次；缓存命中：0次。
+- 成功结构化输出：230次；非法结构化输出：20次；成功率92.00%。
+- 20次失败全部安全转入 Rule fallback，没有中断批处理，也没有清空旧记忆。
+- 失败原因：14次引用字段校验失败、5次条件值校验失败、1次条件操作符校验失败。
+- 输入 Token：674,294；输出 Token：55,233；合计729,527 Token。
+- 平均 Provider 延迟：1,753.29 ms；端到端全量运行耗时约448.2秒。
+
+### 7.4 当前指标口径限制
+
+`新增条件召回率` 没有随 DeepSeek 提升，不能简单解释为模型没有理解新增要求。现有隐藏脚本会把“便宜一点”标成 `price_level <= 2`，把“近一点”标成 `distance_km <= 3`；但这些精确数字并没有出现在用户原话中。第34步的安全策略会把它们保存为 `price=lower`、`distance=closer`，并拒绝模型凭空生成2或3。旧评测器只比较精确 `conditions`，没有给正确的 `relative_preferences` 计分，因此这个指标低估了安全记忆更新能力。
+
+`信息缺口完全匹配` 的下降也表明现有隐藏脚本、任务类型定义与新的多轮记忆语义没有完全对齐。后续应在不查看 validation 答案调规则的前提下，为 development 增加：相对偏好召回率、数值防编造率、任务类型与信息缺口联合一致性，并重新审计隐藏 `state_updates` 是否向评测器提供了 Agent 实际不可见的信息。
+
+全量运行命令为：
 
 ```powershell
 python scripts/run_step34_memory_benchmark.py --mode api --env-file <你的.env路径>
@@ -122,7 +164,9 @@ python scripts/run_step34_memory_benchmark.py --mode api --env-file <你的.env�
 
 如果需要把记忆接入完整的 Query 召回、Hybrid/LightGBM、Embedding、Cross-Encoder、Review RAG 和回答链路，可使用 `scripts/run_step34_agent_benchmark.py`。该脚本支持 `--limit` 先做小样本，并分别保存 Memory LLM 与回答 LLM 的用量。
 
-## 7. 主要代码
+原始逐回合文件保存在本地 `runs/session_memory_v1/api_full/`。`runs/` 按仓库规则不提交，避免提交大体积运行日志和 Provider 请求标识；可复现的汇总结果保存在本文档中。
+
+## 8. 主要代码
 
 - `src/yelp_agent/session_memory/schema.py`：Proposal、正式记忆和压缩上下文 Schema。
 - `extractor.py`：DeepSeek 与规则回退 Adapter。
@@ -134,7 +178,7 @@ python scripts/run_step34_memory_benchmark.py --mode api --env-file <你的.env�
 - `configs/session_memory.yaml`：调用与预算配置。
 - `scripts/run_step34_agent_benchmark.py`：完整 Agent 多轮运行入口。
 
-## 8. 与后续步骤的关系
+## 9. 与后续步骤的关系
 
 - 第35步 LLM Router 读取 `RouterMemoryContext`，决定下一步动作；它不能直接改正式记忆。
 - 第35步应把 `relative_preferences` 交给 Query-aware ranking，使“更近、便宜一点”等相对要求直接改变排序。
