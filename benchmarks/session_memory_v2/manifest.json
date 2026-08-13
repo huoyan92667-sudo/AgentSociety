@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "benchmark_version": "session-memory-benchmark-v2",
+  "session_count": 200,
+  "turn_count": 500,
+  "split_counts": {
+    "development": 400,
+    "validation": 100
+  },
+  "language_counts": {
+    "en-US": 200,
+    "zh-CN": 300
+  },
+  "family_counts": {
+    "clarification_answer": 20,
+    "combined_update": 50,
+    "conflict_resolution": 20,
+    "explicit_condition": 200,
+    "no_state_change": 30,
+    "reference_rejection": 70,
+    "relative_preference": 110
+  },
+  "generator_model": "deepseek-v4-flash",
+  "reviewer_model": "deepseek-v4-flash",
+  "source_run_sha256": "a05fea9743b91bdf46de4cd8dbc1bb25b3630bbb7d1fec647b9b703d3ecd750f",
+  "output_sha256": {
+    "visible_initial_sessions": "cf092308a331155e02b3fa41cf8b6ff5fc7dc43e35a46b6f70be64b3d28dbe51",
+    "visible_scripted_turns": "3b629c5a5187ec760695ccf54c93000d36261bbb7649bb394bf0fef863a10636",
+    "visible_frozen_presentations": "e2abdae6ff95c311cceda4919a7c34a7634ec9c313925b16e7e3ebafc1e171a4",
+    "hidden_ground_truth": "313917a3521487ed72f5bd42df64930dec9aee8312a58361ba310115ceef9a8c",
+    "audit_report": "bfdceab9a59a0e2ba134420a069c6fe8a7bb1cf73a7620e90ea1232b6e722e21"
+  },
+  "generation_input_tokens": 84665,
+  "generation_output_tokens": 29666,
+  "review_input_tokens": 100575,
+  "review_output_tokens": 45802,
+  "provider_call_count": 50,
+  "rejected_generation_count": 0
+}

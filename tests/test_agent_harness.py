@@ -857,6 +857,41 @@ def test_business_removed_by_hard_constraints_cannot_be_reintroduced() -> None:
     assert result.session.business_scope == ["business-1"]
 
 
+def test_new_retrieval_may_replace_previous_turn_business_scope() -> None:
+    from yelp_agent.agent_harness.validation import outcome_violation
+
+    state = AgentSession.model_validate(
+        AgentHarness(
+            agent_version="fake-agent-v1",
+            interpreter=RuleBasedRequestInterpreter(),
+            action_policy=_HardConstraintPolicy(),
+            router=_HardConstraintRouter(),
+            executor=_ReintroducingFilteredBusinessExecutor(),
+            clock=_FixedClock(),
+        ).start(_scenario()).session
+    ).model_copy(
+        update={
+            "status": "running",
+            "business_scope": ["old-business"],
+            "business_scope_known": True,
+        }
+    )
+    decision = AgentDecision(
+        action="retrieve_candidates",
+        arguments={},
+        reason_code="CANDIDATES_REQUIRED",
+        tool_name="EXPAND_CANDIDATES",
+        tool_kind="deterministic",
+    )
+    outcome = ActionOutcome(
+        status="completed",
+        observation={"candidate_business_ids": ["new-business"]},
+        business_scope=["new-business"],
+    )
+
+    assert outcome_violation(state, decision, outcome) is None
+
+
 def test_benchmark_driver_releases_hidden_reply_only_after_trigger_action() -> None:
     harness = AgentHarness(
         agent_version="fake-agent-v1",

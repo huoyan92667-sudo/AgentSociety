@@ -333,10 +333,13 @@ def test_provider_failure_preserves_memory_and_uses_rule_reference_fallback() ->
 class _JSONGenerator:
     def __init__(self) -> None:
         self.calls = 0
+        self.contents: list[str] = []
 
     def generate(self, messages):
         self.calls += 1
+        self.contents.append(messages[-1].content)
         assert "ground_truth" not in messages[-1].content
+        assert "private-business-id" not in messages[-1].content
         return LLMCallResult(
             status="success",
             content=_proposal(
@@ -376,6 +379,41 @@ def test_deepseek_extractor_is_structured_and_cache_is_input_specific(
     assert generator.calls == 2
     assert repeated.trace.cache_hit is True
     assert first.proposal.semantic_summary == repeated.proposal.semantic_summary
+
+
+def test_deepseek_prompt_keeps_business_ids_local(tmp_path: Path) -> None:
+    generator = _JSONGenerator()
+    initial = SessionMemoryManager(config=_config()).update(
+        _turn("Recommend a steakhouse")
+    )
+    presented = record_memory_observation(
+        initial.memory,
+        turn_index=1,
+        business_scope=["private-business-id", "private-other-id"],
+        presented_business_ids=["private-business-id"],
+    )
+    assert presented is not None
+    with SqliteControlledLLMCache(tmp_path / "safe-cache.sqlite3") as cache:
+        extractor = DeepSeekMemoryExtractor(
+            caller=ControlledJSONCaller(
+                generator=generator,
+                model_name="fake-deepseek",
+                cache=cache,
+                ledger=ControlledLLMUsageLedger(),
+            ),
+            config=_config(),
+        )
+        result = extractor.extract(
+            _turn(
+                "Tell me whether private-business-id is quiet.",
+                previous=presented,
+                references=["private-business-id"],
+                turn_index=2,
+            )
+        )
+
+    assert result.proposal is not None
+    assert "EXPLICIT_1" in generator.contents[-1]
 
 
 def test_deepseek_extractor_normalizes_reference_labels_only(tmp_path: Path) -> None:

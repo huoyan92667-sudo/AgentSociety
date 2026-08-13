@@ -43,14 +43,16 @@ class DeepSeekMemoryExtractor:
         self._config = config
 
     def extract(self, value: MemoryTurnInput) -> MemoryExtractionAttempt:
-        payload = _visible_prompt_payload(value)
+        payload, explicit_aliases = _visible_prompt_payload(value)
         called = self._caller.call(
             capability="memory_update",
             prompt_version=self._config.prompt_version,
             input_payload=payload,
             messages=_messages(payload),
             output_model=MemoryProposal,
-            normalize_payload=_normalize_memory_payload,
+            normalize_payload=lambda raw: _restore_explicit_aliases(
+                _normalize_memory_payload(raw), explicit_aliases
+            ),
             context_id=value.base_request.session_id,
             turn_index=value.current_turn,
         )
@@ -161,17 +163,48 @@ class RuleMemoryExtractor:
         )
 
 
-def _visible_prompt_payload(value: MemoryTurnInput) -> dict[str, object]:
-    prior = (
-        None
-        if value.previous_memory is None
-        else compact_memory(value.previous_memory).model_dump(mode="json")
-    )
+def _visible_prompt_payload(
+    value: MemoryTurnInput,
+) -> tuple[dict[str, object], dict[str, str]]:
+    aliases = {
+        f"EXPLICIT_{index}": business_id
+        for index, business_id in enumerate(
+            value.explicit_referenced_business_ids, start=1
+        )
+    }
+    redacted_message = value.query_text
+    for alias, business_id in aliases.items():
+        redacted_message = redacted_message.replace(business_id, alias)
+    prior = None
+    if value.previous_memory is not None:
+        compact = compact_memory(value.previous_memory)
+        prior = {
+            "revision": compact.revision,
+            "task_type": compact.task_type,
+            "hard_constraints": compact.hard_constraints,
+            "soft_preferences": compact.soft_preferences,
+            "information_gaps": compact.information_gaps,
+            "rejected_business_count": len(compact.rejected_business_ids),
+            "presented_results": [
+                {"ordinal": index}
+                for index, _ in enumerate(
+                    compact.last_presented_business_ids, start=1
+                )
+            ],
+            "business_scope_known": compact.business_scope_known,
+            "business_scope_count": len(compact.current_business_scope),
+            "clarification_answers": compact.clarification_answers,
+            "relative_preferences": [
+                item.model_dump(mode="json")
+                for item in compact.relative_preferences
+            ],
+            "recent_turn_count": len(compact.recent_turn_summaries),
+        }
     return {
         "current_turn": value.current_turn,
         "language": value.language,
-        "user_message": value.query_text,
-        "explicit_referenced_business_ids": value.explicit_referenced_business_ids,
+        "user_message": redacted_message,
+        "explicit_referenced_business_ids": list(aliases),
         "rule_parser": {
             "task_type": value.base_readiness.task_type,
             "conditions": [
@@ -182,7 +215,7 @@ def _visible_prompt_payload(value: MemoryTurnInput) -> dict[str, object]:
             "information_gaps": value.base_readiness.information_gaps,
         },
         "prior_memory": prior,
-    }
+    }, aliases
 
 
 def _messages(payload: dict[str, object]) -> list[LLMMessage]:
@@ -311,24 +344,109 @@ def _normalize_memory_payload(raw: object) -> object:
         return payload
     normalized: list[object] = []
     reference_map: dict[str, str] = {}
-    for index, item in enumerate(references, start=1):
+    for item in references:
         if not isinstance(item, dict):
-            normalized.append(item)
             continue
         value = dict(item)
-        canonical = f"R{index}"
+        expression = str(value.get("expression") or "").strip()
+        ordinal = value.get("ordinal")
+        if not isinstance(ordinal, int):
+            ordinal = _infer_reference_ordinal(expression)
+        explicit = value.get("explicit_business_id")
+        if not (
+            isinstance(explicit, str)
+            and re.fullmatch(r"EXPLICIT_[1-9][0-9]*", explicit)
+        ):
+            explicit = None
+        if ordinal is not None:
+            explicit = None
+        if ordinal is None and explicit is None:
+            continue
+        canonical = f"R{len(normalized) + 1}"
         old = value.get("reference_id")
         if isinstance(old, str):
             reference_map[old] = canonical
         value["reference_id"] = canonical
+        value["expression"] = expression or f"ordinal {ordinal}"
+        value["ordinal"] = ordinal
+        value["explicit_business_id"] = explicit
         normalized.append(value)
     payload["references"] = normalized
     rejected = payload.get("rejected_reference_ids")
     if isinstance(rejected, list):
         payload["rejected_reference_ids"] = [
-            reference_map.get(str(item), str(item)) for item in rejected
+            reference_map[str(item)] for item in rejected if str(item) in reference_map
         ]
     _normalize_condition_aliases(payload)
+    _normalize_patch_operations(payload)
+    return payload
+
+
+def _normalize_patch_operations(payload: dict[str, object]) -> None:
+    patches = payload.get("condition_patches")
+    if not isinstance(patches, list):
+        return
+    normalized: list[object] = []
+    for item in patches:
+        if not isinstance(item, dict):
+            normalized.append(item)
+            continue
+        value = dict(item)
+        operator_aliases = {
+            "<=": "less_than_or_equal",
+            ">=": "greater_than_or_equal",
+            "include": "includes",
+            "exclude": "excludes",
+            "preferred": "prefer",
+        }
+        raw_operator = value.get("operator")
+        if isinstance(raw_operator, str):
+            value["operator"] = operator_aliases.get(raw_operator, raw_operator)
+        if value.get("operation") == "remove":
+            value["operator"] = None
+            value["value"] = None
+            value["importance"] = None
+        elif any(value.get(key) is None for key in ("operator", "value", "importance")):
+            continue
+        normalized.append(value)
+    payload["condition_patches"] = normalized
+
+
+def _infer_reference_ordinal(expression: str) -> int | None:
+    lowered = expression.casefold()
+    patterns = (
+        (1, ("first", "1st", "\u7b2c\u4e00", "\u4e00\u5bb6", "\u4e00\u4e2a")),
+        (2, ("second", "2nd", "\u7b2c\u4e8c", "\u4e8c\u5bb6", "\u4e24\u5bb6", "\u4e8c\u4e2a")),
+        (3, ("third", "3rd", "\u7b2c\u4e09", "\u4e09\u5bb6", "\u4e09\u4e2a")),
+        (4, ("fourth", "4th", "\u7b2c\u56db", "\u56db\u5bb6", "\u56db\u4e2a")),
+        (5, ("fifth", "5th", "\u7b2c\u4e94", "\u4e94\u5bb6", "\u4e94\u4e2a")),
+    )
+    return next(
+        (ordinal for ordinal, markers in patterns if any(marker in lowered for marker in markers)),
+        None,
+    )
+
+
+def _restore_explicit_aliases(
+    raw: object, aliases: dict[str, str]
+) -> object:
+    if not isinstance(raw, dict) or not aliases:
+        return raw
+    payload = dict(raw)
+    references = payload.get("references")
+    if not isinstance(references, list):
+        return payload
+    restored: list[object] = []
+    for item in references:
+        if not isinstance(item, dict):
+            restored.append(item)
+            continue
+        value = dict(item)
+        explicit = value.get("explicit_business_id")
+        if isinstance(explicit, str) and explicit in aliases:
+            value["explicit_business_id"] = aliases[explicit]
+        restored.append(value)
+    payload["references"] = restored
     return payload
 
 

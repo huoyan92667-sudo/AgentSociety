@@ -1,0 +1,64 @@
+benchmark_version: session-memory-benchmark-v2
+formal: true
+seed: 42
+pipeline_version: step30-llm-protected-full
+generator_prompt_version: step34.5-turn-generator-v1
+reviewer_prompt_version: step34.5-turn-reviewer-v1
+batch_size: 20
+maximum_generation_rounds: 3
+generation_timeout_seconds: 90
+generation_max_retries: 2
+generation_max_output_tokens: 12000
+duplicate_similarity_threshold: 0.94
+split_plans:
+  development:
+    languages:
+      zh-CN:
+        recommendation_sessions: 72
+        recommendation_families:
+          explicit_condition: 96
+          relative_preference: 53
+          reference_rejection: 34
+          combined_update: 24
+          no_state_change: 9
+        support_families:
+          clarification_answer: 10
+          conflict_resolution: 10
+          no_state_change: 4
+      en-US:
+        recommendation_sessions: 48
+        recommendation_families:
+          explicit_condition: 64
+          relative_preference: 35
+          reference_rejection: 22
+          combined_update: 16
+          no_state_change: 7
+        support_families:
+          clarification_answer: 6
+          conflict_resolution: 6
+          no_state_change: 4
+  validation:
+    languages:
+      zh-CN:
+        recommendation_sessions: 18
+        recommendation_families:
+          explicit_condition: 24
+          relative_preference: 13
+          reference_rejection: 9
+          combined_update: 6
+          no_state_change: 2
+        support_families:
+          clarification_answer: 2
+          conflict_resolution: 2
+          no_state_change: 2
+      en-US:
+        recommendation_sessions: 12
+        recommendation_families:
+          explicit_condition: 16
+          relative_preference: 9
+          reference_rejection: 5
+          combined_update: 4
+          no_state_change: 2
+        support_families:
+          clarification_answer: 2
+          conflict_resolution: 2

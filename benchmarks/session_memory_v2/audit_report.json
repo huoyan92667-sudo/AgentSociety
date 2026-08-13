@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "session_count": 200,
+  "turn_count": 500,
+  "split_counts": {
+    "development": 400,
+    "validation": 100
+  },
+  "language_counts": {
+    "en-US": 200,
+    "zh-CN": 300
+  },
+  "family_counts": {
+    "clarification_answer": 20,
+    "combined_update": 50,
+    "conflict_resolution": 20,
+    "explicit_condition": 200,
+    "no_state_change": 30,
+    "reference_rejection": 70,
+    "relative_preference": 110
+  },
+  "exact_duplicate_count": 0,
+  "cross_split_duplicate_count": 0,
+  "near_duplicate_count": 0,
+  "leaked_business_id_count": 0,
+  "relative_numeric_leak_count": 0,
+  "invalid_session_sequence_count": 0,
+  "issues": []
+}

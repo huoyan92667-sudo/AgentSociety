@@ -119,6 +119,11 @@ def outcome_violation(
     ):
         if new_scope is None or not new_scope.issubset(current_scope):
             return "invalid_hard_constraint_scope"
+    elif decision.action == "retrieve_candidates":
+        # A new recommendation/refinement turn may legitimately search the
+        # catalog again. The registry tool owns this replacement scope; every
+        # downstream filter is still restricted to a subset of it.
+        pass
     elif (
         new_scope is not None
         and state.business_scope_known

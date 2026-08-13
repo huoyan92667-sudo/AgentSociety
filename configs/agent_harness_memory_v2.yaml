@@ -1,0 +1,14 @@
+schema_version: 1
+agent_version: step34.5-controlled-harness-v2
+
+# Local embedding and reranking tokens are tracked for observability but do not
+# incur provider cost. Their own candidate/sequence/timeout limits remain 30,
+# 20, 512 and 90 seconds. This higher aggregate ceiling prevents those local
+# work tokens from consuming the much smaller DeepSeek context budget.
+budget:
+  max_steps: 10
+  max_tool_calls: 5
+  max_semantic_calls: 1
+  max_rag_calls: 2
+  max_total_tokens: 100000
+  timeout_ms: 90000
