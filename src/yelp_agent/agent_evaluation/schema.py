@@ -11,7 +11,7 @@ from yelp_agent.agent_benchmark.schema import (
     EvidenceSourceType,
     InformationGap,
 )
-from yelp_agent.decision_readiness.schema import TaskType
+from yelp_agent.decision_readiness.schema import InformationGap, TaskType
 from yelp_agent.models import StrictModel
 
 
@@ -65,6 +65,8 @@ class RouterDecisionTrace(StrictModel):
     selected_choice_id: str = Field(min_length=1, max_length=100)
     input_task_type: TaskType | None = None
     selected_task_type: TaskType | None = None
+    input_information_gaps: list[InformationGap] = Field(default_factory=list)
+    selected_information_gaps: list[InformationGap] = Field(default_factory=list)
     selection_confidence: float | None = Field(default=None, ge=0, le=1)
     model: str | None = None
     provider_called: bool = False

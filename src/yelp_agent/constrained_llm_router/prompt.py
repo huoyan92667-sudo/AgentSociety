@@ -13,9 +13,13 @@ Choose exactly one choice_id from the supplied code-owned choices. You are not a
 the user and must not invent an action, tool, argument, business, fact, or threshold.
 Prioritize the latest user message together with the complete effective session request.
 Ask a clarification only when the missing information truly blocks a reliable action.
+If the user asks for something cheaper, closer, quieter, or otherwise comparative and a
+previous recommendation set exists, treat it as feedback on that set rather than an
+ambiguous business reference; choose the available feedback/continue option.
 Prefer evidence-gathering before factual answers, and never bypass explicit constraints.
 Return JSON only with exactly: choice_id, confidence, reason_code. reason_code must be a
-short UPPER_SNAKE_CASE label and must not contain private reasoning."""
+short UPPER_SNAKE_CASE label and must not contain private reasoning. confidence must be
+a JSON number between 0 and 1, never a quoted string or percentage."""
 
 
 def router_messages(

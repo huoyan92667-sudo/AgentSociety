@@ -167,6 +167,9 @@ def _augment_router_metrics(path: Path, usage: dict[str, object]) -> None:
             ],
             "router_rule_fallback_count": usage["rule_fallback_count"],
             "router_task_correction_count": usage["task_correction_count"],
+            "router_information_gap_correction_count": usage[
+                "information_gap_correction_count"
+            ],
             "router_provider_call_count": usage["provider_call_count"],
             "router_input_tokens": usage["input_tokens"],
             "router_output_tokens": usage["output_tokens"],

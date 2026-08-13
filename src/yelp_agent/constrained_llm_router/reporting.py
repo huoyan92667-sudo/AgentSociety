@@ -38,6 +38,10 @@ def summarize_router_runs(
             and item.input_task_type != item.selected_task_type
             for item in typed
         ),
+        information_gap_correction_count=sum(
+            item.input_information_gaps != item.selected_information_gaps
+            for item in typed
+        ),
         invalid_output_count=sum(item.status == "invalid_output" for item in typed),
         low_confidence_count=sum(item.status == "low_confidence" for item in typed),
         provider_call_count=sum(item.attempt_count for item in provider),

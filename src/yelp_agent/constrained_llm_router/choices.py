@@ -46,25 +46,55 @@ class ConstrainedDecisionBuilder:
         self._maximum_choices = maximum_choices
 
     def build(self, state: AgentState) -> tuple[tuple[RouterChoice, AgentDecision], ...]:
+        decisions: list[AgentDecision] = []
+        routed_state = state
         if state.readiness.information_gaps:
             gap = highest_priority_gap(list(state.readiness.information_gaps))
-            decision = AgentDecision(
-                action="ask_clarification",
-                arguments={"information_gaps": [gap]},
-                reason_code=GAP_REASON_CODES[gap],
-                routed_task_type=state.readiness.task_type,
+            decisions.append(
+                AgentDecision(
+                    action="ask_clarification",
+                    arguments={"information_gaps": [gap]},
+                    reason_code=GAP_REASON_CODES[gap],
+                    routed_task_type=state.readiness.task_type,
+                    routed_information_gaps=list(
+                        state.readiness.information_gaps
+                    ),
+                )
             )
-            return ((self._choice(decision), decision),)
-
-        decisions: list[AgentDecision] = []
-        ordered_tasks = [state.readiness.task_type]
-        ordered_tasks.extend(task for task in _TASKS if task not in ordered_tasks)
-        for task_type in ordered_tasks:
-            if not self._task_plausible(state, task_type):
-                continue
-            routed = state.model_copy(
+            if not self._can_reconsider_ambiguous_reference(state):
+                decision = decisions[0]
+                return ((self._choice(decision), decision),)
+            routed_state = state.model_copy(
                 update={
                     "readiness": state.readiness.model_copy(
+                        update={"information_gaps": []}
+                    )
+                }
+            )
+        elif self._should_offer_conflict_clarification(state):
+            decisions.append(
+                AgentDecision(
+                    action="ask_clarification",
+                    arguments={"information_gaps": ["constraint_conflict"]},
+                    reason_code=GAP_REASON_CODES["constraint_conflict"],
+                    routed_task_type=state.readiness.task_type,
+                    routed_information_gaps=["constraint_conflict"],
+                )
+            )
+
+        ordered_tasks = [state.readiness.task_type]
+        # The model resolves semantic ambiguity once at the start of a user
+        # turn.  After one action has been accepted, the corrected task is
+        # locked and deterministic prerequisite steps no longer pay for the
+        # same task-classification decision repeatedly.
+        if state.step_count == 0:
+            ordered_tasks.extend(task for task in _TASKS if task not in ordered_tasks)
+        for task_type in ordered_tasks:
+            if not self._task_plausible(routed_state, task_type):
+                continue
+            routed = routed_state.model_copy(
+                update={
+                    "readiness": routed_state.readiness.model_copy(
                         update={"task_type": task_type}
                     )
                 }
@@ -75,7 +105,16 @@ class ConstrainedDecisionBuilder:
                 continue
             if self._decision_executable(state, decision):
                 decisions.append(
-                    decision.model_copy(update={"routed_task_type": task_type})
+                    decision.model_copy(
+                        update={
+                            "routed_task_type": task_type,
+                            "routed_information_gaps": (
+                                []
+                                if routed_state is not state
+                                else list(state.readiness.information_gaps)
+                            ),
+                        }
+                    )
                 )
 
         unique: dict[str, AgentDecision] = {}
@@ -93,6 +132,44 @@ class ConstrainedDecisionBuilder:
             for decision in unique.values()
         ]
         return tuple(rows[: self._maximum_choices])
+
+    @staticmethod
+    def _can_reconsider_ambiguous_reference(state: AgentState) -> bool:
+        """Allow the model to reject one known false-positive gap safely.
+
+        Relative feedback such as "make it cheaper" refers to the previous
+        recommendation set, not to one mandatory business.  Continuing is
+        offered only when that previous set is present; all other gaps remain
+        hard code-enforced clarification gates.
+        """
+
+        if set(state.readiness.information_gaps) != {"ambiguous_reference"}:
+            return False
+        prior = [] if not state.turns else state.turns[-1].recommended_business_ids
+        memory_prior = (
+            [] if state.memory is None else state.memory.last_presented_business_ids
+        )
+        return state.readiness.task_type == "feedback_refinement" and bool(
+            prior or memory_prior
+        )
+
+    @staticmethod
+    def _should_offer_conflict_clarification(state: AgentState) -> bool:
+        """Expose, but do not automatically choose, a missed-conflict option."""
+
+        if state.step_count != 0:
+            return False
+        text = (
+            state.memory.recent_turns[-1].query_text
+            if state.memory is not None and state.memory.recent_turns
+            else state.request.query_text
+        ).casefold()
+        explicit_words = ("conflict", "contradict", "冲突", "矛盾")
+        if any(word in text for word in explicit_words):
+            return True
+        return ("must" in text and "exclude" in text) or (
+            "必须" in text and ("排除" in text or "不要" in text)
+        )
 
     @staticmethod
     def _task_plausible(state: AgentState, task_type: TaskType) -> bool:
@@ -153,6 +230,7 @@ def _decision_key(decision: AgentDecision) -> str:
             "tool_name": decision.tool_name,
             "tool_kind": decision.tool_kind,
             "routed_task_type": decision.routed_task_type,
+            "routed_information_gaps": decision.routed_information_gaps,
         },
         ensure_ascii=False,
         sort_keys=True,

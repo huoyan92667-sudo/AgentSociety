@@ -47,6 +47,14 @@ class ConstrainedLLMRouter:
                         selected_choice_id=choice.choice_id,
                         input_task_type=state.readiness.task_type,
                         selected_task_type=decision.routed_task_type,
+                        input_information_gaps=list(
+                            state.readiness.information_gaps
+                        ),
+                        selected_information_gaps=(
+                            list(state.readiness.information_gaps)
+                            if decision.routed_information_gaps is None
+                            else decision.routed_information_gaps
+                        ),
                     )
                 }
             )
@@ -84,6 +92,14 @@ class ConstrainedLLMRouter:
                         confidence=output.confidence,
                         selected_task_type=decision.routed_task_type,
                         input_task_type=state.readiness.task_type,
+                        selected_information_gaps=(
+                            list(state.readiness.information_gaps)
+                            if decision.routed_information_gaps is None
+                            else decision.routed_information_gaps
+                        ),
+                        input_information_gaps=list(
+                            state.readiness.information_gaps
+                        ),
                         traces=traces,
                     )
                 }
@@ -176,6 +192,12 @@ class ConstrainedLLMRouter:
                     confidence=None if output is None else output.confidence,
                     selected_task_type=fallback.routed_task_type,
                     input_task_type=state.readiness.task_type,
+                    selected_information_gaps=(
+                        list(state.readiness.information_gaps)
+                        if fallback.routed_information_gaps is None
+                        else fallback.routed_information_gaps
+                    ),
+                    input_information_gaps=list(state.readiness.information_gaps),
                     traces=traces,
                     failure=failure,
                 )
@@ -193,6 +215,8 @@ def _trace(
     confidence: float | None = None,
     selected_task_type: TaskType | None = None,
     input_task_type: TaskType | None = None,
+    selected_information_gaps: list[str] | None = None,
+    input_information_gaps: list[str] | None = None,
     traces: list[ControlledLLMCallTrace],
     failure: str | None = None,
 ) -> RouterDecisionTrace:
@@ -213,6 +237,8 @@ def _trace(
         selection_confidence=confidence,
         input_task_type=input_task_type,
         selected_task_type=selected_task_type,
+        input_information_gaps=input_information_gaps or [],
+        selected_information_gaps=selected_information_gaps or [],
         model=next((item.model for item in reversed(traces) if item.model), None),
         provider_called=bool(called),
         cache_hit=bool(traces) and any(item.cache_hit for item in traces),
@@ -245,5 +271,6 @@ def _decision_identity(decision: AgentDecision) -> tuple[object, ...]:
         decision.tool_name,
         decision.tool_kind,
         decision.routed_task_type,
+        tuple(decision.routed_information_gaps or []),
         str(sorted(decision.arguments.items())),
     )

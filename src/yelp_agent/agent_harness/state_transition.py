@@ -11,17 +11,31 @@ def apply_routed_task_type(
     state: AgentSession,
     decision: AgentDecision,
 ) -> AgentSession:
-    """Apply only a validated, enum-bounded Router task correction."""
+    """Apply only validated, enum-bounded Router semantic corrections."""
 
     task_type = decision.routed_task_type
-    if task_type is None or task_type == state.readiness.task_type:
+    gaps = decision.routed_information_gaps
+    if (
+        (task_type is None or task_type == state.readiness.task_type)
+        and (gaps is None or gaps == state.readiness.information_gaps)
+    ):
         return state
     memory = state.memory
     if memory is not None:
-        memory = memory.model_copy(update={"current_task_type": task_type})
+        memory_updates: dict[str, object] = {}
+        if task_type is not None:
+            memory_updates["current_task_type"] = task_type
+        if gaps is not None:
+            memory_updates["information_gaps"] = gaps
+        memory = memory.model_copy(update=memory_updates)
+    readiness_updates: dict[str, object] = {}
+    if task_type is not None:
+        readiness_updates["task_type"] = task_type
+    if gaps is not None:
+        readiness_updates["information_gaps"] = gaps
     return state.model_copy(
         update={
-            "readiness": state.readiness.model_copy(update={"task_type": task_type}),
+            "readiness": state.readiness.model_copy(update=readiness_updates),
             "memory": memory,
         }
     )

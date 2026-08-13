@@ -20,11 +20,13 @@ from yelp_agent.controlled_llm import (
     FakeChatGenerator,
     SqliteControlledLLMCache,
 )
+from yelp_agent.agent_evaluation.schema import AgentTurnTrace
 from yelp_agent.constrained_llm_router import (
     ConstrainedActionPolicy,
     ConstrainedDecisionBuilder,
     ConstrainedLLMRouter,
     ConstrainedLLMRouterConfig,
+    RouterModelOutput,
     build_router_context,
 )
 from yelp_agent.query import QueryParseInput
@@ -414,3 +416,86 @@ def test_selected_alternative_task_type_changes_following_agent_state() -> None:
     updated = apply_routed_task_type(state, decision)
 
     assert updated.readiness.task_type == "recommendation_request"
+
+
+def test_quoted_numeric_confidence_is_normalized_and_bounded() -> None:
+    output = RouterModelOutput.model_validate(
+        {
+            "choice_id": "choice_deadbeefdead",
+            "confidence": "0.95",
+            "reason_code": "VALID_SELECTION",
+        }
+    )
+
+    assert output.confidence == 0.95
+
+
+def test_explicit_conflict_query_offers_a_safe_clarification_choice() -> None:
+    state = _state(
+        "It must be a bar and must exclude all bars; clarify the conflict first."
+    )
+    decisions = [
+        decision
+        for _, decision in ConstrainedDecisionBuilder(
+            RuleRouter(review_rag_enabled=True)
+        ).build(state)
+    ]
+
+    clarification = next(
+        item for item in decisions if item.action == "ask_clarification"
+    )
+    assert clarification.arguments == {
+        "information_gaps": ["constraint_conflict"]
+    }
+    assert clarification.routed_information_gaps == ["constraint_conflict"]
+    assert any(item.action == "retrieve_candidates" for item in decisions)
+
+
+def test_model_can_clear_false_ambiguous_reference_for_visible_feedback() -> None:
+    state = _state("Make it cheaper").model_copy(
+        update={
+            "readiness": _state("Make it cheaper").readiness.model_copy(
+                update={
+                    "task_type": "feedback_refinement",
+                    "information_gaps": ["ambiguous_reference"],
+                }
+            ),
+            "turns": [
+                AgentTurnTrace(
+                    turn_index=1,
+                    predicted_task_type="recommendation_request",
+                    candidate_ranking=["b1", "b2"],
+                    recommended_business_ids=["b1", "b2"],
+                    response_kind="recommendation",
+                )
+            ],
+        }
+    )
+    decisions = [
+        decision
+        for _, decision in ConstrainedDecisionBuilder(
+            RuleRouter(review_rag_enabled=True)
+        ).build(state)
+    ]
+    proceed = next(item for item in decisions if item.action == "apply_feedback")
+
+    updated = apply_routed_task_type(state, proceed)
+
+    assert proceed.routed_information_gaps == []
+    assert updated.readiness.information_gaps == []
+
+
+def test_task_alternatives_are_only_offered_at_start_of_turn() -> None:
+    state = _state(
+        "Is this place quiet, or should you recommend another one?",
+        referenced=["b1"],
+    ).model_copy(update={"step_count": 1})
+    decisions = [
+        decision
+        for _, decision in ConstrainedDecisionBuilder(
+            RuleRouter(review_rag_enabled=True)
+        ).build(state)
+    ]
+
+    assert len(decisions) == 1
+    assert decisions[0].routed_task_type == state.readiness.task_type

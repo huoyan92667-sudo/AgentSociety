@@ -76,6 +76,19 @@ class RouterModelOutput(StrictModel):
         pattern=r"^[A-Z][A-Z0-9_]*$",
     )
 
+    @field_validator("confidence", mode="before")
+    @classmethod
+    def normalize_numeric_confidence(cls, value: object) -> object:
+        """Accept DeepSeek's stable quoted-number variant, then validate bounds."""
+
+        if isinstance(value, str):
+            normalized = value.strip()
+            try:
+                return float(normalized)
+            except ValueError:
+                return value
+        return value
+
 
 class RouterExperimentSummary(StrictModel):
     schema_version: Literal[1] = 1
@@ -84,6 +97,7 @@ class RouterExperimentSummary(StrictModel):
     single_choice_bypass_count: int = Field(ge=0)
     rule_fallback_count: int = Field(ge=0)
     task_correction_count: int = Field(ge=0)
+    information_gap_correction_count: int = Field(ge=0)
     invalid_output_count: int = Field(ge=0)
     low_confidence_count: int = Field(ge=0)
     provider_call_count: int = Field(ge=0)
