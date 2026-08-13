@@ -9,6 +9,7 @@ from yelp_agent.semantic_embedding import EmbeddingProviderError, SemanticMatchR
 
 from ..errors import PermanentToolError, RetryableToolError
 from ..registry import ToolDefinition
+from ..request_context import query_text_from_tool_context
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import CandidateBusinessIdsInput, EmbeddingMatchOutput
 
@@ -97,11 +98,10 @@ class ComputeEmbeddingMatchTool:
 
     @staticmethod
     def _query_text(context: ToolExecutionContext) -> str:
-        request = context.state_snapshot.get("request")
-        query_text = request.get("query_text") if isinstance(request, dict) else None
-        if not isinstance(query_text, str) or not query_text.strip():
-            raise PermanentToolError("visible request query text is missing")
-        return query_text
+        try:
+            return query_text_from_tool_context(context)
+        except (TypeError, ValueError) as exc:
+            raise PermanentToolError(str(exc)) from None
 
     @staticmethod
     def _hybrid_ranking(context: ToolExecutionContext) -> list[str]:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, field_validator, model_validator
 
@@ -139,6 +139,7 @@ class AgentTurnTrace(StrictModel):
     reported_conflict: bool = False
     reported_evidence_recency: bool = False
     recommended_official_verification: bool = False
+    effective_request: dict[str, Any] | None = None
 
     @field_validator(
         "detected_information_gaps",

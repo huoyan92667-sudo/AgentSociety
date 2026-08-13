@@ -11,6 +11,7 @@ from yelp_agent.semantic_embedding import fuse_hybrid_and_semantic
 from yelp_agent.semantic_ranking import SemanticRankingResult
 
 from ..registry import ToolDefinition
+from ..request_context import request_from_tool_context
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import CandidateBusinessIdsInput, SemanticRankingOutput
 
@@ -75,15 +76,15 @@ class ApplySemanticRankingTool:
                 error_code="STEP26_RANKING_REQUIRED",
                 warning="semantic ranking requires the complete current Step-26 order",
             )
-        request_payload = context.state_snapshot.get("request")
-        if not isinstance(request_payload, dict):
+        try:
+            request = request_from_tool_context(context)
+        except (TypeError, ValueError):
             return ToolObservation.error(
                 tool_name=self.definition.name,
                 status="permanent_error",
                 error_code="REQUEST_MISSING",
                 warning="canonical request is missing from visible state",
             )
-        request = RecommendationRequest.model_validate(request_payload)
         result = self._service.rank(
             request=request,
             base_ranking=base,

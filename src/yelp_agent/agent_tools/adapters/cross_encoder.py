@@ -13,6 +13,7 @@ from yelp_agent.semantic_embedding import fuse_hybrid_and_semantic
 
 from ..errors import PermanentToolError, RetryableToolError
 from ..registry import ToolDefinition
+from ..request_context import query_text_from_tool_context
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import CandidateBusinessIdsInput, CrossEncoderMatchOutput
 
@@ -100,11 +101,10 @@ class ComputeCrossEncoderMatchTool:
 
     @staticmethod
     def _query_text(context: ToolExecutionContext) -> str:
-        request = context.state_snapshot.get("request")
-        query_text = request.get("query_text") if isinstance(request, dict) else None
-        if not isinstance(query_text, str) or not query_text.strip():
-            raise PermanentToolError("visible request query text is missing")
-        return query_text
+        try:
+            return query_text_from_tool_context(context)
+        except (TypeError, ValueError) as exc:
+            raise PermanentToolError(str(exc)) from None
 
     def _step25_ranking(self, context: ToolExecutionContext) -> list[str]:
         observations = context.state_snapshot.get("observations")

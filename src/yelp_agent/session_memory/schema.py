@@ -96,6 +96,17 @@ class RelativePreference(StrictModel):
     lifetime: MemoryLifetime = "session"
 
 
+class EffectiveRelativePreference(StrictModel):
+    """A code-bound relative preference ready for downstream execution."""
+
+    field: RelativePreferenceField
+    direction: RelativePreferenceDirection
+    evidence_span: str = Field(min_length=1, max_length=500)
+    confidence: float = Field(ge=0, le=1)
+    reference_business_id: str | None = Field(default=None, min_length=1)
+    source_turn_index: int | None = Field(default=None, ge=1)
+
+
 class MemoryProposal(StrictModel):
     """Strict JSON emitted by an LLM. It is a proposal, not canonical memory."""
 
@@ -228,6 +239,7 @@ class SessionMemory(StrictModel):
     business_scope_known: bool = False
     clarification_answers: dict[str, Any] = Field(default_factory=dict)
     relative_preferences: list[RelativePreference] = Field(default_factory=list)
+    relative_preference_references: dict[str, str] = Field(default_factory=dict)
     semantic_summary: str | None = Field(default=None, min_length=1, max_length=1200)
     long_term_candidates: list[str] = Field(default_factory=list)
     recent_turns: list[MemoryTurnRecord] = Field(default_factory=list)
@@ -253,6 +265,40 @@ class SessionMemory(StrictModel):
             self.last_presented_business_ids
         ).issubset(self.current_business_scope):
             raise ValueError("presented businesses must remain inside known scope")
+        relative_fields = {item.field for item in self.relative_preferences}
+        if not set(self.relative_preference_references).issubset(relative_fields):
+            raise ValueError("relative references require an active relative preference")
+        if any(
+            not business_id or business_id != business_id.strip()
+            for business_id in self.relative_preference_references.values()
+        ):
+            raise ValueError("relative reference business IDs must be nonempty")
+        return self
+
+
+class EffectiveSessionRequest(StrictModel):
+    """The one complete, executable request compiled from canonical memory."""
+
+    schema_version: Literal[1] = 1
+    effective_request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    revision: int = Field(ge=1)
+    task_type: TaskType
+    request: RecommendationRequest
+    relative_preferences: list[EffectiveRelativePreference] = Field(default_factory=list)
+    rejected_business_ids: list[str] = Field(default_factory=list)
+    clarification_answers: dict[str, Any] = Field(default_factory=dict)
+    latest_user_query: str = Field(min_length=1, max_length=2000)
+
+    @model_validator(mode="after")
+    def validate_effective_request(self) -> Self:
+        if self.request.request_id != self.effective_request_id:
+            raise ValueError("compiled request ID must equal effective request ID")
+        fields = [item.field for item in self.relative_preferences]
+        if len(fields) != len(set(fields)):
+            raise ValueError("effective relative preference fields must be unique")
+        if len(self.rejected_business_ids) != len(set(self.rejected_business_ids)):
+            raise ValueError("effective rejected businesses must be unique")
         return self
 
 

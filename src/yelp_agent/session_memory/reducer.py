@@ -59,6 +59,7 @@ class SessionMemoryReducer:
         references: ReferenceResolutionResult,
     ) -> MemoryTurnResult:
         previous = value.previous_memory
+        reset_session_request = previous is None or proposal.request_mode == "replace"
         context_text = _context_text(previous, value.query_text, proposal)
         base_conditions = _base_conditions(value, proposal)
         applied = self._apply_condition_patches(
@@ -76,7 +77,7 @@ class SessionMemoryReducer:
         )
         resolved_by_id = {item.reference_id: item for item in references.resolved}
         rejected_businesses = set(
-            [] if previous is None else previous.rejected_business_ids
+            [] if reset_session_request else previous.rejected_business_ids
         )
         accepted = list(applied.accepted)
         rejected = [*references.rejected, *applied.rejected]
@@ -108,10 +109,14 @@ class SessionMemoryReducer:
             if proposal.party_size is not None
             else value.base_request.party_size
             if value.base_request.party_size is not None
-            else None if previous is None else previous.current_request.party_size
+            else (
+                None
+                if reset_session_request
+                else previous.current_request.party_size
+            )
         )
         location = value.base_request.location_center
-        if location is None and previous is not None:
+        if location is None and not reset_session_request:
             location = previous.current_request.location_center
         missing = _merged_missing_fields(
             value,
@@ -165,7 +170,9 @@ class SessionMemoryReducer:
                     "conflict_fields": list(conflicts),
                 }
             )
-        answers = {} if previous is None else dict(previous.clarification_answers)
+        answers = (
+            {} if reset_session_request else dict(previous.clarification_answers)
+        )
         for answer in proposal.clarification_answers:
             if answer.evidence_span not in value.query_text:
                 rejected.append(
@@ -174,7 +181,14 @@ class SessionMemoryReducer:
                 continue
             answers[answer.information_gap] = answer.value
             accepted.append(f"clarification:{answer.information_gap}")
-        relative = [] if previous is None else list(previous.relative_preferences)
+        relative = (
+            [] if reset_session_request else list(previous.relative_preferences)
+        )
+        relative_references = (
+            {}
+            if reset_session_request
+            else dict(previous.relative_preference_references)
+        )
         for preference in proposal.relative_preferences:
             if preference.evidence_span not in value.query_text:
                 rejected.append(
@@ -183,6 +197,13 @@ class SessionMemoryReducer:
                 continue
             relative = [item for item in relative if item.field != preference.field]
             relative.append(preference)
+            resolved_business_ids = [
+                item.business_id for item in references.resolved
+            ]
+            if resolved_business_ids:
+                relative_references[preference.field] = resolved_business_ids[0]
+            else:
+                relative_references.pop(preference.field, None)
             accepted.append(
                 f"relative:{preference.field}:{preference.direction}"
             )
@@ -229,6 +250,7 @@ class SessionMemoryReducer:
             ),
             clarification_answers=answers,
             relative_preferences=relative,
+            relative_preference_references=relative_references,
             semantic_summary=(
                 proposal.semantic_summary
                 if proposal.semantic_summary is not None
@@ -368,6 +390,8 @@ def _base_conditions(
     previous = value.previous_memory
     if previous is None or proposal.request_mode == "replace":
         return list(value.base_request.conditions)
+    if proposal.request_mode == "no_change":
+        return list(previous.current_request.conditions)
     conditions = list(previous.current_request.conditions)
     for current in value.base_request.conditions:
         if current.field in {
@@ -387,6 +411,8 @@ def _context_text(
 ) -> str:
     if previous is None or proposal.request_mode == "replace":
         return current_text
+    if proposal.request_mode == "no_change":
+        return previous.current_request.query_text
     prior = previous.semantic_summary or previous.current_request.query_text
     combined = f"{prior}\n{current_text}".strip()
     return combined[-2000:]

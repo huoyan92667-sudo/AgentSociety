@@ -16,6 +16,7 @@ from yelp_agent.agent_evaluation.schema import (
 )
 
 from .schema import ActionOutcome, AgentDecision, AgentObservation, AgentSession
+from yelp_agent.session_memory.effective_request import compile_effective_request
 
 
 def arguments_sha256(arguments: dict[str, Any]) -> str:
@@ -176,6 +177,13 @@ class TurnTraceRecorder:
             self.clarification_questions = [outcome.clarification_question]
 
     def build_turn(self, state: AgentSession) -> AgentTurnTrace:
+        effective = (
+            None
+            if state.memory is None
+            else compile_effective_request(state.memory).model_dump(
+                mode="json", exclude_computed_fields=True
+            )
+        )
         return AgentTurnTrace(
             turn_index=state.current_turn,
             predicted_task_type=state.readiness.task_type,
@@ -192,4 +200,5 @@ class TurnTraceRecorder:
             recommended_official_verification=(
                 self.recommended_official_verification
             ),
+            effective_request=effective,
         )

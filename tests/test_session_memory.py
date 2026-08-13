@@ -11,6 +11,7 @@ from yelp_agent.controlled_llm.ledger import ControlledLLMUsageLedger
 from yelp_agent.query import QueryParseInput
 from yelp_agent.session_memory.config import SessionMemoryConfig
 from yelp_agent.session_memory.context import compact_memory
+from yelp_agent.session_memory.effective_request import compile_effective_request
 from yelp_agent.session_memory.extractor import (
     DeepSeekMemoryExtractor,
     MemoryExtractionAttempt,
@@ -191,6 +192,38 @@ def test_model_cannot_remove_a_hard_constraint_without_explicit_user_evidence() 
     )
 
 
+def test_explicit_removal_disappears_from_the_effective_request() -> None:
+    manager = SessionMemoryManager(
+        config=_config(),
+        primary_extractor=_ScriptedExtractor(
+            _proposal(request_mode="replace"),
+            _proposal(
+                condition_patches=[
+                    MemoryConditionPatch(
+                        operation="remove",
+                        field="distance_km",
+                        evidence_span="Remove the 5 km limit",
+                        confidence=0.99,
+                    )
+                ]
+            ),
+        ),
+    )
+    first = manager.update(_turn("Find a steakhouse within 5 km", turn_index=1))
+    second = manager.update(
+        _turn(
+            "Remove the 5 km limit.",
+            previous=first.memory,
+            turn_index=2,
+        )
+    )
+
+    effective = compile_effective_request(second.memory)
+
+    assert not any(item.field == "distance_km" for item in second.request.conditions)
+    assert "distance_km" not in effective.request.query_text
+
+
 def test_model_business_id_outside_visible_scope_is_rejected() -> None:
     manager = SessionMemoryManager(
         config=_config(),
@@ -277,11 +310,69 @@ def test_relative_preference_is_stored_without_accepting_an_invented_threshold()
 
     assert second.memory.rejected_business_ids == ["b1"]
     assert second.memory.relative_preferences[0].direction == "closer"
+    assert second.memory.relative_preference_references == {"distance": "b1"}
     assert not any(
         item.field == "distance_km" and item.value == 5
         for item in second.request.conditions
     )
     assert any("numeric_value_not_explicit" in item for item in second.rejected_changes)
+
+
+def test_explicit_new_request_clears_session_scoped_rejections_and_relatives() -> None:
+    manager = SessionMemoryManager(
+        config=_config(),
+        primary_extractor=_ScriptedExtractor(
+            _proposal(request_mode="replace"),
+            _proposal(
+                task_type="feedback_refinement",
+                references=[
+                    MemoryReferenceMention(
+                        reference_id="R1",
+                        expression="the first one",
+                        ordinal=1,
+                    )
+                ],
+                rejected_reference_ids=["R1"],
+                relative_preferences=[
+                    RelativePreference(
+                        field="price",
+                        direction="lower",
+                        evidence_span="cheaper",
+                        confidence=0.95,
+                    )
+                ],
+            ),
+            _proposal(request_mode="replace", task_type="recommendation_request"),
+        ),
+    )
+    first = manager.update(_turn("Recommend a steakhouse", turn_index=1))
+    presented = record_memory_observation(
+        first.memory,
+        turn_index=1,
+        business_scope=["b1", "b2"],
+        presented_business_ids=["b1", "b2"],
+    )
+    assert presented is not None
+    refined = manager.update(
+        _turn(
+            "The first one is too expensive; find something cheaper.",
+            previous=presented,
+            turn_index=2,
+        )
+    )
+
+    replaced = manager.update(
+        _turn(
+            "Start over with a Chinese restaurant.",
+            previous=refined.memory,
+            turn_index=3,
+        )
+    )
+
+    assert replaced.request.desired_categories == ["Chinese"]
+    assert replaced.memory.rejected_business_ids == []
+    assert replaced.memory.relative_preferences == []
+    assert replaced.memory.relative_preference_references == {}
 
 
 def test_provider_failure_preserves_memory_and_uses_rule_reference_fallback() -> None:

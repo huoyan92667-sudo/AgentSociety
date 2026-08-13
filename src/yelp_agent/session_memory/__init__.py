@@ -7,8 +7,11 @@ forming a circular dependency.
 
 from .config import SessionMemoryConfig, load_session_memory_config
 from .context import compact_memory
+from .effective_request import compile_effective_request, effective_request_from_snapshot
 from .schema import (
     ClarificationAnswerProposal,
+    EffectiveRelativePreference,
+    EffectiveSessionRequest,
     MemoryConditionPatch,
     MemoryExtractionTrace,
     MemoryProposal,
@@ -25,6 +28,8 @@ from .schema import (
 
 __all__ = [
     "ClarificationAnswerProposal",
+    "EffectiveRelativePreference",
+    "EffectiveSessionRequest",
     "MemoryConditionPatch",
     "MemoryExtractionTrace",
     "MemoryProposal",
@@ -39,5 +44,7 @@ __all__ = [
     "SessionMemory",
     "SessionMemoryConfig",
     "compact_memory",
+    "compile_effective_request",
+    "effective_request_from_snapshot",
     "load_session_memory_config",
 ]

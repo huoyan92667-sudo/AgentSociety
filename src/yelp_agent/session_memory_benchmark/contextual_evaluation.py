@@ -517,6 +517,7 @@ def _explorer_case(
         "agent_flow": {
             "predicted_task_type": trace.predicted_task_type,
             "response_kind": trace.response_kind,
+            "effective_request": trace.effective_request,
             "actions": [item.model_dump(mode="json") for item in trace.actions],
             "tools": [
                 {

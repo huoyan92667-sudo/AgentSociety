@@ -112,3 +112,8 @@ def test_memory_interpreter_pauses_and_resumes_without_raw_query_concatenation()
         "b5",
     ]
     assert resumed.session.memory_fallback_count == 2
+    assert resumed.run is not None
+    effective = resumed.run.turns[-1].effective_request
+    assert effective is not None
+    assert effective["revision"] == 2
+    assert "Steakhouses" in effective["request"]["query_text"]

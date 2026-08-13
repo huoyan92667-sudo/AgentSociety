@@ -325,6 +325,7 @@ def test_session_memory_tool_returns_only_visible_prior_observations() -> None:
         "turn_index": 2,
         "observations": [{"payload": {"candidate_business_ids": ["b1"]}}],
         "memory_context": None,
+        "effective_request": None,
     }
 
 

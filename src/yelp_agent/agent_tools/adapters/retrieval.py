@@ -16,6 +16,10 @@ from yelp_agent.query_retrieval import (
 )
 
 from ..registry import ToolDefinition
+from ..request_context import (
+    rejected_business_ids_from_tool_context,
+    request_from_tool_context,
+)
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import CandidateRetrievalOutput, EmptyToolInput
 
@@ -88,7 +92,7 @@ class ExpandCandidatesTool:
         if self._query_retriever is None or self._dual_fusion is None:
             return self._history_observation(result, rejected_business_ids=rejected)
         try:
-            request = self._request(context)
+            request = request_from_tool_context(context)
             query = self._query_retriever.retrieve(
                 QueryRetrievalTask(
                     request=request,
@@ -240,26 +244,11 @@ class ExpandCandidatesTool:
 
     @staticmethod
     def _request(context: ToolExecutionContext) -> RecommendationRequest:
-        raw = context.state_snapshot.get("request")
-        if not isinstance(raw, dict):
-            raise ValueError("current structured request is absent from Agent state")
-        return RecommendationRequest.model_validate(
-            {
-                key: value
-                for key, value in raw.items()
-                if key in RecommendationRequest.model_fields
-            }
-        )
+        return request_from_tool_context(context)
 
     @staticmethod
     def _rejected_business_ids(context: ToolExecutionContext) -> set[str]:
-        memory = context.state_snapshot.get("memory_context")
-        if not isinstance(memory, dict):
-            return set()
-        values = memory.get("rejected_business_ids")
-        if not isinstance(values, list):
-            return set()
-        return {str(value) for value in values if isinstance(value, str)}
+        return rejected_business_ids_from_tool_context(context)
 
     @staticmethod
     def _query_fields(

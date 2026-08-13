@@ -13,6 +13,7 @@ from yelp_agent.query.ranking import (
 )
 
 from ..registry import ToolDefinition
+from ..request_context import request_from_tool_context
 from ..schema import ToolExecutionContext, ToolObservation
 from ..tool_schemas import CandidateBusinessIdsInput, ConstraintOutput
 
@@ -72,21 +73,15 @@ class ApplyConstraintsTool:
         arguments: CandidateBusinessIdsInput,
         context: ToolExecutionContext,
     ) -> ToolObservation:
-        raw_request = context.state_snapshot.get("request")
-        if not isinstance(raw_request, dict):
+        try:
+            request = request_from_tool_context(context)
+        except (TypeError, ValueError):
             return ToolObservation.error(
                 tool_name=self.definition.name,
                 status="permanent_error",
                 error_code="REQUEST_STATE_MISSING",
                 warning="current structured request is absent from Agent state",
             )
-        request = RecommendationRequest.model_validate(
-            {
-                key: value
-                for key, value in raw_request.items()
-                if key in RecommendationRequest.model_fields
-            }
-        )
         candidates = self._reader.get_candidates(
             arguments.business_ids,
             context.cutoff_time,
@@ -120,14 +115,4 @@ class ApplyConstraintsTool:
 
 def request_from_context(context: ToolExecutionContext) -> RecommendationRequest:
     """Rebuild only canonical request fields from a visible state snapshot."""
-
-    raw_request = context.state_snapshot.get("request")
-    if not isinstance(raw_request, dict):
-        raise ValueError("current structured request is absent from Agent state")
-    return RecommendationRequest.model_validate(
-        {
-            key: value
-            for key, value in raw_request.items()
-            if key in RecommendationRequest.model_fields
-        }
-    )
+    return request_from_tool_context(context)

@@ -16,6 +16,7 @@ from yelp_agent.agent_harness.schema import (
 from .registry import AgentToolRegistry
 from .schema import ToolExecutionContext, ToolObservation
 from yelp_agent.session_memory.context import compact_memory
+from yelp_agent.session_memory.effective_request import compile_effective_request
 
 
 class RegistryActionExecutor:
@@ -70,14 +71,25 @@ class RegistryActionExecutor:
         state: AgentSession,
         decision: AgentDecision,
     ) -> ToolExecutionContext:
+        snapshot = cls._visible_snapshot(state)
+        effective = snapshot.get("effective_request")
+        effective_id = (
+            effective.get("effective_request_id")
+            if isinstance(effective, dict)
+            else None
+        )
         return ToolExecutionContext(
-            request_id=state.request.request_id,
+            request_id=(
+                str(effective_id)
+                if isinstance(effective_id, str)
+                else state.request.request_id
+            ),
             user_id=state.user_id,
             cutoff_time=state.cutoff_time,
             action=decision.action,
             business_scope=tuple(state.business_scope),
             business_scope_known=state.business_scope_known,
-            state_snapshot=cls._visible_snapshot(state),
+            state_snapshot=snapshot,
         )
 
     @staticmethod
@@ -97,6 +109,9 @@ class RegistryActionExecutor:
             snapshot["memory_context"] = compact_memory(state.memory).model_dump(
                 mode="json"
             )
+            snapshot["effective_request"] = compile_effective_request(
+                state.memory
+            ).model_dump(mode="json", exclude_computed_fields=True)
         return snapshot
 
     @staticmethod

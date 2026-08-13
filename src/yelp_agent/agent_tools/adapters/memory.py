@@ -28,6 +28,7 @@ class GetSessionMemoryTool:
         del arguments
         snapshot = context.state_snapshot
         memory_context = snapshot.get("memory_context")
+        effective_request = snapshot.get("effective_request")
         return ToolObservation.success(
             tool_name=self.definition.name,
             data={
@@ -42,6 +43,11 @@ class GetSessionMemoryTool:
                 ),
                 "memory_context": (
                     memory_context if isinstance(memory_context, dict) else None
+                ),
+                "effective_request": (
+                    effective_request
+                    if isinstance(effective_request, dict)
+                    else None
                 ),
             },
             confidence=1.0,
