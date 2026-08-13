@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 
 from yelp_agent.rule_router import RuleAgentSourcePaths, build_real_rule_agent_runtime
 from yelp_agent.session_memory_benchmark.agent_replay import run_agent_replay_v2
+from yelp_agent.session_memory_benchmark.contextual_evaluation import (
+    evaluate_context_grounded_replay_v3,
+)
 
 
 def main() -> None:
@@ -73,8 +76,18 @@ def main() -> None:
         )
         if runtime.session_memory is not None:
             runtime.session_memory.ledger.write(output / "memory_llm")
+    contextual = evaluate_context_grounded_replay_v3(
+        runs_path=result.runs_path,
+        benchmark_root=_resolve(code, args.benchmark_root),
+        businesses_path=original.businesses,
+        profile_snapshots_path=original.user_profile_root / "profile_snapshots.parquet",
+        preference_signals_path=original.user_profile_root / "preference_signals.parquet",
+        output_root=output,
+    )
     print(f"runs={result.runs_path}")
     print(f"metrics={result.metrics_path}")
+    print(f"context_metrics={contextual.metrics_path}")
+    print(f"case_explorer={contextual.explorer_path}")
 
 
 def _progress(current: int, total: int) -> None:
