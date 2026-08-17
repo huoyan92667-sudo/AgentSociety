@@ -58,11 +58,12 @@ class QueryRecommendationBenchmarkBuildResult:
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    # Git may materialize text artifacts as CRLF on Windows even though the
+    # immutable benchmark was published with LF.  Hash the canonical text
+    # representation so the same committed bundle verifies cross-platform.
+    return hashlib.sha256(
+        path.read_bytes().replace(b"\r\n", b"\n")
+    ).hexdigest()
 
 
 def _jsonl(values: tuple[StrictModel, ...]) -> str:

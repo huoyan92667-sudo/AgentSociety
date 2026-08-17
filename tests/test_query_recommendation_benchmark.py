@@ -100,6 +100,23 @@ def test_published_bundle_keeps_the_real_positive_out_of_visible_cases(tmp_path)
     assert loaded == _bundle()
 
 
+def test_bundle_hash_verification_is_stable_after_windows_checkout(tmp_path) -> None:
+    result = publish_query_recommendation_bundle(
+        _bundle(),
+        tmp_path / "query_recommendation_v1",
+    )
+    checked_out_files = [
+        result.visible_path,
+        result.ground_truth_path,
+        result.frames_path,
+    ]
+    for path in checked_out_files:
+        content = path.read_bytes()
+        path.write_bytes(content.replace(b"\n", b"\r\n"))
+
+    assert load_query_recommendation_bundle(result.root) == _bundle()
+
+
 def test_visible_case_contract_rejects_any_hidden_target_field() -> None:
     payload = _bundle().visible_cases[0].model_dump(mode="json")
     payload["target_business_id"] = "leaked-business"
