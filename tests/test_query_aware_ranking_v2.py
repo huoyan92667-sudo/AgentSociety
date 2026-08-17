@@ -171,6 +171,25 @@ def test_protected_pool_keeps_both_channels_until_hard_filter() -> None:
     assert [item.business_id for item in pool.exclusions] == ["history-only"]
 
 
+def test_protected_pool_treats_session_rejections_as_hard_exclusions() -> None:
+    pool = ProtectedCandidatePool(candidate_limit=500).build(
+        _history("history-only", "both"),
+        _query("both", "query-only"),
+        additional_exclusions={"both", "outside-pool"},
+    )
+
+    assert [item.business_id for item in pool.items] == [
+        "history-only",
+        "query-only",
+    ]
+    assert [item.model_dump() for item in pool.exclusions] == [
+        {
+            "business_id": "both",
+            "reason_codes": ["SESSION_REJECTED"],
+        }
+    ]
+
+
 def test_coarse_fusion_lets_current_query_rescue_a_history_miss() -> None:
     candidates = [
         CandidateEvidence(

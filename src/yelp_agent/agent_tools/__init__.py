@@ -21,6 +21,7 @@ from .adapters import (
     SearchBusinessReviewsTool,
     AggregateReviewEvidenceTool,
     ApplySemanticRankingTool,
+    GetQueryAwareRankingTool,
 )
 from .registry import AgentToolRegistry, ToolDefinition, UnavailableTool
 from .schema import ToolExecutionContext, ToolObservation
@@ -41,6 +42,7 @@ __all__ = [
     "SearchBusinessReviewsTool",
     "AggregateReviewEvidenceTool",
     "ApplySemanticRankingTool",
+    "GetQueryAwareRankingTool",
     "RegistryActionExecutor",
     "PermanentToolError",
     "RetryableToolError",

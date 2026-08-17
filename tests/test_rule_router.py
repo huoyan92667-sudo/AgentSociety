@@ -463,6 +463,46 @@ def test_router_selects_the_complete_recommendation_tool_chain() -> None:
     assert decisions[-1].reason_code == "READY_TO_FINALIZE"
 
 
+def test_query_aware_router_replaces_the_legacy_recommendation_chain() -> None:
+    router = RuleRouter(display_limit=3, query_aware_enabled=True)
+    policy = RuleBasedActionPolicy(display_limit=3, query_aware_enabled=True)
+    fresh = _state("Find a steakhouse in Philadelphia")
+
+    assert policy.allowed_actions(fresh) == (
+        "retrieve_candidates",
+        "safe_fallback",
+    )
+    first = router.choose_action(fresh)
+    assert first.action == "retrieve_candidates"
+    assert first.tool_name == "GET_QUERY_AWARE_RANKING"
+
+    ranked = fresh.model_copy(
+        update={
+            "business_scope_known": True,
+            "business_scope": ["b2", "b1", "b3", "b4"],
+            "observations": [
+                _observation(
+                    "7",
+                    1,
+                    "retrieve_candidates",
+                    "GET_QUERY_AWARE_RANKING",
+                    {
+                        "candidate_business_ids": ["b2", "b1", "b3", "b4"],
+                        "ranking": ["b2", "b1", "b3", "b4"],
+                    },
+                )
+            ],
+        }
+    )
+    assert policy.allowed_actions(ranked) == (
+        "get_business_details",
+        "safe_fallback",
+    )
+    second = router.choose_action(ranked)
+    assert second.action == "get_business_details"
+    assert second.arguments == {"business_ids": ["b2", "b1", "b3"]}
+
+
 def test_business_detail_route_reads_locked_details_then_answers() -> None:
     policy = RuleBasedActionPolicy()
     router = RuleRouter()

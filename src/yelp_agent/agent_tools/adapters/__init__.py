@@ -12,6 +12,7 @@ from .ranking import GetHybridRankingTool
 from .review_rag import SearchBusinessReviewsTool
 from .evidence import AggregateReviewEvidenceTool
 from .semantic_ranking import ApplySemanticRankingTool
+from .query_aware_ranking import GetQueryAwareRankingTool
 
 __all__ = [
     "GetBusinessDetailsTool",
@@ -28,4 +29,5 @@ __all__ = [
     "SearchBusinessReviewsTool",
     "AggregateReviewEvidenceTool",
     "ApplySemanticRankingTool",
+    "GetQueryAwareRankingTool",
 ]

@@ -14,6 +14,7 @@ from .adapters import (
     GetHybridRankingTool,
     GetSessionMemoryTool,
     GetUserProfileTool,
+    GetQueryAwareRankingTool,
     SearchBusinessReviewsTool,
     AggregateReviewEvidenceTool,
     ApplySemanticRankingTool,
@@ -61,6 +62,7 @@ def build_step23_tool_registry(
     review_search: object | None = None,
     evidence_aggregator: object | None = None,
     semantic_ranking: object | None = None,
+    query_aware_ranking: object | None = None,
     query_retriever: object | None = None,
     dual_channel_fusion: object | None = None,
     embedding_alpha: float = 0.0,
@@ -74,6 +76,17 @@ def build_step23_tool_registry(
         [
             GetSessionMemoryTool(),
             GetUserProfileTool(user_profiles),  # type: ignore[arg-type]
+            (
+                GetQueryAwareRankingTool(query_aware_ranking)  # type: ignore[arg-type]
+                if query_aware_ranking is not None
+                else _future_tool(
+                    name="GET_QUERY_AWARE_RANKING",
+                    step=33,
+                    kind="semantic",
+                    actions=("retrieve_candidates",),
+                    summary="Run the complete protected Query-aware ranking pipeline.",
+                )
+            ),
             ExpandCandidatesTool(
                 retriever,  # type: ignore[arg-type]
                 history_reader,  # type: ignore[arg-type]

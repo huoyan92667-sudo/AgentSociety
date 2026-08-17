@@ -18,8 +18,17 @@ def compile_effective_request(memory: SessionMemory) -> EffectiveSessionRequest:
     """Return the only request representation downstream tools should execute."""
 
     relative = [_compile_relative(memory, item) for item in memory.relative_preferences]
-    query_document = _query_document(memory, relative)
-    effective_id = _effective_id(memory, relative)
+    latest_query = (
+        memory.recent_turns[-1].query_text
+        if memory.recent_turns
+        else memory.current_request.query_text
+    )
+    query_document = _query_document(memory, relative, latest_query=latest_query)
+    effective_id = _effective_id(
+        memory,
+        relative,
+        latest_query=latest_query,
+    )
     request = memory.current_request.model_copy(
         update={
             "request_id": effective_id,
@@ -31,11 +40,6 @@ def compile_effective_request(memory: SessionMemory) -> EffectiveSessionRequest:
             ),
             "parser_version": "session-effective-v1",
         }
-    )
-    latest_query = (
-        memory.recent_turns[-1].query_text
-        if memory.recent_turns
-        else memory.current_request.query_text
     )
     return EffectiveSessionRequest(
         effective_request_id=effective_id,
@@ -86,9 +90,17 @@ def _compile_relative(
 def _query_document(
     memory: SessionMemory,
     relative: list[EffectiveRelativePreference],
+    *,
+    latest_query: str,
 ) -> str:
+    if memory.revision == 1 and len(memory.recent_turns) == 1:
+        return latest_query
     request = memory.current_request
-    lines = ["Active recommendation request reconstructed from accepted session state."]
+    # The latest utterance carries soft semantics that the structured parser may
+    # not represent (cuisine aliases, atmosphere, occasion, and free-form intent).
+    # Keep it first so a bounded semantic document never discards user language.
+    lines = [latest_query]
+    lines.append("Active recommendation request reconstructed from accepted session state.")
     lines.append(f"Task: {memory.current_task_type}.")
     for condition in sorted(
         request.conditions,
@@ -119,7 +131,7 @@ def _query_document(
             f"Exclude {len(memory.rejected_business_ids)} user-rejected businesses "
             "by their validated IDs."
         )
-    return "\n".join(lines)
+    return "\n".join(lines)[:2000]
 
 
 def _relative_phrase(item: EffectiveRelativePreference) -> str:
@@ -140,6 +152,8 @@ def _relative_phrase(item: EffectiveRelativePreference) -> str:
 def _effective_id(
     memory: SessionMemory,
     relative: list[EffectiveRelativePreference],
+    *,
+    latest_query: str,
 ) -> str:
     request = memory.current_request
     payload = {
@@ -147,6 +161,7 @@ def _effective_id(
         "session_id": request.session_id,
         "cutoff_time": request.cutoff_time.isoformat(),
         "intent": request.intent,
+        "latest_user_query": latest_query,
         "conditions": [
             item.model_dump(mode="json")
             for item in sorted(

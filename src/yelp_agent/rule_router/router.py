@@ -24,6 +24,7 @@ class RuleRouter:
         review_rag_enabled: bool = False,
         evidence_aggregation_enabled: bool = False,
         semantic_ranking_enabled: bool = False,
+        query_aware_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -45,6 +46,7 @@ class RuleRouter:
         self._review_rag_enabled = review_rag_enabled
         self._evidence_aggregation_enabled = evidence_aggregation_enabled
         self._semantic_ranking_enabled = semantic_ranking_enabled
+        self._query_aware_enabled = query_aware_enabled
 
     def choose_action(self, state: AgentState) -> AgentDecision:
         facts = RouteFacts.from_state(state)
@@ -85,6 +87,8 @@ class RuleRouter:
         )
 
     def _recommendation_decision(self, facts: RouteFacts) -> AgentDecision:
+        if self._query_aware_enabled:
+            return self._query_aware_recommendation_decision(facts)
         if facts.candidate_retrieval is None or not facts.business_scope_known:
             return AgentDecision(
                 action="retrieve_candidates",
@@ -170,6 +174,46 @@ class RuleRouter:
             cross_encoder_beta=self._cross_encoder_beta,
         )
         display_ids = final_ranking[: self._display_limit]
+        missing_details = [
+            business_id
+            for business_id in display_ids
+            if business_id not in facts.detailed_business_ids
+        ]
+        if missing_details:
+            return AgentDecision(
+                action="get_business_details",
+                arguments={"business_ids": missing_details},
+                reason_code="BUSINESS_DETAILS_REQUIRED",
+                tool_name="GET_BUSINESS_DETAILS",
+                tool_kind="deterministic",
+            )
+        return AgentDecision(
+            action="return_recommendation",
+            arguments={"business_ids": display_ids},
+            reason_code="READY_TO_FINALIZE",
+        )
+
+    def _query_aware_recommendation_decision(
+        self,
+        facts: RouteFacts,
+    ) -> AgentDecision:
+        if facts.query_aware_ranking is None or not facts.business_scope_known:
+            return AgentDecision(
+                action="retrieve_candidates",
+                reason_code="QUERY_AWARE_RANKING_REQUIRED",
+                tool_name="GET_QUERY_AWARE_RANKING",
+                tool_kind="semantic",
+            )
+        if not facts.candidate_ids:
+            return AgentDecision(
+                action="return_uncertain_answer",
+                arguments={"reason": "no_eligible_candidates"},
+                reason_code="NO_ELIGIBLE_CANDIDATES",
+            )
+        display_ids = facts.final_ranking(
+            fusion_alpha=self._fusion_alpha,
+            cross_encoder_beta=self._cross_encoder_beta,
+        )[: self._display_limit]
         missing_details = [
             business_id
             for business_id in display_ids

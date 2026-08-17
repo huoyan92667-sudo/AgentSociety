@@ -215,3 +215,36 @@ class CrossEncoderMatchOutput(StrictModel):
 
 class SemanticRankingOutput(SemanticRankingResult):
     """Named Agent-tool output preserving the Step-30 ranking contract."""
+
+
+class QueryAwareRankingOutput(StrictModel):
+    """Agent-safe projection of the complete Step-33 ranking result."""
+
+    candidate_business_ids: list[str] = Field(min_length=1, max_length=1000)
+    case_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    split: Literal["development", "validation"]
+    ranking: list[str] = Field(min_length=1, max_length=1000)
+    top_10: list[str] = Field(min_length=1, max_length=10)
+    displayed_top_5: list[str] = Field(min_length=1, max_length=5)
+    coarse_scores: list[dict[str, Any]] = Field(min_length=1)
+    semantic_scores: list[dict[str, Any]]
+    hard_exclusions: list[dict[str, Any]]
+    query_weight: float = Field(ge=0, le=1)
+    semantic_candidate_limit: int = Field(ge=5, le=100)
+    fallback: bool = False
+    fallback_reason: str | None = None
+    latency_ms: float = Field(ge=0)
+    embedding_input_tokens: int = Field(ge=0)
+    cross_encoder_input_tokens: int = Field(ge=0)
+    logical_input_tokens: int = Field(ge=0)
+    cache_hits: int = Field(ge=0)
+    cache_misses: int = Field(ge=0)
+    external_model_calls: Literal[0] = 0
+
+    @field_validator("candidate_business_ids", "ranking", "top_10", "displayed_top_5")
+    @classmethod
+    def validate_unique_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)) or any(not value for value in values):
+            raise ValueError("ranking IDs must be nonempty and unique")
+        return values

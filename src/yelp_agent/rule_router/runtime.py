@@ -54,6 +54,12 @@ from yelp_agent.query_retrieval import (
     QueryCandidateRetriever,
     load_query_retrieval_config,
 )
+from yelp_agent.query_aware_ranking import (
+    OnlineQueryAwareRankingRuntime,
+    QueryAwareRankingSources,
+    load_query_aware_ranking_config,
+    load_query_aware_ranking_policy,
+)
 from yelp_agent.review_rag import (
     ReviewRAGStore,
     ReviewRetriever,
@@ -222,6 +228,7 @@ class RuleAgentRuntime:
         query_retrieval: QueryCandidateRetriever | None = None,
         session_memory: SessionMemoryRuntime | None = None,
         constrained_router: ConstrainedLLMRouterRuntime | None = None,
+        query_aware_ranking: OnlineQueryAwareRankingRuntime | None = None,
     ) -> None:
         self.sources = sources
         self.harness = harness
@@ -235,6 +242,7 @@ class RuleAgentRuntime:
         self.query_retrieval = query_retrieval
         self.session_memory = session_memory
         self.constrained_router = constrained_router
+        self.query_aware_ranking = query_aware_ranking
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -267,6 +275,9 @@ class RuleAgentRuntime:
             close = getattr(self.constrained_router, "close", None)
             if callable(close):
                 close()
+            close = getattr(self.query_aware_ranking, "close", None)
+            if callable(close):
+                close()
             self._closed = True
 
 
@@ -289,6 +300,8 @@ def build_real_rule_agent_runtime(
     constrained_router_environment: Mapping[str, str] | None = None,
     agent_harness_config_path: str | Path | None = None,
     query_retrieval_mode: Literal["config", "history_only"] = "config",
+    query_aware_ranking_config_path: str | Path | None = None,
+    query_aware_ranking_policy_path: str | Path | None = None,
 ) -> RuleAgentRuntime:
     """Load all frozen artifacts once and assemble the production Rule Agent."""
 
@@ -351,6 +364,8 @@ def build_real_rule_agent_runtime(
     session_memory = None
     semantic_ranking = None
     constrained_router = None
+    query_aware_ranking = None
+    query_aware_policy = None
     try:
         business_profiles = BusinessKnowledgeStore.from_artifacts(
             sources.business_profile_root,
@@ -540,6 +555,40 @@ def build_real_rule_agent_runtime(
                 config=query_retrieval_config,
             )
             dual_channel_fusion = DualChannelFusion(query_retrieval_config)
+        query_aware_config = None
+        if query_aware_ranking_config_path is not None:
+            query_aware_config = load_query_aware_ranking_config(
+                query_aware_ranking_config_path
+            )
+            query_aware_policy = load_query_aware_ranking_policy(
+                query_aware_ranking_policy_path
+                or sources.project_root / query_aware_config.policy_relative_path
+            )
+            query_aware_embedding_environment = load_local_embedding_environment(
+                embedding_environment
+            )
+            if not query_aware_embedding_environment.enabled:
+                raise ValueError(
+                    "Query-aware ranking local embedding environment is not configured"
+                )
+            query_aware_cross_environment = (
+                load_local_cross_encoder_environment(cross_encoder_environment)
+            )
+            if not query_aware_cross_environment.enabled:
+                raise ValueError(
+                    "Query-aware ranking local Cross-Encoder environment is not configured"
+                )
+            query_aware_ranking = OnlineQueryAwareRankingRuntime.from_sources(
+                QueryAwareRankingSources(
+                    source_root=sources.project_root,
+                    project_root=sources.project_root,
+                    config_root=sources.project_root,
+                ),
+                config=query_aware_config,
+                policy=query_aware_policy,
+                embedding_environment=query_aware_embedding_environment,
+                cross_encoder_environment=query_aware_cross_environment,
+            )
         if session_memory_config_path is not None:
             memory_config = load_session_memory_config(session_memory_config_path)
             session_memory = build_session_memory_runtime(
@@ -560,6 +609,7 @@ def build_real_rule_agent_runtime(
             review_search=review_search,
             evidence_aggregator=evidence_aggregator,
             semantic_ranking=semantic_ranking,
+            query_aware_ranking=query_aware_ranking,
             query_retriever=query_retrieval,
             dual_channel_fusion=dual_channel_fusion,
             embedding_alpha=(
@@ -622,8 +672,18 @@ def build_real_rule_agent_runtime(
                     "max_semantic_calls": max(base_budget.max_semantic_calls, 3),
                 }
             )
+        if query_aware_ranking is not None:
+            base_budget = base_budget.model_copy(
+                update={
+                    "max_tool_calls": max(base_budget.max_tool_calls, 3),
+                    "max_semantic_calls": max(base_budget.max_semantic_calls, 1),
+                    "max_steps": max(base_budget.max_steps, 5),
+                }
+            )
         display_limit = (
-            cross_policy.display_limit
+            query_aware_policy.display_limit
+            if query_aware_policy is not None
+            else cross_policy.display_limit
             if cross_policy is not None
             else rule_config.display_limit
         )
@@ -659,6 +719,7 @@ def build_real_rule_agent_runtime(
                 review_rag_enabled=review_search is not None,
                 evidence_aggregation_enabled=evidence_aggregator is not None,
                 semantic_ranking_enabled=semantic_ranking is not None,
+                query_aware_enabled=query_aware_ranking is not None,
             )
             constrained_router = build_constrained_llm_router_runtime(
                 project_root=sources.project_root,
@@ -700,6 +761,7 @@ def build_real_rule_agent_runtime(
             review_rag_enabled=review_search is not None,
             evidence_aggregation_enabled=evidence_aggregator is not None,
             semantic_ranking_enabled=semantic_ranking is not None,
+            query_aware_enabled=query_aware_ranking is not None,
             semantic_enhancer=(
                 None
                 if controlled_llm is None
@@ -729,6 +791,9 @@ def build_real_rule_agent_runtime(
             agent_version=(
                 constrained_config.agent_version
                 if constrained_router is not None
+                else query_aware_config.agent_version
+                if query_aware_ranking is not None
+                and query_aware_config is not None
                 else memory_config.memory_version
                 if session_memory is not None
                 else query_retrieval_config.agent_version
@@ -771,6 +836,9 @@ def build_real_rule_agent_runtime(
         close = getattr(constrained_router, "close", None)
         if callable(close):
             close()
+        close = getattr(query_aware_ranking, "close", None)
+        if callable(close):
+            close()
         user_profiles.close()
         raise
     return RuleAgentRuntime(
@@ -786,4 +854,5 @@ def build_real_rule_agent_runtime(
         query_retrieval=query_retrieval,
         session_memory=session_memory,
         constrained_router=constrained_router,
+        query_aware_ranking=query_aware_ranking,
     )

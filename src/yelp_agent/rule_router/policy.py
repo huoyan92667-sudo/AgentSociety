@@ -22,6 +22,7 @@ class RuleBasedActionPolicy:
         review_rag_enabled: bool = False,
         evidence_aggregation_enabled: bool = False,
         semantic_ranking_enabled: bool = False,
+        query_aware_enabled: bool = False,
     ) -> None:
         if not 1 <= display_limit <= 100:
             raise ValueError("display_limit must be between 1 and 100")
@@ -37,6 +38,7 @@ class RuleBasedActionPolicy:
         self._review_rag_enabled = review_rag_enabled
         self._evidence_aggregation_enabled = evidence_aggregation_enabled
         self._semantic_ranking_enabled = semantic_ranking_enabled
+        self._query_aware_enabled = query_aware_enabled
 
     def allowed_actions(self, state: AgentState) -> tuple[AgentAction, ...]:
         facts = RouteFacts.from_state(state)
@@ -118,6 +120,21 @@ class RuleBasedActionPolicy:
         self,
         facts: RouteFacts,
     ) -> tuple[AgentAction, ...]:
+        if self._query_aware_enabled:
+            if (
+                facts.query_aware_ranking is None
+                or not facts.business_scope_known
+            ):
+                return ("retrieve_candidates", "safe_fallback")
+            if not facts.candidate_ids:
+                return ("return_uncertain_answer", "safe_fallback")
+            display_ids = facts.final_ranking(
+                fusion_alpha=self._fusion_alpha,
+                cross_encoder_beta=self._cross_encoder_beta,
+            )[: self._display_limit]
+            if not set(display_ids).issubset(facts.detailed_business_ids):
+                return ("get_business_details", "safe_fallback")
+            return ("return_recommendation", "safe_fallback")
         if facts.candidate_retrieval is None or not facts.business_scope_known:
             return ("retrieve_candidates", "safe_fallback")
         if not facts.candidate_ids:

@@ -31,6 +31,7 @@ from .schema import (
     QueryAwareRankingResult,
 )
 from .runtime import (
+    OnlineQueryAwareRankingRuntime,
     QueryAwareFinalizationRuntime,
     QueryAwarePreparationRuntime,
     QueryAwareRankingSources,
@@ -45,6 +46,7 @@ __all__ = [
     "ExternalModelCallError",
     "HardConstraintExclusion",
     "METHODS",
+    "OnlineQueryAwareRankingRuntime",
     "PreparedQueryAwareCase",
     "ProtectedCandidatePool",
     "ProtectedCandidatePoolResult",

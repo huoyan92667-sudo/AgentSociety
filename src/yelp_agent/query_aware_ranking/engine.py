@@ -110,9 +110,14 @@ class QueryAwareRecommendationEngine:
         query: QueryRetrievalResult,
         rrf_fusion_ranking: Sequence[str],
         usage_scope: str,
+        rejected_business_ids: set[str] | frozenset[str] = frozenset(),
     ) -> PreparedQueryAwareCase:
         started = perf_counter()
-        pool = self._pool.build(history, query)
+        pool = self._pool.build(
+            history,
+            query,
+            additional_exclusions=rejected_business_ids,
+        )
         ids = [item.business_id for item in pool.items]
         feature_rows = hybrid_candidate_rows(
             pool,

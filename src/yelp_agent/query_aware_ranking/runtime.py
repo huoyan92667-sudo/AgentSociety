@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Self
+from typing import Literal, Self
 
 from yelp_agent.agent_tools import OnlineHybridV2RankingService
 from yelp_agent.business_profiles import BusinessKnowledgeStore
@@ -27,7 +27,11 @@ from yelp_agent.features.text import TemporalTextStore
 from yelp_agent.learning_to_rank import FrozenLambdaMARTRanker
 from yelp_agent.learning_to_rank.features import HybridV1Weights
 from yelp_agent.profiles.store import UserProfileStore
-from yelp_agent.query import QueryParseInput, build_rule_based_request_parser
+from yelp_agent.query import (
+    QueryParseInput,
+    RecommendationRequest,
+    build_rule_based_request_parser,
+)
 from yelp_agent.query_recommendation_benchmark import VisibleQueryRecommendationCase
 from yelp_agent.query_retrieval import (
     DualChannelFusion,
@@ -250,16 +254,6 @@ class QueryAwarePreparationRuntime:
             self._closed = True
 
     def prepare_case(self, case: VisibleQueryRecommendationCase) -> PreparedQueryAwareCase:
-        history_rows = self._data_view.user_history(case.user_id, case.cutoff_time)
-        history = self._history.retrieve(
-            RetrievalTaskContext(
-                task_id=case.case_id,
-                split=case.split,
-                user_id=case.user_id,
-                cutoff_time=case.cutoff_time,
-                history_count=len(history_rows),
-            )
-        )
         request = self._parser.parse(
             QueryParseInput(
                 user_id=case.user_id,
@@ -270,21 +264,54 @@ class QueryAwarePreparationRuntime:
                 user_longitude=case.user_longitude,
             )
         )
+        return self.prepare_request(
+            case_id=case.case_id,
+            split=case.split,
+            request=request,
+            usage_scope=f"step33:{case.case_id}",
+        )
+
+    def prepare_request(
+        self,
+        *,
+        case_id: str,
+        split: Literal["development", "validation"],
+        request: RecommendationRequest,
+        usage_scope: str,
+        rejected_business_ids: set[str] | frozenset[str] = frozenset(),
+    ) -> PreparedQueryAwareCase:
+        """Prepare one live Agent request through the frozen Step-33 pipeline."""
+
+        parsed_request = RecommendationRequest.model_validate(request)
+        history_rows = self._data_view.user_history(
+            parsed_request.user_id,
+            parsed_request.cutoff_time,
+        )
+        history = self._history.retrieve(
+            RetrievalTaskContext(
+                task_id=case_id,
+                split=split,
+                user_id=parsed_request.user_id,
+                cutoff_time=parsed_request.cutoff_time,
+                history_count=len(history_rows),
+            )
+        )
         query = self._query.retrieve(
             QueryRetrievalTask(
-                request=request,
-                usage_scope=f"step33:{case.case_id}",
+                request=parsed_request,
+                usage_scope=usage_scope,
             )
         )
         dual = self._dual.fuse(history, query)
         return self._engine.prepare(
-            case_id=case.case_id,
-            split=case.split,
-            request=request,
+            case_id=case_id,
+            split=split,
+            request=parsed_request,
             history=history,
             query=query,
             rrf_fusion_ranking=[item.business_id for item in dual.candidates],
-            usage_scope=f"step33:{case.case_id}",
+            usage_scope=usage_scope,
+            rejected_business_ids=rejected_business_ids,
         )
 
 
@@ -380,3 +407,74 @@ class QueryAwareFinalizationRuntime:
             prepared,
             usage_scope=f"step33:{prepared.case_id}",
         )
+
+
+class OnlineQueryAwareRankingRuntime:
+    """One Agent-facing seam owning the complete frozen Step-33 runtime."""
+
+    def __init__(
+        self,
+        *,
+        preparation: QueryAwarePreparationRuntime,
+        finalization: QueryAwareFinalizationRuntime,
+    ) -> None:
+        self._preparation = preparation
+        self._finalization = finalization
+        self._closed = False
+
+    @classmethod
+    def from_sources(
+        cls,
+        sources: QueryAwareRankingSources,
+        *,
+        config: QueryAwareRankingConfig,
+        policy: QueryAwareRankingPolicy,
+        embedding_environment: LocalEmbeddingEnvironment,
+        cross_encoder_environment: LocalCrossEncoderEnvironment,
+    ) -> Self:
+        preparation = QueryAwarePreparationRuntime.from_sources(
+            sources,
+            config=config,
+            provisional_policy=policy,
+            embedding_environment=embedding_environment,
+        )
+        try:
+            finalization = QueryAwareFinalizationRuntime.from_sources(
+                sources,
+                policy=policy,
+                cross_encoder_environment=cross_encoder_environment,
+            )
+        except Exception:
+            preparation.close()
+            raise
+        return cls(preparation=preparation, finalization=finalization)
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
+
+    def close(self) -> None:
+        if not self._closed:
+            self._finalization.close()
+            self._preparation.close()
+            self._closed = True
+
+    def rank(
+        self,
+        *,
+        request: RecommendationRequest,
+        case_id: str,
+        split: Literal["development", "validation"],
+        usage_scope: str,
+        rejected_business_ids: set[str] | frozenset[str] = frozenset(),
+    ) -> QueryAwareRankingResult:
+        prepared = self._preparation.prepare_request(
+            case_id=case_id,
+            split=split,
+            request=request,
+            usage_scope=usage_scope,
+            rejected_business_ids=rejected_business_ids,
+        )
+        return self._finalization.finalize_case(prepared)

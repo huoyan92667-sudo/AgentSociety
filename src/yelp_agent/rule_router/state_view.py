@@ -74,6 +74,7 @@ class RouteFacts(StrictModel):
     semantic_ranks_by_business: dict[str, int]
     cross_encoder_ranks_by_business: dict[str, int]
     semantic_ranking_ids: list[str]
+    query_aware_ranking_ids: list[str]
     detailed_business_ids: list[str]
     profiled_business_ids: list[str]
     compared_business_ids: list[str]
@@ -84,6 +85,7 @@ class RouteFacts(StrictModel):
     semantic_match: RouteToolFact | None = None
     cross_encoder_match: RouteToolFact | None = None
     semantic_ranking: RouteToolFact | None = None
+    query_aware_ranking: RouteToolFact | None = None
     business_details: RouteToolFact | None = None
     business_profiles: RouteToolFact | None = None
     comparison: RouteToolFact | None = None
@@ -109,6 +111,8 @@ class RouteFacts(StrictModel):
     ) -> list[str]:
         """Apply Step-25 then Step-26 fusion, preserving every unscored tail."""
 
+        if self.query_aware_ranking_ids:
+            return list(self.query_aware_ranking_ids)
         step26 = fuse_ranking_and_cross_encoder(
             self.embedding_ranking(fusion_alpha=fusion_alpha),
             self.cross_encoder_ranks_by_business,
@@ -125,7 +129,12 @@ class RouteFacts(StrictModel):
         """Hide request, readiness, scope, and accounting representation details."""
 
         tools = _normalized_tools(state.observations)
-        retrieval = _latest_tool(
+        query_aware_ranking = _latest_tool(
+            tools,
+            "GET_QUERY_AWARE_RANKING",
+            turn_index=state.current_turn,
+        )
+        retrieval = query_aware_ranking or _latest_tool(
             tools,
             "EXPAND_CANDIDATES",
             turn_index=(state.current_turn if state.memory is not None else None),
@@ -286,6 +295,9 @@ class RouteFacts(StrictModel):
             semantic_ranking_ids=_string_list(
                 _tool_data(semantic_ranking).get("ranking")
             ),
+            query_aware_ranking_ids=_string_list(
+                _tool_data(query_aware_ranking).get("ranking")
+            ),
             detailed_business_ids=_accumulated_record_ids(
                 tools,
                 tool_name="GET_BUSINESS_DETAILS",
@@ -308,6 +320,7 @@ class RouteFacts(StrictModel):
             semantic_match=_route_tool_fact(semantic_match),
             cross_encoder_match=_route_tool_fact(cross_encoder_match),
             semantic_ranking=_route_tool_fact(semantic_ranking),
+            query_aware_ranking=_route_tool_fact(query_aware_ranking),
             business_details=_route_tool_fact(details),
             business_profiles=_route_tool_fact(profiles),
             comparison=_route_tool_fact(comparison),

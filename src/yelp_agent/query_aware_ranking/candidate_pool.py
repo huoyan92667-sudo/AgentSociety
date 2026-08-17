@@ -31,6 +31,8 @@ class ProtectedCandidatePool:
         self,
         history: RetrievalResult,
         query: QueryRetrievalResult,
+        *,
+        additional_exclusions: set[str] | frozenset[str] = frozenset(),
     ) -> ProtectedCandidatePoolResult:
         history_by_id = {item.business_id: item for item in history.candidates}
         query_by_id = {item.business_id: item for item in query.candidates}
@@ -48,6 +50,17 @@ class ProtectedCandidatePool:
             for item in query.excluded
             if item.business_id in union_ids
         }
+        for business_id in sorted(additional_exclusions.intersection(union_ids)):
+            existing = excluded_by_id.get(business_id)
+            reason_codes = (
+                [] if existing is None else list(existing.reason_codes)
+            )
+            if "SESSION_REJECTED" not in reason_codes:
+                reason_codes.append("SESSION_REJECTED")
+            excluded_by_id[business_id] = HardConstraintExclusion(
+                business_id=business_id,
+                reason_codes=reason_codes,
+            )
         eligible_ids = sorted(union_ids.difference(excluded_by_id))
         items = []
         for business_id in eligible_ids:

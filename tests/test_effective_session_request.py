@@ -137,6 +137,63 @@ def test_effective_id_depends_on_active_state_not_stale_summary_text() -> None:
     assert first.request.query_text == second.request.query_text
 
 
+def test_effective_request_preserves_the_latest_user_query_for_semantic_tools() -> None:
+    memory = _memory().model_copy(
+        update={
+            "revision": 1,
+            "current_task_type": "recommendation_request",
+            "relative_preferences": [],
+            "relative_preference_references": {},
+            "rejected_business_ids": [],
+            "clarification_answers": {},
+            "current_request": _memory().current_request.model_copy(
+                update={
+                    "query_text": "Find a cozy late-night sandwich shop.",
+                    "conditions": [],
+                    "party_size": None,
+                    "referenced_business_ids": [],
+                }
+            ),
+            "recent_turns": [
+                _memory().recent_turns[0].model_copy(
+                    update={
+                        "turn_index": 1,
+                        "query_text": "Find a cozy late-night sandwich shop.",
+                    }
+                )
+            ],
+        }
+    )
+
+    effective = compile_effective_request(memory)
+
+    assert effective.request.query_text == "Find a cozy late-night sandwich shop."
+
+
+def test_effective_id_separates_unparsed_queries_with_the_same_structured_state() -> None:
+    first_memory = _memory().model_copy(
+        update={
+            "current_request": _memory().current_request.model_copy(
+                update={"conditions": [], "party_size": None}
+            ),
+        }
+    )
+    second_memory = first_memory.model_copy(
+        update={
+            "recent_turns": [
+                first_memory.recent_turns[0].model_copy(
+                    update={"query_text": "Find a quiet sushi bar."}
+                )
+            ]
+        }
+    )
+
+    assert (
+        compile_effective_request(first_memory).effective_request_id
+        != compile_effective_request(second_memory).effective_request_id
+    )
+
+
 def test_tool_context_prefers_the_effective_request_over_legacy_turn_text() -> None:
     memory = _memory()
     effective = compile_effective_request(memory)
