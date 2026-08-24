@@ -1,0 +1,1915 @@
+{
+  "aspects": {
+    "cleanliness": {
+      "both": [
+        {
+          "business_id": "gjALduh0HJg-xMHMm0Uz0Q",
+          "matched_anchor_ids": [
+            "cleanliness:2"
+          ],
+          "matched_terms": [
+            "filthy"
+          ],
+          "review_id": "RXS6lLy5vzPbGS8DrzI-gg",
+          "review_text": "May be the dirtiest restaurant I've ever eaten in. Everything is sticky, stained and filthy. The bathrooms are even worse.",
+          "semantic_score": 0.7966949939727783
+        },
+        {
+          "business_id": "A4CPH0tLHOrtoTVNQcJSRQ",
+          "matched_anchor_ids": [
+            "cleanliness:0"
+          ],
+          "matched_terms": [
+            "dirty"
+          ],
+          "review_id": "4_B7lamwPRyz22Cq2DrqtA",
+          "review_text": "My experience here was okay. I mean the food was edible at least right? \n\nRanging from overcooked noodles to old limp fried shrimp, they're presented on a shiny white platter that didn't seem to actually transfer any heat to the buffet selection. If the food temperature scale was 1-10 where 1 was cold, 5 was warm, and 10 was hot. I would say the food temp. was a 3.5. Not cold but not warm either. \n\nAside from that, some of the food selection just felt old and poorly seasoned. Fish was salty, the soup was bland, noodles were way overcooked, fried shrimp not crisp, the chicken was dry, sushi was more rice/cream cheese/fake crab than fish, etc. \nThere's also small selection. At first, the buffet looks big because there's a lot of rows but then you realize that each row has like 4-5 different entrees. \n\nService was okay. Plates were taken, waters were refilled. However, some areas and plates felt dirty. But hey, at least the bathrooms were pretty clean. So kudos to them for doing something right.",
+          "semantic_score": 0.7409454584121704
+        },
+        {
+          "business_id": "epVHdJqIFN0dtAiFvnVJVg",
+          "matched_anchor_ids": [
+            "cleanliness:2"
+          ],
+          "matched_terms": [
+            "dirty"
+          ],
+          "review_id": "PyydRM6iMR5cTLNrpFDKYA",
+          "review_text": "Very dirty. I mean so gross. The toilets were overflowing, food on the floors & table was sticky.",
+          "semantic_score": 0.7408313751220703
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "v1msvs2bf_LwGUnIcCgSEg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "very clean"
+          ],
+          "review_id": "-34TLxJJc5ZyQDYymgw88A",
+          "review_text": "Yelp I really need some half stars once and for all, this would be a 2.5 star place for me. I've dined in as well as order take out and delivery through the yelp app. The restaurant itself is very clean, intimate, date night like spot feel. It's BYOB and the staff is nice not friendly but nice and attentive.\n\nOn our first time there we ordered a chicken and a lamb dish this comes with rice. My bf and I agreed that even though the food was good it was not the best Indian food we've had.\n\nThe reason for the two stars is our delivery order from last night even though it arrived within the time promised and the delivery guy was polite the food was not very good.\n\nMy boyfriend had chicken tikka masala and again he said it was good but not great. I ordered lamb tikka masala and this is were the problem lies. The \"lamb\" (I put in quotations because I've never had lamb like this before) was of the most weird texture unlike any other piece of lamb I've eaten before. It was very tough and when you bit into it the texture was almost that resembling of liver (if any of you have ever had that you'll know what I'm talking about). After a few bites of this my stomach felt like I'd eaten a block of concrete so I just stopped. \n\nI don't think we'll eat here again. Very disappointing because it seeks like they could have potential.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "KHQXmUFiAD0FHvrMSakJBA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "dirty"
+          ],
+          "review_id": "-3Frf1oGO2ehLbfKy68ZKw",
+          "review_text": "I used to come for the dirty martinis on the happy hour menu. Now that it's gone.. I am just given over priced cocktails and meals that are below average. Sad!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "QXGnmsKYANxOyZBqM-zlJA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "very clean"
+          ],
+          "review_id": "-5kQEEgaK-WleU63JI3B6Q",
+          "review_text": "Had the most delightful vegan prix fixe dining experience served by chef Lenka Zivkovic. An absolutely delicious 4 course dinner available every other Thursday at Plough & The Stars. \n\nWe enjoyed a rich cauliflower bisque (hearty portion!) followed by a unique artichoke/hearts of palm parfait & a very clean arugula salad. The third courses were utterly breathtaking and equally delicious! Grilled polenta with a lentil/walnut pate, portabello with quinoa & asparagus plus an artichoke rose that was sooo good, pasta orecchiette with a topping that mimicked bacon! The portions were hearty and all plates paired exceptionally well together. Then... the desserts came. You must try these vegan cakes. Immediately. The chocolate raspberry cream cake deserves a gold medal. It was so rich and mouth watering. The avocado lime cheesecake will blow your socks off. And both were raw dishes! Truly impressed.\n\nOur waiter, Josh, was the nicest. Extremely friendly and knowledgeable when it came to the menu. We're so happy he told us about the prix fixe!\n\nThe Greater Philadelphia Area vegan community is slowly catching wind of these incredible plates, so definitely book a table in advance!!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "7Y3RjSc99a88oTMEgvazoA",
+          "matched_anchor_ids": [
+            "cleanliness:2"
+          ],
+          "matched_terms": [],
+          "review_id": "phrVuvKSUySQrj3bKpFHIw",
+          "review_text": "This is the dirtiest restaurant I've been to in a long time....look at the dust all over the signs and lights. The filth on the soda machine and sinks...dusty signs and lights right over food. Employees touching their hair and clothing with their food service gloves on. Gross.",
+          "semantic_score": 0.7430248856544495
+        },
+        {
+          "business_id": "-UJ7ZTb3zfmqZogmy3fnGg",
+          "matched_anchor_ids": [
+            "cleanliness:0"
+          ],
+          "matched_terms": [],
+          "review_id": "twXNQuQERO9_Z48snKarfQ",
+          "review_text": "Went here walking by on a whim. They were welcoming and sat us at the bar with drinks while we waited a few minutes for our table. For appetizers we ordered the antipasto - delicious. Also ordered the bruschetta which was delicious though we waited to eat the last piece and it got a little soggy. The table bread wasn't anything special. For the entree I ordered best lasagna I've ever had. The noodles were thin and there were so many layers. It was oddly a delicate lasagna sitting in a very fresh and light red sauce. My husband ordered the seafood linguini. They accidentally brought him the red instead of white sauce but it was delicious and they comped our dessert. I was pleasantly surprised by the creme brûlée! I'm so picky but it was creamy and light, just as it should be. \n\nThe service was great. Everyone was very kind and friendly! On a last note, the bathrooms were extremely clean and smelled of bleach. I'm always grossed out when restaurants have gross bathrooms, but I seriously could have eaten in there. Thanks for a great and surprising dinner!",
+          "semantic_score": 0.7365204691886902
+        },
+        {
+          "business_id": "ytynqOUb3hjKeJfRj5Tshw",
+          "matched_anchor_ids": [
+            "cleanliness:0"
+          ],
+          "matched_terms": [],
+          "review_id": "jbUIIOunu6Qi_LHMv_m7-Q",
+          "review_text": "This place is a hot mess.  But I love every single thing about it. \n\nIt's loud and hectic but full of just about anything you might be looking for- fresh produce, counter after counter of meats, cheeses, and baked goods.  Oh the baked goods!\n\nWe spent well over an hour wandering around and finally settled on a Boneless Rib Sandwich from The Rib Stand (http://www.yelp.com/biz/the-rib-stand-philadelphia#hrid:mN-jilQ6AgwBRYEDz6PO9g) and several snacks from Beiler's Bakery (http://www.yelp.com/biz/beilers-bakery-philadelphia#hrid:2FZHu1jUHxo8Y4oXKGVQfQ).  So good!  Can't wait for another visit. \n\nOther notes:\n- It's set up like a grid which is nice, and there are several exits.\n- Some of the food stands have places to sit inside, but there are a handful of large seating areas in the middle of the market.  \n- There are also a bunch of tables/chairs outside along 12th Street.\n- The bathrooms were surprisingly really clean and stocked.",
+          "semantic_score": 0.7363237142562866
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "4Npws3Svn4Al4_bpvTMXZA",
+          "matched_anchor_ids": [
+            "cleanliness:2"
+          ],
+          "matched_terms": [],
+          "review_id": "pHK91HLV8Jss4j88mw9riA",
+          "review_text": "A buddy was stopping over my place and said he'd pick us up a Deoblo (sp?) hoagie. It cost $20.xx, but you have it for 2 days, the thing's huge with excellent roll.\nThe hoagie was superior.\nI called to get one delivered an other time and was told the delivery stops at 3PM.  (Scratching my head) \nThanks, Danielle for your \"head's up.\"  Certainly will keep it in mind.",
+          "semantic_score": 0.19214659929275513
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "cleanliness:0"
+          ],
+          "matched_terms": [],
+          "review_id": "m4uBu-3x19Wz5e0S1nBxvg",
+          "review_text": "I make hubby stop here on his lunch break once a week and buy several loaves for me at once. I have a freezer in my basement so I cut it up, ziploc it and pop it in oven to warm up again when needed. It's delicious even after freezing/thawing. My kids are addicted to their breads! I dip them in garlic olive oil. So yummy!",
+          "semantic_score": 0.2102224975824356
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "cleanliness:0"
+          ],
+          "matched_terms": [],
+          "review_id": "Vw1D1MXKi_tir89qF5xsKg",
+          "review_text": "I love this place.  Small neighborhood bakery, specializing in Italian-style breads, baked on premises. Surprisingly wide variety. I love braided Italian with sesame seeds, that chewy loaf with pointed ends, and whole wheat (on Fridays only)!  I'm neither Italian nor Catholic, so their many holiday specials are new discoveries to me. \n\nRetail business plus they supply a couple restaurants. Reasonable prices.  They're opposite the SW corner of Columbus Square (aka Passyunk Square). You'll see Mrs. Faragalli sitting in the front window.\n\nUPDATE: From the Phila Inquirer: \"Marie 'Maemoe' Faragalli, 86, owner of the venerable Faragalli's Bakery in South Philadelphia, which lays claim to the only wood-fired open-hearth oven in Philadelphia, died of breast cancer Sunday [June 29, 2008] at Thomas Jefferson University Hospital.\" Great story about the family and bakery ( http://www.philly.com/philly/obituaries/22802524.html ).",
+          "semantic_score": 0.21699051558971405
+        }
+      ]
+    },
+    "crowded": {
+      "both": [
+        {
+          "business_id": "JrG4NINLspXPNhSXg7Q07Q",
+          "matched_anchor_ids": [
+            "crowded:1"
+          ],
+          "matched_terms": [
+            "cramped"
+          ],
+          "review_id": "pP-n0CccSnAmTlvXjm1Z8Q",
+          "review_text": "Last time I was here, I had the big breakfast with the salmon.  Having just spent a month on the other side of the Atlantic...I wasn't overly impressed with the smoked salmon.  I wanted something more substantial for brunch today and opted for the buttermilk fried chicken sandwich.  It was dowsed in a hot/buffalo sauce combo I believe...which was interesting.  I loved the pickle slices hidden within the brioche bun.  I was going to go crazy with the Mimosas, but the first two I ordered were so small...literally one gulp worth.  I thought about running into the nearest Anglican Cathedral for a proper glass.  I had a latte - no complaints there.  I really, really appreciate the room this place has.  The victorian lounge furniture by the fireplace upstairs - nice touch.  The booth nook is a good location.  No matter where you are, you do not feel cramped -there's space to breathe, and you aren't sitting at those flimsy glass tables that so many restaurants have these days.  A definite plus.  The people who greeted us and sat us were especially welcoming.",
+          "semantic_score": 0.7571126818656921
+        },
+        {
+          "business_id": "6ajnOk0GcY9xbb5Ocaw8Gw",
+          "matched_anchor_ids": [
+            "crowded:3"
+          ],
+          "matched_terms": [
+            "crowded"
+          ],
+          "review_id": "izQXKuMBw_eO26l2t0pCmg",
+          "review_text": "Definitely love the food and its excellent service. But the restaurant was so crowded. I saw customers even the waiters/waitresses had difficulties to walk through tables.",
+          "semantic_score": 0.7369446754455566
+        },
+        {
+          "business_id": "6ajnOk0GcY9xbb5Ocaw8Gw",
+          "matched_anchor_ids": [
+            "crowded:3"
+          ],
+          "matched_terms": [
+            "packed"
+          ],
+          "review_id": "xaORCHzHbtqIwPSq8iHMpA",
+          "review_text": "Good food, good service, inspiring presentation, but they try to pack too many people in a small space.  I sat right on top of the people next to me, who weren't at my table.  They need to expand, or get rid of a third of the tables.  Because it's usually packed, the former would be the better option.",
+          "semantic_score": 0.7301803231239319
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "OdIBX09glfXNVSyd0RnIeg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "crowded"
+          ],
+          "review_id": "--3fvGPxMtmv85Hb4lqC1g",
+          "review_text": "I went here back in July with a girlfriend for my 23rd birthday. I was really impressed with their beer list. The mussels were REALLY good, but honestly I hope it's not the best that Philadelphia has to offer, because then I'd be really disappointed in the city.\n\nOne thing that I do find myself craving from this restaurant was that dipping sauce they serve with the french fries. I think I would go back to the restaurant just for that damn dipping sauce!\n\nA downside to the night I went was that it was just so damn hot! Philadelphia gets so humid especially in the middle of the summer, so after walking around all day I wanted to walk into a bar/restaurant that had some AC cranked up. Unfortunately, the combination of the summer heat, how crowded the place was, and the poor ventilation really did put a damper on my eating experience.\n\nAll in all, yes.. I would go back.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "sVZb87xjhbCWHQ2UXOGLrA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "crowded"
+          ],
+          "review_id": "--EKDF0519GcUY5AGj5s7Q",
+          "review_text": "It's been a while since I've been here, and I don't remember much when I was in college with this being a byo and all. But this was a great meal with a lovely waitress lots of wine and great food. \n\nSeating is tight be we managed well. We called earlier to get a reservation, but on a Monday night it wasn't super crowded. \n\nFirst comes the bread. Crusty yet soft with amazing garlic infused oil, yes we ate all of it. \n\nFor the appetizers, we got the sautéed calamari and the grill sweet sausage. Both were really good but I definitely loved the calamari the best. With a squeeze of lemon the calamari was super fresh and complex.\n\nEntrees were the ribeye, linguine with clams, and the fish special bronzino. We got the ribeye cooked rare and wow, I think I'm a rare convert. Best steak I've had in a long while. It also comes with a side of sauce and together they were amazing. The linguine with clams was good, cooked in a white wine sauce with plenty of clams. The bronzino was also pretty good.\n\nHad to order dessert so we agreed on the tiramisu and the creme brûlée. Both were amazing but tiramisu took the cake. Super strong coffee flavors, super rich and melded together. \n\nNext time you need a byo come here.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "ADe114o7Z4vb1O6HkM6YEA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "crowded"
+          ],
+          "review_id": "--G23bgO-XEf0vtTbOwxtg",
+          "review_text": "Awesome lunch place on Penn campus.  Any of the salads are huge and phenomenal.  The gyros are also great - they add french fries to the gyro -  yummy.  \n\nThe place tends to get crowded during lunch.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "ktM6aYuzqWd-kA8SIWswiQ",
+          "matched_anchor_ids": [
+            "crowded:3"
+          ],
+          "matched_terms": [],
+          "review_id": "OthLkBiIZBRDpxHGzVt_sQ",
+          "review_text": "I've only been here for brunch but it is one of my go-to places to eat on a weekend. I've had several of their brunch meals but always with a side of sausage. I don't normally order a side of sausage but it is that good. Recently I had their 9-grain pancakes with bananas. I was pleasantly surprised when I received the pancakes and the bananas were cooked into the pancake - score! Everything I've ever gotten there is fresh and tasty. I really enjoy the bread basket that includes cornbread, rye, and some other yummy slices and jelly. Depending on who is paying I would advise getting a mimosa. I word it that way because I think they are too expensive but very tasty. \n\nOverall I love this place. I can always expect fresh and tasty food. I also can always expect a wait (on the weekends for brunch). I've found that if you arrive at 10:45 or earlier you don't have too long of a wait. One thing I don't like about this place is when you wait for your table you are constantly in the way of the servers and you are squished into a small space with everyone else.",
+          "semantic_score": 0.7044361233711243
+        },
+        {
+          "business_id": "SDL247FlOnScJfuNjZESxg",
+          "matched_anchor_ids": [
+            "crowded:1"
+          ],
+          "matched_terms": [],
+          "review_id": "oElfEgZ6mnsLnvfc8T-mgA",
+          "review_text": "I had high expectations going here.  I walk by this place often and see lots of people eating and having a good time.  However, I was very disappointed with this place for two reasons: 1) my food was terrible; 2) the seating arrangement is awful.  \n\nAllow me to elaborate: 1) I ordered the veggie burger and was surprised to find that the buns are the most substantial part of the dish.  Inside of two gigantic buns was a very small portobello mushroom, some sloppy grilled onions, really large pieces of lettuce, and one sliver of a zucchini.  The burger was bland and the fries that came with the burger were very salty.  I realize that this restaurant isn't known for their veggie burger, but I finished my burger and thought aloud, \"I wish I could've had a veggie Whopper.\"  This was the worst burger I've ever had in my life.\n\n2) the seating arrangement is a joke.  We made a reservation and arrived to find a half-empty restaurant.  Our server sat us next to another tandem, in the corner of the restaurant.  Our tables were literally 4-6 inches apart.  This was painfully awkward.  It was almost like we were joining two random strangers.  This seating arrangement wasn't so bad once the place filled in, but for the 30 minutes we were there before that, it was awful.  It felt like we had to compete with the people sitting next to us to get a word.  The entire meal, I found myself unwillingly eavesdropping in the conversation next to us. \n\nI realize that there's a lot of hype around this place and that it's conveniently located.  However, there are so many fine dining options on the same block and immediately around the corner from this place.  I wonder why ANYONE would ever frequent this spot.",
+          "semantic_score": 0.7001455426216125
+        },
+        {
+          "business_id": "uxZENO1iy7tz8MK77L3_GQ",
+          "matched_anchor_ids": [
+            "crowded:3"
+          ],
+          "matched_terms": [],
+          "review_id": "Q7k9FHVz0EsvWwFwFDNO3g",
+          "review_text": "I like this little joint for their delicious coffee and amazing service, but I hate that they allow about 15-20 people in this very small space. It's definitely beyond full capacity because all the tables are full and people waiting in line inside from the bathroom area to the other side of the entrance. It's SCARY because that's definitely putting people in danger.",
+          "semantic_score": 0.6968719363212585
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "crowded:0"
+          ],
+          "matched_terms": [],
+          "review_id": "4WKQx5WxjgnSu2As3ZGrdg",
+          "review_text": "This place has the BEST Italian bread in the City...\nThey also make the BEST EASTER BREAD you can buy! Been eating their breads for 46 years!",
+          "semantic_score": 0.20540738105773926
+        },
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "crowded:0"
+          ],
+          "matched_terms": [],
+          "review_id": "14vBZTfCnISCjRXMSbxJDQ",
+          "review_text": "Best dogs in S. Philly! Fast, clean, consistently great!",
+          "semantic_score": 0.24186639487743378
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "crowded:1"
+          ],
+          "matched_terms": [],
+          "review_id": "m4uBu-3x19Wz5e0S1nBxvg",
+          "review_text": "I make hubby stop here on his lunch break once a week and buy several loaves for me at once. I have a freezer in my basement so I cut it up, ziploc it and pop it in oven to warm up again when needed. It's delicious even after freezing/thawing. My kids are addicted to their breads! I dip them in garlic olive oil. So yummy!",
+          "semantic_score": 0.24254482984542847
+        }
+      ]
+    },
+    "date_suitable": {
+      "both": [
+        {
+          "business_id": "i_FWONQD1ZBqrNE2b-M5Ug",
+          "matched_anchor_ids": [
+            "date_suitable:0"
+          ],
+          "matched_terms": [
+            "anniversary dinner"
+          ],
+          "review_id": "NzhcI9_bvNMjaoUlIe8Xbw",
+          "review_text": "GREAT spot! Came here for our first anniversary dinner and truly enjoyed every part of our meal. We decided to do the chef's tasting menu and every single dish was delish.  We had heard so much about this restaurant and could not decide what to order and figured this would be a great way to get a taste of the menu in general. Our meal started off with us being served complimentary glasses of a sparkling white wine and we were told about the history of that particular beverage as it was being served. Each of our dishes was served by a different individual which was different from other places we have been. We still had one main server throughout the night as well, and she was excellent. I am always impressed when a server can tell us about various menu items without having to think about it or read the menu itself, and our server was very knowledgeable about every dish. The ambiance of the restaurant, both indoors and out, is beautiful.  It was too cold to sit outside but the garden area really is stunning at night and would be perfect for a summer evening. The overall experience was outstanding and perfect for a cozy, romantic anniversary dinner!",
+          "semantic_score": 0.7247389554977417
+        },
+        {
+          "business_id": "0bvtIbpsqBJZpRKSPwIfNw",
+          "matched_anchor_ids": [
+            "date_suitable:0"
+          ],
+          "matched_terms": [
+            "date night"
+          ],
+          "review_id": "QPldFOpOQZEW0t2qX7jS4g",
+          "review_text": "My partner and I went to Panorama for a little restaurant week date night, and we had a lovely time.\n\nI really liked the flexibility of their restaurant week menu options - you had basically access to their entire regular menu and could get a smaller portion of pasta instead of the appetizer options as your First Course.  It definitely was well worth it.\n\nI had the gnocchi and arancini and we also tried the wine flight.  The gnocchi was the softest, most pillowy gnocchi I've ever had, and I'd go so far as to say probably the best I've ever had as well.  Please note my really sad, out of focus picture does not do the dish justice yikes.\n\nOur server was really helpful in helping us decide which flight to do.  Panorama has (being that it's a wine bar) a really extensive wine list, so for wine lovers, this is a must!  Dessert was a chocolate torte with cherry.\n\nIt's a really romantic location for date night, the interior gives off a fancy flair and vibe.  Service was great, and we left the night really feeling good about our restaurant week choice.",
+          "semantic_score": 0.7135263085365295
+        },
+        {
+          "business_id": "L4kfcADLCU4T33i7Z0CkuA",
+          "matched_anchor_ids": [
+            "date_suitable:0"
+          ],
+          "matched_terms": [
+            "date night"
+          ],
+          "review_id": "CWHulCsy6FjfB-8PL9t6LA",
+          "review_text": "We visited recently for restaurant week. Reservations were easy enough to setup through Open table though I booked about two weeks in advanced. I called about a day later to inquire about a cellar table (you must call to book) and there were none available for my desired date and time (completely understandable) I was contacted a couple of days before my reservation to confirm, which I am sure is a must during restaurant week due to so many reservations. Overall the staff were exceedingly polite and efficient, before and during our visit.\n\nI loved the storefront with lush greenery and a set of adorable bistro tables. It was so inviting I almost wanted to have dinner there (I know the bistro tables are TOO small). Upon entering we were greeted by a host while another employee finished taking a reservation. We were then taken to a small table across from a booth. It was a strip leading to the kitchen or server area which meant there were only two-seater tables on the left and booths on the right, which made our dinner experience semi-private. Some time ago, I read an article on yahoo's front page about Bistro Romano being one of America's 100 most romantic restaurants and with its dim lighting, exposed brick walls and crisp clothes adorning the tables this is the perfect setting for a cozy romantic date night and I couldn't agree more.\n\nRestaurant Week was one well-oiled machine. While the service did not feel rushed, the timing was precise and made sure the process moved along quickly. We were greeting with whipped ricotta and citrus honey on two thin slice of baguette. It was a nice bright beginning. I paired my 3-course meal with their bistro wine flight (choice or red or white) and my fiancé enjoyed a cocktail and beer. The wine list (book actually) for bottles is expansive and PRICEY. The beer list was tiny as expected in an Italian restaurant.\n\nFor starters, I a chose the salad (obviously) and my fiancé the calamari. The salad was zesty and enjoyable. The calamari portion was more than fair and they were lightly battered and fried to perfection. For my entrée, I went with a safe and ever so carby option: pappardelle. It was nice and tender and the sauce was nice and meaty. The fresh grated cheese was a flavorful touch. I had food envy over my fiancés lobster raviolis. Make sure you or someone in your party orders this. The pasta is thin and the flavor is all fresh lobster in a cream sauce. MMM. For dessert, I can never pass on tiramisu and my fiancé went with the cannoli. The servings were large and while I enjoyed both the tiramisu was a bit mushy. A topping of shaved chocolate could have saved the texture.\n\nSuggestions: Update the quality of your house wines, especially the flights. I know these are supposed to be a cheaper option hence choosing cheaper offerings but you didn't have to go bottle of the barrel with options like Zonin and Beringer. Yuck. Also, my meal would have been perfect but I never received the remaining portion of my pappardelle. I saved room for dessert. Don't ask me if I would like it wrapped up to go only to never bring it back L. By the time I remembered, I had made it back to the car.\n\nNote: perfect date night spot. And remember to call for the cellar tables.",
+          "semantic_score": 0.7031558156013489
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "oVwEPg-BADIFl2SlGma6jg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "anniversary dinner"
+          ],
+          "review_id": "-3HPWh2eXnvQGrBiQwV1Yw",
+          "review_text": "Came here with my husband for our anniversary dinner and was blown away by the gnocchi. It was just... wow. Everything about the dish was perfect. The pillowy gnocchi literally melts in your mouth. It was bathed in the most perfect, truffle cream sauce and the porcini mushrooms elevated the flavors to another level. The crushed walnuts gave the dish a nice texture contrast as well. I can't remember having an Italian dish this good since my trip to Italy. We also ordered the burrata appetizer, fusilli pasta with shrimp and crab, and the barramundi (the later two were the specials of the night). My husband thoroughly enjoyed everything. I personally could not get over the gnocchi. Get the gnocchi when you're here.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "oZzN706lKoL4faaTK739xA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "date night"
+          ],
+          "review_id": "-6d1aHyXgfGjmiG6sMuMoQ",
+          "review_text": "The best meal I have ever had.  \n\nThey have a set tasting menu that changes monthly or there about.  Reservation only.  They also have eclectic wine options.  \n\nWe participated in their December Tasting Menu with the Paired Wine option.  It was absolutely incredible.  Mouth watering dishes, creative plating, and magically pairings.  We couldn't have asked for a better experience.  The knowledge of the food and wine was so refreshing as everything is completely described as it hits the table.  The room is quaint, cozy, yet private.  We absolutely loved the service and y'all - the food is AH-MAZING!  Great date night, friends/family in town, or a place to show off your taste.  Highly recommend and one of Philly's gems!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "05ev984NYfimRN0UiFrxaA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "date night"
+          ],
+          "review_id": "-8IQeIYkfQuZ7hO8998xuw",
+          "review_text": "We went on 12/23 on a date night. I wanted to visit this place for a long time. \n\nYou find a rustic charming location. It has limited parking, so prepare to pay for valet at $12 or wander the streets for parking. No, problem we found street parking in a minute or two and only a block away. \n\nThe staff are friendly and attentive. They do not miss a beat. \nI would say the food is a rustic or comfort food type of Italian. There are many choices of interesting things. I saw a number of items I've not seen on a menu. The waitress seemed to love just about everything we ordered. \nThey had an extensive wine menu and to my delight a good sized beer menu of import and specialty beers. I ordered a nice import. The sommelier I think had difficulty pouring it and not having the head take over. He needs a lesson in beer pouring I think. But, he waited until he could get every drop in the glass. \nMy wife ordered an orange wine, which was like a mix of red and white. It was very lovely. \nI had a quail appetizer. It was slightly darkened with a vinagrette type sauce and cabbage. It was precisely balanced flavoring of sweet, sour and bitter. Loved it and it really is portioned as a nice appetizer for one. My wife went with a vegetable dish. It came with a ton of different vegetables, cooked in various ways. I did not try it. I was too busy eating quail. \nOff to the main courses. I ordered a wild boar bolognse. It really tasted a lot like beef stroganoff, so kind of comfort food like. The pasta was hand made and delicious. The boar well seasoned. I only wished for a little more presentation in the dish with more color or textures. But, it was delicious. \nMy wife ordered an octupus course. I only tasted the freshly made pasta. It was slightly more fishy than I would have liked. I did not try the octopus but it looked good. \n\nOn to dessert, I had a fried ravioli with huckleberry. It was pretty when it arrived, but I think needing a little more sauce to balance the sourness of the fruit. The ravioli was a sugar cookie like flavor. \nMy wife, oh my, in what was the surprise of the night ordered a wonderful dessert. You see, I am the one who always seems to order the best dessert when we go out. But, she did this time. I was jealous once I took one bite. She had a pear and ginger crostina with vin brulee. It was beautiful in presentation and delicious. \n\nThe last note to the Chef. If you are going to come out and talk to your friends during a meal. Be kind and at least recognize a table or two next to them. You know a hello or a smile, or how is your evening? We had a table next to us who knew the Chef. I'm fine with that and your taking time to talk to them. Just make sure you recognize in some way guests around you. \nAlso, on a special occasion like just before a major holiday, you may want to plan an amuse or two for guests. It could have moved you from a 4 star to 5. I've been to many 5 star places that do that bite sized taste of something here and there.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "8pqdJjefYq-a9IBSJJmKwA",
+          "matched_anchor_ids": [
+            "date_suitable:1"
+          ],
+          "matched_terms": [],
+          "review_id": "Bdyanr_2kYrGgresdkTdLw",
+          "review_text": "A charming restaurant with a terrific interior and good service. The food is pretty good - portions are small but not too expensive considering the location. Good selection of local beers.\n\nThe Welsh rarebit was maybe a C+, an uninspired take of white bread covered in a little bit of mustard and cheese. \n\nThe fish and chips had great chips, just like I had in London. The fish was small, perhaps the smallest cut that I've ever seen, with too much breading. It was OK.\n\nThe smoked salmon filet pasta with cream was a little bit bland but was a large portion that did the job. \n\nThe shepherd's pie was terrific, with strong unctuous lamb flavors and the right balance of potato and cheese. It was tiny, not close to a meal portion, so keep that in mind and order it perhaps as an appetizer. \n\nThe best thing about the restaurant is the space. You feel like you're in a turn of the century club. Even though our room on the second floor was packed, it felt intimate and casual. The key with this restaurant is to order the right dish and enjoying the ambience.",
+          "semantic_score": 0.7416302561759949
+        },
+        {
+          "business_id": "gnpyyeWQ53WlDMJEq-YA_w",
+          "matched_anchor_ids": [
+            "date_suitable:0"
+          ],
+          "matched_terms": [],
+          "review_id": "O_uq3iRccuxjtHSJIdgHUQ",
+          "review_text": "This place is fantastic. I was recently there for the Chef's Tasting menu for our anniversary, and it was worth every penny. The service is impeccably attentive, the food is perfect (and well-timed), and you get the experience of actually having a long, conversation-filled meal where you are never rushed, the lighting is perfect and the noise is manageable. \n\nThey were willing to make beautiful substitutions on the tasting menu (my spouse did not want seafood), but they were just wonderful - no additional charge or hassle - and their suggestions were spot-on.\n\nThis isn't the place to come if you are rushed, or if you are looking to go cheap...but if you are looking for a long, leisurely, dinner in a low-lit romantic environment...it's perfect. \n\n...it's an impressive date spot for you guys out there wondering where to woo any girl you bring.",
+          "semantic_score": 0.7229172587394714
+        },
+        {
+          "business_id": "ctHjyadbDQAtUFfkcAFEHw",
+          "matched_anchor_ids": [
+            "date_suitable:1"
+          ],
+          "matched_terms": [],
+          "review_id": "6cS4nwg66s5_Uinr1WMw7A",
+          "review_text": "My experience with higher end restaurants has always been generally good but leaves a colder impression that leaves room for the warmth and coziness of hole in the wall places and mom and pop restaurants. This experience absolutely combined the best of intimate spaces and the finer dining experience. It was so hard to get a reservation but glad we did!\n\nThe interior itself is rich and warm, and most parties seem to be in pairs or very small groups. It lends itself to very homey dynamics with low lighting, flickering candles and cushioned seats along the wooden tables.\n\nThe service was amazing, well deserving of the service charge they include even for small parties. They were very quick to exchange out our plates between courses, wipe down the tables and were extremely knowledgeable about the dishes laid in front of us. I have a lactose intolerance food restriction and was very happy to have them notify me which dishes were rich with dairy. \n\nThe food itself was stunning. The balance between sharp and acidic parts of the courses against the muted and softer flavors were delicious, though I don't prefer the degree of acidity some dishes were. The ingredients were fresh and crisp, and I appreciated the use of everyday vegetables and herbs. \n\nParticular standouts were the star of the show: the entree lamb shoulder. Good God, it overwhelms you with Smokey and savory flavor, paired with some fragrant rice and smaller sides. The bread itself is worth a hefty sum, as the hummus is rich and filling. The beets were good to refresh the palate, as both me and my partner found them the best of the vegetables. But the cauliflower almost tasted breaded from how it was roasted! So crisp.\n\nThe haloumi has a number of textural components that made the overall impact delicious: the syrup, the crunch of the pastry, the blueberry coming in -- it all made for a succulent two bites.\n\nThe desserts were two different experiences that we couldn't decide between a winner: the sorbet was mildly sweet and good for summer freshness, and the true taste of cantaloupe made for an unusual flavor! The white chocolate Malabi is more subtle but has more of a sensation with the thicker peaches in the mix, and the crumbly streusel enriching the softer qualities of the dessert. \n\nI will say I'm confused by the addition of a dairy free eggplant dish I did not note in the menu but it was as yummy as the rest!\n\nTheir service is fantastic, and I was mildly surprised when they gave us a free drink of wine to celebrate our anniversary. It was not too dry and tasted fantastic after dessert.\n\n\nOverall, a dreamy and very enjoyable experience. 10/10",
+          "semantic_score": 0.7152884006500244
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "date_suitable:2"
+          ],
+          "matched_terms": [],
+          "review_id": "BzXTU1rfHsfKNALTBVkXmQ",
+          "review_text": "Second attempt to track down Mike and his dogs.  12 p.m. on a Wed.  Is he still in biz??  Thx.",
+          "semantic_score": 0.1824975609779358
+        },
+        {
+          "business_id": "5Orn19gUeqCgKu5IRYlvpQ",
+          "matched_anchor_ids": [
+            "date_suitable:3"
+          ],
+          "matched_terms": [],
+          "review_id": "lm7hTcuGHxfNdJmen-mgng",
+          "review_text": "Following the news of late? They need to fumigate this jawn. Mice, roaches and feces.",
+          "semantic_score": 0.20542240142822266
+        },
+        {
+          "business_id": "hu6WwDxwgsHwY24nQUY8rg",
+          "matched_anchor_ids": [
+            "date_suitable:1"
+          ],
+          "matched_terms": [],
+          "review_id": "vBbbVEENnW9k_cF8T3C75w",
+          "review_text": "Almost everything you need under one roof.  Support your local corner store, they are the backbone of cities like Philadelphia.  I love how they sell small plastic baggies of swedish fish too.  25 cents!  Also, a large veggie hoagie for under $4?  Sign me up.",
+          "semantic_score": 0.20957961678504944
+        }
+      ]
+    },
+    "family_friendly": {
+      "both": [
+        {
+          "business_id": "kPuwg0Lx1RVa9TClDl5Ocw",
+          "matched_anchor_ids": [
+            "family_friendly:2"
+          ],
+          "matched_terms": [
+            "family friendly",
+            "kids menu"
+          ],
+          "review_id": "cFyw6h0ciQFVcxUljuI5zA",
+          "review_text": "I've only been to this restaurant once, and I don't think that I'll be going back.\n\nStarting off with the food, it wasn't too bad.  I feel that they're a little over priced, but the portion was fairly big.  Though I'm used to burritos being stuffed with beans and not rice.  The burrito was stuffed with rice, which was actually fairly well cooked.  The pork in it was cooked decently as well.  Both were moist and tender, which I wouldn't expect from a fast food place.\n\n\nOn the down side, I feel that it was made a bit sloppy.  It seemed that all of the seasoning and sauces were all squirted into a single pile at one end of the burrito, and it wasn't the end that I started from.  Once I moved past the bland end, it wasn't too bad.\n\nCleanliness in this place was definately an issue.  I couldn't find a single table that had been wipped down.  Every single one had the remains of somebody else's meal on it.  That was a HUGE turn off for me.  The floor wasn't any better.  Honestly, once I saw the dining area, I wanted to ask for my money back.  The place was that disgusting.  The food came up a little too quickly though, so we toughed it out.\n\nMy next issue is with the place being family friendly.  I saw a lot of parents w/ kids there, myself included, but I would NEVER consider bringing my kids there again.  Yes, they have a kids menu.  Yes, on the surface it looks like a safe place to bring your kids, but on closer inspection it really isn't.\n\nThe reason why is the \"wall of fire\", or whatever they wanna call their hot sauce shelves.  Most of the labels for these hot sauces are too much, and shouldn't be prominently on display several times in the restaurant.\n\nSeriously, I don't want my to bring my children to a restaurant that serves \"Ass in Antarctica\" or \"Kick Ass\".  I don't want them looking a labels that have pinups on them and women tube tops, thongs, and stilettos.  Many, and I mean many, of the bottle labels were waaay to risque to be display around kids.  I like naked and half naked women as much as the next guy, but it's still not appropriate in a restaurant that's supposed to be catering to families.\n\nI know that having 75 different hot sauces is a selling point, and I'm all for having access to hard to find stuff.  I also aware that California Tortilla doesn't produce any of these products, nor do they name them or design the labels.  That doesn't matter.  They do contol what products they choose to carry, and how they are displayed.  If this is what they want to display, then I won't be eating there.",
+          "semantic_score": 0.7161399722099304
+        },
+        {
+          "business_id": "WsCIwMlDwt8g4i40JS_nGQ",
+          "matched_anchor_ids": [
+            "family_friendly:2"
+          ],
+          "matched_terms": [
+            "kid friendly"
+          ],
+          "review_id": "nHVz23PQPdp3Fe0ibTHSjA",
+          "review_text": "My husband and I always scope out Groupon deals since we are a one income family. We have gone to great bar restaurants (Chickie's, Joe Santucci's, Nick's) which are all kid friendly. We figured why not pay half price and get a $50 groupon. We figured we could bring the kids along since we saw the menu first. We walked in and were not greeted at all. I actually went up to the bartender and asked if we cound sit in this one booth. The food came out shortly, and the portions were decent. I am assuming the guy behind the bar was the owner by the way he talked about the place. The food was mediocre.....not something I would have to go back for, but hey it was a good price. Our bill arrived and we had spent 70 bucks and some change. We had a $50 groupon so we owed $20.40 if I remember. Anyway, I handed the waitress my debit card, and she handed it to the man behind the bar. He looked at what we owed and I heard him say, \"Does that say 20 bucks?\" The waitress giggled, and said \"yes!\" He said, \"You have got to be kidding me.\" She giggled and said, \"I know!\" She returned back, handed me my card and slip to sign and I handed her a 20 for a tip. She thanked me and walked away. The man that was behind the bar was now at the juke box, and he said to her... \"Did they atleast tip you well?\" She said, \"Yes, they did.\" Even while getting up from our booth walking past the bar the man didn't even say have a nice day. He just watched us get up and walk out. Now, I know we didn't sit their drinking away, and rack up a huge bill which I am sure that was the purpose of the groupon. However, my husband and I are very loyal customers when we like a place. I would have returned because the food was not bad. This place left a very bad taste in my mouth and for that I will not return. Not very kid friendly even though a big part of the place is a restaurant.",
+          "semantic_score": 0.7023437023162842
+        },
+        {
+          "business_id": "M_EpyAH1CZZVlhxfYBLOqg",
+          "matched_anchor_ids": [
+            "family_friendly:0"
+          ],
+          "matched_terms": [
+            "kid friendly"
+          ],
+          "review_id": "gCG4wFyB8MQIBZMu7Zxdiw",
+          "review_text": "Good pizza and a nice place. Cool staff. Very kid friendly it seems too since there's a lot of families in there.",
+          "semantic_score": 0.6869547367095947
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "QXGnmsKYANxOyZBqM-zlJA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "family friendly"
+          ],
+          "review_id": "-BYU1F0wpHo8j726rhK99Q",
+          "review_text": "I'm most impressed with Plough & The Stars.  Living in Old City for a long time, its hard to find a great spot that has a neighborhood feel, offers amazing food (the Chicken Curry for dinner and the Plough Omelette are highly recommended) and drinks (try the Hoe J for a delicious twist on a mimosa). The staff is friendly and attentive, the fireplace warms you up on the cold nights and they have the BEST outside seating. The live music and regulars really make this a special spot in Old City.  \n\nThe coolest part about Plough is how versatile it is - you can go dancing at night and show up for a family friendly brunch the next day.  The place is clean and there is no evidence of the dance party from the night before. That's a hard balance to keep, and Plough does it beautifully.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "BxfvdHqETU8jWYUjx5OL2A",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "kid friendly"
+          ],
+          "review_id": "-F6jBpYh2VdByGyHuVsUcw",
+          "review_text": "This is my third Shake Shack location I have visited, the other two being in Chicago.  In place for my typical burger and fries, I splurged on two separate occasions on the same day on a shake and then a hot cocoa.\n\nFirst, location good.  Very clean, kid friendly, great service.  No complaints there.  Spot on, Shake Shack.\n\nItems sampled at Samson Street Location:\n\nHoliday Cookie shake:  very tasty, great consistency, lovely flavor. Thumbs up.\n\nFries: Nice and crisp and hot.  Would be nice to get a little more for the money, however.\n\nSalted Caramel Hot Chocolate: Very disappointing.  Wasn't very hot.  Small cup was 1/3 filled with whipped topping and quite honestly I couldn't tell that it wasn't just straight hot cocoa.  I couldn't even finish it.  This location may need to look at this product.\n\nIn house beer: Hubby tried this one.  Looked to me like a standard light lager.  He said it was acceptable but not his typical style.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "ntiIq1FNqduOyyowMFGh5A",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "family friendly"
+          ],
+          "review_id": "-qvYoVgRViYTJPZd0ylVpg",
+          "review_text": "The food here is so different because of the hand drawn noodles that are made from here. The soup tastes clean and it is family friendly here as well. This place can also accommodate a good amount of people as well. We've went for a friend's birthday and they've fit all of us in. There are different toppings you could get with your noodles which, really allows you to pick anything you want. Would visit again!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "avB60OOVc_YOyfbz2AqL_g",
+          "matched_anchor_ids": [
+            "family_friendly:2"
+          ],
+          "matched_terms": [],
+          "review_id": "cWu9lvUjmG8TW47rbp3TPg",
+          "review_text": "The food was so-so and the service was less than attentive but if you want a semi calm experience do not come here. There was a table of 2 couples that had 3-4 children, ages 5-9, that were running around, screaming, yelling and were uncontrollably- not commenting on the parents lack of control but more the Owners allowance of this behavior. If it were my restaurant I would have asked the parents to control their children or leave... I will never come back here again..",
+          "semantic_score": 0.720740556716919
+        },
+        {
+          "business_id": "kxKai8GE5oDMPevV7oxvbA",
+          "matched_anchor_ids": [
+            "family_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "e6kd0XnyxXiQw-I29aCjRA",
+          "review_text": "We walked in without a reservation -2 adults and 2 young kids\nThey were very attentive and friendly esp toward our kids which i appreciated\nThis is obviously not a typical restaurant for young families yet they welcomed us\nThe food was yummy and the cocktails were excellent \nHope to go back again soon",
+          "semantic_score": 0.7116685509681702
+        },
+        {
+          "business_id": "AGlh4ZDv6jnoiYfz7At9mw",
+          "matched_anchor_ids": [
+            "family_friendly:2"
+          ],
+          "matched_terms": [],
+          "review_id": "GW1XQ9dr9osD0CFOZXM0XA",
+          "review_text": "While they advertised 'good for kids', this place is absolutely not for kids. The place was ok, but people sitting right next to us are SUPER noisy. We should shout to make an order and could not talk to each other. My 4 yr son kept complaining about noisy and we asked a staff to change our seat. She said she cant rudely, since the place is full. She never ask ppl making noise to lower their volume. They just shouted! \nI dont even remember how the taste was. My only goal was to finish our meal and leave this hell asap. Their foods were not impressive either.",
+          "semantic_score": 0.7097026705741882
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "nOVUeN4lQAnrwskMMJ4nEw",
+          "matched_anchor_ids": [
+            "family_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "WDPRQ4fFHXg5KUtZ7gFhZw",
+          "review_text": "I came here for lunch today and had a bowl of chicken pho. Never had anything better! The owner told me he marinaded the broth for 10 hours!! It is the best bowl of Pho I have ever had. Will come back to try the beef Pho the next time!",
+          "semantic_score": 0.21063333749771118
+        },
+        {
+          "business_id": "5WF3593by2u-aE_WaM7_Mw",
+          "matched_anchor_ids": [
+            "family_friendly:1"
+          ],
+          "matched_terms": [],
+          "review_id": "7UCjmwtYpMINPHNZWA-umg",
+          "review_text": "I don't usually like/drink tea but I was feeling under the weather so went up to the counter and asked what they would recommend. The woman was so helpful and friendly! She gave be a lemon herbal tea with some honey and specific instructions on when to take the bag out and start sipping. It was the BEST TEA I've ever had. It's been a week and I'm still thinking about it.",
+          "semantic_score": 0.21224550902843475
+        },
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "family_friendly:3"
+          ],
+          "matched_terms": [],
+          "review_id": "2we1lPKQBdkUtcuERGhPvg",
+          "review_text": "I did find Mike about 6 months ago.  He was back in his usual place.  Said he had not been well. Great dogs!",
+          "semantic_score": 0.21438458561897278
+        }
+      ]
+    },
+    "food_quality": {
+      "both": [
+        {
+          "business_id": "y7WPOc2_vCoBkwK3xPJ8XA",
+          "matched_anchor_ids": [
+            "food_quality:2"
+          ],
+          "matched_terms": [
+            "bland",
+            "tasteless"
+          ],
+          "review_id": "sN_leRJK2GJ6MiDuACkZlw",
+          "review_text": "While we were excited to taste the food at this well reviewed restaurant, aside from the very fine servers, we were completely underwhelmed. The food was bland and poorly seasoned. We ate a variety of dishes and without exception they were tasteless.",
+          "semantic_score": 0.7404975891113281
+        },
+        {
+          "business_id": "DSG_T9HfKqdWxzwMf3DS0A",
+          "matched_anchor_ids": [
+            "food_quality:2"
+          ],
+          "matched_terms": [
+            "bland"
+          ],
+          "review_id": "DzbkkAAo0QIFWaSjEqXlLw",
+          "review_text": "Food was bland and restaurant needed an update. For such rave reviews was highly disappointed. Samon and spinach had no spinach and the rice taste like nothing but oil.",
+          "semantic_score": 0.7191123366355896
+        },
+        {
+          "business_id": "0RuvlgTnKFbX3IK0ZOOocA",
+          "matched_anchor_ids": [
+            "food_quality:3"
+          ],
+          "matched_terms": [
+            "overcooked",
+            "undercooked"
+          ],
+          "review_id": "DLp5GIJRLP92x2hQsP075w",
+          "review_text": "Food was terrible. Everything was dried out and overcooked. I ordered the eggs over medium and they were over easy. The toast was stale. The bacon was so dried out that I felt like I was eating poor quality jerky. The potatoes were undercooked on the inside and overcooked on the outside, also flavorless. It was a really overpriced, poor quality, and flavorless food.",
+          "semantic_score": 0.7014336585998535
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "SCjUeZfjafJ88fWWQjRh2w",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "delicious"
+          ],
+          "review_id": "---aZVSWnQtOP_12QzIt8g",
+          "review_text": "We live multiple hours away, but we come to philly often. We love coming here when we're in the mood for Mexican. Consistently delicious. Our last server was awesome, coming from two service-industry people. He was smart, quick, attentive, but gave us some space, all while training a new server.  I can't come here without ordering the queso fundido, and I'm lactose intolerant. I haven't had everything yet, but the items I've ordered in between trips have always been consistent. I have no plans of finding anywhere else to enjoy tequila and Mexican food while in philly.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "gnpyyeWQ53WlDMJEq-YA_w",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "flavorful"
+          ],
+          "review_id": "--3-36l37JAW-LJlfANCPQ",
+          "review_text": "We made reservations at Tinto so we could bring relatives from out of town somewhere nice, and it did not disappoint. The atmosphere was awesome, with wine bottles lining the walls and an exposed brick interior, and the food was incredible. I loved the duck confit and the pork belly in particular, but noted that all of the meat was tender and flavorful. Other favorites were the brussel sprouts, the patatas riojanas, and the marcona almonds. The charcuterie was a delight, too, and my parents seemed to enjoy the sangria greatly. I will definitely be coming back here--I love a good tapas restaurant, and Tinto's Basque influence really sets it apart from the rest.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "oGMwCmV1EQZgCdylAbK9ow",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "flavorful"
+          ],
+          "review_id": "--DDSbqBrwjs_qJJ0vX3VA",
+          "review_text": "The only problem with our evening at Rex 1516 is trying to decide what superlatives are best. Awesome, terrific, fantastic, none seem to be enough. We chose this restaurant for our daughter's birthday based on yelp reviews. I wish I could give more stars. Rex is a small-ish restaurant, very cozy and sophisticated atmosphere without feeling pretentious in any way. Cool tunes playing in the background that fit the theme perfectly. Interesting menu with many items you won't typically see in a restaurant. Food was well prepared, flavorful, and portions were just right. Highlight was the fried chicken, quite possibly the best we've ever had. The milk & cookies dessert featured an amazing spiked milkshake. Service was friendly, professional, and prompt. Highly recommend, we will he back for sure!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "hYWwNKt65xf525Z1GaQsNg",
+          "matched_anchor_ids": [
+            "food_quality:0"
+          ],
+          "matched_terms": [],
+          "review_id": "hrn20klzQO5cpAlgfiAwUA",
+          "review_text": "Flavors were very good. Food was delivered, not eaten at the restaurant. Everything tastes very good. However, each of the dishes was sweet. That is an unusual flavor for the cuisine, so it stood out. Overall, great experience.",
+          "semantic_score": 0.7106962203979492
+        },
+        {
+          "business_id": "VP8HMhVt-pKmqGNmDW4-TQ",
+          "matched_anchor_ids": [
+            "food_quality:3"
+          ],
+          "matched_terms": [],
+          "review_id": "gQZ-ecKpEMT-3pdHb8xGPQ",
+          "review_text": "Very disappointed in quality. Meat was partly raw in soup dumplings. None of the food was hot... Everything was slightly cooler than room temp. Spoons and plates all had some leftover stains on them.",
+          "semantic_score": 0.7048244476318359
+        },
+        {
+          "business_id": "ntiIq1FNqduOyyowMFGh5A",
+          "matched_anchor_ids": [
+            "food_quality:0"
+          ],
+          "matched_terms": [],
+          "review_id": "DAC1dCVdGHb9tbUBb-EBhg",
+          "review_text": "Wonderful food and it tasted very fresh.  The food definitely stood out as the place wasn't all that charming.",
+          "semantic_score": 0.7021628618240356
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "food_quality:0"
+          ],
+          "matched_terms": [],
+          "review_id": "_lN6nii1Rc1bYLNVFs-hCA",
+          "review_text": "the best hot sausage hot dog i ever had i used to live in so. philly and had a business for 30 years there also..now live in springfield pa. delaware county  ,i'm in philly about 3 times a week ...",
+          "semantic_score": 0.21808315813541412
+        },
+        {
+          "business_id": "hu6WwDxwgsHwY24nQUY8rg",
+          "matched_anchor_ids": [
+            "food_quality:0"
+          ],
+          "matched_terms": [],
+          "review_id": "QkQ6213JWhbP2Q71x6-UVA",
+          "review_text": "Came in one night to get some rolls...and laundry detergent. Here's the thing...anywhere else this would be like a normal thing right? Enter fishtown market and you are stepping into something truly special. The characters that frequent this place always leave me in awe of the human race. Lottery addicts, junkies with horrible tattoos ordering soft pretzels covered in pizza sauce and american cheese that's been blasted to shit in a microwave. I'm sure that will go down great with an arctic splash...and hey if one of your 20 lottery tickets happens to win you can probably stock up on all kinds of goodies for the house. The people who work here are nice...in that neighborhoody kind of way.  Wanna know what joe around the corner has been up to?  You can probably find out here. Fishtown usa.",
+          "semantic_score": 0.23970893025398254
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "food_quality:1"
+          ],
+          "matched_terms": [],
+          "review_id": "Vw1D1MXKi_tir89qF5xsKg",
+          "review_text": "I love this place.  Small neighborhood bakery, specializing in Italian-style breads, baked on premises. Surprisingly wide variety. I love braided Italian with sesame seeds, that chewy loaf with pointed ends, and whole wheat (on Fridays only)!  I'm neither Italian nor Catholic, so their many holiday specials are new discoveries to me. \n\nRetail business plus they supply a couple restaurants. Reasonable prices.  They're opposite the SW corner of Columbus Square (aka Passyunk Square). You'll see Mrs. Faragalli sitting in the front window.\n\nUPDATE: From the Phila Inquirer: \"Marie 'Maemoe' Faragalli, 86, owner of the venerable Faragalli's Bakery in South Philadelphia, which lays claim to the only wood-fired open-hearth oven in Philadelphia, died of breast cancer Sunday [June 29, 2008] at Thomas Jefferson University Hospital.\" Great story about the family and bakery ( http://www.philly.com/philly/obituaries/22802524.html ).",
+          "semantic_score": 0.24666787683963776
+        }
+      ]
+    },
+    "group_suitable": {
+      "both": [
+        {
+          "business_id": "sVZb87xjhbCWHQ2UXOGLrA",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "w53xjnCMbTQbm-FiejEQqw",
+          "review_text": "Great restaurant. Very hospitable staff. Great food with huge portions! Also very good for large groups. It's not a huge place but there were a few large parties.",
+          "semantic_score": 0.7833408117294312
+        },
+        {
+          "business_id": "4_VDvhKpKSsj7jZYdocZYA",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "cQcVO6deEFhrQGREalsbeA",
+          "review_text": "The food is great but if you are dining to also enjoy a having a conversation with someone, go elsewhere. This restaurant routinely welcomes very large groups who bring lots of wine and drink way too much. The large groups of young folks have on three separate occasions (!!) been obnoxiously LOUD and rowdy. The restaurant management takes no action. Will not return because it feels like a frat house and not a restaurant. Too bad - good food but horrible experience",
+          "semantic_score": 0.7223061323165894
+        },
+        {
+          "business_id": "EtKSTHV5Qx_Q7Aur9o4kQQ",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "tSxRfs_kbJQiwDg--KQZCg",
+          "review_text": "This place keeps getting better.  I love when there isn't so much on a menu that you're completely overwhelmed, this place keeps it simple, amazing burgers, amazing fries with the best cheese sauce ever, and a few other great choices.  This is definitely a must try in Philly, as well as a staple for when you are really craving a good burger.  \n\nThe food: The burgers seem to have gotten larger since I was here last, I could barely finish mine.  I love that you can customize the burger with so many options, fried egg? yes please!  The burger of the month this month was Mexican inspired and I can't remember everything that was on it but it had a great kick, and chorizo on the bottom that so perfectly finished it off - was it kind of a meat overload, yes, is that always a bad thing, definitely not in this case, it was one of the best burgers I have ever had.  As always the fried were perfect, and the fried pickles were probably the best I've ever had. \n\nThe booze: Oh the important stuff... I love whiskey, and if you do too you have to try this place.  They have whiskey flights in 3 options all with a generous pour, and a huge list of other whiskey to choose from, the largest list I've seen in the city.  They also have great whiskey cocktails if you don't feel like drinking it straight, I would recommend the commador.  There are many other drinks, wine and beers if whiskey isn't your thing.  \n\nThe services: as always just wonderful.  Everyone is friendly and helpful here.  The hostesses were great.  We were on a waiting list and they simply take down you number and txt you when your table is ready so you can go have a drink somewhere else if they are too crowded.  \n\nIt was also really nice to sit outside this time of year.  There is plenty of seating around the restaurant outside, and they seem to be able to accommodate large groups out there.",
+          "semantic_score": 0.7138344645500183
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "8kUh6TROemLfbVR_ewVVLg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "-2th_pzbkTnWHqU8QgPhHA",
+          "review_text": "Nam Phuong is fantastic for large groups.  We came here tonight with about 16 people, and the staff was quick to put two large tables together to accommodate us despite an almost packed house.  With such a large group, we've come to expect slow service and mixed up orders, but the service was quick and efficient and they got all of the orders correct.  They also provided large water glasses for refills and were quick to provide extra spoons, fish sauce, napkins, etc.\n\nThe food is always delicious and cooked fresh.  The beef cubes with watercress were delicious - consistently so too! Everyone was happy with their foods - from the pho (even though I think the pho is better at Pho ha) to the pork chops with rice. One of the best values is the dinner for two, which includes hot and sour soup, spring rolls, a a fish dish, beef cubes, and a dessert for less than $35.  \n\nIf you need to feed a large group with some delicious Vietnamese food, check out Nam Phuong!\n\nEnjoy!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "8kUh6TROemLfbVR_ewVVLg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "-5cNgsHiWO3SryXmgi_5_Q",
+          "review_text": "one of my go to vietnamese restaurants for their quick service, solid food, and large space that can easily manage small or large groups of people. they accept credit card here although there might be a minimum.  \n\nI recommend ordering any of their family dinners if you get lost in the plethora of dishes listed on their menu.  \n\nsome of my favorite dishes are: \n1) Spring Rolls - simple yet savory and crunchy - dip in their sauce that comes with the dish for added acidity.\n\n2) Lotus Root Salad with shrimp and pork - punch of acidity, yet refreshing to the taste buds.\n\n3) Country Style Beef Cubes - beef cubes marinated and pan seared, with a nice savory yet salty kick when you dip it in their sauce provided.\n\n4) Fish Stewed in Pottery Pot - catfish that is marinated with a sweet/salty sauce and melts in your mouth - great with white rice.\n\nI have heard their Pho, Pad Thai, and other fried rices dishes are pretty solid as well.  Smoothies/drinks are standard compared to other restaurants. Come here if you want to get the switch up from the usual Pho or Viet hoagies!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "i6DlLLxZ2iwQRxhUDx3TTg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "large groups"
+          ],
+          "review_id": "-BnFHWprmmT2HCyLH31IAw",
+          "review_text": "This Mexican restaurant is off the beaten path so it is far less crowded compared to the other Mexican options down on Main Street. It is also cheaper and you get a decent amount of food for the prices. The restaurant is huge, which is good for large groups, and the atmosphere has a very cool Mexican vibe. My favorite place to sit is outside on the cute patio during the warmer months. The tacos, quesadillas, and fajitas are all delicious and you get free chips and salsa when you sit down. The biggest downfalls of this restaurant are the drinks and the service. The margaritas are made with mix and aren't very authentic. I'd recommend getting a Corona if you are picky on margs. The service is hit or miss. It can be painfully slow sometimes and the server tends to disappear for long periods of time when the restaurant isn't even that busy. Besides those things, I would definitely visit and sit outside and enjoy some beers and good Mexican food!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "8P8HIysyyGbG8_94cG1Jyg",
+          "matched_anchor_ids": [
+            "group_suitable:2"
+          ],
+          "matched_terms": [],
+          "review_id": "awNj7bvjE3ulot11107w9w",
+          "review_text": "First off, the food is excellent. Had two great dinners here and was so impressed that I booked Entree for my wife's graduation dinner. \n\nUnfortunately, it is a small restaurant and best for small groups - they don't handle big groups well at all. We made our reservation almost a month before the date for a party of 12 at 7:30 pm. When I called earlier that day to ask if it was possible to come in at 7PM instead, they said no because another group of 12 which had originally reserved for 5PM was now coming in at 6:30 PM. The timing seemed tight, but okay..\n\nWe arrived at 7:30 PM for our reservation and of course the previous 12-top was still there, enjoying their own dinner. At 8:05, with hungry relatives who had flown in from all over the country still waiting to be seated, we decided to cut our losses and go next door to Miles Table instead. \n\nTo top it all off, I got an email from Opentable the next day saying that we \"missed\" our reservation.\n\nIt's a shame that the reservation management here is so careless, because the kitchen really does great work and I would have loved to treat my family to the great food.",
+          "semantic_score": 0.7492220997810364
+        },
+        {
+          "business_id": "VJEzpfLs_Jnzgqh5A_FVTg",
+          "matched_anchor_ids": [
+            "group_suitable:2"
+          ],
+          "matched_terms": [],
+          "review_id": "GfQoJwG2Iy-Nw9Qf2VDd_Q",
+          "review_text": "Make sure to make reservations before showing up. The restaurant is small and only seats about 30 people total. Because they try to get as many people in as possible, it's a tight fit and also LOUD. It seems like the kitchen is too small for the volume or people, or maybe the place is too new to have worked out a good system for large parties. \n\nTo their credit, they fit us in when a party of four was late for their reservation and the spring rolls and entrees were pretty good. \n\nAlso, they were diligent about refilling water glasses and had very friendly staff. \n\nI'd go back, but probably for take-out only.",
+          "semantic_score": 0.7448490858078003
+        },
+        {
+          "business_id": "2WGnykxiM-Mp-qIm2u7iAw",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [],
+          "review_id": "Tpr7fiZyzfhmuQoA3SnCSg",
+          "review_text": "Great food and good ambiance. The atmosphere is colorful and vibrant. There is always good music playing and the staff is always friendly and helpful. \n\nMaggiano's provides an array of Italian dishes. The food is served family style, meaning that you select a few salads, appetizers, entrees, pasta's and desserts and share them. I love the chopped salad, maggiano salad, zucchini,calamari, mozzarella sticks, chicken parmesan, salmon (served with spinach) and lasagna. \n\nThe food is served in ample portions and is continuously served throughout the meal, with no restrictions. In fact, you can even pack food to take home.The desserts are divine! The apple crostada, tiramisu, cheesecake and nonna's pound cake! You will find yourself being pried away from the table to stop eating. \n\nIn order to utilize the family style menu, you must have at least 4 people. This is a great restaurant to go to with a large party of group. I promise, if you try this place, you will not be disappointed for there is a variety of food for every taste.",
+          "semantic_score": 0.7286975979804993
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "5Orn19gUeqCgKu5IRYlvpQ",
+          "matched_anchor_ids": [
+            "group_suitable:3"
+          ],
+          "matched_terms": [],
+          "review_id": "lm7hTcuGHxfNdJmen-mgng",
+          "review_text": "Following the news of late? They need to fumigate this jawn. Mice, roaches and feces.",
+          "semantic_score": 0.19477464258670807
+        },
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [],
+          "review_id": "_lN6nii1Rc1bYLNVFs-hCA",
+          "review_text": "the best hot sausage hot dog i ever had i used to live in so. philly and had a business for 30 years there also..now live in springfield pa. delaware county  ,i'm in philly about 3 times a week ...",
+          "semantic_score": 0.19788579642772675
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "group_suitable:0"
+          ],
+          "matched_terms": [],
+          "review_id": "m4uBu-3x19Wz5e0S1nBxvg",
+          "review_text": "I make hubby stop here on his lunch break once a week and buy several loaves for me at once. I have a freezer in my basement so I cut it up, ziploc it and pop it in oven to warm up again when needed. It's delicious even after freezing/thawing. My kids are addicted to their breads! I dip them in garlic olive oil. So yummy!",
+          "semantic_score": 0.21320809423923492
+        }
+      ]
+    },
+    "parking": {
+      "both": [
+        {
+          "business_id": "LizaSXXtaPjbxGtwo_rw9Q",
+          "matched_anchor_ids": [
+            "parking:1"
+          ],
+          "matched_terms": [
+            "there's a parking lot"
+          ],
+          "review_id": "a2fMpX6nCjlbt867sLdZfw",
+          "review_text": "Food was delicious! Staff friendly, casual atmosphere. Parking wasn't even an issue - there's a parking lot down the street and off-street parking with Kiosks ($5 for a few hours) nearby.",
+          "semantic_score": 0.7307764291763306
+        },
+        {
+          "business_id": "kL98j83h3QFUoSBBevCHOw",
+          "matched_anchor_ids": [
+            "parking:1"
+          ],
+          "matched_terms": [
+            "plenty of parking"
+          ],
+          "review_id": "4g02r3ulY-aQJo0QzcdjJA",
+          "review_text": "I saw Tap Room on 19th on the Eater Philly burger map a few weeks ago, and remembered seeing that Mondays were half-price burger nights. So when furniture delivery took longer than anticipated, I suggested we head down there for a (half price) burger. We arrived to see the bartender/server squeezing fresh lime juice at the bar. Good sign! We sat outside and he promptly brought us menus. I almost died and went to heaven when I saw their signature cocktails are $7! I got the gin and juice (gin, grapefruit, lemon, elderflower syrup) and my husband got one with bourbon, lemon, and elderflower syrup. Delish! Our burgers came quickly, perfectly cooked to temp. The red onion marmalade was awesome. I got mine with a fried egg...I wish I had done the garlic insanity bacon instead (though the egg was perfectly cooked, so no fault of theirs!). Excellent burgers, drinks, and service. The rest of the menu looked awesome, too. Oh, and plenty of parking in the area! Check it out",
+          "semantic_score": 0.7239197492599487
+        },
+        {
+          "business_id": "14ZGwnDyydXdSBsLXpSUrA",
+          "matched_anchor_ids": [
+            "parking:1"
+          ],
+          "matched_terms": [
+            "free parking"
+          ],
+          "review_id": "0jn_pY6ov-1UC2PjRV9UJg",
+          "review_text": "I had lunch with about 16 friends on a Saturday afternoon, and without exception, we were pleased.  The food was exceptional. My husband and I tried the Tom Yum soup, the satay appetizer, the pad thai and the fried rice.  We thought everything other than the fried rice was special; you know a little out of the ordinary compared to what we have eaten at other places.  The tofu satay was perfectly made, and the vegetarian spring rolls were really tasty.  Dessert included nibbles of coconut ice cream, a fried chocolate banana and the sticky mango rice.  I highly recommend the coconut ice cream.  Sticky mango is one of my favorite treats, and this was excellent. But the friend banana was pretty close to what I have had elsewhere (except I never had friend banana with a splash of chocolate tlike this). \n\nAs to other issues, here is the run down: parking was available in a nearby free parking lot; the wait service was friendly and service was quick; the atmosphere was perfect for quiet two-person conversation and large group atmosphere; and the prices were moderate.\n\nI highly recommend this restaurant.",
+          "semantic_score": 0.6912102103233337
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "14ZGwnDyydXdSBsLXpSUrA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "free parking"
+          ],
+          "review_id": "-8FcgZQJ8Vao6f45fK15KQ",
+          "review_text": "I know the Vietnamese restaurants along Washington Avenue. But, I knew nothing about Lao food. A quick check online directed me to Vientiane Café at 4728 Baltimore Avenue. The section of Philadelphia is quite remarkable for its Victorian houses, no small number of which have been wonderfully restored. There is also the quite remarkable Byzantine green domed St. Francis de Sales. (See my site http://www.daytraveller.net/2013/04/24/university-city-philadelphia-hidden-in-plain-sight/)\nVientiane Café has very convenient free parking just behind the restaurant. The interior is small but clean and comfortable. The staff is most congenial and second generation English speaking. Our server brought us the menu. Of course we had no idea what anything was. In such cases I always turn to the server. \"If you were having lunch, what would you have?\" He proposed a selection. We could not have done better. We began with Green Papaya Salad: Shredded green papaya with tomatoes, chili, lime juice and special sauce mixed together in a mortar and topped with crushed peanuts. The salad with sweet and acidic and spicy all at once: a wonderful exploration of all your tastes. I will say, however, that it was so enveloping that it did dull the soup (at least for the first few minutes) which followed.  The\"King soup\" offered an introduction into another new set of taste experiences. The base seemed something of a curries coconut milk. The other ingredients I believe were thinly sliced white radish with unknown small vegetables. Long noodles provided the main substance.  Now, as usual with Asian restaurants, the main course came out at the same time. We have long since given up trying to have them do one course at a time. The suggested entrée was nothing that one would expect from an Asian restaurant:  Homemade Laotian Sausages: Stuffed with pork, spices, lemongrass and kaffir leaves; served with steamed vegetables, sticky rice with sweet chili and tomato chili sauce. These sausages, so unexpected in Asian food bore little resemblance to the gristle and hard chop sausages we know. The Lao version has something of a creamy and unctuous quality with a hint of sweetness. The bill for our lunch was a bit more than the price of a Vietnamese lunch, but still well worth it. With our quality first experience of Lao cuisine we are sure to return to broaden our knowledge of this new face of Asian dining.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "TdrNka-oPWf4B-jN9rKltw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "free parking"
+          ],
+          "review_id": "-GRxF21Jwhs0OC3HhEq4Mw",
+          "review_text": "This is a bar on the roof of a closed down school. Came here on a Sunday afternoon and loved my experience. Sunday's are family days so you can bring kids and your pets !!! Many people were there with their cute fur babies. Some tables also have chalk so the kids can stay entertained and draw with them. There are two bars at the top. In terms of food they serve small plates / snacks such as a plate full of pickled veggies & hummus and pita chips! The BEST part about this place is the spectacular views !!! See philly from all angles. Perfect place to relax on a Sunny day. They were also playing light music in the background. There is also free parking for Bok patrons a couple streets down ( I forgot the exact street but I'm sure you can google it ). You have to walk through the school to get to the elevator to go up which is all a little confusing but otherwise all good !",
+          "semantic_score": null
+        },
+        {
+          "business_id": "q-zV08jt6U-q05SMEuQJAQ",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "no parking"
+          ],
+          "review_id": "-MQWurDA4HGPIR2AcQy0wA",
+          "review_text": "My favorite cheesesteak joint in Philly. They are just fantastic. In fact I try to come back here every time I come back to town. The only problem with this place is the same problem that every other cheesesteak place has: No parking and some days the line is wrapped around the whole building. There is only a couple tables inside as well, so it's hard to find a seat in general. If it's busy, expect to stand up eating your cheesesteak.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "IGxrAQcqw8Mr1x9WLXQsNA",
+          "matched_anchor_ids": [
+            "parking:0"
+          ],
+          "matched_terms": [],
+          "review_id": "QX4CN1_e9sFMrf0wnk4bEw",
+          "review_text": "Came here with a friend this weekend after a recommendation from another friend. All employees were wearing masks. They informed us the wait was 45min-1hr but it ended up only being 20-25min. We were seated outside - half of the tables have umbrellas but we were seated at a table without one - this wasn't bad at first but as it got sunnier and warmer, it got a little uncomfortable. I wish they had more umbrellas available - try to get seated under an umbrella if you can.\n\nI ordered the Crabby Dick on a biscuit after talking with the waitress and it was definitely a good call. It didn't look like much food at first but I ended up feeling super full and couldn't actually finish all of it. The potatoes looked really good but they were a little bland and had less seasoning than I expected. The biscuit was fluffy while with the crab cake was crispy - both delicious. It was also reasonably priced.\n\nAnd parking was so easy as there were plenty of open spots right next to the restaurant.",
+          "semantic_score": 0.7536187171936035
+        },
+        {
+          "business_id": "RSKvB-XntkiDnMqYqAmtKw",
+          "matched_anchor_ids": [
+            "parking:3"
+          ],
+          "matched_terms": [],
+          "review_id": "wtBM5xF17dEyDZPKyd1Kng",
+          "review_text": "Let me just say that my favorite thing about this restaurant was admiring the beautiful mosiac on the wall, done by local artist Isaiah Zagar (South St. Magic Gardens). I was dissapointed when we were seated in the rear of the restaurant, which is not as visually interesting. We started with a few cocktails and an appetizer. The Tempura Veggies w/ Soy Ginger Dipping Sauce hit the spot. The vegetables were fresh and the tempura crispness on the outside was perfect. I love anything dipped in Soy Ginger, so this was my favorite part of the meal. I was in the mood for a good salad so I ordered the Blackened Salmon Salad. The Salmon was excellent... It was a nice sized piece and was blackened just right on the outside. Yummmmm. The rest of the salad was just plain. That's the best word I can use to describe it. It was pretty simple and came with an average vinagrette dressing. We definitely enjoyed our meal here and left full and satisified. The only thing that was super annoying was trying to find parking near the restaurant. We drove around for quite a while and ended up several blocks away, with about a 10 minute walk. Luckily it was a nice night and this is a nice area for walking. All in all it was a good time :)",
+          "semantic_score": 0.7459020018577576
+        },
+        {
+          "business_id": "TwnzM8mJn_nT2PJf1x-9kQ",
+          "matched_anchor_ids": [
+            "parking:3"
+          ],
+          "matched_terms": [],
+          "review_id": "Sl6ciec1d2nFmp1T79D-MQ",
+          "review_text": "Parking is hard & it gets very crowded in the restaurant & waiting area. Food was great but not worth the hassle!",
+          "semantic_score": 0.7326744794845581
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "parking:3"
+          ],
+          "matched_terms": [],
+          "review_id": "4WKQx5WxjgnSu2As3ZGrdg",
+          "review_text": "This place has the BEST Italian bread in the City...\nThey also make the BEST EASTER BREAD you can buy! Been eating their breads for 46 years!",
+          "semantic_score": 0.18583905696868896
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "parking:1"
+          ],
+          "matched_terms": [],
+          "review_id": "lztvIoorUBRXNyhEG4N-3A",
+          "review_text": "This family still makes real Italian bread for Manny of the best restaurant in Philadelphia.  It is made by hand and baked in a wood burning brick oven.  you get so much flavor in the crust and the receipt has come from the old world and is still made with love.",
+          "semantic_score": 0.19362051784992218
+        },
+        {
+          "business_id": "NXwEDLZjv8dUqbc5g5dCYg",
+          "matched_anchor_ids": [
+            "parking:0"
+          ],
+          "matched_terms": [],
+          "review_id": "R-AnT-4g8gacivDOZr28JA",
+          "review_text": "I have been to Abunai a couple times since it opened inside of the Bourse Food Hall. From what I have read, their original location is in D.C. Abunai lets you create your own poke bowls and have multiple types of fish and protein options. You can choose a base, which is either rice or greens or both. Then they offer mix-ins with the fish such as green onion or cucumbers. Finally you can add on other toppings such as seaweed salad, masago, nori, avocado etc. They also feature their own signature bowls\n\nBoth times I have gone I ordered the spicy salmon. The first time so had the signature bowl which was delicious and cost about $13. The second time I went, I made my own small bowl with spicy salmon and added several toppings. The small bowl came out to be about $9. Both bowls were delicious and the fish was fresh! I will definitely be back!",
+          "semantic_score": 0.22267107665538788
+        }
+      ]
+    },
+    "pet_friendly": {
+      "both": [
+        {
+          "business_id": "BgQOm2TuoF1UmD4e7BOUjA",
+          "matched_anchor_ids": [
+            "pet_friendly:2"
+          ],
+          "matched_terms": [
+            "pet friendly"
+          ],
+          "review_id": "S6eb_PLv8hMw6RI8axxU0A",
+          "review_text": "Made reservations and was able to be seated a bit earlier since we arrived before our reservation time. The place was packed and I could see/hear that they had a live band inside. \n\nThey have indoor and outdoor seating and I could see that they had seating upstairs as well. \n\nDrinks: PGT Elixir and the Hot Tropic. The elixir was really good, had a sweet taste to it and wasn't to gingery. The hot tropic was a bit tart for me but I'm told it was good as well. \n\nOrdered the clam chowder and it wasn't the white creamy chowder I was expecting so I was kinda thrown off. The soup was okay but it did have a lot of crab meat inside which I pleased about. \n\nDinner:  We shared the chicken sandwich, which we ordered with a side Cesar salad and fries. The fries were really good. The sandwich was ok, wasn't much real flavor. I bit into and didn't taste any flavor just a fried chicken sandwich w/a piece of lettuce and tomato. (Didn't finish)\n\nI was turned off by the dog that was seated next to me. I understand restaurants being pet friendly (I guess) but you've forgotten about your paying human customers. Not everyone likes dogs, not everyone wants one seated next to them, some people have had traumatic interactions with dogs. Therefor I think it would be appropriate to ask a customer if they mind having a dog next to them or just have a completely separate area for animals and there owners. And the dog had an odor which really turned me off.",
+          "semantic_score": 0.7412323355674744
+        },
+        {
+          "business_id": "LQZdcwfqneUIrZTy1VvWfg",
+          "matched_anchor_ids": [
+            "pet_friendly:3"
+          ],
+          "matched_terms": [
+            "no dogs allowed"
+          ],
+          "review_id": "CL262uz5kSJziU9_hj8Qwg",
+          "review_text": "The food was fair. I have a service dog and they told me no dogs allowed. When I reiterated that my dog was a service animal the server disappeared and came back and asked for papers. I said there are no \"papers\" and he left again. From there another server came out and waited on us. This server was not engaging and was slow to respond to our requests. There was only one other customer in the restaurant most of the time we were there. I was disappointed.",
+          "semantic_score": 0.7240549921989441
+        },
+        {
+          "business_id": "venWfi69QVylbyrvaPt0nQ",
+          "matched_anchor_ids": [
+            "pet_friendly:2"
+          ],
+          "matched_terms": [
+            "pet friendly"
+          ],
+          "review_id": "4Emw6rn67fvrWSysbizvUg",
+          "review_text": "Not a pet friendly restaurant. The only reason we choose to visit this very restaurant. Very disappointed, the guy who looks like the owner or the manager was not even friendly. Such a waste of a time going all the way there from our hotels.",
+          "semantic_score": 0.7232472896575928
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "Du0waRmHch08QABPLIQcMw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "pet friendly"
+          ],
+          "review_id": "-cC_Fbr8YR9y724SkV-SBQ",
+          "review_text": "This is one of my favorite places in Manayunk.  The beer selection is diverse and the staff are all great.  \n\nI think they have  the best outside seating in Manayunk and keep the seating available outside almost all year for the brave souls.  It is an active corner near the heart of Main Street so there is plenty to watch when sitting outside.  I think for the position of the establishment it houses the best pet friendly seating on Main Street.  They just redid the sidewalks outside this summer to help alleviate the annoying wobbly tables.  The inside, though small, affords a nice view of Main Street with its large front windows.  It can get crowded inside quickly but still maintains an integrity unlike dives bars that become too overwhelming.  \n\nThe food is delicious and the owners do a good job of staying on top of keeping an updated menu.  \n\nThough their brunch menu is not extensive, I would put their brunch up against any other restaurant on Main Street.\n\nI've lost count the number of visits I've made here and expect that trend to continue.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "D5V0Fawd6ODVgqCY8xngsw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "dog friendly"
+          ],
+          "review_id": "-fCVvzDDNjPJxR41QNQEWg",
+          "review_text": "We were in Philly for a wedding and decided to stay at the Loews since it is a dog friendly hotel. I as a little annoyed our room still wasnt ready at 4:30pm when we went to check in but they managed to get one ready in 10min...and boy what a view! We had a corner room with HUGE windows on both walls and the view was just spectacular. The room was very clean and the bed was super comfy. Overall a great stay and I will gladly come back the next time i'm in the city.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "REiAM73RkOxFqCVlEFiRWA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "dog friendly"
+          ],
+          "review_id": "-xSbOb88u112NKffzUt6NQ",
+          "review_text": "Love this place and the atmosphere. We sit at the bar and right off the bat notice that they have a beer on tap from our home state of GA, a Terrapin Brewery seasonal. They are also dog friendly which is great and there was a pretty pit bull mix there while we were in there. Plenty of good drink specials, just check the website as they vary. Food looked good though we didn't eat anything while we were there. Very cool dive bar in Philly worth checking out.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "1Ck2drCXGh1h5bhc9aIRpg",
+          "matched_anchor_ids": [
+            "pet_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "t1sfsGvViBZFLf_d9J6sfA",
+          "review_text": "i have had a much better experience here than the other eaters below. i had my dog with me and i was looking for somewhere that was petfriendly. first off the furnishing is lovely, and when its warm they will bring out tables with sofas and you can eat just outside the restaurant on the sidewalk in a way. after sitting down, i was tended to by the sweetest waiter ever and he got my dog a bowll of water and a biscuit! i ordered a pulledpork sandwich which was pretty good (could be a little pricey. the food is a little better than average i would say. pretty good but it doesnt put you in that state of ecstasy from yummy goodness! anyways, what i loved the MOST is that they give you free samples of cookies and muffins and cakes which are VERY good, so i guess they have very delicious desserts (: but i would say come and try the place out its a nice place and the neighborhood is lovely!",
+          "semantic_score": 0.7541068196296692
+        },
+        {
+          "business_id": "jULIPydhMj18KOI5OHTwfA",
+          "matched_anchor_ids": [
+            "pet_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "6eAT6E9awQ7cUzRvuFhFSQ",
+          "review_text": "At the close of a very long day, I desperately needed an afternoon snack before heading to the airport.\nMexican food seemed a good choice and Yelp reviews confirmed this as a good spot.\nAlso, the location is conveniently only steps from the Barnes Foundation museum collection. \n\nIt was a bizarrely warm (73 degrees) and sunny November day.\nOn entry, a friendly and attentive server, Jessie (sic?), explained that if I was not taking out, she would provide table service.\nI selected a seat in the sun and scanned the menu.\nGoing simple, I ordered nachos with added sides and a soda.\nQuickly, she brought out my selections.\nI expected a bottle of Boylans.\nTo my happy and thirsty surprise, a pitcher was brought out.\nMy nachos were exactly what I wanted/needed.\nPlenty of crispy chips, cheese, beans chicken.\nAdmittedly, not the best I've ever had.\nBut, it was the Mexican styled fare I craved.\n\nUnfortunately, I selected a table beneath an adjacent residential building.\nMid snack, someone decided to clean their balcony, splashing down dirty water on me, my food, and my drinks.\nDisgustingly unpleasant, I told the server what had happened.\nShe jumped to action, apologizing for an event outside her control and notifying the concierge next door that the tenants needed to be aware of the diners below.\nShe unhesitatingly offered to replace my snacks and drinks. \nThe manager, smiling and accommodating, also apologized and brought out replacements for my order without delay. \n\nWhile I might have only given 3.5 stars for the food, the extraordinary customer service and professionalism, together with the unexpected bottomless pitcher of soda elevated my experience.\nIn a time when everyone defers blame and takes no responsibility for anything, the team at the restaurant smartly treats customers with a positive attitude and courtesy.\nAnd, prices are very reasonable. \nWhen I'm back in Philly, I wouldn't hesitate to return.\nThank you Jessie, management and the rest of the staff! \n\n\nN.B. I'm a dog owner. This is a very appropriately pet-friendly location.",
+          "semantic_score": 0.7471069097518921
+        },
+        {
+          "business_id": "w_JNBcdRer2wZlKMiC4hHA",
+          "matched_anchor_ids": [
+            "pet_friendly:3"
+          ],
+          "matched_terms": [],
+          "review_id": "D51M0hDs8tKpexew41fGUQ",
+          "review_text": "This restaurant came highly recommended by locals during my visit so I was very excited. My friend has been to this restaurant multiple times before as well, however when we arrived for brunch she was turned away from the establishment due to having her service dog with her. She has been to this restaurant before with her service dog and never had any issues so this came as a shock to both of us. They were extremely rude to her and asked for proof and paperwork for the service dog which is illegal to request. Needless to say unfortunate that a place so highly recommended was so uncooperative.",
+          "semantic_score": 0.7420122027397156
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "pet_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "4WKQx5WxjgnSu2As3ZGrdg",
+          "review_text": "This place has the BEST Italian bread in the City...\nThey also make the BEST EASTER BREAD you can buy! Been eating their breads for 46 years!",
+          "semantic_score": 0.22779914736747742
+        },
+        {
+          "business_id": "5WF3593by2u-aE_WaM7_Mw",
+          "matched_anchor_ids": [
+            "pet_friendly:3"
+          ],
+          "matched_terms": [],
+          "review_id": "S6sbbnMj1P7w3pDUskRArw",
+          "review_text": "I love coming to Philly and can't miss a trip without stopping in for some of the the best teas around. I have fallen in love with the Yin Hao Jasmine Tea. We had it iced for the first time and I wanted to buy out the store. The rich floral scent came through with a fantastically full bodied flavor of Jasmine. I have never had such a soothing and refreshing tea. I took home a huge bag that day. I have actually tried to order the same version online and I can tell you that no one has come up to the quality of this tea at a very reasonable price. Would love to see you have a website that we could order from but I know that would take away from that wonderful service you give at your very busy store. I will be calling for my order very soon. A true tea connoisseur shop owner who does it right. Keep up the great work.",
+          "semantic_score": 0.23522496223449707
+        },
+        {
+          "business_id": "yHsG1SuEtB_pTZ9TjvOxrg",
+          "matched_anchor_ids": [
+            "pet_friendly:0"
+          ],
+          "matched_terms": [],
+          "review_id": "ZjhqKrvMyhB0jjys3bKgmA",
+          "review_text": "Generally a really good Greek salad and side dishes (orzo salad, couscous salad, tabbouleh, bean salad, grape leaves).  Sometimes there can be a bit too much acid/oil/liquid along with them\n\nAs others mentioned, the Greek salad with grilled chicken is a great value.  However, I don't eat chicken so I cannot speak to that aspect.  Unfortunately if you order the greek salad without chicken, it's the same exact price as those that have 2 huge hunks of chicken on them. (seems unfair, shouldn't it cost less?)\n\nGreat food though and family that operates it.",
+          "semantic_score": 0.24379616975784302
+        }
+      ]
+    },
+    "portion_size": {
+      "both": [
+        {
+          "business_id": "3eJMsl41qwhcYlvoTF1ElQ",
+          "matched_anchor_ids": [
+            "portion_size:2"
+          ],
+          "matched_terms": [
+            "small portions"
+          ],
+          "review_id": "XOfGIUTILuZj6xYn-Jgm7w",
+          "review_text": "I agree with others' reviews that the staff lacks energy and enthusiasm. However, let's talk about the food. \n\nWe started with the halloumi cheese. It is served with a few pieces of lettuce and some shreds of pickled onions. It contains two thin strips of halloumi (each about 2.5 inches long). The portion of this appetizer was surprisingly small, but I didn't get hung up on it. \n\n...until I got my entree, chilli-glazed swordfish with white beans and black olive paste. We chuckled at the size of the plate and portion of my meal. It contained 4 small cubes of swordfish (each cube of protein was about half a squared inch), and I could probably have counted the number of white beans with both hands. Yes, tops 10 individual pieces of bean. I laughed but the taste was fabulous. \n\nMy partner had the fettucini with pork bolognese, topped with a perfect amount of shredded parmesan cheese. Also small portion but satisfying to the taste buds. \n\nWe shared the upside down plum cake with orange caramel and some roasted almonds. Two small triangular pieces...but we were glad it was more than a bite for each. \n\nI would say that you pay for the good taste of the food, not necessarily for the portions. Everything seemed sort of tapas-sized, although that is not explicitly (or implicitly) described. \n\nI wouldn't go there if I was really really hungry, unless I planned to order an appetizer, entree, and dessert, all for myself. The reason I complain about the portions is primarily b/c I'm used to restaurant serving an incredible amount of food, regardless of how fancy/trendy and upscale they aim to be. I think a.kitchen provides an air of the portions we all attempt to eat (and/or should be eating). The portions really are comparable to what you would have consumed had you prepared your own dinner. However, because you are eating out, you naturally expect to splurge and indulgence and over-consume. That is still doable at akitchen if it is what you're looking for---you simply have to order more than you would elsewhere. \n\nEven the bread (which was only served upon request) is tiny. The waitress brought a sliced dinner roll, whose diameter was really no large than 1 inch. I didn't mind. It's better than having eaten an entire basket of bread a-la-Parc, but still...it was humorous. Just go knowing that everything comes in unexpectedly small portions, but the taste of food is certainly strong. You will not be disappointment by flavor and presentation.",
+          "semantic_score": 0.7201811075210571
+        },
+        {
+          "business_id": "ctHjyadbDQAtUFfkcAFEHw",
+          "matched_anchor_ids": [
+            "portion_size:2"
+          ],
+          "matched_terms": [
+            "small portions"
+          ],
+          "review_id": "ZkuYAf3N_MO4-26i5rhW_A",
+          "review_text": "yeah, the food was GREAT, but i couldnt get past the laughably small portions. i went with 4 other ppl and most dishes couldnt be split into 5 pieces - they were that small. it was like that wendys commercial where the guys pays a ton of money for a tiny bite of steak. its not like i cant appreciate good food - i just know a lot of places where i can get food that i enjoy just as much - with normal adult size portions. if u have the money to pay 10 dollars for two fried balls of lamb - do it - they are fantastic. but im not that into it.",
+          "semantic_score": 0.7169449329376221
+        },
+        {
+          "business_id": "OOfY8bhTuC5A4qbdn8wFBA",
+          "matched_anchor_ids": [
+            "portion_size:2"
+          ],
+          "matched_terms": [
+            "small portions"
+          ],
+          "review_id": "sSsx2OyLh2He0DzZEi_PJw",
+          "review_text": "My husband and I went to Philly last weekend and we happen to try this restaurant. Our B&B owner also recommended that place to us. So we thought to give it a try. When we went we were very skeptical (especially me)about how the food would be.\nWe ordered our Samosa Chaat, believe me it was yumm!!! No exaggeration  at all. The green dip(chutney) was icing on the cake.The portion was appropriate and the samosa was cooked perfect. The best I had till now in United States. Then, we ordered Chicken Pakora; again  mind blowing. It was delicious. No one has cooked chicken pakora tht well in Ohio. If u guys go there do try that one.\nThen comes the main course; we ordered Chicken Biryani and Lamb Chops Lahori. The lamb chops were perfectly cooked .Though I am not a great lamb fan,I still enjoyed every bite of it. \nI am not very sure why people are complaining abt they serving small portions(probably it was earlier). But I think it was just perfect when we went.\nWe were very delighted after eating there and didn't have any problems with the service. They made sure that we were liking and enjoying their food. \nI would definitely recommend people to visit them and have a great meal.",
+          "semantic_score": 0.7110740542411804
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "0RuvlgTnKFbX3IK0ZOOocA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "large portions"
+          ],
+          "review_id": "-1YkC4F6tbA4u-Xu010-oA",
+          "review_text": "Loved coming here for brunch. My friends and I waited over an hour to get inside due to our large +8 party. It was well worth it. I'm a break down the highlight of each dish below: \n\nPastrami lox benedict- so much lox on our plate. We had several strips leftover. The potatoes were lightly fried with perfect crisp\n\nCreole shrimp and grits- usually not a fan of grits, but this one was really creamy and rich\n\nBuffalo mac and cheese- lump large portions of fried buffalo chicken in this dish \n\nItalian roast pork egg rolls- combination of a gravy/ ranch sauce added a nice punch. The roasted pork was very tender and delicious \n\nKitchen sink skillet- large skillet dish which featured the creamy gruyere cheese with gravy smothered on the biscuit was amazing \n\nCreme brulee french toast with cinnamon sweet potato fries- must order dish if you love sweets. French toast was so fluffy and delicious. Combination of cinnamon on the fries added a nice crunch to each bite.\n\nThis place really innovates with careful selection of dishes served. You can find anything to satisfy any flavor profile. Just be aware that the wait times are long. Its best to get a table reservation and walk around for 30- 60 minutes then come back. This place has to be one of the my top brunch spots in the city. Kuddos to the eclectic menu and great flavors!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "RnhLCG4N9MPy6ZRzq787Cg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "small portions"
+          ],
+          "review_id": "-1ZYfrpw3OHGj8QgcwTx5g",
+          "review_text": "Th place is nice inside. Pretty cool open upstairs and little patio on the sidewalk. Food was small portions and service was weak. Just real slow and never really checked in. Could have bee the guys first night because he sucked ... Prices were what we expected. Worth a try.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "0ak-7uV9Nb7nF_l-mMCysA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "good portion"
+          ],
+          "review_id": "-3d9ra9OkaNFygC6honz1Q",
+          "review_text": "Great spot for a quick, fresh and delicious lunch! Stopped in to make my own bowl and loved that you could add nearly any of their toppings without any surcharge. Ingredients were all tasty and seemed freshly cut - I really enjoyed their selection of pickled toppings. Folks behind the counter were incredible nice and friendly. Also tried the miso soup, which was a good portion and just the right amount of salt. Still full hours later, and I have a pretty substantial appetite - I was worried about all the reviews saying it was too light, but at least the rice bowl was spot on for lunch. Felt like a treat with some of the toppings but still a really healthy option.\n\nThe only things that kept it from 5 stars were that the shrimp tempura was much more breading than shrimp and that they played one song on repeat the entire time we were there for lunch - don't know how the staff manage to work there with it on all day, maybe it was a fluke. Just something to keep in mind if you want to eat in. No-brainer for take out!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "Uky0DD3LU4C7eyNDhpmOXg",
+          "matched_anchor_ids": [
+            "portion_size:2"
+          ],
+          "matched_terms": [],
+          "review_id": "4klJoQiud-9mRp65Td4SNw",
+          "review_text": "Terrible experience, will never go back due to the way we were treated! I have never had this experience at a restaurant even in Chicago where we are from. My sister lives in Philadelphia and she was appalled at the way the owner Robin Barg treated us. \nWe were told there was a 30 minute wait. My husband and I were waiting for the table while my sister was still on her way. The table was ready in 10 minutes so we sat down knowing she was going to arrive shortly. \nRobin came to the table 3 minutes later asking where our 3rd person is and next time we should not take the table if we are not all there, because she could have sat someone else. We said she will be here in a few minutes, then she proceeded to tell us that we can write a bad yelp review if we want, but that we should not have taken the table because it throws everything off and the waiter has to keep checking on us.\nThen five minutes later again she came back and said \"ok guys, what's going on?\" My husband and I had ordered juice and coffee and assured her that she will arrive any minute. I asked her what the difference is if we needed extra time looking at the menu or decided to stay longer after our meal to converse. Would we be forced to leave? Meanwhile a table of 6 left and the few people that were waiting were able to get seated. She made us feel so uncomfortable and we couldn't possibly stay to eat and have a good experience after that. Just as we decided to leave because we couldn't believe the way she was treating us, my sister walked in! \nSo after only 7-10 minutes, we were harassed twice! Another couple heard what happened and walked out with us and said they would never return. \nMy sister will never go back or recommend it. Even from a previous experience she had saying that the food was just ok and the portions were extremely small.",
+          "semantic_score": 0.7645910978317261
+        },
+        {
+          "business_id": "6ewV-e7-39oqYUq3yZuIyw",
+          "matched_anchor_ids": [
+            "portion_size:0"
+          ],
+          "matched_terms": [],
+          "review_id": "4A1699QxumhfOzM7bivZrQ",
+          "review_text": "I liked the food alright. But the portions were, dare I say, TOO BIG!? I mean you could feed a family of three with one of these meals. In fact I would suggest order sparingly to anyone going here. I mean, a lot of food for very little money, isn't a huge problem, but it just feels wrong to be served this much food. Am I the only one who feels this way?",
+          "semantic_score": 0.7436022758483887
+        },
+        {
+          "business_id": "30cpm1uq6xcQCmN6JTrB8w",
+          "matched_anchor_ids": [
+            "portion_size:2"
+          ],
+          "matched_terms": [],
+          "review_id": "235f9OReeJ0C0Rj6ItUXzg",
+          "review_text": "I was greeted by a really friendly worker when I walked into this shop. It was like a half basement kind of thing. However, there was plenty of seating to be found and the food came out pretty quick!\n\nI got the Luke's trio in order to try out all of them. By far, the shrimp and the lobster rolls were the best. They really give you a lot of the meat! However, even though the rolls were \"half\" rolls, they were as small as my fist (Donald trump size). Sad to say the taste is excellent (except maybe for crab, a little under-seasoned I felt) with perfectly toasted rolls with butter (crunchy on the outside, soft on the inside), the price to quantity ratio was not it. It was 21 dollars overall, and I'd probably spend 18 dollars next time to get two full shrimp rolls.\n\nThey have a lot of unique bottled drinks though, if you are into trying out new things. \n\nOverall, tasty food, but the portion sizes are too small for my liking. (If you eat little, it will be worth for you!)",
+          "semantic_score": 0.7388584017753601
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "portion_size:0"
+          ],
+          "matched_terms": [],
+          "review_id": "14vBZTfCnISCjRXMSbxJDQ",
+          "review_text": "Best dogs in S. Philly! Fast, clean, consistently great!",
+          "semantic_score": 0.22690065205097198
+        },
+        {
+          "business_id": "SgQUBMOJglbjvssPHD3uhQ",
+          "matched_anchor_ids": [
+            "portion_size:0"
+          ],
+          "matched_terms": [],
+          "review_id": "bt1xDW-GvDzvk7VjJRvfzw",
+          "review_text": "If i could leave -100 stars I would. so I worked at dp dough for a while....i've had it with the bosses shit, he treats the customers like trash he's pulled a gun on a customer before. He treats the STAFF like we are toys or pawns. He would say \"i'm coming in at 10\" then soon he says he's not coming in bc he has a headache. He's used so many excuses to not come into his OWN FUCKING JOB. Now the main reason I quit is because he sexually harassed me. One day he came in at an earlier time and he kept saying \"oh you're so beautiful\" like several times like HELLO BOUNDARIES YOURE MY BOSS NOT MY FRIEND. Then i was trynna put boxes up and he said \"it's bc you're too small\" EXCUSE ME? then mans going to say to me \"the bigger then better\" my guy i ain't ur friend, not ur anything, IM YOUR FUCKING COWORKER. He needs to learn his boundaries. Don't support this terribly run business.",
+          "semantic_score": 0.25263696908950806
+        },
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "portion_size:1"
+          ],
+          "matched_terms": [],
+          "review_id": "V9WiMcn5jrtv_fVH-jtXDA",
+          "review_text": "Mike's Hot Dog Cart should really be called Mike's Hot Sausage Truck because he stands at the back of his truck making the best hot sausage sandwich in Philly. So what you say? Try one. He uses only the best beef sausages, a great roll, and the ingredient that makes it pop, his own homemade Relish. It's not a green, pickle relish, but a all white Amish-ey sweet and crunchy condiment. It changes the whole taste of the same old, same old sandwich \nMike is there Monday thru Fridays for lunch to early afternoon and the only problem here is the long line. But when you want good food, sometimes you got to wait. So, try him out, he's parked right in front of the South Philly Shopping Mall at 24th and Passyunk, don't worry about the line it will be well Worth it and you might just end up a 20 year customer like me. \n(PS. don't confuse Mikes with the other cart near him, Mike is the one with the long line!!)",
+          "semantic_score": 0.2602226436138153
+        }
+      ]
+    },
+    "price_value": {
+      "both": [
+        {
+          "business_id": "Wl7iw_u4WeEreF4ZZF1oDw",
+          "matched_anchor_ids": [
+            "price_value:0"
+          ],
+          "matched_terms": [
+            "affordable"
+          ],
+          "review_id": "H9MN6NdVesqw3svB1kDayg",
+          "review_text": "Not 3.5 but not quite 4 stars and Only been once so bear with me, the staff was extremely friendly and nice which is always great and the food is very Authentic and delicious. The menu is HUGE! And extensive with a variety to fit anyone's palette, even had an American style section for those less adventurous patrons( I steered clear of that section and would advise others to do so as well, kinda ruins the point of going to an authentic spot ya know?) \n\nFor starters I got the Dan Dan noodles and had them make it as spicy as possible,even told them don't hold back, not like \" American\" spicy and she chuckled. They were alright not that flavorful( in comparison to Han) and really not fiery how I was hoping,very little heat to me but I'm am a chili head by true nature so go figure. I also got the wontons in chili oil ordered as is no adjusting heat and they were Delish!! I wish I had ordered them spicier because it wasn't at all but my friend who doesn't take heat well thought they were spicy enough, so an individual take on heat level. \n\nMy friend and I didn't even order our entrees off of the menu as we were peeking on the table next to ours and saw a few great options. She got braised pork belly which we later found had tofu in it and we aren't tofu people but the tofu was a firmer one and flavorful so okay and the pork belly was super tender with melty fat perfect for those who like different textures. Has an herb that gave a odd aftertaste but still fine. I got the crispy dry pepper shrimp ordered super hot and it was great! The shrimp was super crispy and even still crispy after a day in the fridge for left overs , was impressed. The heat was not where I wanted it but the shrimp size and portion made up for it.  The meal was really affordable as well. \n\nComing back to browse the menu some without a doubt",
+          "semantic_score": 0.7787100076675415
+        },
+        {
+          "business_id": "aUoMG97DMJG4nmwhT6z1zA",
+          "matched_anchor_ids": [
+            "price_value:1"
+          ],
+          "matched_terms": [
+            "overpriced"
+          ],
+          "review_id": "IJ1L8B_NpOYb4iGibj3eJQ",
+          "review_text": "This place is way overpriced and definitely lacking in their portions sizes for the prices of their entrees. The step down dining, is something I like. It's a slightly dark place. The lighting from the small track lights above do just enough illumination. It reminds me of a reformed wine cellar. The booths are tall, yet you sit at ground level. All around you are those scientific artist renderings of various species of seafood. Be that as it may, I wasn't impressed. Where as with Lacroix, I was treated to something special. This was kind of normal, average. I digress. I really love their complementary biscuit, served with sweet butter cream. More please! For our appetizer we had the small order of Muscles in garlic butter juice. I love seafood and Muscles especially. There was enough for the both of us and it came with a nice size of (Sourdough?) garlic bread. I ordered a glass of Cline Los Carneros Syrah. For my entree I had the Fried Shrimp. This was your standard 10, large, butterflied Shrimp. With fries and Cole Slaw. Again, nothing special. It tasted as it should. There was no special way the Shrimp was fried other than Panko bread crumbs. Then again, I use Panko bread crumbs when I make the frozen Mac-n-Cheese from Trader Joe's. Nothing special there you see???? My lady had The \"Jumbo\" Lump Crab Cakes with Asparagus and Mashed Potatoes. Her crab cakes were seasoned and spiced with special ingredients garnish etc. The mash was done up too. Really becasue she had a greater variety of a meal, her entree was the more enticing. But, there was no JUMBO in her 2 measly crab cakes. They were two 4oz scoops, if that's what JUMBO means. Her mash was like 2 table spoons smeared into a ball. She had some Riesling with her dinner as well. She agreed after we left that for close to $95 the food was good, not spectacular. The portion sizes were very underwhelming (yes, I understand that good restaurants will portion control to preserve the integrity of the food. It is dining at a higher level so there is more to consider. It's also about keeping cost down etc.). We just feel we didn't get our money's worth.",
+          "semantic_score": 0.7630494236946106
+        },
+        {
+          "business_id": "0S3TvsmbCeOZ9UitnpRd1A",
+          "matched_anchor_ids": [
+            "price_value:3"
+          ],
+          "matched_terms": [
+            "overpriced"
+          ],
+          "review_id": "Ln1VgxDN1VPVBV9Mv7lixQ",
+          "review_text": "Just okay. The food quality was good but incredibly overpriced. And I mean incredibly!",
+          "semantic_score": 0.7616572976112366
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "OHzX-ZD9qyoeoxR8Z0dlIA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "affordable"
+          ],
+          "review_id": "--LD3oJRxcSbA_npwH9PCA",
+          "review_text": "Khyber Pass Pub is like a little secret spot tucked away in the Old City area.  Really affordable, perfectly flavored, and perfectly cooked BBQ and sides.  Exceptional (without being too pushy) service.  Note: I don't really eat meat, so I just got the macaroni and cheese side.  However, the side was out of this world delicious.  They also had some vegan options that sounded so good, I kind of didn't understand them.  Vegan pulled pork?  What would that be like?  So needless to say, I was too scared to try them.  But after seeing everyone else's dishes, I now know I should have just bit the bullet and given them a try!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "rK4MQ-vybY5KXI73o-0mlw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "over priced"
+          ],
+          "review_id": "--Rtv1JutrrjH_8rFBs5sw",
+          "review_text": "Way too pretentious and over priced for the food they serve. \n\nSurf and turf was almost bad. \n\nThe ice cream taco desert was very good but no idea why they are serving such an unsophisticated dish in a place that wants to be Le Bec Fin. \n\nOne other thing, the backwaiter yelled 'excuse me' every time he came to bring something to or clear the table. I don't get it?",
+          "semantic_score": null
+        },
+        {
+          "business_id": "OAWa1WML2V1ZLJGD6V3nBQ",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "reasonably priced"
+          ],
+          "review_id": "--iWKFutwRKH7KsbDsOmfA",
+          "review_text": "This was the best breakfast sandwich I've ever had. The whole thing was perfect. Additionally the hash brown was out of this world. It's also reasonably priced! Highly recommend making this a stop on any visit to Philly!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "ctHjyadbDQAtUFfkcAFEHw",
+          "matched_anchor_ids": [
+            "price_value:0"
+          ],
+          "matched_terms": [],
+          "review_id": "HA0Kcod6_5i8NzdHNgVpSA",
+          "review_text": "My reviews don't usually start with comments on service because honestly the food is the only thing that truly matters at a restaurant to me. That said, the service a Zahav was impeccable! Our waiter was knowledgeable, kind, engaging, friendly, etc. Now on to the food. It's mostly tapas which is a great way to try lots of things without breaking the bank. The great:The hummus with bread straight from the oven, the duck hearts(my favorite), ground duck and foie gras, crispy grape leaves, kibble naya, coffee custard with marshmallow. the average:cauliflower, grilled haloumi, eggplant, pistachio tart. The Disappointing:roasted turnips.(can't win them all). On a Monday at 8pm the place was rocking! Lively atmosphere with a higher than normal noise level and lots happy diners. I had reservations but overheard there was 1 hour wait for the bar and that tables were fully booked. Price point was actually a bit lower than what I expected for a restaurant of this caliber(rare thing).",
+          "semantic_score": 0.7506421804428101
+        },
+        {
+          "business_id": "gnpyyeWQ53WlDMJEq-YA_w",
+          "matched_anchor_ids": [
+            "price_value:2"
+          ],
+          "matched_terms": [],
+          "review_id": "wucBgr91Q6pPmEmdmTbM0w",
+          "review_text": "OVERRATED!! It was expensive and not even that good. Dinner for two of us was $200 and we ordered one drink each and no dessert. Speaking of dessert, the options were meh. We ended up going somewhere else to get dessert that night. We ordered about 5 plates and ended up really liking only one of them. It absolutely wasn't worth the high price tag. Save your money and go somewhere else.",
+          "semantic_score": 0.7499883770942688
+        },
+        {
+          "business_id": "8pqdJjefYq-a9IBSJJmKwA",
+          "matched_anchor_ids": [
+            "price_value:0"
+          ],
+          "matched_terms": [],
+          "review_id": "aH3MVKa8CElp_kww71vosg",
+          "review_text": "Every detail shines through here, from the classically and beautifully styled rooms, tables and bars to a simple brunch meal. The beer list is well curated and the fact you can get a 20oz pour of your top choice ( I went with the Prima Pils) adds a little extra joy. \n\nA great place for dinner with the parents or to celebrate a special occasion, or even just because sometimes you want a big beer and a classic English breakfast. \n\nI chose a sausage egg and cheese with triple fried chips. Not health food by any means but so good you'll happily loosen your belt. The bread is buttery and a little crispy, with great flavor in the meat and satisfying texture from the gooey cheese and an egg that runs ever so slightly. The fries were thick, but crispy and we'll seasoned. Dessert and coffee satisfied, though I can't say it excelled. \n\nStaff and service are strong, cool without being aloof. Price is reasonable given the strength of the meal and the impressive aesthetics - a visual treat.",
+          "semantic_score": 0.7454401254653931
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "5Orn19gUeqCgKu5IRYlvpQ",
+          "matched_anchor_ids": [
+            "price_value:1"
+          ],
+          "matched_terms": [],
+          "review_id": "lm7hTcuGHxfNdJmen-mgng",
+          "review_text": "Following the news of late? They need to fumigate this jawn. Mice, roaches and feces.",
+          "semantic_score": 0.23072664439678192
+        },
+        {
+          "business_id": "SgQUBMOJglbjvssPHD3uhQ",
+          "matched_anchor_ids": [
+            "price_value:1"
+          ],
+          "matched_terms": [],
+          "review_id": "FukgSd9yWckb7Ja4byuChA",
+          "review_text": "Thank you Charlotte for helping me over the phone! I super appreciated you accommodating my needs last minute. That was so very  kind of you to help and your team as well even when it caused more work!",
+          "semantic_score": 0.23526336252689362
+        },
+        {
+          "business_id": "jsL0EmA3k75npcRvleq2VA",
+          "matched_anchor_ids": [
+            "price_value:3"
+          ],
+          "matched_terms": [],
+          "review_id": "F6-mTBRNDmEsmNYK7AJ8Og",
+          "review_text": "Girl at the desk terrible person she made me wait for looong time! Didn't even say any info...",
+          "semantic_score": 0.23708376288414001
+        }
+      ]
+    },
+    "queue_time": {
+      "both": [
+        {
+          "business_id": "aCHS5pnDjChkHpFo4-EfKg",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [
+            "long wait"
+          ],
+          "review_id": "r4LYJfkg-26gz9u4nFAomA",
+          "review_text": "After Very long wait time (even with a reservation) the server took approximately 30 min to come take our appetizer order. I believe we had the one and only wobbly unstable table at the restaurant (by the street). Our entrees were cold upon serving. With all of this being, the staff was friendly and apologetic.",
+          "semantic_score": 0.775596022605896
+        },
+        {
+          "business_id": "Ipkx4Sa7ybn8C6LtTqTztw",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [
+            "long wait"
+          ],
+          "review_id": "mF-3yf1oCKWtYeMRycegfQ",
+          "review_text": "Our experience started less than desirably.  We arrived on time for an 8:30 reservation.  Unfortunately, friends of ours were unable to get a babysitter so we contacted the restaurant earlier in the day and they said it would be no problem. When we arrived the hostess acted as if they had no clue.  My husband got us drinks at the bar, but that took more than 15 minutes.  We continued to wait for our table, so my husband inquired with the host. We were then seated 20 minutes late.  Be ware, there is no place to wait, so the entire time you are waiting for your table you are bumped by waiters, waitress, and other patrons.  Perhaps there should be a limit on the number of people permitted in the upstairs bar area.  We ordered the chef's tasting menu.  Our entire service was completed in an hour, 10 courses in 1 hour.  I have never in my life had food brought to me to quickly.  I felt extremely rushed.  There was a couple seated next to us who complained to the manager prior to getting seated, due to their long wait.  At least they were comped for their bad experience. Now to the food, it was average.  Nothing spectacular, nothing inedible.  Just average.  Our dinner concluded with dessert and our waitress didn't even ask if we wanted coffee; as I noticed other tables around us getting this.  All in all, I was disappointed with the experience, the initial wait and the service. As I stated the food was average.  I have attended happy hour in the upstairs space on a prior occasion and felt the experience was much better.",
+          "semantic_score": 0.7431493401527405
+        },
+        {
+          "business_id": "KYPhGJIibu_7ePIX4HNs6A",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [
+            "long wait"
+          ],
+          "review_id": "H7CZDvXVxkrFc7Fz5J_ymw",
+          "review_text": "I was pretty disappointed with the experience I had at this restaurant, possibly because I had high expectations from previous reviews. There wasn't a wait to be seated but there was an extremely long wait to be served! So long that we required refills on our drinks before receiving our meals... and that was another wait to even be noticed that a refill was needed. When the food arrived after about 45 minutes or more! My plate wasn't even full! It was a very skimpy meal!\n\nThe table next to us had 3 older ladies who also had the same wait as us in addition to one of the ladies not being able to eat her meal because it was too spicy. Another dish had to be boxed for her because once she received it, her friends had already finished eating.\n\nThe food itself was ok, nothing worth coming out my way for again",
+          "semantic_score": 0.7418405413627625
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "EtKSTHV5Qx_Q7Aur9o4kQQ",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "seated right away",
+            "took forever"
+          ],
+          "review_id": "--cj-82XKE-cMcfYykDvNw",
+          "review_text": "Did I really pay $20 for a burger? Yup. Was it the best. burger. ever.? Yup. \n\nI was feeling a little under the weather when I went to Village Whiskey and really was looking forward to a nice hot toddy more than anything, which didn't disappoint. I wasn't even sure about ordering food since I didn't know how well I could taste, but the hostess offered us a seat at the \"back table\" which turned out to be fine and we ordered burgers and fries. \n\n\"Burgers and fries\" is a total understatement. We got two orders of fries-- one with cheese and one plain. Both were delicious but the real deal here is the burgers. I ordered mine with carmelized onion and bacon. My friend got cheddar cheese and bacon. I have no idea what they do to these burgers but they are seriously gourmet. Even the rolls are rich. \n\nOur server was nice and helpful with questions about the menu, but service was really slow. The restaurant was definitely packed, but even ordering beers took a long time and our second order of fries took forever. \n\nOne last note about the crowd-- definitely not what I expected. Mostly over 40 but very fun-- we were sitting in an area that was crowded with people standing and people were chatty. In retrospect and in reading other reviews, we were lucky to be seated right away. Seating is extremely limited and very cramped, even at the actual tables. Next time we will try going on a weeknight.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "h7TO_IsmLCYmKKDVOOIeFw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "seated right away"
+          ],
+          "review_id": "-0QQ8ZneF0TINVLD4Wt6LA",
+          "review_text": "Great service, Great atmosphere & great food. We had a reservation & we were seated right away which doesn't happen at many restaurants. Our server, Lisa, really knew the menu & helped us make great selections. She definitely made the whole experience! The food was delicious too.  \nI had the Tempura Shrimp & Vegetables and loved it.  We will go back!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "mUdjeVjdsiOQMBK41x0Bow",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "seated immediately"
+          ],
+          "review_id": "-0r8heOdKKDdIVnCLnwc_A",
+          "review_text": "I brought a party of 6 here for dinner last weekend and we loved our experience! We arrived early on a Friday (about 5:30) and were seated immediately. I was surprised at the decor. It was not exactly latin inspired, I just remember it being very dark. They had multiple TVs which my boyfriend and his friends enjoyed to watch basketball on. We ordered a few pitchers of their house margaritas which were amazing. They are not your typical Mexican joint's neon green \"margaritas\". These were fresh squeezed, strong, and had a hint of pineapple juice to them. So good! The waiter was very attentive in refilling our glasses for us which we liked. I had the Tuna tacos and my boyfriend had skirt steak. Both were excellent! We thought the tuna was the better of the two. My only regret is that we did not order the tuna guacamole as well. Our bill was pricy but that was to be expected. We did not mind paying it after getting such great service, delicious food and tasty drinks. I definitely want to come back to Sancho Pistolas for happy hour next!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "iUZEGx29miZObLd6_lt7Vg",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [],
+          "review_id": "OcnX5UJ4WHSWn_qvPmBlMQ",
+          "review_text": "I just want to say, we could not even step into your restaurant because you, for some reason, keep skipping us and not even trying setting us up with the table when we know we got there way before some people that you have already found the table for your other customers. So when we got there, girl with the tablet told us it would be 30 to 40 minutes until the table is available. We walked around and came back. When we came back, man who had a cell phone said 10 to 15 minutes. Then we waited at near the door. Still waited while people who were there after us got to sit. \n\nWe asked if our table is ready, he said another 10 to 15 minutes. We just left. And after another 1 hour and 30 minutes later, we received the text stating our table is ready. \n\nTotal waiting time: 2 hours and 30 minutes.\n\nI dont care how your food is good. You literally didn't let us sit for some reason. Glad you have customers. But no thanks.",
+          "semantic_score": 0.7903664112091064
+        },
+        {
+          "business_id": "6ajnOk0GcY9xbb5Ocaw8Gw",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [],
+          "review_id": "PjVQqV4p-ZXfhBCfZW_z8A",
+          "review_text": "One of the best places in Philly.  I've been here a few times over the last couple years (great date spot). The ambience is great,  not too dark but relaxed.  The food is spectacular.  The kitchen is open (you can sit at a bar along the kitchen) so you know everything is fresh. While there my favorite things were the meatballs which had a seasoning akin to what you would use in italian sausage and the ricotta which I could have eaten by the bucketfull. I also had the pappardelle in a meat sauce which wasn't bad, but wasn't great (the pasta was too thick and the meat sauce was bland).  Whats great about the food is they are mostly small plates so you can drive a bunch of different things.  Their cocktail menu is solid with a good variety (i had an old fashioned that wasn't bad), but you come here for the food.  The service was excellent and the wait is long for a table (30-60 mins) if you don't have a reservation.",
+          "semantic_score": 0.7625784277915955
+        },
+        {
+          "business_id": "IGxrAQcqw8Mr1x9WLXQsNA",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [],
+          "review_id": "ZQbeoxkO8IwvXuKCiHlB0Q",
+          "review_text": "Seems like they have way too many tables setup and the kitchen can't keep up.  After we ordered our food, we waited for over an hour just for the appetizers, and took 90 minutes to get our main dishes.",
+          "semantic_score": 0.762549877166748
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "hu6WwDxwgsHwY24nQUY8rg",
+          "matched_anchor_ids": [
+            "queue_time:1"
+          ],
+          "matched_terms": [],
+          "review_id": "vBbbVEENnW9k_cF8T3C75w",
+          "review_text": "Almost everything you need under one roof.  Support your local corner store, they are the backbone of cities like Philadelphia.  I love how they sell small plastic baggies of swedish fish too.  25 cents!  Also, a large veggie hoagie for under $4?  Sign me up.",
+          "semantic_score": 0.2137964516878128
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [],
+          "review_id": "Vw1D1MXKi_tir89qF5xsKg",
+          "review_text": "I love this place.  Small neighborhood bakery, specializing in Italian-style breads, baked on premises. Surprisingly wide variety. I love braided Italian with sesame seeds, that chewy loaf with pointed ends, and whole wheat (on Fridays only)!  I'm neither Italian nor Catholic, so their many holiday specials are new discoveries to me. \n\nRetail business plus they supply a couple restaurants. Reasonable prices.  They're opposite the SW corner of Columbus Square (aka Passyunk Square). You'll see Mrs. Faragalli sitting in the front window.\n\nUPDATE: From the Phila Inquirer: \"Marie 'Maemoe' Faragalli, 86, owner of the venerable Faragalli's Bakery in South Philadelphia, which lays claim to the only wood-fired open-hearth oven in Philadelphia, died of breast cancer Sunday [June 29, 2008] at Thomas Jefferson University Hospital.\" Great story about the family and bakery ( http://www.philly.com/philly/obituaries/22802524.html ).",
+          "semantic_score": 0.23572707176208496
+        },
+        {
+          "business_id": "NXwEDLZjv8dUqbc5g5dCYg",
+          "matched_anchor_ids": [
+            "queue_time:3"
+          ],
+          "matched_terms": [],
+          "review_id": "R-AnT-4g8gacivDOZr28JA",
+          "review_text": "I have been to Abunai a couple times since it opened inside of the Bourse Food Hall. From what I have read, their original location is in D.C. Abunai lets you create your own poke bowls and have multiple types of fish and protein options. You can choose a base, which is either rice or greens or both. Then they offer mix-ins with the fish such as green onion or cucumbers. Finally you can add on other toppings such as seaweed salad, masago, nori, avocado etc. They also feature their own signature bowls\n\nBoth times I have gone I ordered the spicy salmon. The first time so had the signature bowl which was delicious and cost about $13. The second time I went, I made my own small bowl with spicy salmon and added several toppings. The small bowl came out to be about $9. Both bowls were delicious and the fish was fresh! I will definitely be back!",
+          "semantic_score": 0.2440798282623291
+        }
+      ]
+    },
+    "quiet_environment": {
+      "both": [
+        {
+          "business_id": "woTZpX92uByUgliPrh39Mg",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [
+            "noisy"
+          ],
+          "review_id": "nyDt185_OgKUhEWEz0ZniQ",
+          "review_text": "We were very pleased to get a lovely booth when we arrived. Our server was excellent and the food terrific. The restaurant is very attractive and inviting. However, the restaurant is SO NOISY that we had difficulty conversing and enjoying our meal. There was loud rock like music on the sound system which does not go with such a fine restaurant. In addition there were large groups nearby that added to the noise. It is unfortunate and we would never return. The Prices are VERY high. It is just not worth it.",
+          "semantic_score": 0.7789973616600037
+        },
+        {
+          "business_id": "DsKzHnkLKnxZTVsFpts4oA",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [
+            "noisy",
+            "very loud"
+          ],
+          "review_id": "PicDez3Hxi3fcsJsfxIy8g",
+          "review_text": "We tried to have brunch here while in town to visit some museums.  As we entered the restaurant, we noticed that while not completely pack, it was very loud and noisy.  When we were seated, we could not even hold a conversation unless we were speaking very loud.  We ended up leaving and not ordering anything.  We actually grabbing a bite and eating in the park, less noise if you want to ha e a conversation.",
+          "semantic_score": 0.7782959342002869
+        },
+        {
+          "business_id": "8vxNQrL_ONPNXZ1VuMTmCw",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [
+            "noisy"
+          ],
+          "review_id": "1qIR52_d5RZgU0ykn1Gqbg",
+          "review_text": "This place was fine when my friend and I were the only ones in the restaurant; then when the place began to fill up it became so loud that it was truly unbearable.  It was so noisy that we had to shout at each other from across our two-top and eventually stopped our conversation altogether. Mediocre food, mediocre service, unacceptably loud.  Will not be returning.",
+          "semantic_score": 0.7749190926551819
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "XIKYdKWq72zUYsq8NBxcCQ",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "quiet"
+          ],
+          "review_id": "--UB6upEz_RB8wQ9LgVF8g",
+          "review_text": "Still a solid place for brunch in West. It's quiet, friendly, byo and serves a nice variety for brunch. I got the chicken and waffles and the chicken was juicy and tender and the waffles were fluffy and buttery. I like the ease of this place. It has a very nice vibe. However, just a personal opinion, but the atmosphere would be on a sweeter level if there were nice music playing (one night, long ago, when dining here, I remember such a lovely jazz play list that floated through the dining room)  that filled the restaurant with sweet sounds instead of the large, looming TV that was playing sports. This seems like an odd choice to me as a place that has such somewhat elevated choices on their menu shouldn't be giving out \"sports bar vibes\". However, if you are ok with that,  it's still a nice place for a tasty brunch.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "iWy6Wft0MMO9Ud2wM93frg",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "easy to talk"
+          ],
+          "review_id": "--vgXsRmG043HGskXuO3yw",
+          "review_text": "I live two blocks away and consider myself pretty lucky to have a place like this within a short walk. There's definitely a hipster vibe and sometimes I feel out of place, but everyone is cool and easy to talk to.\n\nFood is just flat out solid. I've never had something I didn't enjoy, and every dish is unique in its own way. The beer rotation and the fun atmosphere is what puts it over the edge and compels me to give them 5 stars. One of the most enjoyable restaurants I have ever been patronized.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "h7TO_IsmLCYmKKDVOOIeFw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "quiet"
+          ],
+          "review_id": "-1en5h2YHuAVz3iwFefiTA",
+          "review_text": "This is definitely a sushi favorite.\nTheir special rolls are amazing! It's made well and when it comes to your table, it looks great and tastes like it! I don't know who their sushi chef is but he creates miracles!\nIt opens for lunch and then closes to reopen for dinner. And although, street parking is a bit difficult to find, this place is probably my number one in the city for sushi. The ambience is very modern and it can be a little quiet at times even though there is conversation going on. Great for couples and small groups.\nRecommended this place to friends and they all said they loved it. It's worth to try this place at least once.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "S8ZFYEgMejpChID8tzKo9A",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [],
+          "review_id": "kKLIa8beY_4Z5916A3sqqA",
+          "review_text": "A hard review to write, as i loved the food and thought that our server was fantastic. But, this was without any doubt, the single loudest restaurant that I've ever been to. It was loud enough to significantly effect my experience. \n\nIf you are in anyway sensitive to noise or, if like me, just simply prefer a quieter atmosphere, this is by no means an option.",
+          "semantic_score": 0.7807626724243164
+        },
+        {
+          "business_id": "oqy15jhe1lOXttEvd4Srog",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [],
+          "review_id": "jowJzMSdb77Qjbs7pmIRRA",
+          "review_text": "I've been here before. Food and margs are decent, but the noise level was UNCOMFORTABLY LOUD! I HAD TO MOVE MY CHAIR TO THE SIDE IN THE HOPES I COUKD HEAR MY DINNER COMPANION. IT DIDN'T WORK! When I asked the waiter if it was always this loud on a Friday night, he shrugged and replied, \"If people are talking loudly.\" A trip through the restaurant to the bathroom confirmed it was loud everywhere. SO APPARENTLY PEOPLE TALK LOUD AT THE BAR, IN A DINING ROOM.... If you go, go on a warm evening and sit on the patio if you would like to have a conversation that isn't punctuated by \"Huh?\" and \"What?\".",
+          "semantic_score": 0.7787865400314331
+        },
+        {
+          "business_id": "of-GVqY0G_UDHXT9Xg_ADQ",
+          "matched_anchor_ids": [
+            "quiet_environment:2"
+          ],
+          "matched_terms": [],
+          "review_id": "K2O2bVCIPUPBLrobN0dFUQ",
+          "review_text": "The food is awesome, but it is so incredibly loud there it's not a very pleasant place to eat. I came for a date with my boo, and we had to scream at each other above the din. It was hard to relax and enjoy the food, because it was impossible to have a conversation. It is pretty crowded (easy to bang elbows with your neighbor) and that doesn't help the noise sitch since you can hear them screaming as well. Maybe if I was at the bar for a lively drink it would be fun, but the care put into the food is not matched by care put into the experience of eating the food.",
+          "semantic_score": 0.7433814406394958
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "quiet_environment:3"
+          ],
+          "matched_terms": [],
+          "review_id": "4WKQx5WxjgnSu2As3ZGrdg",
+          "review_text": "This place has the BEST Italian bread in the City...\nThey also make the BEST EASTER BREAD you can buy! Been eating their breads for 46 years!",
+          "semantic_score": 0.2169991284608841
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "quiet_environment:1"
+          ],
+          "matched_terms": [],
+          "review_id": "m4uBu-3x19Wz5e0S1nBxvg",
+          "review_text": "I make hubby stop here on his lunch break once a week and buy several loaves for me at once. I have a freezer in my basement so I cut it up, ziploc it and pop it in oven to warm up again when needed. It's delicious even after freezing/thawing. My kids are addicted to their breads! I dip them in garlic olive oil. So yummy!",
+          "semantic_score": 0.22937555611133575
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "quiet_environment:1"
+          ],
+          "matched_terms": [],
+          "review_id": "XjV-E-j6-E2jvN-FzEE9Lg",
+          "review_text": "This local bakery is a few blocks from my apartment and is one of the best Bakeries in town. Delicious bread and incredibly low priced. It's a tiny little shop on the corner and they have weird hours. If you are in the area when they are open, I would highly recommended stopping by! \n\nThey only have a few different selections of breads but all are freshly baked. Definitely worth the trip.",
+          "semantic_score": 0.23902757465839386
+        }
+      ]
+    },
+    "service": {
+      "both": [
+        {
+          "business_id": "4_VDvhKpKSsj7jZYdocZYA",
+          "matched_anchor_ids": [
+            "service:0"
+          ],
+          "matched_terms": [
+            "attentive"
+          ],
+          "review_id": "jo2xyDsJncZMfCw3k2efmQ",
+          "review_text": "My family and I absolutely love this place.  The food is amazing and the service is wonderful.  We've been two times and both times everything was perfect.  The mushroom appetizer is to die for! The veal is so tender and delicious that you can cut it with a fork.  We have gotten the veal viola, veal carciofi, linguine pizzaioli (which has veal, capers and olives in a spicy red sauce), and the chicken rollatini.  The prices are reasonable and the portions are huge.  The veal/chicken dishes are served with vegetables, so a side of spaghetti costs extra, but it's so worth it! The side is huge and the red sauce is hands-down the freshest, most delicious sauce I've had since being in Italy.  The restaurant is BYOB and the outdoor area is picturesque with all of the overhead lights.  The desserts are reasonably priced and delicious, we especially loved the tiramisu and the cannoli cake.  Lastly, the staff is friendly, welcoming and attentive.",
+          "semantic_score": 0.7330220341682434
+        },
+        {
+          "business_id": "hGeI6ICLbNHLuXAgJxjlFg",
+          "matched_anchor_ids": [
+            "service:2"
+          ],
+          "matched_terms": [
+            "rude staff"
+          ],
+          "review_id": "4cnW8465gvwpZpFXW2N5fw",
+          "review_text": "I am here often as I travel to Philly alot. There food is hit or miss. Some items on the menu are great (their burgers and breakfast sausage) and some are bland (their cheesesteak and cheesesteak omelet, which is kind of sad since it IS a PHIL airport restaurant). \n\nAlthough sometimes I have a good experience with the food, and sometimes there is room for improvement, I can say that they should look more into their staff. \n\nI have rarely had good service here, and I am hear a LOT. You order via ipad screen, which is convenient (I really like that) but to me, that is also another reason the service should be better, because its less work for them. They don't even have to take your order. \n\nI sat here the other day (close to the bar) and heard 3-4 20ish  year old waitresses complaining, and talking about the customers, and gossiping about the other staff. It was the ENTIRE time I was there (at least an hour, they didnt stop). They all had a story about one of their customers that irritated them, and the customers were there at that moment. Immature and rude staff. \n\nI would suggest some training and management oversight here.",
+          "semantic_score": 0.7248311042785645
+        },
+        {
+          "business_id": "x4855nj7vfdXeVpg5fREZA",
+          "matched_anchor_ids": [
+            "service:0"
+          ],
+          "matched_terms": [
+            "attentive"
+          ],
+          "review_id": "YEKGt0fW9OSIC_WZ3OjZwQ",
+          "review_text": "This place is pretty awesome. Xfinity Live made a great move by getting rid of the fancy shmancy restaurant that used to be there and putting this one in. It has more of a polished and professional vibe than the other 3 places at Xfinity, but still has a young, fun atmosphere.\n\nThe food was great. It's a nice change of pace to see unique menu offerings at a place full of sports bars if you're not in the mood for wings or a burger. They also have a nice selection of vegetarian options for people like my room mate who normally only has 1-2 options on the menu when we go out to eat. Do yourself a favor and get the cheese fundido with house-made chips!\n\nI'm normally a beer drinker but I tried one of their signature cocktails (and tried sips of my friend's drinks) and they were all amazing. I'd go back just for one of those drinks!!\n\nLast but not least, service was perfect. Staff was friendly, knowledgable, and attentive without being overbearing. Our waitress gave great recommendations and asked for feedback. All in all, it was a great experience!",
+          "semantic_score": 0.7244802713394165
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "SCjUeZfjafJ88fWWQjRh2w",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "attentive"
+          ],
+          "review_id": "---aZVSWnQtOP_12QzIt8g",
+          "review_text": "We live multiple hours away, but we come to philly often. We love coming here when we're in the mood for Mexican. Consistently delicious. Our last server was awesome, coming from two service-industry people. He was smart, quick, attentive, but gave us some space, all while training a new server.  I can't come here without ordering the queso fundido, and I'm lactose intolerant. I haven't had everything yet, but the items I've ordered in between trips have always been consistent. I have no plans of finding anywhere else to enjoy tequila and Mexican food while in philly.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "ZNWox30LIv7hV5k5YP8tCQ",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "great service"
+          ],
+          "review_id": "--14yHFQP5zSaQM6WOyhjQ",
+          "review_text": "I love this bar, and will go out of my way to end the night here. Prices are good, their food is AMAZING, a huge selection of beer on tap, and great service. Tons of TVs and lively atmosphere during sporting events. You might consider getting there early, though, as it gets pretty busy, but for good reason, and it's totally worth it.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "BryQISFnkCdcJET-tpAx3w",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "attentive"
+          ],
+          "review_id": "--1z0MjmPFmNQLpnwwhBOA",
+          "review_text": "I brought my family here recently because I had been interested in trying it for a while. I loved that you could get a free \"Mix Meze\" appetizer just by checking in on Yelp. We enjoyed all six of the items and the waitress kindly brought us as much pita as we asked for. We also ordered the Manti (Turkish ravioli) which I have never had before, it was amazing and probably my favorite dish in the entire meal. The raviolis were great and the yogurt sauce was also amazing. Amongst my family, we ordered the Prime Time Steak, Pan Seared Seabass (or possibly the catch of the day, can't remember), the Kasap Kofte (ground beef patties), Lamb Chops. We all tried bits of everything, the fish dish was amazing. I thought the steak was slightly dry though, and the kasap kofte and lamb chops slightly over done. I wish one of us had ordered a chicken dish. I would come back to try that or the Kushbashi! (filet mignon). For dessert we ordered a baklava and Kunefe. I absolutely LOVED the baklava, it wasn't too sweet but sweet enough. (And I'm pretty picky about the baklava). The kunefe was a little interesting, I have too much of a sweet tooth to have enjoyed that (we described it to each other like shredded wheat and a sweetened mozzarella type cheese). Our waitress was very sweet and attentive. However, the dishes did take a very long time to come out and the main courses also came out at different times which can be difficult with a group of people. I would come back again though!",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "lKU_kljhbEQKIPaM1Zbqiw",
+          "matched_anchor_ids": [
+            "service:2"
+          ],
+          "matched_terms": [],
+          "review_id": "Rp4NFyIghBkMJ6pFzxR1Wg",
+          "review_text": "Food is amazing. Staff are so rude, impatient, and unfriendly. They rolled their eyes at us multiple times, snatched the menus out of our hands, and were incredibly curt",
+          "semantic_score": 0.7797024846076965
+        },
+        {
+          "business_id": "v5iurptJZo_7xm2Qm-3lgQ",
+          "matched_anchor_ids": [
+            "service:2"
+          ],
+          "matched_terms": [],
+          "review_id": "pwnBvGKW5RhwmOzVOdVF5w",
+          "review_text": "There are just a few airport bars I really like, and this is (close to being) one of them.\n\nJet Rock has many positives - chief among them being the draft beer selection: 48 quality pulls, skewing heavily towards the ales.  Whiskey (or whisky, depending upon your potable preference) lovers will appreciate choosing from among 19 single malts and blends.\n\nDon't like draft?  Fear not, they have two bottled beers as well, \n\nThe bar itself, a grand sweeping behemoth studded with fluorescing ceramic and brass draft-towers, is the central eyepiece in this concourse.  The wall is lined with a few high-tops, and a mawing cavern awaits those to be seated at a traditional 4-top.  This area, while truly an image of purgatory for any agoraphobics out there, at least offers a view of the tarmac.  wow.\n\nTheir food is, in general, not bad, but please stay away from the Philly Cheese Steak sammich with Cheese Wiz.  I warned you.\n\nOther than that, I have ordered several satisfying dishes, but my favorite so far has simply been their burgers, which are excellent!  They also have decent salads, which you might want to get instead of the fries, which are waayyy too salty.  Horrible.  They exist only to coerce you into drinking more beer.  Come on, peeps!  You do not have to do much to get me to drink more beer.  Simply having beer to sell is sufficient.\n\nNow, I am a huge Guinness fan, but their Guinness here is occasionally off-tasting.  The last time I was here it was not drinkable.  The strange thing about that is that the staff knew it was bad, and served it to me anyway, without warning, and apparently in some vain attempt to get me to take the shite off their hands.\n\nThis brings me squarely to the staff - by far the biggest weakness in the establishment.\n\nGenerally I am very staff friendly, but this place simply has consistently bad staff, with a pervasive poor attitude, low attentiveness, and a nonchalant incivility.  This is exacerbated during any rush when they just seem to be put out.  (\"Customers are really very annoying, aren't they?  Always wanting us to do shit for them!\"\n\nToo bad.  Would have gotten a four.",
+          "semantic_score": 0.764536440372467
+        },
+        {
+          "business_id": "vUkiYPpbkMXA99WneLSGkQ",
+          "matched_anchor_ids": [
+            "service:0"
+          ],
+          "matched_terms": [],
+          "review_id": "Mo3uYJrK1O2zoTiV-WfEvQ",
+          "review_text": "As a college student, I love Banana Leaf. It can be rowdy at times but it's always a good time. We tend to go in a group with a few boxes of wine (BYOB). It's not uncommon for the restaurant to be loud with college kids, which can be good or bad. Our group doesn't mind as we are also loud college kids.\n\nThe menu is pretty large and there will be something for everyone in your party. Start with the Roti Canai. It's delicious, the \"bread\" itself has a good texture and the sauce they serve it with compliments it very well. When I went yesterday, I had the Captain's Noodles with flat noodles. It was pretty good. I've also had their spicy chicken, curry chicken, and pad Thai. There are a ton more things on the menu that I would like to try. Also, the fried ice cream is good. Everything on the menu is extremely affordable. The staff can seem \"pushy\" at times but I think there just trying to provide the best service they can. They are also helpful with menu recommendations.",
+          "semantic_score": 0.7536022663116455
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "yHsG1SuEtB_pTZ9TjvOxrg",
+          "matched_anchor_ids": [
+            "service:0"
+          ],
+          "matched_terms": [],
+          "review_id": "ZjhqKrvMyhB0jjys3bKgmA",
+          "review_text": "Generally a really good Greek salad and side dishes (orzo salad, couscous salad, tabbouleh, bean salad, grape leaves).  Sometimes there can be a bit too much acid/oil/liquid along with them\n\nAs others mentioned, the Greek salad with grilled chicken is a great value.  However, I don't eat chicken so I cannot speak to that aspect.  Unfortunately if you order the greek salad without chicken, it's the same exact price as those that have 2 huge hunks of chicken on them. (seems unfair, shouldn't it cost less?)\n\nGreat food though and family that operates it.",
+          "semantic_score": 0.169759601354599
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "service:1"
+          ],
+          "matched_terms": [],
+          "review_id": "Vw1D1MXKi_tir89qF5xsKg",
+          "review_text": "I love this place.  Small neighborhood bakery, specializing in Italian-style breads, baked on premises. Surprisingly wide variety. I love braided Italian with sesame seeds, that chewy loaf with pointed ends, and whole wheat (on Fridays only)!  I'm neither Italian nor Catholic, so their many holiday specials are new discoveries to me. \n\nRetail business plus they supply a couple restaurants. Reasonable prices.  They're opposite the SW corner of Columbus Square (aka Passyunk Square). You'll see Mrs. Faragalli sitting in the front window.\n\nUPDATE: From the Phila Inquirer: \"Marie 'Maemoe' Faragalli, 86, owner of the venerable Faragalli's Bakery in South Philadelphia, which lays claim to the only wood-fired open-hearth oven in Philadelphia, died of breast cancer Sunday [June 29, 2008] at Thomas Jefferson University Hospital.\" Great story about the family and bakery ( http://www.philly.com/philly/obituaries/22802524.html ).",
+          "semantic_score": 0.17795884609222412
+        },
+        {
+          "business_id": "NXwEDLZjv8dUqbc5g5dCYg",
+          "matched_anchor_ids": [
+            "service:0"
+          ],
+          "matched_terms": [],
+          "review_id": "R-AnT-4g8gacivDOZr28JA",
+          "review_text": "I have been to Abunai a couple times since it opened inside of the Bourse Food Hall. From what I have read, their original location is in D.C. Abunai lets you create your own poke bowls and have multiple types of fish and protein options. You can choose a base, which is either rice or greens or both. Then they offer mix-ins with the fish such as green onion or cucumbers. Finally you can add on other toppings such as seaweed salad, masago, nori, avocado etc. They also feature their own signature bowls\n\nBoth times I have gone I ordered the spicy salmon. The first time so had the signature bowl which was delicious and cost about $13. The second time I went, I made my own small bowl with spicy salmon and added several toppings. The small bowl came out to be about $9. Both bowls were delicious and the fish was fresh! I will definitely be back!",
+          "semantic_score": 0.1819896250963211
+        }
+      ]
+    },
+    "spiciness": {
+      "both": [
+        {
+          "business_id": "qISf5ojuYbD9h71NumGUQA",
+          "matched_anchor_ids": [
+            "spiciness:2"
+          ],
+          "matched_terms": [
+            "too spicy"
+          ],
+          "review_id": "ZSTJxCuUvS4Xha_dcGnSLQ",
+          "review_text": "We found the food to be too spicy to be able to taste the other flavors.  Everyone in my group arrived thinking we enjoyed spicy food.  Apparently we do not.  We ordered only dishes that had mid-level heat ratings (4-6) and found that with only one exception the flavors were overpowered by the chilies.  \nThe \\dish we most enjoyed were the dan dan noodles.\nSo,if everyone in your group likes really, really hot food this is the place for you.",
+          "semantic_score": 0.7301665544509888
+        },
+        {
+          "business_id": "bffLbfi1IEAff5C2IHJvFA",
+          "matched_anchor_ids": [
+            "spiciness:0"
+          ],
+          "matched_terms": [
+            "not spicy"
+          ],
+          "review_id": "ahnFzXJNIhffoeEH5bub9g",
+          "review_text": "I've been to this place a couple of times with a group of people and in general thought it was good. I definitely enjoy going back, however I've had mixed experiences with the spice level. The menu is helpful because it indicates the spice level of each meal, although the lowest is three, I think. Definitely could make more dishes that appeal to those of us that don't like spicy. The first time I went I got a meal that was advertised as three (to them not spicy) and asked for no peppers and mild. It came out perfect and I loved it. However the next time the waitress seemed annoyed and it came out spicier. That is my only complaint, so for those who need mild dishes, just be adamant and careful about it. However, overall great food and I will definitely be going back!",
+          "semantic_score": 0.7078272700309753
+        },
+        {
+          "business_id": "WxB8498ejPtHE7wFa89_fA",
+          "matched_anchor_ids": [
+            "spiciness:3"
+          ],
+          "matched_terms": [
+            "not spicy"
+          ],
+          "review_id": "Ez2GQ79S8SUSQuPiF8sN8g",
+          "review_text": "It was late at night and since so much of Philly seems to shutdown early, we didn't know where to eat.  On the advice from our hotel's concierge we hit up Continental Midtown.  When we walked in I didn't get the best feeling.  The place looks like you are walking onto the set of the Brady Bunch and a bad 70s disco all at once.  The set up is strange, the levels feel like the inside of a old department store with the glass siding and wood trim on the top.  Whoever designed the look of this place is trying way too hard to  be different...and failing.  \n\nIt was around 11 and the only seating left was on the second floor.  That was fine, but where I had to sit was not.  They have 70s looking wicker seats that are suspended from the ceiling.  Maybe to some people this seems hip.  To me however, the novelty of it never even starts let alone wear off.  The seats are very uncomfortable and by the time we left my back and legs was in pain.  It's just not a seat meant for dining, it's way too awkward.  \n\nThe music began OK even though it was extremely loud.  After the first two songs, the music just went completely downhill.  There was no consistency.  The songs went from current indie songs, to 80s \"new wave\" to just loud bass thumping poor club music.  Very odd.  Decor and music, two strike outs.\n\nThe server was friendly.  She tells us they are out of szechuan shoestring fries.  That sucked since we were going to order that.  We tell her we need more time.  She comes back and just as we are about to order the BBQ chicken entree, she tells us they just ran out of that as well.  It was a Friday night, how are they running out of food?  Very amateurish.\n\nWe finally get the food we ordered, the food they didn't run out of.  One of the entrees is very spicy.  There was zero indication on the menu that the food would be spicy.  I thought that was weird.  We tell the server and she quickly offers to give us a new replacement entree that is less spicy.  She tells us they have a spicy and a not spicy version.  Why didn't she tell us that before we ordered it?\n \nThe server and the food were good, but the rest killed any enjoyment I would have gotten out of the place.  I would not recommend it and I would never return.",
+          "semantic_score": 0.7072858214378357
+        }
+      ],
+      "keyword_only": [
+        {
+          "business_id": "iCVrRHR_Yxr6mHCpObnE1g",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "too spicy"
+          ],
+          "review_id": "--giW3GaCJNMPQu6Os6XgQ",
+          "review_text": "I frequent AmeriThai a lot during lunch time and also order take out and delivery.  Service is always excellent.  The owner is always smiling and always friendly and she remembers my name every time. Everything that I've tried was delicious.  I've had the pad thai, crazy noodles, nhem khao, papaya salad, Tom yum soup and the pho.  The only thing is some of the dishes are spicy and it doesn't state it in the menu.  So when ordering, make sure to ask if it is spicy or not and tell them how you handle your spice.  The nhem khao and papaya salad were both way too spicy for me when I first ordered them.  But when I told them my preference of spice it was good.  Definitely worth a try!",
+          "semantic_score": null
+        },
+        {
+          "business_id": "KQgCflC8eqJU5kvJkByXzw",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "too spicy"
+          ],
+          "review_id": "--tLN9nVUzFX6VVPicgmzw",
+          "review_text": "Passed by here a few times. Finally got a chance to try it. We got there at 12:30 and there was only two other people. I ordered the spicy ramen- the ramen was good. Nice and chewy. But the broth was thick. I am used to thin broth. Not too spicy either. Overall, I won't be back because there are other good ramen places in Chinatown.",
+          "semantic_score": null
+        },
+        {
+          "business_id": "DsKzHnkLKnxZTVsFpts4oA",
+          "matched_anchor_ids": [],
+          "matched_terms": [
+            "too spicy"
+          ],
+          "review_id": "-1V3_r_S0PGIA28r8EDfqg",
+          "review_text": "I'm sitting here eating breakfast. The orange juice tastes fresh squeezed - delicious! I ordered the eggs benedict with much hesitation. They are made with a sriaccha hollandaise and placed on Belgium waffles. I was fearful they would be too spicy. I can't stress enough how perfect they tasted! The breakfast potatoes were equally as delicious! I highly recommend this breakfast! The only reason I didn't give 5 stars is because there were crumbs on the seat and the hostess wasn't friendly.",
+          "semantic_score": null
+        }
+      ],
+      "semantic_only": [
+        {
+          "business_id": "aa0xi7fgFJyA4qWux6vz0A",
+          "matched_anchor_ids": [
+            "spiciness:2"
+          ],
+          "matched_terms": [],
+          "review_id": "FeB5eaZvO67DOK86L2xyFw",
+          "review_text": "If you are wondering around Reading Market Terminal and absolutely overwhelmed, look for Carmen's because it has the longest line of all time. I went on a Sunday morning and I thought it would be quiet. To my surprise, it was the complete opposite!! The line wrapped around the corner and it was only getting longer as I waited.\n\nMan oh man did I make the choice to commit the line! Watching the cooks make the philly cheesesteaks and hoagies make the whole experience mouthwatering. \nYou must eat this while its hot!!! Don't let this baby get cold!!\n\nThe food ordered:\n\nThe Classic Cheesesteak: (5/5)\nSweet roasted pepper, cheese wiz\nI have never been so happy before with a philly cheesesteak. The amount of meat was proportionate to the bread. \n\nKamikaze Cheesesteak: (4/5)\nAll the peppers and hot sauce complimented the whole cheese steak. I'm a huge fan of spicy so in all honesty, it wasn't really that spicy. The menu makes it sound spicy.",
+          "semantic_score": 0.745089054107666
+        },
+        {
+          "business_id": "-1B9pP_CrRBJYPICE5WbRA",
+          "matched_anchor_ids": [
+            "spiciness:3"
+          ],
+          "matched_terms": [],
+          "review_id": "df66Xf9swEz2Qcferp_FmQ",
+          "review_text": "Came here recently with a group of friends - the ambiance is nice, and we were seated promptly with our reservation. The bay windows out front were wide open and fresh cool air was coming in - looked like were were in for a great night.\n\nAlthough I got to try a couple of the things that other people ordered, I'm just going to focus on the two dishes that I ordered:\n\n1. Dan Dan Noodles - 3/5. I was a little disappointed with this - not really a whole lot of heat/numbing sensation with this one. And the noodles weren't as chewy as I had hoped for. I'd definitely say that Han's Dynasty still has a huge advantage over them here. \n\n2. Silken tofu with fish in hot chili oil - 4/5. I really was looking forward to this dish because I was hoping to get a good combination of numbing spice and strong heat. This dish is rated \"3/3\" on their menu and supposedly is one of the spiciest dishes they offer. It came out in a relatively small pot and after several pieces of fish and servings of sauce over rice, my tongue was sufficiently numb and tingling. However, I didn't feel the heat that it was supposed to bring. After our meal was over, our waitress asked us how everything was. I expressed my surprise that my dish was not as spicy as I had thought it would be, and she proceeded to tell me that she had lowered the spiciness of my order from a 3 to 2. Excuse me? Why would you do such a thing. I came here to THIS restaurant because I like SPICY food. My only complaint of this dish was it wasn't spicy enough and you're telling me now that you had it prepared less spicy without my request? \n\nAlthough I kept this internal for our dinner, I fumed a little inside. I got over it (well, I think so) and I'd be willing to try it again - and although I don't think one should have to request the spiciness that is listed on the menu, I will be sure to make sure that I receive what I order.\n\nI'd come back - not for the Dan Dan Noodles - but for trying out some of their other Szechuan dishes.",
+          "semantic_score": 0.73221755027771
+        },
+        {
+          "business_id": "oyA87-Q_vqnmxVOn_auJQQ",
+          "matched_anchor_ids": [
+            "spiciness:0"
+          ],
+          "matched_terms": [],
+          "review_id": "ht3eijPtg_voXMTAnvo1FA",
+          "review_text": "Once you've tasted hand-drawn noodles, you'll never want any other noodles. This is my favorite comfort food, especially when I'm sick and need a warm soup that can also help to clear my sinuses. And the best part is that they give very hearty portions so I usually have enough left to save for a second meal.\n\nI say their soup is the way to go. It just tastes SO good. I've had several variations and my usuals will either be the 3 Treasures, wonton (you can never go wrong with wonton noodle soup), or the chicken with mixed vegetables. Sometimes I get the fried fish balls and add them to my soup. Not sure if that's looked down upon, but I love fried fish balls and I think it tastes good together. Their dry hand-drawn noodles still taste good, but the overall dishes are nothing to rave about. I really expected more after having the soup.\n\nThe one thing I don't like from here is the fried egg add-on. I tried adding it to my soup once because who doesn't love egg in their soup? But it was way too overdone. \n\nIn terms of spiciness, I will say, if you aren't accustomed to eating spicy food all the time, then going Mild is more than enough for you. Mild heat is usually what I get when I'm sick because I don't want to push my stomach too much. Even with the mild, my lips start to feel the burn halfway into my meal. I find it bearable, but I've known it to be rough on others who don't eat spicy food often. So do what you will with that information.",
+          "semantic_score": 0.7311758995056152
+        }
+      ],
+      "semantic_only_weak_tail": [
+        {
+          "business_id": "AxcyIxsjJbRNG2RFTguavw",
+          "matched_anchor_ids": [
+            "spiciness:3"
+          ],
+          "matched_terms": [],
+          "review_id": "2we1lPKQBdkUtcuERGhPvg",
+          "review_text": "I did find Mike about 6 months ago.  He was back in his usual place.  Said he had not been well. Great dogs!",
+          "semantic_score": 0.19375357031822205
+        },
+        {
+          "business_id": "Q_pHfuSpVEIVfjJLUSTu3g",
+          "matched_anchor_ids": [
+            "spiciness:2"
+          ],
+          "matched_terms": [],
+          "review_id": "4WKQx5WxjgnSu2As3ZGrdg",
+          "review_text": "This place has the BEST Italian bread in the City...\nThey also make the BEST EASTER BREAD you can buy! Been eating their breads for 46 years!",
+          "semantic_score": 0.20553578436374664
+        },
+        {
+          "business_id": "5Orn19gUeqCgKu5IRYlvpQ",
+          "matched_anchor_ids": [
+            "spiciness:1"
+          ],
+          "matched_terms": [],
+          "review_id": "lm7hTcuGHxfNdJmen-mgng",
+          "review_text": "Following the news of late? They need to fumigate this jawn. Mice, roaches and feces.",
+          "semantic_score": 0.2137572318315506
+        }
+      ]
+    }
+  },
+  "meaning": "只用于检查两路粗筛是否找到相关完整评论，不是最终正负判断；semantic_only_weak_tail 专门展示最弱候选，不能把它当成优质证据",
+  "samples_per_aspect_route": 3
+}

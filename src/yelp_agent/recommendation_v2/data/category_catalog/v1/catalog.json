@@ -1,0 +1,2999 @@
+{
+  "schema_version": 1,
+  "taxonomy_version": "1.0.1",
+  "groups": [
+    {
+      "group_id": "dining",
+      "label": "Dining",
+      "parent_group_id": null
+    },
+    {
+      "group_id": "cuisine",
+      "label": "Cuisine",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "north_american_cuisine",
+      "label": "North American Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "east_asian_cuisine",
+      "label": "East Asian Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "southeast_asian_cuisine",
+      "label": "Southeast Asian Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "south_asian_cuisine",
+      "label": "South Asian Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "middle_eastern_cuisine",
+      "label": "Middle Eastern and Mediterranean Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "european_cuisine",
+      "label": "European Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "latin_caribbean_cuisine",
+      "label": "Latin American and Caribbean Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "african_cuisine",
+      "label": "African Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "other_cuisine",
+      "label": "Other Regional Cuisine",
+      "parent_group_id": "cuisine"
+    },
+    {
+      "group_id": "dish",
+      "label": "Dish",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "handheld_dish",
+      "label": "Handheld and Bread-based Dish",
+      "parent_group_id": "dish"
+    },
+    {
+      "group_id": "noodle_rice_dish",
+      "label": "Noodle and Rice Dish",
+      "parent_group_id": "dish"
+    },
+    {
+      "group_id": "meat_grill_dish",
+      "label": "Meat and Grill Dish",
+      "parent_group_id": "dish"
+    },
+    {
+      "group_id": "seafood_dish",
+      "label": "Seafood Dish",
+      "parent_group_id": "dish"
+    },
+    {
+      "group_id": "light_dish",
+      "label": "Light Meal",
+      "parent_group_id": "dish"
+    },
+    {
+      "group_id": "dessert_bakery",
+      "label": "Dessert and Bakery",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "beverage",
+      "label": "Beverage",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "venue",
+      "label": "Restaurant Format",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "bar_venue",
+      "label": "Bar and Drinking Venue",
+      "parent_group_id": "venue"
+    },
+    {
+      "group_id": "dietary",
+      "label": "Dietary Requirement",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "generic",
+      "label": "Generic Dataset Marker",
+      "parent_group_id": "dining"
+    },
+    {
+      "group_id": "excluded",
+      "label": "Non-dining Companion Category",
+      "parent_group_id": "dining"
+    }
+  ],
+  "categories": [
+    {
+      "category": "Restaurants",
+      "business_count": 2447,
+      "business_share": 1.0,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Food",
+      "business_count": 848,
+      "business_share": 0.34654679199019206,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Nightlife",
+      "business_count": 528,
+      "business_share": 0.21577441765427052,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bars",
+      "business_count": 505,
+      "business_share": 0.20637515324887618,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sandwiches",
+      "business_count": 429,
+      "business_share": 0.17531671434409482,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pizza",
+      "business_count": 358,
+      "business_share": 0.14630159378831223,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Breakfast & Brunch",
+      "business_count": 334,
+      "business_share": 0.1364936657131181,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "American (Traditional)",
+      "business_count": 330,
+      "business_share": 0.1348590110339191,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "American (New)",
+      "business_count": 316,
+      "business_share": 0.12913771965672252,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Coffee & Tea",
+      "business_count": 263,
+      "business_share": 0.10747854515733551,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "beverage",
+      "parent_is_category": false
+    },
+    {
+      "category": "Italian",
+      "business_count": 237,
+      "business_share": 0.09685328974254188,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Chinese",
+      "business_count": 194,
+      "business_share": 0.07928075194115243,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Burgers",
+      "business_count": 164,
+      "business_share": 0.06702084184715978,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Seafood",
+      "business_count": 162,
+      "business_share": 0.06620351450756028,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "seafood_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mexican",
+      "business_count": 152,
+      "business_share": 0.06211687780956273,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Event Planning & Services",
+      "business_count": 151,
+      "business_share": 0.061708214139762976,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cafes",
+      "business_count": 144,
+      "business_share": 0.05884756845116469,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Salad",
+      "business_count": 140,
+      "business_share": 0.05721291377196567,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "light_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bakeries",
+      "business_count": 135,
+      "business_share": 0.0551695954229669,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Fast Food",
+      "business_count": 131,
+      "business_share": 0.05353494074376788,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Specialty Food",
+      "business_count": 120,
+      "business_share": 0.049039640375970577,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Delis",
+      "business_count": 119,
+      "business_share": 0.04863097670617082,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Japanese",
+      "business_count": 118,
+      "business_share": 0.04822231303637107,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cocktail Bars",
+      "business_count": 106,
+      "business_share": 0.04331834899877401,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Asian Fusion",
+      "business_count": 105,
+      "business_share": 0.042909685328974254,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Desserts",
+      "business_count": 105,
+      "business_share": 0.042909685328974254,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sushi Bars",
+      "business_count": 100,
+      "business_share": 0.04086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Caterers",
+      "business_count": 95,
+      "business_share": 0.03882304863097671,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Chicken Wings",
+      "business_count": 95,
+      "business_share": 0.03882304863097671,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cheesesteaks",
+      "business_count": 94,
+      "business_share": 0.03841438496117695,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pubs",
+      "business_count": 90,
+      "business_share": 0.03677973028197793,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Beer",
+      "business_count": 86,
+      "business_share": 0.035145075602778915,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Vegetarian",
+      "business_count": 86,
+      "business_share": 0.035145075602778915,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Wine & Spirits",
+      "business_count": 86,
+      "business_share": 0.035145075602778915,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mediterranean",
+      "business_count": 82,
+      "business_share": 0.03351042092357989,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Vegan",
+      "business_count": 74,
+      "business_share": 0.030241111565181854,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Juice Bars & Smoothies",
+      "business_count": 71,
+      "business_share": 0.029015120555782592,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "beverage",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sports Bars",
+      "business_count": 68,
+      "business_share": 0.027789129546383327,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Vietnamese",
+      "business_count": 65,
+      "business_share": 0.02656313853698406,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Steakhouses",
+      "business_count": 62,
+      "business_share": 0.025337147527584796,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "meat_grill_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Barbeque",
+      "business_count": 61,
+      "business_share": 0.024928483857785042,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "meat_grill_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Lounges",
+      "business_count": 59,
+      "business_share": 0.024111156518185534,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Grocery",
+      "business_count": 57,
+      "business_share": 0.023293829178586023,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Beer Bar",
+      "business_count": 56,
+      "business_share": 0.02288516550878627,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Diners",
+      "business_count": 55,
+      "business_share": 0.022476501838986515,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Middle Eastern",
+      "business_count": 55,
+      "business_share": 0.022476501838986515,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Thai",
+      "business_count": 55,
+      "business_share": 0.022476501838986515,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Arts & Entertainment",
+      "business_count": 53,
+      "business_share": 0.021659174499387004,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gastropubs",
+      "business_count": 53,
+      "business_share": 0.021659174499387004,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Indian",
+      "business_count": 49,
+      "business_share": 0.020024519820187985,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "south_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "business_count": 49,
+      "business_share": 0.020024519820187985,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Soup",
+      "business_count": 48,
+      "business_share": 0.01961585615038823,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "light_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Wine Bars",
+      "business_count": 48,
+      "business_share": 0.01961585615038823,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Food Trucks",
+      "business_count": 46,
+      "business_share": 0.01879852881078872,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ethnic Food",
+      "business_count": 44,
+      "business_share": 0.01798120147118921,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Halal",
+      "business_count": 44,
+      "business_share": 0.01798120147118921,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Korean",
+      "business_count": 43,
+      "business_share": 0.017572537801389457,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Comfort Food",
+      "business_count": 41,
+      "business_share": 0.016755210461789946,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Food Stands",
+      "business_count": 41,
+      "business_share": 0.016755210461789946,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bagels",
+      "business_count": 40,
+      "business_share": 0.016346546791990192,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Food Delivery Services",
+      "business_count": 40,
+      "business_share": 0.016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Noodles",
+      "business_count": 39,
+      "business_share": 0.015937883122190438,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "noodle_rice_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Caribbean",
+      "business_count": 38,
+      "business_share": 0.015529219452390683,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Soul Food",
+      "business_count": 37,
+      "business_share": 0.015120555782590927,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Shopping",
+      "business_count": 36,
+      "business_share": 0.014711892112791173,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "French",
+      "business_count": 34,
+      "business_share": 0.013894564773191663,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ice Cream & Frozen Yogurt",
+      "business_count": 34,
+      "business_share": 0.013894564773191663,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Chicken Shop",
+      "business_count": 33,
+      "business_share": 0.013485901103391908,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Convenience Stores",
+      "business_count": 33,
+      "business_share": 0.013485901103391908,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gluten-Free",
+      "business_count": 33,
+      "business_share": 0.013485901103391908,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bubble Tea",
+      "business_count": 31,
+      "business_share": 0.012668573763792398,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "beverage",
+      "parent_is_category": false
+    },
+    {
+      "category": "Local Flavor",
+      "business_count": 31,
+      "business_share": 0.012668573763792398,
+      "selectable": false,
+      "category_kind": "generic",
+      "parent": "generic",
+      "parent_is_category": false
+    },
+    {
+      "category": "Latin American",
+      "business_count": 30,
+      "business_share": 0.012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tacos",
+      "business_count": 28,
+      "business_share": 0.011442582754393135,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Mexican",
+      "parent_is_category": true
+    },
+    {
+      "category": "Tapas/Small Plates",
+      "business_count": 28,
+      "business_share": 0.011442582754393135,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "Spanish",
+      "parent_is_category": true
+    },
+    {
+      "category": "Greek",
+      "business_count": 26,
+      "business_share": 0.010625255414793625,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tex-Mex",
+      "business_count": 26,
+      "business_share": 0.010625255414793625,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Mexican",
+      "parent_is_category": true
+    },
+    {
+      "category": "Dim Sum",
+      "business_count": 25,
+      "business_share": 0.01021659174499387,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Music Venues",
+      "business_count": 24,
+      "business_share": 0.009807928075194115,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ramen",
+      "business_count": 24,
+      "business_share": 0.009807928075194115,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Wraps",
+      "business_count": 24,
+      "business_share": 0.009807928075194115,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Breweries",
+      "business_count": 23,
+      "business_share": 0.00939926440539436,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Dive Bars",
+      "business_count": 22,
+      "business_share": 0.008990600735594606,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Donuts",
+      "business_count": 22,
+      "business_share": 0.008990600735594606,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hot Dogs",
+      "business_count": 20,
+      "business_share": 0.008173273395995096,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pakistani",
+      "business_count": 18,
+      "business_share": 0.0073559460563955865,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "south_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Spanish",
+      "business_count": 18,
+      "business_share": 0.0073559460563955865,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Street Vendors",
+      "business_count": 18,
+      "business_share": 0.0073559460563955865,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Szechuan",
+      "business_count": 17,
+      "business_share": 0.006947282386595832,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Dance Clubs",
+      "business_count": 16,
+      "business_share": 0.006538618716796077,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hookah Bars",
+      "business_count": 16,
+      "business_share": 0.006538618716796077,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Hotels & Travel",
+      "business_count": 16,
+      "business_share": 0.006538618716796077,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Active Life",
+      "business_count": 15,
+      "business_share": 0.006129955046996322,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Meat Shops",
+      "business_count": 15,
+      "business_share": 0.006129955046996322,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Modern European",
+      "business_count": 15,
+      "business_share": 0.006129955046996322,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Buffets",
+      "business_count": 14,
+      "business_share": 0.005721291377196567,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cantonese",
+      "business_count": 14,
+      "business_share": 0.005721291377196567,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Irish",
+      "business_count": 14,
+      "business_share": 0.005721291377196567,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Southern",
+      "business_count": 14,
+      "business_share": 0.005721291377196567,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Beer Gardens",
+      "business_count": 13,
+      "business_share": 0.0053126277073968125,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Coffee Roasteries",
+      "business_count": 13,
+      "business_share": 0.0053126277073968125,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "beverage",
+      "parent_is_category": false
+    },
+    {
+      "category": "Falafel",
+      "business_count": 13,
+      "business_share": 0.0053126277073968125,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Middle Eastern",
+      "parent_is_category": true
+    },
+    {
+      "category": "Irish Pub",
+      "business_count": 13,
+      "business_share": 0.0053126277073968125,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Irish",
+      "parent_is_category": true
+    },
+    {
+      "category": "Fruits & Veggies",
+      "business_count": 12,
+      "business_share": 0.004903964037597058,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hotels",
+      "business_count": 12,
+      "business_share": 0.004903964037597058,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Karaoke",
+      "business_count": 12,
+      "business_share": 0.004903964037597058,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pasta Shops",
+      "business_count": 12,
+      "business_share": 0.004903964037597058,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "Italian",
+      "parent_is_category": true
+    },
+    {
+      "category": "Brewpubs",
+      "business_count": 11,
+      "business_share": 0.004495300367797303,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cupcakes",
+      "business_count": 11,
+      "business_share": 0.004495300367797303,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cajun/Creole",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cheese Shops",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Health Markets",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hot Pot",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Pan Asian",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Taiwanese",
+      "business_count": 10,
+      "business_share": 0.004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Farmers Market",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gelato",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Indonesian",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Kosher",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Seafood Markets",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tapas Bars",
+      "business_count": 9,
+      "business_share": 0.0036779730281977932,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Spanish",
+      "parent_is_category": true
+    },
+    {
+      "category": "Acai Bowls",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "light_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Arts & Crafts",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Brazilian",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cambodian",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ethiopian",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "african_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "New Mexican Cuisine",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Mexican",
+      "parent_is_category": true
+    },
+    {
+      "category": "Poke",
+      "business_count": 8,
+      "business_share": 0.0032693093583980384,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "Hawaiian",
+      "parent_is_category": true
+    },
+    {
+      "category": "Cuban",
+      "business_count": 7,
+      "business_share": 0.0028606456885982836,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Imported Food",
+      "business_count": 7,
+      "business_share": 0.0028606456885982836,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pretzels",
+      "business_count": 7,
+      "business_share": 0.0028606456885982836,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "African",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "african_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Books",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Chocolatiers & Shops",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Creperies",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Eatertainment",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Fashion",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Food Court",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "German",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Iberian",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mags",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Music & Video",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Patisserie/Cake Shop",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Polish",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Russian",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Whiskey Bars",
+      "business_count": 6,
+      "business_share": 0.002451982018798529,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Arcades",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Automotive",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Brasseries",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cooking Classes",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gas Stations",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hawaiian",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "north_american_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Jazz & Blues",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Live/Raw Food",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "dietary",
+      "parent": "dietary",
+      "parent_is_category": false
+    },
+    {
+      "category": "Portuguese",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Puerto Rican",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Shaved Ice",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tea Rooms",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "beverage",
+      "parent_is_category": false
+    },
+    {
+      "category": "Wineries",
+      "business_count": 5,
+      "business_share": 0.002043318348998774,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Art Galleries",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Belgian",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bowling",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Butcher",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Comedy Clubs",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Filipino",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Health & Medical",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "International Grocery",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Izakaya",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Kebab",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Middle Eastern",
+      "parent_is_category": true
+    },
+    {
+      "category": "Laotian",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Peruvian",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pop-Up Restaurants",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Shanghainese",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Shopping Centers",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Turkish",
+      "business_count": 4,
+      "business_share": 0.0016346546791990192,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Adult Entertainment",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Arabic",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Beverage Store",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bookstores",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "British",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cooking Schools",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Custom Cakes",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Department Stores",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Education",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Fish & Chips",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "seafood_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gay Bars",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "Bars",
+      "parent_is_category": true
+    },
+    {
+      "category": "Home & Garden",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Internet Cafes",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Kitchen & Bath",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Lebanese",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Malaysian",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Moroccan",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Museums",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Personal Chefs",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pool Halls",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Public Markets",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Singaporean",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Social Clubs",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Specialty Schools",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Themed Cafes",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Uzbek",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "other_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Waffles",
+      "business_count": 3,
+      "business_share": 0.0012259910093992644,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Afghan",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "south_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Argentine",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Beauty & Spas",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cafeteria",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Candy Stores",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "dessert_bakery",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cosmetics & Beauty Supply",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Dinner Theater",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Do-It-Yourself Food",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Dominican",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Flowers & Gifts",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Golf",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mass Media",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mongolian",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "east_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Organic Stores",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Parks",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Party & Event Planning",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Performing Arts",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Print Media",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Recreation Centers",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sardinian",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Skating Rinks",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Strip Clubs",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Teppanyaki",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Tours",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Trinidadian",
+      "business_count": 2,
+      "business_share": 0.0008173273395995096,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Adult",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Adult Education",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Airport Shuttles",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Apartments",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Appliances",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Armenian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Art Museums",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Australian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "other_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Axe Throwing",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Bangladeshi",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "south_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Banks & Credit Unions",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Barbers",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Basque",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Beaches",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Boat Charters",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Boat Tours",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Boating",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Burmese",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "southeast_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cannabis Clinics",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cards & Stationery",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Cideries",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "venue",
+      "parent": "bar_venue",
+      "parent_is_category": false
+    },
+    {
+      "category": "Colleges & Universities",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Colombian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Conveyor Belt Sushi",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Costumes",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Delicatessen",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Dentists",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Distilleries",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Empanadas",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Latin American",
+      "parent_is_category": true
+    },
+    {
+      "category": "Ethnic Grocery",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Festivals",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Financial Advising",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Financial Services",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Fitness & Instruction",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Furniture Reupholstery",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Furniture Stores",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "General Dentistry",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Georgian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Gift Shops",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Golf Lessons",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hainan",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Hair Salons",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Himalayan/Nepalese",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "south_asian_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Home Decor",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Home Services",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Honduran",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hong Kong Style Cafe",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Chinese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Hospitals",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Hungarian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Israeli",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Japanese Curry",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Japanese",
+      "parent_is_category": true
+    },
+    {
+      "category": "Jewelry",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Kitchen Supplies",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Landmarks & Historical Buildings",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Local Services",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Men's Clothing",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Mini Golf",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Music & DVDs",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Newspapers & Magazines",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Nurseries & Gardening",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Nutritionists",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Paint & Sip",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Persian/Iranian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "middle_eastern_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Pets",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Poutineries",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "handheld_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Public Services & Government",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Public Transportation",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Real Estate",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Salvadoran",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Scandinavian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Senegalese",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "african_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sicilian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "Italian",
+      "parent_is_category": true
+    },
+    {
+      "category": "Smokehouse",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "dish",
+      "parent": "meat_grill_dish",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sporting Goods",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Sports Clubs",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tabletop Games",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Taxis",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ticket Sales",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Tobacco Shops",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Toy Stores",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Train Stations",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Transportation",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Travel Services",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Ukrainian",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "european_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Unofficial Yelp Events",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Used",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Venezuelan",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": true,
+      "category_kind": "cuisine",
+      "parent": "latin_caribbean_cuisine",
+      "parent_is_category": false
+    },
+    {
+      "category": "Videos & Video Game Rental",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Vintage & Consignment",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Vinyl Records",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Visitor Centers",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    },
+    {
+      "category": "Watches",
+      "business_count": 1,
+      "business_share": 0.0004086636697997548,
+      "selectable": false,
+      "category_kind": "excluded",
+      "parent": "excluded",
+      "parent_is_category": false
+    }
+  ]
+}

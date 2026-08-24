@@ -1,0 +1,40 @@
+{
+  "aspect_counts": {
+    "cleanliness": 7213,
+    "crowded": 30742,
+    "date_suitable": 3825,
+    "family_friendly": 966,
+    "food_quality": 152916,
+    "group_suitable": 1308,
+    "parking": 1165,
+    "pet_friendly": 356,
+    "portion_size": 4970,
+    "price_value": 25736,
+    "queue_time": 8020,
+    "quiet_environment": 8705,
+    "service": 41214,
+    "spiciness": 2116
+  },
+  "business_count": 2447,
+  "candidate_aspect_count": 289252,
+  "candidate_review_count": 227364,
+  "definitions_sha256": "347fe53646e2cdb03d49119a6271d9bd04f4540c56e3a84cb0a917026efee97a",
+  "output_sha256": {
+    "aspect_recall_definitions": "a00e7aca0511b4a4cb948502c371dc9da8f35e9b14f4db59b8cbdd130d0fe5c3",
+    "keyword_candidate_aspects": "29b6399b832539d5cdd59ac8e58309b323b1b69a78a3d4d903ec1f33093a7116",
+    "keyword_candidate_reviews": "8f9083159f1ee6796e52872bd14188e41cbefbb82f5e37bc7aa2eb127be47b57"
+  },
+  "recall_version": "1.0.0",
+  "schema_version": 1,
+  "source_paths": {
+    "business_facts": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\business_facts\\v1\\business_facts.parquet",
+    "old_vocabulary": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\configs\\review_aspect_vocabulary.yaml",
+    "reviews": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\data\\processed\\reviews.parquet"
+  },
+  "source_review_count": 499314,
+  "source_sha256": {
+    "business_facts": "1b49271ab7b4c02a072ee54312501ed7f2519d59395967fcfc831401b7afa159",
+    "old_vocabulary": "bb69f169008d89c5b80445559ab4f8fc666287f8dc2871893b1d40ca15e2d060",
+    "reviews": "82b2a1c90ab4e99991e72f8414c8285bc8960bcf98b942b8d6a4ba45ee73d21b"
+  }
+}

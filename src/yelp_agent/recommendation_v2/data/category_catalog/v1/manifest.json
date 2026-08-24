@@ -1,0 +1,13 @@
+{
+  "non_selectable_category_count": 140,
+  "output_sha256": {
+    "catalog": "656f95724e7514e882de0bea186d22329984f45614e4da9a3ce0a4b5b105ac17",
+    "categories": "7a346f76926df8de5076b9bdde272f7de3e0faea39ad83c54e82b40c867735b4"
+  },
+  "schema_version": 1,
+  "selectable_category_count": 179,
+  "source_category_count": 319,
+  "source_path": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\dining_catalog\\v1\\categories.parquet",
+  "source_sha256": "247c4cd41df8c25ccfd34c09b322813f389a0fc0f477e57d37e870f8943397fd",
+  "taxonomy_version": "1.0.1"
+}

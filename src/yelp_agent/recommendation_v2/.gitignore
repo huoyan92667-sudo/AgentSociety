@@ -1,0 +1,12 @@
+# Python 运行缓存，不属于源码。
+__pycache__/
+*.py[cod]
+
+# 评论召回与向量索引均可由构建程序重新生成，文件很大，不放进普通 Git。
+data/review_index/**/*.npy
+data/review_index/**/*.parquet
+data/review_features/**/*.parquet
+
+# 后续 Qdrant 持久化目录同样是可重建的运行数据。
+data/qdrant/
+

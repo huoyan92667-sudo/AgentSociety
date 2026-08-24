@@ -1,0 +1,46 @@
+{
+  "aspect_counts": {
+    "cleanliness": 53033,
+    "crowded": 75382,
+    "date_suitable": 51969,
+    "family_friendly": 49349,
+    "food_quality": 185866,
+    "group_suitable": 49829,
+    "parking": 49445,
+    "pet_friendly": 49055,
+    "portion_size": 52919,
+    "price_value": 68122,
+    "queue_time": 55267,
+    "quiet_environment": 55240,
+    "service": 83867,
+    "spiciness": 50483
+  },
+  "candidate_aspect_count": 929826,
+  "candidate_review_count": 310561,
+  "output_sha256": {
+    "candidate_aspects": "69af156419a3c9b0c0b935a52e0f1b4a9c08567e709ebea5b3e00efbb72cfe80",
+    "candidate_reviews": "f27f5c87193160ae1dbe76738356d1274a8bd261e191f7e3c92313a1f6fbb5c8",
+    "recall_audit_samples": "cba38a3d3f7a8cd8d42de35b60453ee3ee780955ddad77dea3f2320a533414e3"
+  },
+  "recall_version": "1.0.0",
+  "route_counts": {
+    "both": 44586,
+    "keyword_only": 244666,
+    "semantic_only": 640574
+  },
+  "schema_version": 1,
+  "source_paths": {
+    "keyword_candidates": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_features\\v1\\keyword_candidate_aspects.parquet",
+    "keyword_manifest": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_features\\v1\\keyword_manifest.json",
+    "reviews": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\data\\processed\\reviews.parquet",
+    "semantic_candidates": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_features\\v1\\semantic_candidate_aspects.parquet",
+    "semantic_manifest": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_features\\v1\\semantic_manifest.json"
+  },
+  "source_sha256": {
+    "keyword_candidates": "29b6399b832539d5cdd59ac8e58309b323b1b69a78a3d4d903ec1f33093a7116",
+    "keyword_manifest": "f274e2110ac60f57c92d8040ef65d6b3da38bfcff3bf43cc5ec242893227bcae",
+    "reviews": "82b2a1c90ab4e99991e72f8414c8285bc8960bcf98b942b8d6a4ba45ee73d21b",
+    "semantic_candidates": "863fe2af252ef52b1e7f62471d3ec4991c011e7feb6c572c9fa935ab28324949",
+    "semantic_manifest": "79a3f75327ae23e75d2b030c5960502a59dcfd43c9b5f4355089d8083585dd84"
+  }
+}

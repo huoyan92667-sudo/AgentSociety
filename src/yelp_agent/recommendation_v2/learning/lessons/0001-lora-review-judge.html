@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>用 LoRA 训练餐厅评论判断小模型</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 0001 · recommendation_v2</p>
+  <h1>用 LoRA 训练餐厅评论判断小模型</h1>
+  <p class="lede">目标不是让小模型学会“推荐餐厅”，而是学会一个窄而稳定的动作：阅读全文，输出真正提到的软特征、五级程度、条件和对象。</p>
+
+  <section>
+    <h2>1. LoRA 到底做了什么</h2>
+    <div class="card">
+      <p><strong>完整微调：</strong>修改原模型几乎全部参数，显存和训练成本很高。</p>
+      <p><strong>LoRA：</strong>冻结原模型，在部分线性层旁边增加很小的可训练参数；训练时只修改这些新增参数。</p>
+      <p><strong>四位加载 LoRA：</strong>原模型用四位数值压缩加载，新增参数仍以较高精度训练，进一步降低显存占用。</p>
+    </div>
+    <p>LoRA 原始论文的核心就是冻结预训练权重，只训练注入的小矩阵。Hugging Face 官方指南也把这种方法作为减少可训练参数和显存的标准实现。对本项目的8GB显存，建议从四位加载 LoRA 开始，而不是完整微调。</p>
+    <div class="flow">基础小模型（冻结）＋ 评论判断新增参数（训练）＝ 专用评论判断模型</div>
+  </section>
+
+  <section>
+    <h2>2. 训练的本质：给模型看成对示范</h2>
+    <p>性能好的大模型先生成标准答案。训练数据中的每一条都由“输入”和“标准输出”组成：</p>
+    <pre>输入：
+完整评论 + 14项固定定义 + 输出规则
+
+标准输出：
+评论真正提到的特征、1～5级、条件、菜品或商家整体、原文依据</pre>
+    <p>小模型不断比较自己预测的下一个字与标准答案之间的差异，再只修改 LoRA 新增参数。几百个训练步骤后，它会逐渐模仿这种固定判断方式。</p>
+    <div class="warning"><strong>不是把商家分数喂给小模型。</strong>小模型只判断单条评论。商家分数由程序在训练之外汇总。</div>
+  </section>
+
+  <section>
+    <h2>3. 一条训练数据长什么样</h2>
+    <pre>{
+  "messages": [
+    {"role": "system", "content": "固定的14项定义和判断规则"},
+    {"role": "user", "content": "评论编号R001\n完整评论……"},
+    {"role": "assistant", "content": "固定结构的标准答案"}
+  ],
+  "business_id": "仅用于划分数据，不放进模型输入"
+}</pre>
+    <ul>
+      <li>没有提到的特征不输出，程序将它们补成“未提到”。</li>
+      <li>只提到但无法判断程度时，程度为空，不能强填3级。</li>
+      <li>一个特征在不同条件下相反时，输出多条观察。</li>
+      <li>原文依据必须是完整评论中的真实连续文字，程序进行包含检查。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. 第一批数据怎么做</h2>
+    <table>
+      <thead><tr><th>样本来源</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td>旧词表明确命中</td><td>提供常见、明确和少见特征样本</td></tr>
+        <tr><td>否定、转折命中</td><td>训练模型理解完整语义而不是看到词就判断</td></tr>
+        <tr><td>意思相近高、中、低位置</td><td>覆盖换说法和明显无关的弱尾部</td></tr>
+        <tr><td>两路都没找到的随机评论</td><td>训练“什么都不要输出”</td></tr>
+        <tr><td>多特征、条件、具体菜品</td><td>训练复杂但真实的输出</td></tr>
+      </tbody>
+    </table>
+    <p>第一轮建议约5,000～7,000条，不追求一次覆盖全部。强模型生成后，程序先检查结构、字段范围和原文依据，再由人抽查各特征和各难例。</p>
+  </section>
+
+  <section>
+    <h2>5. 数据必须按商家隔离</h2>
+    <p>训练、调整和最终测试必须按商家编号划分，同一家商家的评论只能出现在其中一组。</p>
+    <div class="flow">训练商家 70% ｜ 调整商家 15% ｜ 最终测试商家 15%</div>
+    <p>这样可以防止小模型记住某家店的固定印象。最终测试集在训练期间不能反复查看和调参数。</p>
+  </section>
+
+  <section>
+    <h2>6. 8GB显存的第一组保守设置</h2>
+    <table>
+      <tbody>
+        <tr><th>基础模型大小</th><td>先从约15亿～30亿参数的指令模型试起</td></tr>
+        <tr><th>原模型加载</th><td>四位压缩</td></tr>
+        <tr><th>LoRA秩</th><td>16，表示新增参数的内部宽度</td></tr>
+        <tr><th>LoRA缩放</th><td>32</td></tr>
+        <tr><th>随机丢弃</th><td>0.05，用于减少死记训练样本</td></tr>
+        <tr><th>训练位置</th><td>全部线性层，符合官方四位 LoRA 风格</td></tr>
+        <tr><th>单次显卡样本数</th><td>1</td></tr>
+        <tr><th>累积次数</th><td>16，累计16次后更新一次参数</td></tr>
+        <tr><th>最长长度</th><td>先从2048个模型记号开始</td></tr>
+        <tr><th>训练轮数</th><td>先跑2轮，不直接跑很多轮</td></tr>
+        <tr><th>学习速度</th><td>先试0.0001，再根据调整集变化</td></tr>
+      </tbody>
+    </table>
+    <p>这些是第一轮实验起点，不是永远正确的常数。正式运行前先用100条数据验证显存、输入长度、保存和恢复，再跑全量训练。</p>
+  </section>
+
+  <section>
+    <h2>7. 实际训练顺序</h2>
+    <ol class="checklist">
+      <li>冻结一份模型、词表、训练数据和输出结构版本。</li>
+      <li>先让未经训练的小模型跑最终测试样本，记录原始水平。</li>
+      <li>用100条训练数据跑通加载、前向、反向、保存和重新加载。</li>
+      <li>再使用完整训练集跑第一轮四位 LoRA。</li>
+      <li>每隔固定步骤只看调整集，不看最终测试集。</li>
+      <li>保存 LoRA 新增参数、训练配置、数据校验值和每次结果。</li>
+      <li>训练结束后只运行一次最终测试集。</li>
+      <li>收集小模型与旧词表、强模型冲突的评论，形成第二批难例。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>8. 怎样判断真的学会了</h2>
+    <ul>
+      <li>分别统计14种特征的提及判断，不能只报一个总数。</li>
+      <li>单独统计未提到却乱输出的比例。</li>
+      <li>五级程度同时看完全一致和只差一级。</li>
+      <li>单独检查否定、转折、条件和具体菜品。</li>
+      <li>检查输出结构是否合法、原文依据是否真实存在。</li>
+      <li>直接阅读每类错误样本，确认是否达到商家画像所需质量。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>9. 常见失败方式</h2>
+    <div class="warning bad">
+      <ul>
+        <li>训练样本几乎都是相关评论，导致模型什么都输出。</li>
+        <li>把星级、旧词正负或相近程度放进输入，模型学会走捷径。</li>
+        <li>同一家商家同时出现在训练和测试中，结果虚高。</li>
+        <li>强模型标准答案本身没有审查，学生认真学错。</li>
+        <li>训练轮数太多，只会背训练样本。</li>
+        <li>只看结构合法，不看语义是否正确。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>10. 下一次可以做什么</h2>
+    <p>下一步不是立刻下载模型，而是先确定训练输出结构和14种五级定义，然后从现有词表、意思相近结果和随机评论中生成第一批500条试标数据。先验证强模型答案质量，再扩大到5,000～7,000条。</p>
+    <p class="note">有任何一步不清楚，继续问我。建议下一问聚焦在“训练数据固定结构具体长什么样”，然后再进入模型选择和训练代码。</p>
+  </section>
+
+  <footer>
+    <h2>主要资料</h2>
+    <ul>
+      <li><a href="https://arxiv.org/abs/2106.09685">LoRA 原始论文</a></li>
+      <li><a href="https://huggingface.co/docs/peft/en/developer_guides/lora">Hugging Face LoRA 官方指南</a></li>
+      <li><a href="https://huggingface.co/docs/peft/en/developer_guides/quantization">Hugging Face 量化训练官方指南</a></li>
+      <li><a href="https://huggingface.co/docs/trl/sft_trainer">Hugging Face 监督微调官方文档</a></li>
+    </ul>
+  </footer>
+</main>
+</body>
+</html>

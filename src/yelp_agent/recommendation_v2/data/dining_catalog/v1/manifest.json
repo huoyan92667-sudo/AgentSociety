@@ -1,0 +1,15 @@
+{
+  "catalog_version": "1.0.0",
+  "dining_business_count": 2447,
+  "dining_category_count": 319,
+  "output_sha256": {
+    "businesses": "c8d17f4b6e26b5e015e110ce2239b77a9f8a48cee27131bb9fa6d9cff8c76266",
+    "categories": "247c4cd41df8c25ccfd34c09b322813f389a0fc0f477e57d37e870f8943397fd"
+  },
+  "schema_version": 1,
+  "selection_category": "Restaurants",
+  "source_business_count": 3973,
+  "source_category_count": 662,
+  "source_path": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\data\\features\\business_profiles\\v1\\businesses.parquet",
+  "source_sha256": "1f6c0ce93c87c33131e47804d6c946897b7b6dd8aa20ee62fa74eba3ef0d86dc"
+}

@@ -1,0 +1,22 @@
+{
+  "business_count": 2447,
+  "dimension": 1024,
+  "index_version": "1.0.0",
+  "model": "local:Qwen3-Embedding-0.6B",
+  "output_sha256": {
+    "embeddings": "830b819df4583a845b6403e54fa16f3ee0679e9fb25778bf15d4743a83de3341",
+    "segments": "2213b336e7cf02f0bd2adcd41822b583e23319b232d571cd6a80967247777d81"
+  },
+  "review_count": 499314,
+  "schema_version": 1,
+  "segment_count": 617797,
+  "source_paths": {
+    "business_facts": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\business_facts\\v1\\business_facts.parquet",
+    "review_segments": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\data\\features\\review_rag\\v1\\review_segments.parquet"
+  },
+  "source_sha256": {
+    "business_facts": "1b49271ab7b4c02a072ee54312501ed7f2519d59395967fcfc831401b7afa159",
+    "review_segments": "dc771aad596e6e5b5a9905bc983951b7a1688c5024d86a89f25fe9b82d18e475"
+  },
+  "vector_dtype": "float16"
+}

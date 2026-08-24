@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "policy_version": "1.0.0",
+  "meaning": "approximate_cost_per_person",
+  "bands": [
+    {
+      "price_level": 1,
+      "symbol": "$",
+      "currency": "USD",
+      "lower_inclusive": 0,
+      "upper_inclusive": 10
+    },
+    {
+      "price_level": 2,
+      "symbol": "$$",
+      "currency": "USD",
+      "lower_inclusive": 11,
+      "upper_inclusive": 30
+    },
+    {
+      "price_level": 3,
+      "symbol": "$$$",
+      "currency": "USD",
+      "lower_inclusive": 31,
+      "upper_inclusive": 60
+    },
+    {
+      "price_level": 4,
+      "symbol": "$$$$",
+      "currency": "USD",
+      "lower_inclusive": 61,
+      "upper_inclusive": null
+    }
+  ]
+}

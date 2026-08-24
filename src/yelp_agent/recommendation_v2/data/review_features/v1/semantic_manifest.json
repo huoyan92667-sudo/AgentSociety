@@ -1,0 +1,39 @@
+{
+  "aspect_counts": {
+    "cleanliness": 48940,
+    "crowded": 48940,
+    "date_suitable": 48940,
+    "family_friendly": 48940,
+    "food_quality": 48940,
+    "group_suitable": 48940,
+    "parking": 48940,
+    "pet_friendly": 48940,
+    "portion_size": 48940,
+    "price_value": 48940,
+    "queue_time": 48940,
+    "quiet_environment": 48940,
+    "service": 48940,
+    "spiciness": 48940
+  },
+  "business_count": 2447,
+  "candidate_aspect_count": 685160,
+  "definitions_sha256": "347fe53646e2cdb03d49119a6271d9bd04f4540c56e3a84cb0a917026efee97a",
+  "dimension": 1024,
+  "model": "local:Qwen3-Embedding-0.6B",
+  "output_sha256": {
+    "semantic_candidates": "863fe2af252ef52b1e7f62471d3ec4991c011e7feb6c572c9fa935ab28324949"
+  },
+  "recall_version": "1.0.0",
+  "schema_version": 1,
+  "source_paths": {
+    "review_index_manifest": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_index\\v1\\manifest.json",
+    "review_segments": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_index\\v1\\review_segments.parquet",
+    "segment_embeddings": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\review_index\\v1\\segment_embeddings.npy"
+  },
+  "source_sha256": {
+    "review_index_manifest": "0864680cc14556f85ff7fc1bb2a7ce3d4aed3ba99b1a0bf625f9fc7545a0c239",
+    "review_segments": "2213b336e7cf02f0bd2adcd41822b583e23319b232d571cd6a80967247777d81",
+    "segment_embeddings": "830b819df4583a845b6403e54fa16f3ee0679e9fb25778bf15d4743a83de3341"
+  },
+  "top_reviews_per_business_aspect": 20
+}

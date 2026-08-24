@@ -1,0 +1,326 @@
+[
+  {
+    "aspect": "food_quality",
+    "meaning_zh": "菜品质量从很差到很好",
+    "keyword_terms": [
+      "delicious",
+      "tasty",
+      "flavorful",
+      "fresh food",
+      "cooked perfectly",
+      "excellent food",
+      "food was good",
+      "food was also good",
+      "bland",
+      "tasteless",
+      "stale food",
+      "undercooked",
+      "overcooked",
+      "terrible food"
+    ],
+    "semantic_anchors": [
+      "The food is delicious, fresh, flavorful, and cooked well.",
+      "The dishes taste excellent and the ingredients are high quality.",
+      "The food is bland, stale, badly cooked, or tastes terrible.",
+      "The dishes are undercooked, overcooked, flavorless, or poor quality."
+    ]
+  },
+  {
+    "aspect": "service",
+    "meaning_zh": "服务从很差到很好",
+    "keyword_terms": [
+      "friendly staff",
+      "attentive",
+      "helpful staff",
+      "excellent service",
+      "great service",
+      "quick service",
+      "service is quick",
+      "rude staff",
+      "inattentive",
+      "ignored us",
+      "terrible service",
+      "service was terrible",
+      "poor service",
+      "slow service"
+    ],
+    "semantic_anchors": [
+      "The staff are friendly, attentive, helpful, and provide prompt service.",
+      "Employees respond quickly and take good care of customers.",
+      "The staff are rude, inattentive, slow, or ignore customers.",
+      "Customers receive poor service or have difficulty getting help."
+    ]
+  },
+  {
+    "aspect": "price_value",
+    "meaning_zh": "性价比从很低到很高",
+    "keyword_terms": [
+      "good value",
+      "worth the price",
+      "reasonably priced",
+      "reasonable prices",
+      "affordable",
+      "great deal",
+      "overpriced",
+      "not worth the price",
+      "poor value",
+      "too expensive",
+      "expensive for",
+      "over priced"
+    ],
+    "semantic_anchors": [
+      "The meal is affordable, reasonably priced, and worth the money.",
+      "The portions and quality provide good value for the price.",
+      "The restaurant is overpriced, expensive, or not worth the money.",
+      "The price is too high for the quality or quantity received."
+    ]
+  },
+  {
+    "aspect": "quiet_environment",
+    "meaning_zh": "环境从非常吵到非常安静",
+    "keyword_terms": [
+      "quiet",
+      "peaceful",
+      "calm atmosphere",
+      "relaxing atmosphere",
+      "easy to talk",
+      "noisy",
+      "very loud",
+      "too loud",
+      "deafening",
+      "hard to talk",
+      "could not hear"
+    ],
+    "semantic_anchors": [
+      "The restaurant is quiet, peaceful, calm, and suitable for conversation.",
+      "Customers can talk comfortably without raising their voices.",
+      "The restaurant is loud and noisy, making conversation difficult.",
+      "Customers cannot hear each other or need to shout over the noise."
+    ]
+  },
+  {
+    "aspect": "crowded",
+    "meaning_zh": "客流从不拥挤到非常拥挤",
+    "keyword_terms": [
+      "not crowded",
+      "plenty of space",
+      "spacious",
+      "uncrowded",
+      "crowded",
+      "packed",
+      "cramped",
+      "shoulder to shoulder",
+      "no room",
+      "get very busy",
+      "gets very busy",
+      "restaurant was very busy",
+      "place was very busy"
+    ],
+    "semantic_anchors": [
+      "The restaurant is uncrowded, spacious, and has plenty of room.",
+      "There are few people and customers do not feel cramped.",
+      "The restaurant is crowded, packed, cramped, or extremely busy.",
+      "There are too many people and very little space between customers."
+    ]
+  },
+  {
+    "aspect": "queue_time",
+    "meaning_zh": "等位从无需等待到等待很久",
+    "keyword_terms": [
+      "no wait",
+      "seated immediately",
+      "seated right away",
+      "short wait",
+      "quick line",
+      "long wait",
+      "waited forever",
+      "waited an hour",
+      "slow line",
+      "long queue",
+      "took forever"
+    ],
+    "semantic_anchors": [
+      "Customers are seated immediately or wait only a short time.",
+      "There is no line and no meaningful wait for a table.",
+      "Customers wait a long time in a line or queue before being seated.",
+      "Getting a table takes a very long time or feels like forever."
+    ]
+  },
+  {
+    "aspect": "portion_size",
+    "meaning_zh": "分量从很少到很多",
+    "keyword_terms": [
+      "generous portions",
+      "large portions",
+      "huge portions",
+      "plenty of food",
+      "good portion",
+      "small portions",
+      "tiny portions",
+      "skimpy portions",
+      "portion was small",
+      "not enough food"
+    ],
+    "semantic_anchors": [
+      "The portions are large, generous, and provide plenty of food.",
+      "Serving sizes are substantial and enough to satisfy customers.",
+      "The portions are small, tiny, skimpy, or do not provide enough food.",
+      "Serving sizes are much smaller than customers expect."
+    ]
+  },
+  {
+    "aspect": "parking",
+    "meaning_zh": "停车从很困难到很方便",
+    "keyword_terms": [
+      "easy parking",
+      "plenty of parking",
+      "free parking",
+      "parking was convenient",
+      "has a parking lot",
+      "there's a parking lot",
+      "large parking lot",
+      "private parking lot",
+      "good parking options",
+      "difficult parking",
+      "hard to park",
+      "no parking",
+      "parking was expensive",
+      "limited parking",
+      "parking lot is full",
+      "parking lot was full"
+    ],
+    "semantic_anchors": [
+      "Parking is easy, convenient, free, or plentiful near the restaurant.",
+      "The restaurant has a useful parking lot or many available spaces.",
+      "Parking is difficult, limited, expensive, full, or unavailable.",
+      "Customers struggle to find a place to park near the restaurant."
+    ]
+  },
+  {
+    "aspect": "pet_friendly",
+    "meaning_zh": "从不允许宠物到非常宠物友好",
+    "keyword_terms": [
+      "dog friendly",
+      "pet friendly",
+      "dogs are welcome",
+      "allowed our dog",
+      "water bowl for dogs",
+      "no dogs allowed",
+      "not pet friendly",
+      "dogs not allowed",
+      "would not allow our dog"
+    ],
+    "semantic_anchors": [
+      "Dogs and other pets are welcome and treated well at the restaurant.",
+      "The restaurant provides a pet-friendly space or amenities for dogs.",
+      "Dogs or pets are not allowed and the restaurant is not pet friendly.",
+      "Customers are refused service or seating because they brought a pet."
+    ]
+  },
+  {
+    "aspect": "family_friendly",
+    "meaning_zh": "从不适合家庭儿童到非常适合",
+    "keyword_terms": [
+      "kid friendly",
+      "family friendly",
+      "great for kids",
+      "children are welcome",
+      "kids menu",
+      "not kid friendly",
+      "not family friendly",
+      "adults only",
+      "no children"
+    ],
+    "semantic_anchors": [
+      "The restaurant is suitable for families, children, and young kids.",
+      "Children are welcome and the restaurant offers helpful family amenities.",
+      "The restaurant is unsuitable for children or is not family friendly.",
+      "Children are unwelcome, restricted, or have a poor experience here."
+    ]
+  },
+  {
+    "aspect": "date_suitable",
+    "meaning_zh": "从不适合约会到非常适合约会",
+    "keyword_terms": [
+      "date night",
+      "romantic atmosphere",
+      "romantic dinner",
+      "perfect for a date",
+      "anniversary dinner",
+      "not romantic",
+      "bad for a date",
+      "would not recommend for a date"
+    ],
+    "semantic_anchors": [
+      "The restaurant is romantic and well suited to a date or anniversary.",
+      "The atmosphere supports an intimate meal for two people.",
+      "The restaurant is not romantic and is a poor place for a date.",
+      "The atmosphere makes an intimate date uncomfortable or unsuitable."
+    ]
+  },
+  {
+    "aspect": "group_suitable",
+    "meaning_zh": "从不适合多人聚餐到非常适合",
+    "keyword_terms": [
+      "great for groups",
+      "large groups",
+      "group dinner",
+      "party of ten",
+      "accommodated our group",
+      "not good for groups",
+      "cannot accommodate groups",
+      "too small for groups",
+      "split our group"
+    ],
+    "semantic_anchors": [
+      "The restaurant can comfortably accommodate large groups and parties.",
+      "Group dinners are handled well with enough space and suitable seating.",
+      "The restaurant cannot accommodate groups or is too small for a party.",
+      "Large groups are split up, refused, or have difficulty dining together."
+    ]
+  },
+  {
+    "aspect": "spiciness",
+    "meaning_zh": "辣度从完全不辣到非常辣",
+    "keyword_terms": [
+      "perfect spice",
+      "good spice level",
+      "pleasantly spicy",
+      "spicy and flavorful",
+      "too spicy",
+      "painfully spicy",
+      "not spicy",
+      "no heat",
+      "overly spicy"
+    ],
+    "semantic_anchors": [
+      "The food has little heat, is mild, or is not spicy.",
+      "The spice level is low and gentle for customers who avoid heat.",
+      "The food is spicy, very hot, or has an extremely intense heat level.",
+      "The dish is painfully spicy or much hotter than customers expect."
+    ]
+  },
+  {
+    "aspect": "cleanliness",
+    "meaning_zh": "环境从很脏到非常干净",
+    "keyword_terms": [
+      "very clean",
+      "spotless",
+      "clean restaurant",
+      "clean bathroom",
+      "well maintained",
+      "dirty",
+      "filthy",
+      "unsanitary",
+      "sticky tables",
+      "dirty bathroom",
+      "poorly maintained"
+    ],
+    "semantic_anchors": [
+      "The restaurant, tables, and bathrooms are clean and well maintained.",
+      "The dining area is spotless, hygienic, and carefully maintained.",
+      "The restaurant is dirty, filthy, sticky, or unsanitary.",
+      "Tables, bathrooms, or dining areas are poorly cleaned and maintained."
+    ]
+  }
+]
