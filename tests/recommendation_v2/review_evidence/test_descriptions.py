@@ -15,6 +15,7 @@ class _Generator:
     def generate(self, messages: list[object]) -> LLMCallResult:
         self.call_count += 1
         user_payload = json.loads(messages[-1].content)  # type: ignore[attr-defined]
+        items = user_payload["items"]
         return LLMCallResult(
             status="success",
             content=json.dumps(
@@ -31,7 +32,7 @@ class _Generator:
                                 f"negative meaning two for {item['requirement_id']}",
                             ],
                         }
-                        for item in user_payload
+                        for item in items
                     ]
                 }
             ),
@@ -84,4 +85,19 @@ def test_all_long_tail_requirements_share_one_model_call() -> None:
     assert result.failure_reason is None
     assert len(result.descriptions) == 2
     assert all(item.kind == "long_tail" for item in result.descriptions)
+    assert generator.call_count == 1
+
+
+def test_online_fixed_aspect_is_rewritten_with_current_query() -> None:
+    generator = _Generator()
+    preference = get_scene_baseline("date").soft_preferences[0]
+
+    result = PreferenceDescriptionBuilder(generator).build(
+        [preference],
+        [],
+        query_text="我想吃牛排",
+    )
+
+    assert result.failure_reason is None
+    assert result.descriptions[0].kind == "fixed_aspect"
     assert generator.call_count == 1

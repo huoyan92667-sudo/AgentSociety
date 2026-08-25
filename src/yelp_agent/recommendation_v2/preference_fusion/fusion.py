@@ -7,12 +7,17 @@ import json
 import time
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Literal, Protocol, Self, cast
 
 from pydantic import Field, ValidationError, model_validator
 
 from yelp_agent.agent.llm import LLMCallResult, LLMMessage
 from yelp_agent.models import StrictModel
+from yelp_agent.recommendation_v2.business_facts import (
+    CATALOG_TIME_ZONE,
+    catalog_local_time,
+)
 from yelp_agent.recommendation_v2.category_catalog import load_fixed_category_catalog
 from yelp_agent.recommendation_v2.preference_fusion.profile_adapter import (
     ProfilePreferenceSet,
@@ -37,11 +42,17 @@ from yelp_agent.recommendation_v2.schema import (
     SceneBaseline,
     SceneKind,
     SceneSelection,
+    SearchCenter,
     SoftPreference,
     SourceKind,
     UnifiedRecommendationState,
     merchant_feature_for,
     requirement_unit_for,
+)
+from yelp_agent.recommendation_v2.tools.business_facts import (
+    BusinessFactsObservation,
+    BusinessFactsQuery,
+    BusinessFactsTool,
 )
 from yelp_agent.recommendation_v2.tools.history_business import (
     HistoryBusinessFact,
@@ -58,6 +69,7 @@ _SOURCE_PRIORITY: dict[SourceKind, int] = {
     "session": 3,
     "user_profile": 2,
     "scene": 1,
+    "system_default": 0,
 }
 _CHOICE_FIELDS: set[RequirementField] = {"category"}
 _DIRECTIONAL_FIELDS: set[RequirementField] = {
@@ -79,6 +91,31 @@ _BOOLEAN_FIELDS: set[RequirementField] = {
 type SemanticRelation = Literal["same", "conflict", "shadow", "independent"]
 
 
+class RecommendationSnapshot(StrictModel):
+    """一轮推荐的紧凑记忆；完整评论继续留在评论库中。"""
+
+    state_revision: int = Field(ge=1)
+    ordered_business_ids: list[str] = Field(min_length=1, max_length=5)
+    evidence_review_ids_by_business: dict[str, list[str]] = Field(
+        default_factory=dict
+    )
+
+    @model_validator(mode="after")
+    def validate_evidence_businesses(self) -> Self:
+        if len(self.ordered_business_ids) != len(set(self.ordered_business_ids)):
+            raise ValueError("snapshot business IDs must be unique")
+        if not set(self.evidence_review_ids_by_business) <= set(
+            self.ordered_business_ids
+        ):
+            raise ValueError("snapshot evidence must belong to a shown business")
+        if any(
+            len(values) != len(set(values))
+            for values in self.evidence_review_ids_by_business.values()
+        ):
+            raise ValueError("snapshot review IDs must be unique per business")
+        return self
+
+
 class ConversationHistoryTurn(StrictModel):
     """一轮原始对话，以及这一轮真正展示给用户的商家快照。"""
 
@@ -89,6 +126,7 @@ class ConversationHistoryTurn(StrictModel):
         default_factory=list,
         max_length=100,
     )
+    recommendation_snapshot: RecommendationSnapshot | None = None
 
     @model_validator(mode="after")
     def validate_business_turns(self) -> Self:
@@ -99,6 +137,12 @@ class ConversationHistoryTurn(StrictModel):
             for item in self.presented_businesses
         ):
             raise ValueError("presented businesses must belong to their history turn")
+        if self.recommendation_snapshot is not None:
+            ordered_ids = [item.business_id for item in self.presented_businesses]
+            if self.recommendation_snapshot.ordered_business_ids != ordered_ids:
+                raise ValueError(
+                    "recommendation snapshot must match presented business order"
+                )
         return self
 
 
@@ -115,6 +159,17 @@ class CompactSceneSelection(StrictModel):
         if (self.kind == "custom") != (self.custom_label is not None):
             raise ValueError("only a custom scene uses custom_label")
         return self
+
+
+class CompactSearchCenter(StrictModel):
+    """大模型从用户地点原话得到的近似搜索中心和合理搜索半径。"""
+
+    label: str = Field(min_length=1, max_length=200)
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    radius_km: float = Field(gt=0, le=30)
+    evidence_text: str = Field(min_length=1, max_length=500)
+    evidence_turn_index: int = Field(ge=1)
 
 
 class CompactHardRequirement(StrictModel):
@@ -177,6 +232,7 @@ class PreferenceFusionProposal(StrictModel):
     """大模型最终只输出当前仍然有效的对话需求。"""
 
     scene: CompactSceneSelection | None = None
+    search_center: CompactSearchCenter | None = None
     hard_constraints: list[CompactHardRequirement] = Field(
         default_factory=list,
         max_length=50,
@@ -209,6 +265,13 @@ class PreferenceFusionToolCall(StrictModel):
     arguments: HistoryFactQuery
 
 
+class BusinessFactsFusionToolCall(StrictModel):
+    """大模型拿到历史商家编号后，按需读取新版完整商家属性。"""
+
+    action: Literal["lookup_business_facts"]
+    arguments: BusinessFactsQuery
+
+
 class PreferenceCandidate(StrictModel):
     """程序补齐后的单一来源软偏好，供固定优先级裁决使用。"""
 
@@ -232,6 +295,9 @@ class PreferenceFusionRequest(StrictModel):
     session_id: str = Field(min_length=1)
     turn_index: int = Field(ge=1)
     query_text: str = Field(min_length=1, max_length=4000)
+    request_time: datetime = Field(
+        default_factory=lambda: datetime.now(UTC)
+    )
     previous_state: UnifiedRecommendationState | None = None
     conversation_history: list[ConversationHistoryTurn] = Field(
         default_factory=list,
@@ -275,7 +341,7 @@ class PreferenceFusionAttempt(StrictModel):
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
     model_call_count: int = Field(default=0, ge=0, le=MAX_TOOL_CALLS + 1)
-    tool_observations: list[HistoryFactObservation] = Field(
+    tool_observations: list[HistoryFactObservation | BusinessFactsObservation] = Field(
         default_factory=list,
         max_length=MAX_TOOL_CALLS,
     )
@@ -309,7 +375,7 @@ class _ModelLoopResult:
     input_tokens: int | None
     output_tokens: int | None
     call_count: int
-    observations: list[HistoryFactObservation]
+    observations: list[HistoryFactObservation | BusinessFactsObservation]
     facts: dict[str, HistoryBusinessFact]
 
 
@@ -340,9 +406,11 @@ class PreferenceFusion:
         generator: ChatGenerator,
         *,
         history_tool: HistoryBusinessFactTool | None = None,
+        business_tool: BusinessFactsTool | None = None,
     ) -> None:
         self._generator = generator
         self._history_tool = history_tool or HistoryBusinessFactTool()
+        self._business_tool = business_tool
 
     def fuse(self, request: PreferenceFusionRequest) -> PreferenceFusionAttempt:
         """返回本轮唯一完整状态；任一步失败都不产生半份状态。"""
@@ -392,9 +460,12 @@ class PreferenceFusion:
     def _run_model_loop(self, request: PreferenceFusionRequest) -> _ModelLoopResult:
         """允许大模型按需查询历史事实，直到返回精简后的最终需求。"""
 
-        messages = _messages(request)
+        messages = _messages(
+            request,
+            business_tool_available=self._business_tool is not None,
+        )
         businesses = _all_business_references(request)
-        observations: list[HistoryFactObservation] = []
+        observations: list[HistoryFactObservation | BusinessFactsObservation] = []
         facts: dict[str, HistoryBusinessFact] = {}
         seen_calls: set[str] = set()
         calls: list[LLMCallResult] = []
@@ -455,6 +526,47 @@ class PreferenceFusion:
                         ]
                     )
                     continue
+                if (
+                    payload.get("action") == BusinessFactsTool.name
+                    and self._business_tool is not None
+                ):
+                    if len(observations) >= MAX_TOOL_CALLS:
+                        raise ValueError("model exceeded the business tool call limit")
+                    tool_call = BusinessFactsFusionToolCall.model_validate(payload)
+                    visible_ids = {
+                        item.business_id for item in businesses
+                    }
+                    if not set(tool_call.arguments.business_ids) <= visible_ids:
+                        raise ValueError(
+                            "business facts may only be queried for visible history"
+                        )
+                    call_signature = tool_call.arguments.model_dump_json()
+                    if call_signature in seen_calls:
+                        raise ValueError("model repeated the same business fact query")
+                    seen_calls.add(call_signature)
+                    observation = self._business_tool.execute(tool_call.arguments)
+                    observations.append(observation)
+                    messages.extend(
+                        [
+                            LLMMessage(role="assistant", content=raw_json),
+                            LLMMessage(
+                                role="user",
+                                content=json.dumps(
+                                    {
+                                        "tool_observation": observation.model_dump(
+                                            mode="json"
+                                        ),
+                                        "instruction": (
+                                            "根据真实商家属性继续；信息足够时输出最终精简需求。"
+                                        ),
+                                    },
+                                    ensure_ascii=False,
+                                    sort_keys=True,
+                                ),
+                            ),
+                        ]
+                    )
+                    continue
                 proposal = PreferenceFusionProposal.model_validate(payload)
             except (json.JSONDecodeError, TypeError, ValueError, ValidationError) as exc:
                 return _loop_result(
@@ -485,7 +597,11 @@ class PreferenceFusion:
         )
 
 
-def _messages(request: PreferenceFusionRequest) -> list[LLMMessage]:
+def _messages(
+    request: PreferenceFusionRequest,
+    *,
+    business_tool_available: bool = False,
+) -> list[LLMMessage]:
     """给模型完整语境，但把商家详细事实留给可核验工具查询。"""
 
     system = """你负责把餐厅推荐的多轮对话整理成“当前仍然有效的对话需求”。
@@ -504,13 +620,21 @@ def _messages(request: PreferenceFusionRequest) -> list[LLMMessage]:
 4. 不复制场景默认值、画像偏好、编号、单位、数据库字段名或来源名称，程序会统一补齐。
 5. 不推荐商家，不生成商家分数，不猜商家事实。
 
+地点和到店时间：
+- 用户说出城市、区域、商圈、地标或详细地址时，填写 search_center。latitude/longitude 是该地点的大致中心；radius_km 是这个地点合理的附近范围。社区或商圈一般使用1到3公里，城市级地点可以更大。
+- search_center 只取自用户地点原话。用户没说新地点时保持 null，程序会沿用上一轮地点或用户定位。
+- 用户明确说“今天晚上九点、周六中午、现在”等到店时间时，输出 hard_constraints：field=open_at、operator=equals、value 为目录当地时区的 ISO 日期时间，例如 2026-08-25T21:00:00。
+- 用户没有说到店时间时不要输出 open_at；程序会自动使用请求发生时刻。
+
 怎样把常见原话放入现有字段：
 - “想吃川菜/日料”等菜系要求：hard_constraints，field=category，operator=any_of，value 使用数据库类别名称列表。对话中的菜系决定候选范围，不允许放进 soft_preferences。
 - “辣一点/清淡一点”：field=spiciness，direction=higher/lower。
 - “安静/别太吵”：field=quiet_environment，direction=higher。
 - “近一点”：field=distance_km，direction=lower。
 - “五公里以内”：hard_constraints，field=distance_km，operator=less_than_or_equal，value=5。
+- “今晚九点还营业”：hard_constraints，field=open_at，operator=equals，value 使用 ISO 日期时间字符串。
 - “价格二档左右”：soft_preferences，field=price_level，direction=closer_to，target_value=2。
+- “地道、正宗、本地人才会去”等无法由现有14种特征直接表达的要求：open_requirements，behavior=prefer，保留用户原话供评论检索。
 - 只有现有硬条件字段和软偏好字段确实无法表达时，才放 open_requirements；不要把川菜、辣度、安静、距离、价格放进开放要求。
 
 顺序和开放要求格式：
@@ -530,6 +654,7 @@ def _messages(request: PreferenceFusionRequest) -> list[LLMMessage]:
 - 工具调用格式严格遵守 tool_call_schema。
 - 使用工具事实形成要求时，把返回的 fact_id 放进 supporting_fact_ids。不得编造 fact_id。
 - 找不到事实时，不要猜数值；可以把仍然有效但无法结构化的原话放进 open_requirements。
+- 需要查询历史商家的地址、评分、评论数、预订、外卖、停车或营业时间等完整属性时，先用历史工具确认商家编号，再调用 lookup_business_facts。只能查询 visible history 中出现的商家编号。
 
 证据规则：
 - evidence_text 必须逐字取自对应轮次的用户原话。
@@ -540,9 +665,17 @@ def _messages(request: PreferenceFusionRequest) -> list[LLMMessage]:
     payload = {
         "turn_index": request.turn_index,
         "query_text": request.query_text,
+        "current_time_in_catalog_timezone": catalog_local_time(
+            request.request_time
+        ).isoformat(),
+        "catalog_timezone": CATALOG_TIME_ZONE,
         "previous_state": _visible_previous_state(request.previous_state),
         "conversation_history": _visible_history(request.conversation_history),
         "available_tool": _history_tool_description(request),
+        "available_business_tool": _business_tool_description(
+            request,
+            enabled=business_tool_available,
+        ),
         "allowed_dining_categories": list(
             load_fixed_category_catalog().model_options()
         ),
@@ -571,6 +704,22 @@ def _history_tool_description(
     }
 
 
+def _business_tool_description(
+    request: PreferenceFusionRequest,
+    *,
+    enabled: bool,
+) -> dict[str, object] | None:
+    """只有模型确实看得到历史商家编号时才开放完整属性查询。"""
+
+    if not enabled or not _all_business_references(request):
+        return None
+    return {
+        "name": BusinessFactsTool.name,
+        "description": "按历史商家编号读取地址、评分、价格、服务属性和每周营业时间。",
+        "tool_call_schema": BusinessFactsFusionToolCall.model_json_schema(),
+    }
+
+
 def _visible_previous_state(
     state: UnifiedRecommendationState | None,
 ) -> dict[str, object] | None:
@@ -594,6 +743,11 @@ def _visible_previous_state(
         "turn_index": state.turn_index,
         "latest_query_text": state.latest_query_text,
         "scene": None if state.scene is None else state.scene.model_dump(mode="json"),
+        "search_center": (
+            None
+            if state.search_center is None
+            else state.search_center.model_dump(mode="json")
+        ),
         "hard_constraints": [
             item.model_dump(mode="json") for item in state.hard_constraints
         ],
@@ -633,7 +787,7 @@ def _loop_result(
     status: Literal["success", "provider_failure", "invalid_output"],
     reason: str | None,
     calls: list[LLMCallResult],
-    observations: list[HistoryFactObservation],
+    observations: list[HistoryFactObservation | BusinessFactsObservation],
     facts: dict[str, HistoryBusinessFact],
     raw_json: str | None,
     proposal: PreferenceFusionProposal | None = None,
@@ -702,6 +856,12 @@ def _validate_model_understanding(
             request,
             proposal.scene.evidence_text,
             proposal.scene.evidence_turn_index,
+        )
+    if proposal.search_center is not None:
+        _validate_dialogue_evidence(
+            request,
+            proposal.search_center.evidence_text,
+            proposal.search_center.evidence_turn_index,
         )
 
 
@@ -1031,6 +1191,27 @@ def _materialize_scene(
             turn_index=compact.evidence_turn_index,
         ),
     )
+
+
+def _materialize_search_center(
+    request: PreferenceFusionRequest,
+    compact: CompactSearchCenter | None,
+) -> SearchCenter | None:
+    """新地点覆盖旧地点；本轮没说地点时沿用上一轮搜索中心。"""
+
+    if compact is not None:
+        return SearchCenter(
+            kind="named_place",
+            label=compact.label,
+            location=GeoPoint(
+                latitude=compact.latitude,
+                longitude=compact.longitude,
+            ),
+        )
+    previous = request.previous_state
+    if previous is None or previous.search_center is None:
+        return None
+    return previous.search_center.model_copy(deep=True)
 
 
 def _materialize_open_requirements(
@@ -1395,27 +1576,39 @@ def _all_business_references(
     return [values[key] for key in sorted(values)]
 
 
-def _normalize_open_requirements(
-    requirements: list[OpenRequirement],
-    soft_count: int,
-) -> list[OpenRequirement]:
-    """让软偏好和可排序开放要求共享一套连续编号。"""
+def _normalize_ranked_requirements(
+    soft_preferences: list[SoftPreference],
+    open_requirements: list[OpenRequirement],
+) -> tuple[list[SoftPreference], list[OpenRequirement]]:
+    """显式长尾偏好和普通软偏好遵守同一来源优先级与连续顺序。"""
 
-    ordered = sorted(
-        requirements,
-        key=lambda item: (item.priority is None, item.priority or 0, item.key),
+    ranked_open = [item for item in open_requirements if item.priority is not None]
+    must_have = [item for item in open_requirements if item.priority is None]
+    combined: list[tuple[str, SoftPreference | OpenRequirement]] = [
+        ("soft", item) for item in soft_preferences
+    ]
+    combined.extend(("open", item) for item in ranked_open)
+    combined.sort(
+        key=lambda pair: (
+            -_SOURCE_PRIORITY[pair[1].controlling_source],
+            pair[1].priority or 10_000,
+            0 if pair[0] == "soft" else 1,
+            pair[1].key,
+        )
     )
-    next_priority = soft_count + 1
-    result: list[OpenRequirement] = []
-    for item in ordered:
-        if item.priority is None:
-            result.append(item.model_copy(deep=True))
-        else:
-            result.append(
-                item.model_copy(update={"priority": next_priority}, deep=True)
+    normalized_soft: list[SoftPreference] = []
+    normalized_open: list[OpenRequirement] = []
+    for priority, (kind, item) in enumerate(combined, start=1):
+        if kind == "soft":
+            normalized_soft.append(
+                item.model_copy(update={"priority": priority}, deep=True)  # type: ignore[union-attr]
             )
-            next_priority += 1
-    return result
+        else:
+            normalized_open.append(
+                item.model_copy(update={"priority": priority}, deep=True)  # type: ignore[union-attr]
+            )
+    normalized_open.extend(item.model_copy(deep=True) for item in must_have)
+    return normalized_soft, normalized_open
 
 
 def _materialize_state(
@@ -1426,10 +1619,26 @@ def _materialize_state(
     """补齐固定字段、执行四来源规则，生成下游只读的完整状态。"""
 
     scene = _materialize_scene(request, proposal.scene)
+    compact_hard = list(proposal.hard_constraints)
+    if (
+        proposal.search_center is not None
+        and not any(item.field == "distance_km" for item in compact_hard)
+    ):
+        # 地点只有坐标还不能限制候选范围。大模型同时给出地点尺度，程序把它
+        # 补成真正可执行的距离硬条件，后续仍走同一个数据库过滤入口。
+        compact_hard.append(
+            CompactHardRequirement(
+                field="distance_km",
+                operator="less_than_or_equal",
+                value=proposal.search_center.radius_km,
+                evidence_text=proposal.search_center.evidence_text,
+                evidence_turn_index=proposal.search_center.evidence_turn_index,
+            )
+        )
     hard_constraints = _resolve_hard_constraints(
         [
             _materialize_hard_requirement(request, item, facts)
-            for item in proposal.hard_constraints
+            for item in compact_hard
         ]
     )
     defaults, persistent = _persistent_candidates(request, scene)
@@ -1446,19 +1655,21 @@ def _materialize_state(
         _materialize_preference(group, priority)
         for priority, group in enumerate(groups, start=1)
     ]
+    open_requirements = _materialize_open_requirements(
+        request,
+        proposal.open_requirements,
+    )
+    soft_preferences, open_requirements = _normalize_ranked_requirements(
+        soft_preferences,
+        open_requirements,
+    )
     previous = request.previous_state
     user_location = (
         request.user_location
         if request.user_location is not None
         else (None if previous is None else previous.user_location)
     )
-    search_center = None
-    if request.user_location is None and previous is not None:
-        search_center = (
-            None
-            if previous.search_center is None
-            else previous.search_center.model_copy(deep=True)
-        )
+    search_center = _materialize_search_center(request, proposal.search_center)
     return UnifiedRecommendationState(
         user_id=request.user_id,
         session_id=request.session_id,
@@ -1472,10 +1683,7 @@ def _materialize_state(
         default_constraints=default_constraints,
         soft_preferences=soft_preferences,
         preference_memory=_materialize_memory(decisions),
-        open_requirements=_normalize_open_requirements(
-            _materialize_open_requirements(request, proposal.open_requirements),
-            len(soft_preferences),
-        ),
+        open_requirements=open_requirements,
         referenced_businesses=_all_business_references(request),
     )
 

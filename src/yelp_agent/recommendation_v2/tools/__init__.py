@@ -5,6 +5,11 @@ from yelp_agent.recommendation_v2.tools.baseline_ranking import (
     RatingBaselineRankingTool,
     build_legacy_baseline_ranking_tool,
 )
+from yelp_agent.recommendation_v2.tools.business_facts import (
+    BusinessFactsObservation,
+    BusinessFactsQuery,
+    BusinessFactsTool,
+)
 from yelp_agent.recommendation_v2.tools.geography import (
     BusinessDistance,
     GeographicDistanceResult,
@@ -26,6 +31,9 @@ from yelp_agent.recommendation_v2.tools.user_profile import UserProfileTool
 
 __all__ = [
     "BusinessDistance",
+    "BusinessFactsObservation",
+    "BusinessFactsQuery",
+    "BusinessFactsTool",
     "FilteredBusiness",
     "GeographicDistanceResult",
     "GeographicDistanceTool",

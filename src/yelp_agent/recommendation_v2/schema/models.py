@@ -19,6 +19,7 @@ type SourceKind = Literal[
     "session",
     "scene",
     "user_profile",
+    "system_default",
 ]
 type SceneKind = Literal[
     "casual",
@@ -76,6 +77,7 @@ type HardConstraintField = Literal[
     "wheelchair_accessible",
     "dogs_allowed",
     "parking_available",
+    "open_at",
 ]
 # 软偏好既可以使用结构化字段，也可以使用评论归纳出的商家特征。
 type RequirementField = Literal[
@@ -124,6 +126,7 @@ type MerchantFeature = Literal[
     "wheelchair_accessible",
     "dogs_allowed",
     "parking_available",
+    "weekly_hours",
     "food_quality",
     "service",
     "price_value",
@@ -148,6 +151,7 @@ type RequirementUnit = Literal[
     "count",
     "boolean",
     "match_score",
+    "datetime",
 ]
 type HardOperator = Literal[
     "equals",
@@ -203,6 +207,7 @@ _SOURCE_PRIORITY: dict[SourceKind, int] = {
     "session": 3,
     "user_profile": 2,
     "scene": 1,
+    "system_default": 0,
 }
 _FIELD_FEATURE: dict[RequirementField, MerchantFeature] = {
     "category": "categories",
@@ -221,8 +226,11 @@ _FIELD_FEATURE: dict[RequirementField, MerchantFeature] = {
     "parking_available": "parking_available",
     **{aspect: aspect for aspect in ASPECT_FIELDS},
 }
-_HARD_ONLY_FIELD_FEATURE: dict[Literal["business_id"], MerchantFeature] = {
+_HARD_ONLY_FIELD_FEATURE: dict[
+    Literal["business_id", "open_at"], MerchantFeature
+] = {
     "business_id": "business_id",
+    "open_at": "weekly_hours",
 }
 _FIELD_UNIT: dict[RequirementField, RequirementUnit] = {
     "category": "category",
@@ -241,8 +249,11 @@ _FIELD_UNIT: dict[RequirementField, RequirementUnit] = {
     "parking_available": "boolean",
     **{aspect: "match_score" for aspect in ASPECT_FIELDS},
 }
-_HARD_ONLY_FIELD_UNIT: dict[Literal["business_id"], RequirementUnit] = {
+_HARD_ONLY_FIELD_UNIT: dict[
+    Literal["business_id", "open_at"], RequirementUnit
+] = {
     "business_id": "business_id",
+    "open_at": "datetime",
 }
 _COLLECTION_FIELDS = {"category", "business_id"}
 _COLLECTION_OPERATORS = {"any_of", "all_of", "none_of"}
@@ -275,7 +286,7 @@ def merchant_feature_for(
     通过这里补齐商家字段，避免不同文件各写一份映射后逐渐不一致。
     """
 
-    if field == "business_id":
+    if field in _HARD_ONLY_FIELD_FEATURE:
         return _HARD_ONLY_FIELD_FEATURE[field]
     return _FIELD_FEATURE[field]
 
@@ -285,7 +296,7 @@ def requirement_unit_for(
 ) -> RequirementUnit:
     """返回某个要求字段的固定单位，供完整统一状态自动补齐。"""
 
-    if field == "business_id":
+    if field in _HARD_ONLY_FIELD_UNIT:
         return _HARD_ONLY_FIELD_UNIT[field]
     return _FIELD_UNIT[field]
 
@@ -329,12 +340,12 @@ def _validate_structured_constraint(
 
     expected_feature = (
         _HARD_ONLY_FIELD_FEATURE[field]
-        if field == "business_id"
+        if field in _HARD_ONLY_FIELD_FEATURE
         else _FIELD_FEATURE[field]
     )
     expected_unit = (
         _HARD_ONLY_FIELD_UNIT[field]
-        if field == "business_id"
+        if field in _HARD_ONLY_FIELD_UNIT
         else _FIELD_UNIT[field]
     )
     if merchant_feature != expected_feature:
@@ -353,6 +364,15 @@ def _validate_structured_constraint(
             raise ValueError("collection filter values must be nonempty and trimmed")
         if len(value) != len(set(value)):
             raise ValueError("collection filter values must be unique")
+    elif field == "open_at":
+        if operator != "equals" or not isinstance(value, str):
+            raise ValueError("open_at requires equals and an ISO date-time string")
+        if "T" not in value and " " not in value:
+            raise ValueError("open_at must include both date and time")
+        try:
+            datetime.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError("open_at must be an ISO date-time string") from exc
     elif field in _BOOLEAN_FIELDS:
         if operator != "equals" or not isinstance(value, bool):
             raise ValueError("boolean filters require equals and a true/false value")

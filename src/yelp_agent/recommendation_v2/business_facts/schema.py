@@ -30,6 +30,23 @@ BUSINESS_FACT_SCHEMA = pa.schema(
         pa.field("price_upper_usd", pa.int16(), nullable=True),
         pa.field("rating", pa.float64(), nullable=False),
         pa.field("review_count", pa.int64(), nullable=False),
+        # Yelp 原始数据按星期保存一段营业时间。保留原始字符串，具体某个
+        # 时刻是否营业由硬过滤工具统一解释，避免生成事实时偷偷改写含义。
+        pa.field(
+            "weekly_hours",
+            pa.struct(
+                [
+                    pa.field("monday", pa.string(), nullable=True),
+                    pa.field("tuesday", pa.string(), nullable=True),
+                    pa.field("wednesday", pa.string(), nullable=True),
+                    pa.field("thursday", pa.string(), nullable=True),
+                    pa.field("friday", pa.string(), nullable=True),
+                    pa.field("saturday", pa.string(), nullable=True),
+                    pa.field("sunday", pa.string(), nullable=True),
+                ]
+            ),
+            nullable=True,
+        ),
         pa.field("accepts_reservations", pa.bool_(), nullable=True),
         pa.field("delivery", pa.bool_(), nullable=True),
         pa.field("takeout", pa.bool_(), nullable=True),
@@ -73,6 +90,7 @@ BASE_FACT_FEATURE_COLUMNS: dict[str, tuple[str, ...]] = {
     "business_id": ("business_id",),
     "rating": ("rating",),
     "review_count": ("review_count",),
+    "weekly_hours": ("weekly_hours",),
     "accepts_reservations": ("accepts_reservations",),
     "delivery": ("delivery",),
     "takeout": ("takeout",),
@@ -83,6 +101,24 @@ BASE_FACT_FEATURE_COLUMNS: dict[str, tuple[str, ...]] = {
     "dogs_allowed": ("dogs_allowed",),
     "parking_available": ("parking_available",),
 }
+
+
+class WeeklyHours(StrictModel):
+    """Yelp 数据中一家商户每周每天记录的一段营业时间。"""
+
+    monday: str | None = None
+    tuesday: str | None = None
+    wednesday: str | None = None
+    thursday: str | None = None
+    friday: str | None = None
+    saturday: str | None = None
+    sunday: str | None = None
+
+    @model_validator(mode="after")
+    def validate_has_value(self) -> Self:
+        if not any(getattr(self, day) for day in type(self).model_fields):
+            raise ValueError("weekly hours must contain at least one day")
+        return self
 
 
 class PriceBand(StrictModel):
@@ -138,6 +174,7 @@ class BusinessFact(StrictModel):
     price_upper_usd: int | None = Field(default=None, ge=0)
     rating: float = Field(ge=1, le=5)
     review_count: int = Field(ge=0)
+    weekly_hours: WeeklyHours | None = None
     accepts_reservations: bool | None = None
     delivery: bool | None = None
     takeout: bool | None = None
@@ -197,7 +234,7 @@ class BusinessFactManifest(StrictModel):
     """记录事实来源、字段覆盖情况和生成文件校验值。"""
 
     schema_version: Literal[1] = 1
-    fact_version: Literal["1.0.0"] = "1.0.0"
+    fact_version: Literal["1.1.0"] = "1.1.0"
     dining_source_path: str = Field(min_length=1)
     raw_business_source_path: str = Field(min_length=1)
     source_sha256: dict[str, str]
@@ -211,7 +248,7 @@ class BusinessFactManifest(StrictModel):
             raise ValueError("manifest must hash both business sources")
         if set(self.output_sha256) != {"business_facts", "price_bands"}:
             raise ValueError("manifest must hash facts and price bands")
-        expected_counts = {"price_level", *BOOLEAN_FACT_FIELDS}
+        expected_counts = {"price_level", "weekly_hours", *BOOLEAN_FACT_FIELDS}
         if set(self.known_value_counts) != expected_counts:
             raise ValueError("manifest known-value fields are incomplete")
         if any(not 0 <= count <= self.business_count for count in self.known_value_counts.values()):

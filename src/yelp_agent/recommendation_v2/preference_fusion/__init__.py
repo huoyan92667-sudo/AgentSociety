@@ -2,9 +2,11 @@
 
 from yelp_agent.recommendation_v2.preference_fusion.fusion import (
     PROMPT_VERSION,
+    BusinessFactsFusionToolCall,
     CompactHardRequirement,
     CompactOpenRequirement,
     CompactSceneSelection,
+    CompactSearchCenter,
     CompactSoftRequirement,
     ConversationHistoryTurn,
     PreferenceCandidate,
@@ -13,6 +15,7 @@ from yelp_agent.recommendation_v2.preference_fusion.fusion import (
     PreferenceFusionProposal,
     PreferenceFusionRequest,
     PreferenceFusionToolCall,
+    RecommendationSnapshot,
 )
 from yelp_agent.recommendation_v2.preference_fusion.profile_adapter import (
     ASPECT_DIRECTION_POLICY,
@@ -33,9 +36,11 @@ from yelp_agent.recommendation_v2.tools.history_business import (
 __all__ = [
     "ASPECT_DIRECTION_POLICY",
     "PROMPT_VERSION",
+    "BusinessFactsFusionToolCall",
     "CompactHardRequirement",
     "CompactOpenRequirement",
     "CompactSceneSelection",
+    "CompactSearchCenter",
     "CompactSoftRequirement",
     "ConversationHistoryTurn",
     "HistoryBusinessFact",
@@ -50,6 +55,7 @@ __all__ = [
     "PreferenceFusionRequest",
     "PreferenceFusionToolCall",
     "ProfilePreferenceSet",
+    "RecommendationSnapshot",
     "adapt_user_profile",
     "build_preference_fusion",
 ]

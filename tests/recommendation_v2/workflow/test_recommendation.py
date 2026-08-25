@@ -162,6 +162,7 @@ def test_small_entry_loads_and_adapts_profile_then_adds_scene_automatically() ->
     state = result.fusion.state
     assert state.scene is not None and state.scene.kind == "friends"
     assert state.default_constraints[0].field == "distance_km"
+    assert any(item.field == "open_at" for item in state.default_constraints)
     assert state.hard_constraints[0].field == "category"
     assert state.hard_constraints[0].value == ["Szechuan"]
     quiet = next(item for item in state.soft_preferences if item.field == "quiet_environment")
@@ -182,3 +183,43 @@ def test_small_entry_loads_and_adapts_profile_then_adds_scene_automatically() ->
 
     workflow.close()
     assert profile_store.closed is True
+
+
+def test_explicit_visit_time_replaces_request_time_default() -> None:
+    """用户说了晚上九点后，只允许九点进入营业硬筛选。"""
+
+    proposal = PreferenceFusionProposal(
+        hard_constraints=[
+            CompactHardRequirement(
+                field="open_at",
+                operator="equals",
+                value="2026-08-25T21:00:00-04:00",
+                evidence_text="今天晚上9点",
+                evidence_turn_index=1,
+            )
+        ]
+    )
+    workflow = RecommendationWorkflow(
+        fusion=PreferenceFusion(FakeGenerator(proposal)),
+        profile_store=FakeProfileStore(_real_shape_profile()),
+    )
+
+    result = workflow.process(
+        RecommendationInput(
+            user_id="real-user",
+            session_id="time-session",
+            query_text="今天晚上9点去吃饭",
+            request_time=datetime(2026, 8, 25, 12, tzinfo=UTC),
+        )
+    )
+
+    assert result.fusion.state is not None
+    assert [
+        item.value
+        for item in result.fusion.state.hard_constraints
+        if item.field == "open_at"
+    ] == ["2026-08-25T21:00:00-04:00"]
+    assert not any(
+        item.field == "open_at"
+        for item in result.fusion.state.default_constraints
+    )

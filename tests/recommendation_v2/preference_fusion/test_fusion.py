@@ -9,6 +9,7 @@ from yelp_agent.recommendation_v2.preference_fusion import (
     CompactHardRequirement,
     CompactOpenRequirement,
     CompactSceneSelection,
+    CompactSearchCenter,
     CompactSoftRequirement,
     ConversationHistoryTurn,
     HistoryBusinessFactTool,
@@ -202,6 +203,50 @@ def test_compact_output_does_not_ask_model_for_fixed_technical_fields() -> None:
     assert "merchant_feature" not in soft_properties
     assert "controlling_source" not in soft_properties
     assert "preference_strength" not in soft_properties
+
+
+def test_named_place_creates_search_center_and_distance_hard_constraint() -> None:
+    """地点由模型给出近似坐标，程序必须固定补成可执行的范围硬条件。"""
+
+    proposal = PreferenceFusionProposal(
+        search_center=CompactSearchCenter(
+            label="费城唐人街",
+            latitude=39.9537,
+            longitude=-75.1579,
+            radius_km=1.5,
+            evidence_text="费城唐人街",
+            evidence_turn_index=1,
+        ),
+        hard_constraints=[
+            CompactHardRequirement(
+                field="category",
+                operator="any_of",
+                value=["Szechuan"],
+                evidence_text="吃川菜",
+                evidence_turn_index=1,
+            )
+        ],
+    )
+
+    attempt = PreferenceFusion(FakeGenerator(proposal)).fuse(
+        PreferenceFusionRequest(
+            user_id="user-1",
+            session_id="session-1",
+            turn_index=1,
+            query_text="去费城唐人街吃川菜",
+        )
+    )
+
+    assert attempt.status == "success"
+    assert attempt.state is not None
+    assert attempt.state.search_center is not None
+    assert attempt.state.search_center.label == "费城唐人街"
+    distance = next(
+        item for item in attempt.state.hard_constraints if item.field == "distance_km"
+    )
+    assert distance.operator == "less_than_or_equal"
+    assert distance.value == 1.5
+    assert distance.sources[0].text == "费城唐人街"
 
 
 def test_dialogue_soft_preferences_require_a_clear_total_order() -> None:

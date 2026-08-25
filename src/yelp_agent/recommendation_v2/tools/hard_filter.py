@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 import duckdb
 import pyarrow as pa
 from pydantic import Field, field_validator
@@ -10,6 +12,8 @@ from yelp_agent.models import StrictModel
 from yelp_agent.recommendation_v2.business_facts import (
     BusinessFact,
     BusinessFactCatalog,
+    is_open_at,
+    parse_visit_time,
 )
 from yelp_agent.recommendation_v2.category_catalog import FixedCategoryCatalog
 from yelp_agent.recommendation_v2.schema import (
@@ -118,6 +122,16 @@ class StructuredHardFilterTool:
             *state.default_constraints,
         ]
         needs_distance = any(item.field == "distance_km" for item in constraints)
+        open_at_values = {
+            str(item.value) for item in constraints if item.field == "open_at"
+        }
+        if len(open_at_values) > 1:
+            raise ValueError("hard filter accepts one effective visit time")
+        visit_time = (
+            parse_visit_time(next(iter(open_at_values)))
+            if open_at_values
+            else None
+        )
         if needs_distance and geography is None:
             raise ValueError("distance filtering requires geographic distances")
         if geography is not None and state.search_center != geography.search_center:
@@ -131,8 +145,17 @@ class StructuredHardFilterTool:
                 self._businesses.get(business_id)
 
         with duckdb.connect(database=":memory:") as connection:
-            self._register_sources(connection, geography=geography, scope=scope)
-            from_sql = self._from_sql(geography is not None, scope is not None)
+            self._register_sources(
+                connection,
+                geography=geography,
+                scope=scope,
+                visit_time=visit_time,
+            )
+            from_sql = self._from_sql(
+                geography is not None,
+                scope is not None,
+                visit_time is not None,
+            )
             clauses: list[str] = []
             parameters: list[RequirementValue] = []
             source_count = self._count(connection, from_sql, clauses, parameters)
@@ -221,6 +244,7 @@ class StructuredHardFilterTool:
         *,
         geography: GeographicDistanceResult | None,
         scope: list[str] | None,
+        visit_time: datetime | None,
     ) -> None:
         """把已校验的事实文件和本轮工具结果注册成只读查询表。"""
 
@@ -252,14 +276,39 @@ class StructuredHardFilterTool:
                     ),
                 ),
             )
+        if visit_time is not None:
+            connection.register(
+                "business_open_status",
+                pa.Table.from_pylist(
+                    [
+                        {
+                            "business_id": business.business_id,
+                            "is_open_at": is_open_at(business, visit_time),
+                        }
+                        for business in self._businesses.all()
+                    ],
+                    schema=pa.schema(
+                        [
+                            pa.field("business_id", pa.string(), nullable=False),
+                            pa.field("is_open_at", pa.bool_(), nullable=True),
+                        ]
+                    ),
+                ),
+            )
 
     @staticmethod
-    def _from_sql(has_geography: bool, has_scope: bool) -> str:
+    def _from_sql(
+        has_geography: bool,
+        has_scope: bool,
+        has_open_status: bool,
+    ) -> str:
         joins = ["business_facts f"]
         if has_geography:
             joins.append("JOIN business_distances d USING (business_id)")
         if has_scope:
             joins.append("JOIN candidate_scope s USING (business_id)")
+        if has_open_status:
+            joins.append("JOIN business_open_status o USING (business_id)")
         return " ".join(joins)
 
     @staticmethod
@@ -309,6 +358,12 @@ class StructuredHardFilterTool:
                 f"d.distance_km IS NOT NULL AND d.distance_km {operator} ?",
                 [constraint.value],
                 "d.distance_km IS NULL",
+            )
+        if constraint.field == "open_at":
+            return (
+                "o.is_open_at IS TRUE",
+                [],
+                "o.is_open_at IS NULL",
             )
         if constraint.field in _BOOLEAN_COLUMNS:
             column = _BOOLEAN_COLUMNS[constraint.field]

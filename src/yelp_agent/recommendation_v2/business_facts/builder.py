@@ -115,7 +115,7 @@ def _read_raw_facts(
 
 
 def _known_value_counts(facts: list[BusinessFact]) -> dict[str, int]:
-    fields = ("price_level", *BOOLEAN_FACT_FIELDS)
+    fields = ("price_level", "weekly_hours", *BOOLEAN_FACT_FIELDS)
     return {
         field: sum(getattr(fact, field) is not None for fact in facts)
         for field in fields

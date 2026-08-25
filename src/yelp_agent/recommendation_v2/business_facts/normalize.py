@@ -6,7 +6,7 @@ import ast
 from collections.abc import Mapping
 from typing import Any
 
-from .schema import PRICE_BANDS_BY_LEVEL, BusinessFact
+from .schema import PRICE_BANDS_BY_LEVEL, BusinessFact, WeeklyHours
 
 DIRECT_BOOLEAN_ATTRIBUTES: dict[str, str] = {
     "accepts_reservations": "RestaurantsReservations",
@@ -26,6 +26,16 @@ PARKING_KEYS: tuple[str, ...] = (
     "lot",
     "valet",
 )
+
+_HOUR_DAY_KEYS: dict[str, str] = {
+    "Monday": "monday",
+    "Tuesday": "tuesday",
+    "Wednesday": "wednesday",
+    "Thursday": "thursday",
+    "Friday": "friday",
+    "Saturday": "saturday",
+    "Sunday": "sunday",
+}
 
 
 class BusinessFactNormalizationError(ValueError):
@@ -90,6 +100,21 @@ def _price_level(attributes: Mapping[str, Any]) -> int | None:
     return int(normalized)
 
 
+def _weekly_hours(value: object) -> WeeklyHours | None:
+    """只整理 Yelp 明确给出的星期与时间，不猜缺失日期。"""
+
+    if not isinstance(value, Mapping):
+        return None
+    normalized: dict[str, str | None] = {}
+    for source_day, target_day in _HOUR_DAY_KEYS.items():
+        raw = value.get(source_day)
+        text = str(raw).strip() if raw is not None else ""
+        normalized[target_day] = text or None
+    if not any(normalized.values()):
+        return None
+    return WeeklyHours(**normalized)
+
+
 def normalize_business_fact(raw: Mapping[str, Any]) -> BusinessFact:
     """生成一行可直接过滤和排序的商家基础事实。"""
 
@@ -141,6 +166,7 @@ def normalize_business_fact(raw: Mapping[str, Any]) -> BusinessFact:
         ),
         rating=rating,
         review_count=review_count,
+        weekly_hours=_weekly_hours(raw.get("hours")),
         parking_available=parking_available,
         parking_garage=parking["garage"],
         parking_street=parking["street"],

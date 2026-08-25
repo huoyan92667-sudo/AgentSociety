@@ -1,7 +1,7 @@
 {
   "business_count": 2447,
   "dining_source_path": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\dining_catalog\\v1\\businesses.parquet",
-  "fact_version": "1.0.0",
+  "fact_version": "1.1.0",
   "known_value_counts": {
     "accepts_reservations": 2158,
     "delivery": 2266,
@@ -17,10 +17,11 @@
     "parking_validated": 2189,
     "price_level": 2192,
     "takeout": 2345,
+    "weekly_hours": 2304,
     "wheelchair_accessible": 895
   },
   "output_sha256": {
-    "business_facts": "1b49271ab7b4c02a072ee54312501ed7f2519d59395967fcfc831401b7afa159",
+    "business_facts": "dca552a529d32f54860471c7a442ad6258fa41e764b4bd264ba1d744c3c0494b",
     "price_bands": "ec12e210bce8f3d9323c0ba3afb4b14374eaddfc73f25ad452eeedb93ecc0710"
   },
   "raw_business_source_path": "C:\\Users\\29072\\PycharmProjects\\AgentSociety\\data\\raw\\yelp_academic_dataset_business.json",

@@ -8,6 +8,7 @@ from yelp_agent.recommendation_v2.business_facts import (
     PRICE_BAND_DOCUMENT,
     BusinessFact,
     BusinessFactCatalog,
+    WeeklyHours,
 )
 from yelp_agent.recommendation_v2.category_catalog.catalog import FixedCategoryCatalog
 from yelp_agent.recommendation_v2.category_catalog.schema import (
@@ -36,6 +37,7 @@ def _fact(
     latitude: float,
     price_level: int | None,
     accepts_reservations: bool | None,
+    weekly_hours: WeeklyHours | None = None,
 ) -> BusinessFact:
     band = PRICE_BAND_DOCUMENT.bands[price_level - 1] if price_level else None
     return BusinessFact(
@@ -53,16 +55,29 @@ def _fact(
         price_upper_usd=None if band is None else band.upper_inclusive,
         rating=4.5,
         review_count=100,
+        weekly_hours=weekly_hours,
         accepts_reservations=accepts_reservations,
     )
 
 
 def _catalogs(tmp_path):
     facts = [
-        _fact("b1", "Szechuan", latitude=39.95, price_level=2, accepts_reservations=True),
+        _fact(
+            "b1", "Szechuan", latitude=39.95, price_level=2,
+            accepts_reservations=True,
+            weekly_hours=WeeklyHours(tuesday="17:0-22:0"),
+        ),
         _fact("b2", "Cantonese", latitude=39.951, price_level=2, accepts_reservations=False),
-        _fact("b3", "Szechuan", latitude=40.0, price_level=3, accepts_reservations=True),
-        _fact("b4", "Szechuan", latitude=39.952, price_level=None, accepts_reservations=True),
+        _fact(
+            "b3", "Szechuan", latitude=40.0, price_level=3,
+            accepts_reservations=True,
+            weekly_hours=WeeklyHours(tuesday="20:0-23:0"),
+        ),
+        _fact(
+            "b4", "Szechuan", latitude=39.952, price_level=None,
+            accepts_reservations=True,
+            weekly_hours=WeeklyHours(tuesday="10:0-20:0"),
+        ),
     ]
     fact_path = tmp_path / "facts.parquet"
     pq.write_table(
@@ -165,3 +180,29 @@ def test_geography_then_parameterized_hard_filter(tmp_path) -> None:
     # 用户值只作为参数传入，不能被拼进程序生成的查询语句。
     assert "Chinese" not in result.generated_sql
     assert "?" in result.generated_sql
+
+
+def test_open_at_is_a_real_hard_filter_and_unknown_hours_are_excluded(
+    tmp_path,
+) -> None:
+    businesses, categories = _catalogs(tmp_path)
+    state = UnifiedRecommendationState(
+        user_id="user-1",
+        session_id="session-1",
+        revision=1,
+        turn_index=1,
+        latest_query_text="Tuesday at nine",
+        hard_constraints=[
+            _constraint(
+                "open.exact",
+                "open_at",
+                "equals",
+                "2026-08-25T21:00:00",
+            )
+        ],
+    )
+
+    result = StructuredHardFilterTool(businesses, categories).execute(state)
+
+    assert result.candidate_business_ids == ["b1", "b3"]
+    assert result.steps[0].unknown_excluded_count == 1

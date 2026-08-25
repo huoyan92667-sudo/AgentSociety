@@ -69,7 +69,7 @@ def _sources(root: Path) -> tuple[Path, Path]:
                 ),
             },
             "categories": "Restaurants, Chinese, Szechuan",
-            "hours": None,
+            "hours": {"Monday": "17:0-22:0", "Friday": "17:0-23:0"},
         },
         {
             "business_id": "b2",
@@ -112,6 +112,9 @@ def test_builds_raw_categories_prices_ratings_and_unknown_values(tmp_path: Path)
     assert known.categories == ["Restaurants", "Chinese", "Szechuan"]
     assert known.rating == 4.5
     assert known.review_count == 123
+    assert known.weekly_hours is not None
+    assert known.weekly_hours.monday == "17:0-22:0"
+    assert result.manifest.known_value_counts["weekly_hours"] == 1
     assert known.price_level == 2
     assert (known.price_lower_usd, known.price_upper_usd) == (11, 30)
     assert known.accepts_reservations is True
@@ -155,6 +158,7 @@ def test_every_base_feature_points_to_real_fact_columns() -> None:
         "business_id",
         "rating",
         "review_count",
+        "weekly_hours",
         "accepts_reservations",
         "delivery",
         "takeout",

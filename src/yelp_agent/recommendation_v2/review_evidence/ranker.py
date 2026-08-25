@@ -70,6 +70,7 @@ class ReviewEvidenceRanker:
         description_result = self._description_builder.build(
             state.soft_preferences,
             state.open_requirements,
+            query_text=state.latest_query_text,
         )
         call = description_result.call
         if description_result.failure_reason is not None:
