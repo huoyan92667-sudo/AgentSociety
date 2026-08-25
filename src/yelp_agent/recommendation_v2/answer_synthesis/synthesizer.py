@@ -10,6 +10,11 @@ from pydantic import Field
 from yelp_agent.agent.llm import LLMCallResult, LLMMessage, OpenAICompatibleLLM
 from yelp_agent.config import AgentConfig
 from yelp_agent.models import StrictModel
+from yelp_agent.recommendation_v2.business_facts import (
+    BusinessFact,
+    is_open_at,
+    parse_visit_time,
+)
 from yelp_agent.recommendation_v2.review_evidence import ReviewEvidenceRankingResult
 from yelp_agent.recommendation_v2.review_evidence.schema import (
     BusinessPreferenceEvidence,
@@ -33,7 +38,12 @@ _SYSTEM_PROMPT = """
 7. 结合软偏好的先后顺序解释个性化原因，但不要暴露内部字段名、相似度、公式和计算过程。
 8. 每家控制在一小段：核心推荐理由、最相关的真实证据、必要的风险或条件。
 9. 营业时间来自历史 Yelp 数据；如果提到，只能表述为“数据记录显示”，不能声称实时准确。
-10. 最后可以用一两句话告诉用户五家分别更适合什么选择。
+10. 按 rank=1 到 rank=5 依次介绍，介绍完第五家直接结束。禁止在末尾再次比较、重新排序或另选“最好、首选、最稳妥”的商家。
+11. visit_context 是程序按到店时间算好的结果。星期、当天营业时段和是否营业必须原样使用，禁止自己从日期推算星期，禁止拿其他星期的营业时间代替。
+12. straight_line_distance_km 是经纬度直线距离，不是步行、驾车或路线距离。只能说“直线距离约多少”，不能改写成步行可达或步行多少公里。
+13. 禁止使用模型自身知道的餐厅背景。除非商家事实或所给评论直接写明，否则不能说“知名、连锁、老字号、核心区、最佳位置”。
+14. 评论里的外送经历只能说明外送，不能推导堂食普遍如何。只有一条评论时不能写“普遍、多次、多条评论都认为”。
+15. 正反证据混合时必须保留风险，不能新造“最稳妥、口味有保障、位置最佳”等更强结论。
 """.strip()
 
 
@@ -79,11 +89,16 @@ class RecommendationAnswerSynthesizer:
             selected = _select_business_evidence(ranked.preference_evidence)
             business_id = ranked.business.business_id
             selected_by_business[business_id] = selected
+            # 完整的一周营业表既浪费上下文，也容易让模型读错星期。程序只把
+            # 本轮真正到店那一天和已经计算好的营业结论交给最终总结。
+            business_facts = ranked.business.model_dump(mode="json")
+            business_facts.pop("weekly_hours", None)
             businesses.append(
                 {
                     "rank": ranked.final_rank,
-                    "business": ranked.business.model_dump(mode="json"),
-                    "distance_km": ranked.distance_km,
+                    "business": business_facts,
+                    "straight_line_distance_km": ranked.distance_km,
+                    "visit_context": _visit_context(state, ranked.business),
                     "evidence": [
                         {
                             "review_id": item.review_id,
@@ -148,8 +163,46 @@ class RecommendationAnswerSynthesizer:
             model=call.model,
             input_tokens=call.input_tokens,
             output_tokens=call.output_tokens,
-            latency_ms=call.latency_ms,
-        )
+        latency_ms=call.latency_ms,
+    )
+
+
+def _visit_context(
+    state: UnifiedRecommendationState,
+    business: BusinessFact,
+) -> dict[str, object] | None:
+    """把到店日期、正确星期和当天营业记录算好，避免模型自己心算出错。"""
+
+    visit_values = {
+        str(item.value)
+        for item in [*state.hard_constraints, *state.default_constraints]
+        if item.field == "open_at"
+    }
+    if len(visit_values) != 1:
+        return None
+    visit_time = parse_visit_time(next(iter(visit_values)))
+    weekday_fields = (
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    )
+    weekday_labels = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
+    recorded_hours = (
+        None
+        if business.weekly_hours is None
+        else getattr(business.weekly_hours, weekday_fields[visit_time.weekday()])
+    )
+    return {
+        "local_datetime": visit_time.isoformat(timespec="minutes"),
+        "weekday": weekday_labels[visit_time.weekday()],
+        "recorded_hours_for_visit_day": recorded_hours,
+        "recorded_open_at_visit_time": is_open_at(business, visit_time),
+        "source": "historical_yelp_weekly_hours",
+    }
 
 
 def _select_business_evidence(

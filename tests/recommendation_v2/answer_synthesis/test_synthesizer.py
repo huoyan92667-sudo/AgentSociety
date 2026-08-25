@@ -5,7 +5,7 @@ from yelp_agent.agent.llm import LLMCallResult, LLMMessage
 from yelp_agent.recommendation_v2.answer_synthesis import (
     RecommendationAnswerSynthesizer,
 )
-from yelp_agent.recommendation_v2.business_facts import BusinessFact
+from yelp_agent.recommendation_v2.business_facts import BusinessFact, WeeklyHours
 from yelp_agent.recommendation_v2.review_evidence.schema import (
     BusinessPreferenceEvidence,
     PreferenceSearchDescription,
@@ -13,7 +13,11 @@ from yelp_agent.recommendation_v2.review_evidence.schema import (
     RankedReviewEvidence,
     ReviewEvidenceRankingResult,
 )
-from yelp_agent.recommendation_v2.schema import UnifiedRecommendationState
+from yelp_agent.recommendation_v2.schema import (
+    HardConstraint,
+    RequirementBasis,
+    UnifiedRecommendationState,
+)
 
 NOW = datetime(2026, 8, 25, tzinfo=UTC)
 
@@ -121,6 +125,7 @@ def _ranking() -> ReviewEvidenceRankingResult:
         categories=["Szechuan", "Chinese"],
         rating=4.5,
         review_count=200,
+        weekly_hours=WeeklyHours(tuesday="11:0-21:30"),
     )
     return ReviewEvidenceRankingResult(
         status="success",
@@ -156,6 +161,24 @@ def test_synthesis_sends_only_compact_full_review_evidence_and_returns_free_text
         revision=1,
         turn_index=1,
         latest_query_text="今晚九点去费城唐人街吃地道川菜",
+        hard_constraints=[
+            HardConstraint(
+                key="hard.open_at.test",
+                field="open_at",
+                operator="equals",
+                value="2026-08-25T21:00:00-04:00",
+                unit="datetime",
+                merchant_feature="weekly_hours",
+                controlling_source="current_query",
+                sources=[
+                    RequirementBasis(
+                        source="current_query",
+                        text="今晚九点",
+                        turn_index=1,
+                    )
+                ],
+            )
+        ],
     )
 
     answer = synthesizer.synthesize(
@@ -171,6 +194,17 @@ def test_synthesis_sends_only_compact_full_review_evidence_and_returns_free_text
     payload = json.loads(generator.messages[1].content)
     sent_reviews = payload["top5"][0]["evidence"]
     assert len(sent_reviews) == 4
+    assert payload["top5"][0]["straight_line_distance_km"] == 0.4
+    assert "distance_km" not in payload["top5"][0]
     assert all(item["full_review"].startswith("完整真实评论") for item in sent_reviews)
     assert payload["current_query"] == state.latest_query_text
+    assert "weekly_hours" not in payload["top5"][0]["business"]
+    assert payload["top5"][0]["visit_context"] == {
+        "local_datetime": "2026-08-25T21:00-04:00",
+        "weekday": "周二",
+        "recorded_hours_for_visit_day": "11:0-21:30",
+        "recorded_open_at_visit_time": True,
+        "source": "historical_yelp_weekly_hours",
+    }
     assert "不需要返回 JSON" in generator.messages[0].content
+    assert "不是步行、驾车或路线距离" in generator.messages[0].content

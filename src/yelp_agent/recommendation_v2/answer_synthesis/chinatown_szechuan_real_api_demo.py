@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 from datetime import datetime
 from pathlib import Path
@@ -9,8 +10,11 @@ from zoneinfo import ZoneInfo
 
 from yelp_agent.recommendation_v2.workflow import (
     RecommendationInput,
+    RecommendationTurnResult,
     build_recommendation_workflow,
 )
+
+from .synthesizer import build_recommendation_answer_synthesizer
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _OUTPUT = (
@@ -25,8 +29,8 @@ _REAL_USER_ID = "gpXLAdgNBglNB_DuQ4JFXA"
 _QUERY = "我今天晚上9点想和我女朋友去费城唐人街吃川菜，要地道的川菜"
 
 
-def main() -> None:
-    """调用真实模型完成需求理解、检索说法生成和Top5自然总结。"""
+def _run_full_workflow() -> RecommendationTurnResult:
+    """调用真实模型完成需求理解、评论检索、排序和最终总结。"""
 
     request_time = datetime(
         2026,
@@ -37,7 +41,7 @@ def main() -> None:
         tzinfo=ZoneInfo("America/New_York"),
     )
     with build_recommendation_workflow(_PROJECT_ROOT) as workflow:
-        result = workflow.process(
+        return workflow.process(
             RecommendationInput(
                 user_id=_REAL_USER_ID,
                 session_id="chinatown-szechuan-answer-demo",
@@ -45,6 +49,26 @@ def main() -> None:
                 request_time=request_time,
             )
         )
+
+
+def _rerun_answer_only() -> RecommendationTurnResult:
+    """复用已经保存的排序和证据，只重新测试最终自然回答。"""
+
+    saved = RecommendationTurnResult.model_validate_json(
+        _OUTPUT.read_text(encoding="utf-8")
+    )
+    if saved.fusion.state is None or saved.review_evidence_ranking is None:
+        raise RuntimeError("saved result has no state or evidence ranking")
+    answer = build_recommendation_answer_synthesizer().synthesize(
+        query_text=_QUERY,
+        state=saved.fusion.state,
+        ranking=saved.review_evidence_ranking,
+    )
+    return saved.model_copy(update={"answer": answer}, deep=True)
+
+
+def _save_and_print(result: RecommendationTurnResult) -> None:
+    """统一保存完整结果，并向终端打印便于人工核对的紧凑摘要。"""
 
     _OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     _OUTPUT.write_text(
@@ -91,6 +115,16 @@ def main() -> None:
     if result.answer is not None:
         print(f"answer_status={result.answer.status}")
         print(result.answer.text or result.answer.failure_reason)
+
+
+def main(argv: list[str] | None = None) -> None:
+    """默认跑完整流程；--answer-only只复用现有Top5重新总结。"""
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--answer-only", action="store_true")
+    args = parser.parse_args(argv)
+    result = _rerun_answer_only() if args.answer_only else _run_full_workflow()
+    _save_and_print(result)
 
 
 if __name__ == "__main__":

@@ -101,3 +101,24 @@ def test_online_fixed_aspect_is_rewritten_with_current_query() -> None:
     assert result.failure_reason is None
     assert result.descriptions[0].kind == "fixed_aspect"
     assert generator.call_count == 1
+
+
+def test_current_long_tail_requirement_is_returned_before_weaker_fixed_aspect() -> None:
+    """当前问题的第一偏好必须先于画像或场景评论，供后续挑证据使用。"""
+
+    generator = _Generator()
+    scene_preference = get_scene_baseline("date").soft_preferences[0].model_copy(
+        update={"priority": 2},
+        deep=True,
+    )
+
+    result = PreferenceDescriptionBuilder(generator).build(
+        [scene_preference],
+        [_open("open.authentic", "要地道的川菜", 1)],
+        query_text="今晚去吃地道川菜",
+    )
+
+    assert [item.requirement_id for item in result.descriptions] == [
+        "open.authentic",
+        scene_preference.key,
+    ]

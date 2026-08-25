@@ -215,4 +215,6 @@ class PreferenceDescriptionBuilder:
                     negative_descriptions=item.negative_descriptions,
                 )
             )
-        return result
+        # 最终评论挑选也会沿用这里的顺序，所以必须让当前问题产生的第一
+        # 优先要求真正排在画像和场景前面，不能只在打分公式里权重大。
+        return sorted(result, key=lambda item: (item.priority, item.requirement_id))
