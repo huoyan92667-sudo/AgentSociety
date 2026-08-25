@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Protocol, Self
 
@@ -20,11 +21,15 @@ from yelp_agent.recommendation_v2.preference_fusion import (
     ProfilePreferenceSet,
     build_preference_fusion,
 )
+from yelp_agent.recommendation_v2.review_evidence import (
+    ReviewEvidenceRanker,
+    ReviewEvidenceRankingResult,
+    build_review_evidence_ranker,
+)
 from yelp_agent.recommendation_v2.schema import UnifiedRecommendationState
 from yelp_agent.recommendation_v2.soft_ranking import (
     PriorityLayeredRanker,
     SoftRankingAttempt,
-    build_priority_layered_ranker,
 )
 from yelp_agent.recommendation_v2.tools import (
     GeographicDistanceResult,
@@ -63,6 +68,7 @@ class RecommendationTurnResult(StrictModel):
     geography: GeographicDistanceResult | None = None
     hard_filter: StructuredHardFilterResult | None = None
     soft_ranking: SoftRankingAttempt | None = None
+    review_evidence_ranking: ReviewEvidenceRankingResult | None = None
 
 
 class RecommendationWorkflow:
@@ -77,6 +83,7 @@ class RecommendationWorkflow:
         hard_filter_tool: StructuredHardFilterTool | None = None,
         baseline_ranking_tool: RatingBaselineRankingTool | None = None,
         soft_ranker: PriorityLayeredRanker | None = None,
+        review_evidence_ranker: ReviewEvidenceRanker | None = None,
     ) -> None:
         self._fusion = fusion
         self._profile_store = profile_store
@@ -85,8 +92,10 @@ class RecommendationWorkflow:
         self._hard_filter_tool = hard_filter_tool
         self._baseline_ranking_tool = baseline_ranking_tool
         self._soft_ranker = soft_ranker
+        self._review_evidence_ranker = review_evidence_ranker
         self._states: dict[tuple[str, str], UnifiedRecommendationState] = {}
         self._history: dict[tuple[str, str], list[ConversationHistoryTurn]] = {}
+        self._reference_times: dict[tuple[str, str], datetime] = {}
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -101,6 +110,8 @@ class RecommendationWorkflow:
         if not self._closed:
             if self._soft_ranker is not None:
                 self._soft_ranker.close()
+            if self._review_evidence_ranker is not None:
+                self._review_evidence_ranker.close()
             self._profile_store.close()
             self._closed = True
 
@@ -117,6 +128,7 @@ class RecommendationWorkflow:
         if previous is None:
             raw_profile, adapted_profile = self._profile_tool.load(request.user_id)
             user_location = self._profile_tool.location(raw_profile)
+            self._reference_times[key] = raw_profile.cutoff_time
 
         turn_index = 1 if previous is None else previous.turn_index + 1
         attempt = self._fusion.fuse(
@@ -135,6 +147,7 @@ class RecommendationWorkflow:
         geography: GeographicDistanceResult | None = None
         hard_filter: StructuredHardFilterResult | None = None
         soft_ranking: SoftRankingAttempt | None = None
+        review_evidence_ranking: ReviewEvidenceRankingResult | None = None
         if attempt.state is not None:
             # 先用统一搜索中心计算距离，再把距离和商家事实交给硬过滤。
             if (
@@ -148,6 +161,18 @@ class RecommendationWorkflow:
                     geography=geography,
                 )
             if (
+                hard_filter is not None
+                and self._review_evidence_ranker is not None
+            ):
+                reference_time = self._reference_times.get(key)
+                if reference_time is None:
+                    raise RuntimeError("review evidence ranking needs a profile cutoff")
+                review_evidence_ranking = self._review_evidence_ranker.rank(
+                    state=attempt.state,
+                    hard_filter=hard_filter,
+                    reference_time=reference_time,
+                )
+            elif (
                 hard_filter is not None
                 and self._baseline_ranking_tool is not None
                 and self._soft_ranker is not None
@@ -175,6 +200,7 @@ class RecommendationWorkflow:
             geography=geography,
             hard_filter=hard_filter,
             soft_ranking=soft_ranking,
+            review_evidence_ranking=review_evidence_ranking,
         )
 
 
@@ -196,6 +222,5 @@ def build_recommendation_workflow(
             business_catalog,
             load_fixed_category_catalog(),
         ),
-        baseline_ranking_tool=RatingBaselineRankingTool(),
-        soft_ranker=build_priority_layered_ranker(),
+        review_evidence_ranker=build_review_evidence_ranker(),
     )

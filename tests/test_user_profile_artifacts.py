@@ -205,6 +205,11 @@ def test_profile_store_reads_only_exact_cutoff_or_bound_task(tmp_path: Path) -> 
     with UserProfileStore(output_root) as store:
         train_profile = store.get("user-1", datetime(2020, 1, 15))
         validation_profile = store.for_task("validation:user-1")
+        latest_profile = store.latest("user-1")
+        bounded_profile = store.latest(
+            "user-1",
+            at_or_before=datetime(2020, 2, 15),
+        )
         with pytest.raises(UserProfileNotFound):
             store.get("user-1", datetime(2020, 2, 15))
 
@@ -212,6 +217,8 @@ def test_profile_store_reads_only_exact_cutoff_or_bound_task(tmp_path: Path) -> 
     assert train_profile.aspect_preferences[0].value == "food_quality"
     assert validation_profile.history_length == 2
     assert validation_profile.cutoff_time == datetime(2020, 3, 1)
+    assert latest_profile.profile_id == validation_profile.profile_id
+    assert bounded_profile.profile_id == train_profile.profile_id
 
 
 def test_history_count_mismatch_leaves_no_partial_artifacts(tmp_path: Path) -> None:

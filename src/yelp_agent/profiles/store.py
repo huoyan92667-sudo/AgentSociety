@@ -184,6 +184,49 @@ class UserProfileStore:
         self._require_open()
         return self._assemble(self._profile_id_for_exact_cutoff(user_id, cutoff_time))
 
+    def latest(
+        self,
+        user_id: str,
+        *,
+        at_or_before: datetime | None = None,
+    ) -> UserProfileV1:
+        """Return the newest known profile for a live request, optionally time-bounded.
+
+        Benchmark code should keep using ``get`` with an exact cutoff.  This method is
+        for the online recommendation entry, where the caller only knows the user.
+        """
+
+        self._require_open()
+        if not user_id or user_id != user_id.strip():
+            raise ValueError("user_id must be nonempty without surrounding whitespace")
+        if at_or_before is not None and not isinstance(at_or_before, datetime):
+            raise TypeError("at_or_before must be a datetime")
+        if at_or_before is None:
+            rows = self._connection.execute(
+                """
+                SELECT profile_id
+                FROM profile_snapshots
+                WHERE user_id = ?
+                ORDER BY cutoff_time DESC, profile_id
+                LIMIT 1
+                """,
+                [user_id],
+            ).fetchall()
+        else:
+            rows = self._connection.execute(
+                """
+                SELECT profile_id
+                FROM profile_snapshots
+                WHERE user_id = ? AND cutoff_time <= ?
+                ORDER BY cutoff_time DESC, profile_id
+                LIMIT 1
+                """,
+                [user_id, at_or_before],
+            ).fetchall()
+        if len(rows) != 1:
+            raise UserProfileNotFound(f"No user profile exists for {user_id!r}")
+        return self._assemble(str(rows[0][0]))
+
     def for_task(self, task_id: str) -> UserProfileV1:
         """Resolve one frozen task mapping without accepting ground truth."""
 
