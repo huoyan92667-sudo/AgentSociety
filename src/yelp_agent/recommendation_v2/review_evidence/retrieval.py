@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+from dataclasses import dataclass
 from datetime import datetime
+from time import perf_counter
 from typing import Protocol
 
 import numpy as np
@@ -17,6 +19,7 @@ from .schema import (
     EvidenceDirection,
     PreferenceSearchDescription,
     QdrantSegmentHit,
+    ReviewRetrievalMetrics,
     ReviewSimilarityCandidate,
 )
 
@@ -29,6 +32,65 @@ class QueryEncoder(Protocol):
     def close(self) -> None: ...
 
 
+class SegmentVectorReader(Protocol):
+    """按 Qdrant 稳定点编号读取本地评论片段向量。"""
+
+    def get_many(self, point_ids: list[int]) -> dict[int, np.ndarray]: ...
+
+    def close(self) -> None: ...
+
+
+@dataclass(slots=True)
+class ReviewRetrievalBatch:
+    """全部偏好的评论候选和本轮可观察性能数据。"""
+
+    by_requirement: dict[str, dict[str, list[ReviewSimilarityCandidate]]]
+    metrics: ReviewRetrievalMetrics
+
+
+@dataclass(slots=True)
+class _SearchPass:
+    """一档检索结果及向量、关键词、融合三段可比较耗时。"""
+
+    results: list[dict[str, list[QdrantSegmentHit]]]
+    wall_latency_ms: float
+    dense_latency_ms: float
+    bm25_latency_ms: float = 0.0
+    fusion_latency_ms: float = 0.0
+    dense_hit_count: int = 0
+    bm25_hit_count: int = 0
+    bm25_only_hit_count: int = 0
+
+
+@dataclass(slots=True)
+class _MergedSegmentCandidate:
+    """同一片段被多条说法命中后，保留它在哪一侧、经哪条路线进入。"""
+
+    hit: QdrantSegmentHit
+    positive_route_score: float = 0.0
+    negative_route_score: float = 0.0
+    positive_dense_match: bool = False
+    negative_dense_match: bool = False
+    positive_bm25_match: bool = False
+    negative_bm25_match: bool = False
+
+    def add(self, hit: QdrantSegmentHit, *, side: str) -> None:
+        if hit.route_similarity > self.hit.route_similarity:
+            self.hit = hit
+        if side == "positive":
+            self.positive_route_score = max(
+                self.positive_route_score, hit.route_similarity
+            )
+            self.positive_dense_match |= hit.dense_rank is not None
+            self.positive_bm25_match |= hit.bm25_rank is not None
+        else:
+            self.negative_route_score = max(
+                self.negative_route_score, hit.route_similarity
+            )
+            self.negative_dense_match |= hit.dense_rank is not None
+            self.negative_bm25_match |= hit.bm25_rank is not None
+
+
 class ReviewEvidenceRetriever:
     """每家先各取正反候选，再按 P、N 差值直接判定方向。"""
 
@@ -37,30 +99,52 @@ class ReviewEvidenceRetriever:
         *,
         store: QdrantReviewSegmentStore,
         encoder: QueryEncoder,
+        segment_vectors: SegmentVectorReader,
         full_reviews: FullReviewStore,
         recall_threshold: float = 0.55,
         acceptance_threshold: float = 0.60,
         direction_margin: float = 0.05,
         recall_each_side: int = 15,
-        segment_group_size: int = 60,
+        initial_segment_group_size: int = 15,
+        middle_segment_group_size: int = 30,
+        final_segment_group_size: int = 60,
+        minimum_clear_evidence: int = 5,
+        search_concurrency: int = 4,
+        enable_bm25: bool = False,
+        rrf_k: int = 60,
     ) -> None:
         if not -1 <= recall_threshold <= acceptance_threshold <= 1:
             raise ValueError("review similarity thresholds are invalid")
         if not 0 <= direction_margin <= 2:
             raise ValueError("direction margin is invalid")
-        if recall_each_side < 1 or segment_group_size < recall_each_side:
+        if (
+            recall_each_side < 1
+            or initial_segment_group_size < recall_each_side
+            or middle_segment_group_size < initial_segment_group_size
+            or final_segment_group_size < middle_segment_group_size
+        ):
             raise ValueError("review recall limits are invalid")
+        if minimum_clear_evidence < 1 or search_concurrency < 1 or rrf_k < 1:
+            raise ValueError("review retrieval controls must be positive")
         self._store = store
         self._encoder = encoder
+        self._segment_vectors = segment_vectors
         self._full_reviews = full_reviews
         self.recall_threshold = recall_threshold
         self.acceptance_threshold = acceptance_threshold
         self.direction_margin = direction_margin
         self._recall_each_side = recall_each_side
-        self._segment_group_size = segment_group_size
+        self._initial_segment_group_size = initial_segment_group_size
+        self._middle_segment_group_size = middle_segment_group_size
+        self._final_segment_group_size = final_segment_group_size
+        self._minimum_clear_evidence = minimum_clear_evidence
+        self._search_concurrency = search_concurrency
+        self._enable_bm25 = enable_bm25
+        self._rrf_k = rrf_k
 
     def close(self) -> None:
         self._full_reviews.close()
+        self._segment_vectors.close()
         self._encoder.close()
         self._store.close()
 
@@ -71,69 +155,409 @@ class ReviewEvidenceRetriever:
         *,
         cutoff_time: datetime | None = None,
     ) -> dict[str, list[ReviewSimilarityCandidate]]:
-        """返回每家最多30条去重评论，模糊项仍保留计数但不参与证据分。"""
+        """兼容单条要求调用；在线排序会使用一次处理全部要求的入口。"""
 
-        if not business_ids:
-            return {}
-        descriptions = [
-            *requirement.positive_descriptions,
-            *requirement.negative_descriptions,
-        ]
-        encoded = self._encoder.encode(descriptions, input_type="query")
-        query_vectors = _normalize_matrix(np.asarray(encoded.vectors, dtype=np.float32))
-        positive_count = len(requirement.positive_descriptions)
-        positive_vectors = query_vectors[:positive_count]
-        negative_vectors = query_vectors[positive_count:]
+        batch = self.retrieve_many(
+            [requirement],
+            business_ids,
+            cutoff_time=cutoff_time,
+        )
+        return batch.by_requirement.get(requirement.requirement_id, {})
 
-        # 每个说法独立查一次，再合并片段。这样某个具体表达不会被另一个宽泛表达淹没。
-        by_business_segment: dict[str, dict[str, QdrantSegmentHit]] = {
-            business_id: {} for business_id in business_ids
-        }
-        for query_vector in query_vectors:
-            grouped = self._store.search_grouped(
-                query_vector,
+    def retrieve_many(
+        self,
+        requirements: list[PreferenceSearchDescription],
+        business_ids: list[str],
+        *,
+        cutoff_time: datetime | None = None,
+    ) -> ReviewRetrievalBatch:
+        """一次编码并批量检索全部要求，证据确实不足时才扩大召回。"""
+
+        if not requirements or not business_ids:
+            return ReviewRetrievalBatch(
+                by_requirement={item.requirement_id: {} for item in requirements},
+                metrics=ReviewRetrievalMetrics(),
+            )
+
+        descriptions: list[str] = []
+        requirement_slices: dict[str, tuple[int, int, int]] = {}
+        for requirement in requirements:
+            start = len(descriptions)
+            descriptions.extend(requirement.positive_descriptions)
+            positive_end = len(descriptions)
+            descriptions.extend(requirement.negative_descriptions)
+            requirement_slices[requirement.requirement_id] = (
+                start,
+                positive_end,
+                len(descriptions),
+            )
+
+        query_vectors, embedding_latency_ms, embedding_batches = self._encode_all(
+            descriptions
+        )
+        first_pass = self._search_many(
+            descriptions,
+            query_vectors,
+            business_ids,
+            cutoff_time=cutoff_time,
+            group_size=self._initial_segment_group_size,
+        )
+        first_results = first_pass.results
+        first_search_ms = first_pass.wall_latency_ms
+
+        segments = self._empty_segment_map(requirements, business_ids)
+        self._merge_search_results(
+            segments,
+            requirements,
+            requirement_slices,
+            first_results,
+        )
+        # Qdrant 只负责找编号和片段事实。这里跨所有偏好统一去重，
+        # 再从本地内存映射文件读取真正参与点积的向量。
+        vectors_by_point: dict[int, np.ndarray] = {}
+        vector_load_ms = self._load_missing_vectors(segments, vectors_by_point)
+        middle_ids = self._businesses_needing_expansion(
+            requirements,
+            business_ids,
+            requirement_slices,
+            query_vectors,
+            segments,
+            first_results,
+            group_size=self._initial_segment_group_size,
+            vectors_by_point=vectors_by_point,
+        )
+
+        middle_search_ms = 0.0
+        middle_hit_count = 0
+        middle_results: list[dict[str, list[QdrantSegmentHit]]] = []
+        middle_pass: _SearchPass | None = None
+        if middle_ids:
+            middle_pass = self._search_many(
+                descriptions,
+                query_vectors,
+                middle_ids,
+                cutoff_time=cutoff_time,
+                group_size=self._middle_segment_group_size,
+            )
+            middle_results = middle_pass.results
+            middle_search_ms = middle_pass.wall_latency_ms
+            middle_hit_count = _search_hit_count(middle_results)
+            self._merge_search_results(
+                segments,
+                requirements,
+                requirement_slices,
+                middle_results,
+            )
+            vector_load_ms += self._load_missing_vectors(segments, vectors_by_point)
+
+        final_ids = (
+            self._businesses_needing_expansion(
+                requirements,
+                middle_ids,
+                requirement_slices,
+                query_vectors,
+                segments,
+                middle_results,
+                group_size=self._middle_segment_group_size,
+                vectors_by_point=vectors_by_point,
+            )
+            if middle_results
+            else []
+        )
+        final_search_ms = 0.0
+        final_hit_count = 0
+        final_pass: _SearchPass | None = None
+        if final_ids:
+            final_pass = self._search_many(
+                descriptions,
+                query_vectors,
+                final_ids,
+                cutoff_time=cutoff_time,
+                group_size=self._final_segment_group_size,
+            )
+            final_results = final_pass.results
+            final_search_ms = final_pass.wall_latency_ms
+            final_hit_count = _search_hit_count(final_results)
+            self._merge_search_results(
+                segments,
+                requirements,
+                requirement_slices,
+                final_results,
+            )
+            vector_load_ms += self._load_missing_vectors(segments, vectors_by_point)
+
+        raw_by_requirement: dict[str, dict[str, list[_ReviewAggregate]]] = {}
+        requested_review_ids: list[str] = []
+        for requirement in requirements:
+            start, positive_end, end = requirement_slices[requirement.requirement_id]
+            positive_vectors = query_vectors[start:positive_end]
+            negative_vectors = query_vectors[positive_end:end]
+            by_business: dict[str, list[_ReviewAggregate]] = {}
+            for business_id in business_ids:
+                aggregates = self._aggregate_reviews(
+                    list(segments[requirement.requirement_id][business_id].values()),
+                    positive_vectors,
+                    negative_vectors,
+                    vectors_by_point,
+                )
+                selected = self._select_each_side(aggregates)
+                by_business[business_id] = selected
+                requested_review_ids.extend(item.review_id for item in selected)
+            raw_by_requirement[requirement.requirement_id] = by_business
+
+        full_review_started = perf_counter()
+        full_texts = self._full_reviews.get_many(requested_review_ids)
+        full_review_ms = (perf_counter() - full_review_started) * 1000
+        output: dict[
+            str, dict[str, list[ReviewSimilarityCandidate]]
+        ] = {}
+        for requirement in requirements:
+            by_business = {}
+            for business_id in business_ids:
+                candidates = [
+                    self._materialize(item, full_texts[item.review_id])
+                    for item in raw_by_requirement[requirement.requirement_id].get(
+                        business_id, []
+                    )
+                ]
+                by_business[business_id] = self._deduplicate_full_reviews(candidates)
+            output[requirement.requirement_id] = by_business
+
+        return ReviewRetrievalBatch(
+            by_requirement=output,
+            metrics=ReviewRetrievalMetrics(
+                query_vector_count=len(query_vectors),
+                query_description_count=len(descriptions),
+                bm25_enabled=self._enable_bm25,
+                embedding_batch_count=embedding_batches,
+                embedding_latency_ms=embedding_latency_ms,
+                dense_route_latency_ms=sum(
+                    item.dense_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_route_latency_ms=sum(
+                    item.bm25_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                rrf_fusion_latency_ms=sum(
+                    item.fusion_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                hybrid_search_wall_latency_ms=sum(
+                    item.wall_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                dense_segment_hit_count=sum(
+                    item.dense_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_segment_hit_count=sum(
+                    item.bm25_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_only_segment_hit_count=sum(
+                    item.bm25_only_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                first_pass_search_latency_ms=first_search_ms,
+                middle_pass_search_latency_ms=middle_search_ms,
+                final_pass_search_latency_ms=final_search_ms,
+                local_vector_load_latency_ms=vector_load_ms,
+                full_review_load_latency_ms=full_review_ms,
+                first_pass_segment_hit_count=_search_hit_count(first_results),
+                middle_pass_segment_hit_count=middle_hit_count,
+                final_pass_segment_hit_count=final_hit_count,
+                middle_pass_business_count=len(middle_ids),
+                final_pass_business_count=len(final_ids),
+                loaded_vector_count=len(vectors_by_point),
+                requirement_segment_relation_count=sum(
+                    len(hits)
+                    for requirement_map in segments.values()
+                    for hits in requirement_map.values()
+                ),
+                unique_segment_count=len(vectors_by_point),
+                full_review_count=len(full_texts),
+            ),
+        )
+
+    def _encode_all(
+        self,
+        descriptions: list[str],
+    ) -> tuple[np.ndarray, float, int]:
+        """按本地模型的批量上限编码，但不再按偏好重复调用。"""
+
+        batch_size = int(getattr(self._encoder, "batch_size", 16))
+        vectors: list[np.ndarray] = []
+        latency_ms = 0.0
+        batch_count = 0
+        for offset in range(0, len(descriptions), batch_size):
+            encoded = self._encoder.encode(
+                descriptions[offset : offset + batch_size],
+                input_type="query",
+            )
+            vectors.extend(np.asarray(item, dtype=np.float32) for item in encoded.vectors)
+            latency_ms += float(getattr(encoded, "latency_ms", 0.0))
+            batch_count += 1
+        return _normalize_matrix(np.asarray(vectors, dtype=np.float32)), latency_ms, batch_count
+
+    def _search_many(
+        self,
+        query_texts: list[str],
+        query_vectors: np.ndarray,
+        business_ids: list[str],
+        *,
+        cutoff_time: datetime | None,
+        group_size: int,
+    ) -> _SearchPass:
+        if self._enable_bm25:
+            hybrid_method = getattr(self._store, "search_hybrid_grouped_many", None)
+            if not callable(hybrid_method):
+                raise RuntimeError("BM25 is enabled but the review store has no hybrid search")
+            hybrid = hybrid_method(
+                query_texts,
+                [vector for vector in query_vectors],
                 business_ids,
                 score_threshold=self.recall_threshold,
                 cutoff_time=cutoff_time,
-                group_size=self._segment_group_size,
+                group_size=group_size,
+                max_concurrency=self._search_concurrency,
+                rrf_k=self._rrf_k,
             )
-            for business_id, hits in grouped.items():
-                for hit in hits:
-                    previous = by_business_segment[business_id].get(hit.segment_id)
-                    if previous is None or hit.route_similarity > previous.route_similarity:
-                        by_business_segment[business_id][hit.segment_id] = hit
-
-        raw_reviews: dict[str, list[_ReviewAggregate]] = {}
-        requested_review_ids: list[str] = []
-        for business_id, hits_by_id in by_business_segment.items():
-            aggregates = self._aggregate_reviews(
-                list(hits_by_id.values()),
-                positive_vectors,
-                negative_vectors,
+            return _SearchPass(
+                results=hybrid.results,
+                wall_latency_ms=hybrid.wall_latency_ms,
+                dense_latency_ms=hybrid.dense_latency_ms,
+                bm25_latency_ms=hybrid.bm25_latency_ms,
+                fusion_latency_ms=hybrid.fusion_latency_ms,
+                dense_hit_count=hybrid.dense_hit_count,
+                bm25_hit_count=hybrid.bm25_hit_count,
+                bm25_only_hit_count=hybrid.bm25_only_hit_count,
             )
-            selected = self._select_each_side(aggregates)
-            raw_reviews[business_id] = selected
-            requested_review_ids.extend(item.review_id for item in selected)
 
-        full_texts = self._full_reviews.get_many(requested_review_ids)
-        output: dict[str, list[ReviewSimilarityCandidate]] = {}
-        for business_id in business_ids:
-            candidates = [
-                self._materialize(item, full_texts[item.review_id])
-                for item in raw_reviews.get(business_id, [])
+        started = perf_counter()
+        method = getattr(self._store, "search_grouped_many", None)
+        if callable(method):
+            results = method(
+                [vector for vector in query_vectors],
+                business_ids,
+                score_threshold=self.recall_threshold,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+                max_concurrency=self._search_concurrency,
+            )
+        else:
+            # 小型测试替身和旧调用方仍可以只实现单次查询接口。
+            results = [
+                self._store.search_grouped(
+                    vector,
+                    business_ids,
+                    score_threshold=self.recall_threshold,
+                    cutoff_time=cutoff_time,
+                    group_size=group_size,
+                )
+                for vector in query_vectors
             ]
-            output[business_id] = self._deduplicate_full_reviews(candidates)
-        return output
+        elapsed = (perf_counter() - started) * 1000
+        return _SearchPass(
+            results=results,
+            wall_latency_ms=elapsed,
+            dense_latency_ms=elapsed,
+            dense_hit_count=_search_hit_count(results),
+        )
+
+    @staticmethod
+    def _empty_segment_map(
+        requirements: list[PreferenceSearchDescription],
+        business_ids: list[str],
+    ) -> dict[str, dict[str, dict[str, _MergedSegmentCandidate]]]:
+        return {
+            requirement.requirement_id: {
+                business_id: {} for business_id in business_ids
+            }
+            for requirement in requirements
+        }
+
+    @staticmethod
+    def _merge_search_results(
+        target: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
+        requirements: list[PreferenceSearchDescription],
+        requirement_slices: dict[str, tuple[int, int, int]],
+        search_results: list[dict[str, list[QdrantSegmentHit]]],
+    ) -> None:
+        for requirement in requirements:
+            start, positive_end, end = requirement_slices[requirement.requirement_id]
+            for query_index, grouped in enumerate(
+                search_results[start:end], start=start
+            ):
+                side = "positive" if query_index < positive_end else "negative"
+                for business_id, hits in grouped.items():
+                    destination = target[requirement.requirement_id].get(business_id)
+                    if destination is None:
+                        continue
+                    for hit in hits:
+                        merged = destination.get(hit.segment_id)
+                        if merged is None:
+                            merged = _MergedSegmentCandidate(hit=hit)
+                            destination[hit.segment_id] = merged
+                        merged.add(hit, side=side)
+
+    def _businesses_needing_expansion(
+        self,
+        requirements: list[PreferenceSearchDescription],
+        business_ids: list[str],
+        requirement_slices: dict[str, tuple[int, int, int]],
+        query_vectors: np.ndarray,
+        segments: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
+        current_results: list[dict[str, list[QdrantSegmentHit]]],
+        *,
+        group_size: int,
+        vectors_by_point: dict[int, np.ndarray],
+    ) -> list[str]:
+        """只有当前一档截满且明确证据不足的商家才进入下一档。"""
+
+        needed: set[str] = set()
+        for requirement in requirements:
+            start, positive_end, end = requirement_slices[requirement.requirement_id]
+            for business_id in business_ids:
+                hit_limit_reached = any(
+                    len(grouped.get(business_id, []))
+                    >= group_size
+                    for grouped in current_results[start:end]
+                )
+                if not hit_limit_reached:
+                    continue
+                aggregates = self._aggregate_reviews(
+                    list(segments[requirement.requirement_id][business_id].values()),
+                    query_vectors[start:positive_end],
+                    query_vectors[positive_end:end],
+                    vectors_by_point,
+                )
+                clear_count = sum(
+                    self._direction(item.positive, item.negative) != "ambiguous"
+                    for item in aggregates
+                )
+                if clear_count < self._minimum_clear_evidence:
+                    needed.add(business_id)
+        return [business_id for business_id in business_ids if business_id in needed]
 
     def _aggregate_reviews(
         self,
-        hits: list[QdrantSegmentHit],
+        hits: list[_MergedSegmentCandidate],
         positive_vectors: np.ndarray,
         negative_vectors: np.ndarray,
+        vectors_by_point: dict[int, np.ndarray],
     ) -> list[_ReviewAggregate]:
         by_review: dict[str, _ReviewAggregate] = {}
-        for hit in hits:
-            vector = np.asarray(hit.vector, dtype=np.float32)
+        for merged in hits:
+            hit = merged.hit
+            vector = np.asarray(vectors_by_point[hit.point_id], dtype=np.float32)
             vector /= max(float(np.linalg.norm(vector)), 1e-12)
             positive = float((positive_vectors @ vector).max())
             negative = float((negative_vectors @ vector).max())
@@ -141,20 +565,71 @@ class ReviewEvidenceRetriever:
             if aggregate is None:
                 aggregate = _ReviewAggregate(hit)
                 by_review[hit.review_id] = aggregate
-            aggregate.add(hit, positive=positive, negative=negative)
+            aggregate.add(
+                hit,
+                positive=positive,
+                negative=negative,
+                positive_route_score=merged.positive_route_score,
+                negative_route_score=merged.negative_route_score,
+                positive_dense_match=merged.positive_dense_match,
+                negative_dense_match=merged.negative_dense_match,
+                positive_bm25_match=merged.positive_bm25_match,
+                negative_bm25_match=merged.negative_bm25_match,
+            )
         return list(by_review.values())
+
+    def _load_missing_vectors(
+        self,
+        segments: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
+        destination: dict[int, np.ndarray],
+    ) -> float:
+        """跨偏好、正反说法和商家统一去重后，再从本地文件读取。"""
+
+        point_ids = [
+            merged.hit.point_id
+            for requirement_map in segments.values()
+            for business_map in requirement_map.values()
+            for merged in business_map.values()
+            if merged.hit.point_id not in destination
+        ]
+        unique_ids = list(dict.fromkeys(point_ids))
+        if not unique_ids:
+            return 0.0
+        started = perf_counter()
+        destination.update(self._segment_vectors.get_many(unique_ids))
+        return (perf_counter() - started) * 1000
 
     def _select_each_side(
         self,
         aggregates: list[_ReviewAggregate],
     ) -> list[_ReviewAggregate]:
         positive = sorted(
-            (item for item in aggregates if item.positive >= self.recall_threshold),
-            key=lambda item: (-item.positive, -item.useful, item.review_id),
+            (
+                item
+                for item in aggregates
+                if item.positive >= self.recall_threshold
+                or item.positive_bm25_match
+            ),
+            key=lambda item: (
+                -item.positive_route_score,
+                -item.positive,
+                -item.useful,
+                item.review_id,
+            ),
         )[: self._recall_each_side]
         negative = sorted(
-            (item for item in aggregates if item.negative >= self.recall_threshold),
-            key=lambda item: (-item.negative, -item.useful, item.review_id),
+            (
+                item
+                for item in aggregates
+                if item.negative >= self.recall_threshold
+                or item.negative_bm25_match
+            ),
+            key=lambda item: (
+                -item.negative_route_score,
+                -item.negative,
+                -item.useful,
+                item.review_id,
+            ),
         )[: self._recall_each_side]
         selected = {item.review_id: item for item in positive}
         selected.update({item.review_id: item for item in negative})
@@ -178,6 +653,12 @@ class ReviewEvidenceRetriever:
             matched_segment_text=item.best_hit.segment_text,
             positive_similarity=item.positive,
             negative_similarity=item.negative,
+            positive_retrieval_score=item.positive_route_score,
+            negative_retrieval_score=item.negative_route_score,
+            positive_dense_match=item.positive_dense_match,
+            negative_dense_match=item.negative_dense_match,
+            positive_bm25_match=item.positive_bm25_match,
+            negative_bm25_match=item.negative_bm25_match,
             direction=self._direction(item.positive, item.negative),
         )
 
@@ -238,12 +719,40 @@ class _ReviewAggregate:
         self.review_text_sha256 = hit.review_text_sha256
         self.positive = -1.0
         self.negative = -1.0
+        self.positive_route_score = 0.0
+        self.negative_route_score = 0.0
+        self.positive_dense_match = False
+        self.negative_dense_match = False
+        self.positive_bm25_match = False
+        self.negative_bm25_match = False
         self.best_hit = hit
         self._best_similarity = -1.0
 
-    def add(self, hit: QdrantSegmentHit, *, positive: float, negative: float) -> None:
+    def add(
+        self,
+        hit: QdrantSegmentHit,
+        *,
+        positive: float,
+        negative: float,
+        positive_route_score: float,
+        negative_route_score: float,
+        positive_dense_match: bool,
+        negative_dense_match: bool,
+        positive_bm25_match: bool,
+        negative_bm25_match: bool,
+    ) -> None:
         self.positive = max(self.positive, positive)
         self.negative = max(self.negative, negative)
+        self.positive_route_score = max(
+            self.positive_route_score, positive_route_score
+        )
+        self.negative_route_score = max(
+            self.negative_route_score, negative_route_score
+        )
+        self.positive_dense_match |= positive_dense_match
+        self.negative_dense_match |= negative_dense_match
+        self.positive_bm25_match |= positive_bm25_match
+        self.negative_bm25_match |= negative_bm25_match
         best = max(positive, negative)
         if best > self._best_similarity:
             self._best_similarity = best
@@ -253,3 +762,11 @@ class _ReviewAggregate:
 def _normalize_matrix(values: np.ndarray) -> np.ndarray:
     norms = np.linalg.norm(values, axis=1, keepdims=True)
     return values / np.maximum(norms, 1e-12)
+
+
+def _search_hit_count(
+    results: list[dict[str, list[QdrantSegmentHit]]],
+) -> int:
+    """统计查询返回关系数；同一片段被不同说法命中会分别计数。"""
+
+    return sum(len(hits) for grouped in results for hits in grouped.values())

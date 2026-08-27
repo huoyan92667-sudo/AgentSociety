@@ -8,9 +8,10 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from functools import lru_cache
 from typing import Literal, Protocol, Self, cast
 
-from pydantic import Field, ValidationError, model_validator
+from pydantic import Field, ValidationError, field_validator, model_validator
 
 from yelp_agent.agent.llm import LLMCallResult, LLMMessage
 from yelp_agent.models import StrictModel
@@ -18,9 +19,18 @@ from yelp_agent.recommendation_v2.business_facts import (
     CATALOG_TIME_ZONE,
     catalog_local_time,
 )
-from yelp_agent.recommendation_v2.category_catalog import load_fixed_category_catalog
+from yelp_agent.recommendation_v2.category_catalog import (
+    CategoryCandidateSearch,
+    load_fixed_category_catalog,
+)
 from yelp_agent.recommendation_v2.preference_fusion.profile_adapter import (
     ProfilePreferenceSet,
+)
+from yelp_agent.recommendation_v2.review_evidence.schema import (
+    PreferenceSearchDescription,
+)
+from yelp_agent.recommendation_v2.review_features.definitions import (
+    preference_semantic_anchors,
 )
 from yelp_agent.recommendation_v2.schema import (
     ASPECT_FIELDS,
@@ -61,7 +71,7 @@ from yelp_agent.recommendation_v2.tools.history_business import (
     HistoryFactQuery,
 )
 
-PROMPT_VERSION = "recommendation-v2-compact-tool-fusion-v1"
+PROMPT_VERSION = "recommendation-v2-retrieved-category-fusion-v2"
 MAX_TOOL_CALLS = 4
 
 _SOURCE_PRIORITY: dict[SourceKind, int] = {
@@ -86,6 +96,13 @@ _BOOLEAN_FIELDS: set[RequirementField] = {
     "wheelchair_accessible",
     "dogs_allowed",
     "parking_available",
+}
+# 只有这三种评论语义会被“牛排、川菜、某道菜”等当前对象明显改变。
+# 安静、停车、服务等商家整体特征继续使用离线固定说法，无需模型重复抄写。
+_CONTEXTUAL_REVIEW_FIELDS: set[RequirementField] = {
+    "food_quality",
+    "portion_size",
+    "spiciness",
 }
 
 type SemanticRelation = Literal["same", "conflict", "shadow", "independent"]
@@ -228,6 +245,50 @@ class CompactOpenRequirement(StrictModel):
         return self
 
 
+class CompactReviewSearchPlan(StrictModel):
+    """融合模型顺手生成的英文正反评论检索说法。"""
+
+    kind: Literal["fixed_aspect", "long_tail"]
+    plan_id: str | None = Field(default=None, min_length=1, max_length=200)
+    field: RequirementField | None = None
+    direction: PreferenceDirection | None = None
+    target_value: RequirementValue | None = None
+    requirement_text: str | None = Field(default=None, min_length=1, max_length=500)
+    behavior: Literal["must_have", "prefer", "avoid"] | None = None
+    positive_descriptions: list[str] = Field(min_length=2, max_length=2)
+    negative_descriptions: list[str] = Field(min_length=2, max_length=2)
+
+    @field_validator("positive_descriptions", "negative_descriptions")
+    @classmethod
+    def validate_descriptions(cls, values: list[str]) -> list[str]:
+        cleaned = [item.strip() for item in values]
+        if any(not item for item in cleaned) or len(cleaned) != len(set(cleaned)):
+            raise ValueError("review search descriptions must be nonempty and unique")
+        return cleaned
+
+    @model_validator(mode="after")
+    def validate_target(self) -> Self:
+        if self.kind == "fixed_aspect":
+            if (
+                self.plan_id is None
+                or self.field not in ASPECT_FIELDS
+                or self.direction is None
+                or self.requirement_text is not None
+                or self.behavior is not None
+            ):
+                raise ValueError("fixed review plan requires only aspect semantics")
+        elif (
+            self.plan_id is not None
+            or self.field is not None
+            or self.direction is not None
+            or self.target_value is not None
+            or self.requirement_text is None
+            or self.behavior is None
+        ):
+            raise ValueError("long-tail review plan requires text and behavior")
+        return self
+
+
 class PreferenceFusionProposal(StrictModel):
     """大模型最终只输出当前仍然有效的对话需求。"""
 
@@ -244,6 +305,10 @@ class PreferenceFusionProposal(StrictModel):
     open_requirements: list[CompactOpenRequirement] = Field(
         default_factory=list,
         max_length=30,
+    )
+    review_search_plans: list[CompactReviewSearchPlan] = Field(
+        default_factory=list,
+        max_length=100,
     )
 
     @model_validator(mode="after")
@@ -335,6 +400,10 @@ class PreferenceFusionAttempt(StrictModel):
     status: Literal["success", "provider_failure", "invalid_output"]
     raw_json: str | None = Field(default=None, max_length=100000)
     state: UnifiedRecommendationState | None = None
+    review_search_descriptions: list[PreferenceSearchDescription] = Field(
+        default_factory=list,
+        max_length=100,
+    )
     failure_reason: str | None = Field(default=None, max_length=500)
     model: str | None = None
     latency_ms: float = Field(ge=0)
@@ -433,6 +502,10 @@ class PreferenceFusion:
         try:
             _validate_model_understanding(request, result.proposal, result.facts)
             state = _materialize_state(request, result.proposal, result.facts)
+            review_descriptions = _materialize_review_search_descriptions(
+                state,
+                result.proposal.review_search_plans,
+            )
         except (TypeError, ValueError, ValidationError) as exc:
             return PreferenceFusionAttempt(
                 status="invalid_output",
@@ -449,6 +522,7 @@ class PreferenceFusion:
             status="success",
             raw_json=result.raw_json,
             state=state,
+            review_search_descriptions=review_descriptions,
             model=result.model,
             latency_ms=latency_ms,
             input_tokens=result.input_tokens,
@@ -604,64 +678,37 @@ def _messages(
 ) -> list[LLMMessage]:
     """给模型完整语境，但把商家详细事实留给可核验工具查询。"""
 
-    system = """你负责把餐厅推荐的多轮对话整理成“当前仍然有效的对话需求”。
-你会看到本轮用户原话，以及多轮时仍然有效的历史对话需求和历史展示商家。
+    system = """把餐厅多轮对话整理成当前仍有效的需求，只输出严格 JSON，不推荐商家。
 
-最重要的输出边界：
-- hard_constraints、soft_preferences、open_requirements 只能整理本轮用户原话和历史 user_message 中的要求。
-- 场景基准和长期画像由程序在你输出后直接加入并处理冲突，不会交给你抄写。
-- evidence_text 绝对不能取自 scene_baseline、profile_preferences、assistant_message 或程序说明。
-- 你只需要输出识别到的 scene 种类；不要输出该场景自带的默认条件和软偏好。
+边界：
+1. 需求状态只整理本轮 query_text 和历史 user_message；长期画像与场景候选只用于顺手生成评论检索说法，程序随后按固定来源顺序合并它们。
+2. 结合 previous_state 判断新增、替换、放宽、收紧、删除和重新排序；输出完整当前状态，被取消的不要保留。
+3. evidence_text 必须逐字来自对应用户原话，evidence_turn_index 填原话轮次；不得引用助手回答、画像或程序说明。
+4. 软偏好 priority 从1连续排列，不填强度。“最重要、其次、先……再……”必须反映真实顺序。
+5. 同一次输出 review_search_plans，不再另调一次模型。只处理 required_fixed_review_plans、你新输出的菜品质量/分量/辣度偏好、prefer/avoid 开放要求，以及确实能由评论查证的 must_have 开放要求；需要历史商家、距离或其他工具才能处理的 must_have 不要生成评论计划。其他固定特征由程序读取离线说法，不要重复生成。硬条件及距离、价格、评分等结构化偏好不要生成。
+6. 每个检索计划恰好给2条英文正向说法和2条英文反向说法。同一方向两条有固定分工：第一条写评论可能给出的直接总体结论；第二条必须写可观察原因或表现，例如原料、做法、味道、熟度、花椒麻感、偏甜偏淡、说话是否要提高声音，不能再次用抽象近义词重复第一条。反向第一条写直接否定结论，第二条写具体失败表现，不能只在正向前添加not/no。正向表示满足，反向表示违反；结合 query_text 中的具体菜品，例如牛排+菜品质量应写牛排肉质、味道或熟度。环境、停车、服务等整体特征不必生硬绑定菜名。
+7. required_fixed_review_plans 是必须完成的平面清单。review_search_plans 必须逐条复制其中的 plan_id、field、direction、target_value并填写正反英文说法，一个都不能漏。你新输出的菜品质量、分量或辣度偏好如果不在清单中也要添加；其余固定特征不要添加。每条 prefer/avoid 和每条能由评论查证的 must_have 开放要求要添加长尾计划，并原样复制 behavior。
 
-你的职责：
-1. 理解用户是在新增、修改、放宽、收紧、删除还是重新排序要求。
-2. 最终只输出当前仍有效的对话场景、硬条件、软偏好和未结构化要求；被取消的不要输出。
-3. 软偏好只填写先后顺序，不填写强度。用户同一句话明确说“最重要、其次、先……再……”时，priority 必须体现这个顺序。
-4. 不复制场景默认值、画像偏好、编号、单位、数据库字段名或来源名称，程序会统一补齐。
-5. 不推荐商家，不生成商家分数，不猜商家事实。
+常用归类：
+- 明确想吃或排除某类餐饮：category 硬条件，目标只能从 category_candidates 原样选择；想吃用 any_of，不要用 none_of。候选只是检索结果，必须结合否定和上下文判断，不能见到候选就自动采用。
+- 明确数值上限/下限、商家编号、真假属性和到店营业：硬条件。
+- 近一点、安静、辣度、价格档位左右等用于排序：软偏好。
+- 地道、正宗等现有字段无法表达的要求：开放要求。
+- 用户说地点时填写搜索中心和合理半径；用户没说新地点则为 null，程序沿用旧地点或定位。
+- 用户明确说到店时间时生成 open_at 等于目录时区 ISO 时间；没说时不要生成，程序使用请求时刻。
 
-地点和到店时间：
-- 用户说出城市、区域、商圈、地标或详细地址时，填写 search_center。latitude/longitude 是该地点的大致中心；radius_km 是这个地点合理的附近范围。社区或商圈一般使用1到3公里，城市级地点可以更大。
-- search_center 只取自用户地点原话。用户没说新地点时保持 null，程序会沿用上一轮地点或用户定位。
-- 用户明确说“今天晚上九点、周六中午、现在”等到店时间时，输出 hard_constraints：field=open_at、operator=equals、value 为目录当地时区的 ISO 日期时间，例如 2026-08-25T21:00:00。
-- 用户没有说到店时间时不要输出 open_at；程序会自动使用请求发生时刻。
+历史指代：
+- 用户说“第几家、那家”等且形成需求需要真实距离或属性时，按 available_tool 的格式查询；没有可见历史商家时不得调用。
+- 工具返回的 fact_id 放进 supporting_fact_ids；查不到不能猜。
 
-怎样把常见原话放入现有字段：
-- “想吃川菜/日料”等菜系要求：hard_constraints，field=category，operator=any_of，value 使用数据库类别名称列表。对话中的菜系决定候选范围，不允许放进 soft_preferences。
-- “辣一点/清淡一点”：field=spiciness，direction=higher/lower。
-- “安静/别太吵”：field=quiet_environment，direction=higher。
-- “近一点”：field=distance_km，direction=lower。
-- “五公里以内”：hard_constraints，field=distance_km，operator=less_than_or_equal，value=5。
-- “今晚九点还营业”：hard_constraints，field=open_at，operator=equals，value 使用 ISO 日期时间字符串。
-- “价格二档左右”：soft_preferences，field=price_level，direction=closer_to，target_value=2。
-- “地道、正宗、本地人才会去”等无法由现有14种特征直接表达的要求：open_requirements，behavior=prefer，保留用户原话供评论检索。
-- 只有现有硬条件字段和软偏好字段确实无法表达时，才放 open_requirements；不要把川菜、辣度、安静、距离、价格放进开放要求。
-
-顺序和开放要求格式：
-- soft_preferences 的 priority 必须从1开始、不能重复、不能跳号。“最重要”必须排在其他软偏好前面。
-- open_requirements 中 behavior=must_have 时 priority 必须是 null；behavior=prefer 或 avoid 时 priority 必须是数字。
-
-必须遵守的排序例子：
-- 用户说“想吃川菜，辣一点，安静最重要”，category 必须成为硬条件；软排序中 quiet_environment priority=1，spiciness priority=2。不能把菜系混入软排序，也不能按词语出现顺序把安静排到后面。
-- 用户说“先保证安静，在安静程度相近时再选距离近的”，正确顺序是 quiet_environment priority=1，distance_km priority=2。
-- 类别目标只能从 allowed_dining_categories 原样复制，例如川菜选择 ["Szechuan"]、日料选择 ["Japanese"]，不要填写中文类别名，也不要自己翻译或创造类别。
-
-历史商家事实查询：
-- 当用户用“第几家、那家、上一家、和某家一样”等指代，而且你需要距离、价格、类别、位置或评论特征才能形成要求时，先输出 lookup_history_business 工具调用。
-- 只有 available_tool 不为 null，并且 visible history 中确实列出了用户所指的历史商家时才能调用。没有历史展示商家，或者用户没有指代某家商家时，绝对不要调用。
-- 由你根据语义决定是否调用、查哪一轮哪一家、需要哪些字段。程序不会匹配任何固定句式。
-- 调用时 position 和 business_id 必须且只能填写一个非 null 值：用户说“第几家”就填写 position；明确商家编号时才填写 business_id。
-- 工具调用格式严格遵守 tool_call_schema。
-- 使用工具事实形成要求时，把返回的 fact_id 放进 supporting_fact_ids。不得编造 fact_id。
-- 找不到事实时，不要猜数值；可以把仍然有效但无法结构化的原话放进 open_requirements。
-- 需要查询历史商家的地址、评分、评论数、预订、外卖、停车或营业时间等完整属性时，先用历史工具确认商家编号，再调用 lookup_business_facts。只能查询 visible history 中出现的商家编号。
-
-证据规则：
-- evidence_text 必须逐字取自对应轮次的用户原话。
-- evidence_turn_index 等于当前轮表示本轮明确要求；更早轮表示仍然有效的会话要求。
-- 最终输出是完整的当前对话状态，不是只输出本轮变化。
-
-直接输出一个 JSON 对象。需要查询时只输出工具调用；信息齐全时只输出 final_output_schema 对应的精简需求，不要解释或输出思考过程。"""
+格式：需要工具时只输出工具调用；信息齐全时严格按 output_contract 输出，不要解释。"""
+    candidates = [
+        item.model_payload()
+        for item in _category_candidate_search().search(
+            request.query_text,
+            limit=5,
+        )
+    ]
     payload = {
         "turn_index": request.turn_index,
         "query_text": request.query_text,
@@ -676,10 +723,11 @@ def _messages(
             request,
             enabled=business_tool_available,
         ),
-        "allowed_dining_categories": list(
-            load_fixed_category_catalog().model_options()
+        "category_candidates": candidates,
+        "required_fixed_review_plans": _visible_persistent_review_candidates(
+            request
         ),
-        "final_output_schema": PreferenceFusionProposal.model_json_schema(),
+        "output_contract": _OUTPUT_CONTRACT,
     }
     return [
         LLMMessage(role="system", content=system),
@@ -688,6 +736,95 @@ def _messages(
             content=json.dumps(payload, ensure_ascii=False, sort_keys=True),
         ),
     ]
+
+
+_OUTPUT_CONTRACT = {
+    "scene": "null或{kind,custom_label:null|string,evidence_text,evidence_turn_index}",
+    "search_center": (
+        "null或{label,latitude,longitude,radius_km,evidence_text,evidence_turn_index}"
+    ),
+    "hard_constraints": (
+        "[{field,operator,value,evidence_text,evidence_turn_index,"
+        "supporting_fact_ids:[]}]"
+    ),
+    "soft_preferences": (
+        "[{field,direction,target_value:null|值,priority,evidence_text,"
+        "evidence_turn_index,supporting_fact_ids:[]}]"
+    ),
+    "open_requirements": (
+        "[{text,behavior:must_have|prefer|avoid,priority:null|整数,"
+        "evidence_text,evidence_turn_index,supporting_fact_ids:[]}]"
+    ),
+    "review_search_plans": (
+        "[{kind:fixed_aspect,plan_id:复制required_fixed_review_plans中的编号,field,direction,target_value:null|值,"
+        "requirement_text:null,behavior:null,positive_descriptions:[恰好2条英文],"
+        "negative_descriptions:[恰好2条英文]}或"
+        "{kind:long_tail,plan_id:null,field:null,direction:null,target_value:null,"
+        "requirement_text,behavior:must_have|prefer|avoid,positive_descriptions:[恰好2条英文],"
+        "negative_descriptions:[恰好2条英文]}]"
+    ),
+    "hard_fields": (
+        "category|distance_km|price_level|business_id|rating|review_count|"
+        "accepts_reservations|delivery|takeout|outdoor_seating|good_for_kids|"
+        "good_for_groups|wheelchair_accessible|dogs_allowed|parking_available|open_at"
+    ),
+    "hard_operators": (
+        "equals|any_of|all_of|none_of|less_than|less_than_or_equal|"
+        "greater_than|greater_than_or_equal"
+    ),
+    "soft_directions": "higher|lower|closer_to|match|avoid",
+}
+
+
+def _visible_persistent_review_candidates(
+    request: PreferenceFusionRequest,
+) -> list[dict[str, object]]:
+    """只给模型可能生效的评论语义，不发送完整画像记录和场景结构。"""
+
+    def compact(preferences: list[SoftPreference]) -> list[dict[str, object]]:
+        unique: dict[tuple[object, ...], dict[str, object]] = {}
+        for item in preferences:
+            if item.field not in _CONTEXTUAL_REVIEW_FIELDS:
+                continue
+            signature = (
+                item.field,
+                item.direction,
+                json.dumps(item.target_value, ensure_ascii=False, sort_keys=True),
+            )
+            unique[signature] = {
+                "plan_id": _fixed_review_plan_id(item),
+                "field": item.field,
+                "direction": item.direction,
+                "target_value": item.target_value,
+            }
+        return list(unique.values())
+
+    from yelp_agent.recommendation_v2.scenes import SCENE_ORDER, get_scene_baseline
+
+    candidates = list(_profile_requirements(request))
+    for scene in SCENE_ORDER:
+        candidates.extend(get_scene_baseline(scene).soft_preferences)
+    return compact(candidates)
+
+
+def _fixed_review_plan_id(preference: SoftPreference) -> str:
+    """给模型一个只需原样复制的稳定短编号，减少语义对齐负担。"""
+
+    target = json.dumps(
+        preference.target_value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    suffix = hashlib.sha256(target.encode("utf-8")).hexdigest()[:8]
+    return f"fixed.{preference.field}.{preference.direction}.{suffix}"
+
+
+@lru_cache(maxsize=1)
+def _category_candidate_search() -> CategoryCandidateSearch:
+    """固定类别表只建一次本地索引，后续每轮只做毫秒级检索。"""
+
+    return CategoryCandidateSearch(load_fixed_category_catalog())
 
 
 def _history_tool_description(
@@ -1685,6 +1822,97 @@ def _materialize_state(
         preference_memory=_materialize_memory(decisions),
         open_requirements=open_requirements,
         referenced_businesses=_all_business_references(request),
+    )
+
+
+def _materialize_review_search_descriptions(
+    state: UnifiedRecommendationState,
+    plans: list[CompactReviewSearchPlan],
+) -> list[PreferenceSearchDescription]:
+    """四路裁决完成后只保留生效需求的计划，并补齐稳定编号与权重。"""
+
+    fixed_plans = [item for item in plans if item.kind == "fixed_aspect"]
+    long_tail_plans = [item for item in plans if item.kind == "long_tail"]
+    descriptions: list[PreferenceSearchDescription] = []
+    for preference in state.soft_preferences:
+        if preference.field not in ASPECT_FIELDS:
+            continue
+        matching = [
+            item
+            for item in fixed_plans
+            if item.field == preference.field
+            and item.direction == preference.direction
+            and item.target_value == preference.target_value
+        ]
+        if len(matching) > 1:
+            raise ValueError(
+                f"duplicate review plans for aspect {preference.field}"
+            )
+        if matching:
+            positive = matching[0].positive_descriptions
+            negative = matching[0].negative_descriptions
+        else:
+            # 固定14种即使模型漏写也有项目内定义好的安全说法，不能为此
+            # 再发起第二次模型调用，更不能让整轮推荐失败。
+            anchors = preference_semantic_anchors(
+                preference.field,  # type: ignore[arg-type]
+                preference.direction,
+            )
+            positive = anchors.satisfying
+            negative = anchors.contradicting
+        descriptions.append(
+            PreferenceSearchDescription(
+                requirement_id=preference.key,
+                requirement_text=preference.key,
+                kind="fixed_aspect",
+                priority=preference.priority,
+                preference_strength=preference.preference_strength,
+                positive_descriptions=positive,
+                negative_descriptions=negative,
+                preference=preference,
+            )
+        )
+
+    for requirement in state.open_requirements:
+        matching = [
+            item
+            for item in long_tail_plans
+            if item.requirement_text == requirement.text
+            and item.behavior == requirement.behavior
+        ]
+        # “第三家太远但历史里查不到第三家”也会暂存成 must_have 开放
+        # 要求。这类要求不能靠评论回答，没有评论计划时继续留在状态，
+        # 不能为了RAG让整轮融合失败。
+        if requirement.behavior == "must_have" and not matching:
+            continue
+        if len(matching) != 1:
+            raise ValueError(
+                "every active long-tail preference requires exactly one review plan"
+            )
+        strengths = [
+            basis.preference_strength
+            for basis in requirement.sources
+            if basis.preference_strength is not None
+        ]
+        descriptions.append(
+            PreferenceSearchDescription(
+                requirement_id=requirement.key,
+                requirement_text=requirement.text,
+                kind="long_tail",
+                # 无法结构化硬筛的“必须地道”等长尾要求仍然要查评论，
+                # 并作为最高优先证据，不能因为没有软偏好序号掉到最后。
+                priority=requirement.priority or 1,
+                preference_strength=max(
+                    strengths,
+                    default=(100 if requirement.behavior == "must_have" else 75),
+                ),
+                positive_descriptions=matching[0].positive_descriptions,
+                negative_descriptions=matching[0].negative_descriptions,
+            )
+        )
+    return sorted(
+        descriptions,
+        key=lambda item: (item.priority, item.requirement_id),
     )
 
 

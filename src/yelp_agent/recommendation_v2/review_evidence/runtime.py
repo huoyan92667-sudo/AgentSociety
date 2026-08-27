@@ -20,6 +20,7 @@ from .qdrant_store import QdrantReviewSegmentStore
 from .ranker import ReviewEvidenceRanker
 from .retrieval import ReviewEvidenceRetriever
 from .scoring import EvidenceScoringConfig
+from .segment_vectors import ReviewSegmentVectorStore
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _REVIEW_RAG_CONFIG = _PROJECT_ROOT / "configs" / "review_rag.yaml"
@@ -70,15 +71,34 @@ def build_review_evidence_ranker(
     store = QdrantReviewSegmentStore.from_url(
         qdrant_url or os.environ.get("QDRANT_URL", "http://localhost:6333")
     )
+    index_root = (
+        _PROJECT_ROOT
+        / "src"
+        / "yelp_agent"
+        / "recommendation_v2"
+        / "data"
+        / "review_evidence"
+        / "v1"
+        / "index"
+    )
     retriever = ReviewEvidenceRetriever(
         store=store,
         encoder=encoder,
+        segment_vectors=ReviewSegmentVectorStore(
+            index_root / "segment_embeddings.npy"
+        ),
         full_reviews=FullReviewStore(),
         recall_threshold=0.55,
         acceptance_threshold=0.60,
         direction_margin=0.05,
         recall_each_side=15,
-        segment_group_size=60,
+        initial_segment_group_size=15,
+        middle_segment_group_size=30,
+        final_segment_group_size=60,
+        minimum_clear_evidence=5,
+        search_concurrency=4,
+        enable_bm25=True,
+        rrf_k=60,
     )
     return ReviewEvidenceRanker(
         description_builder=PreferenceDescriptionBuilder(generator),

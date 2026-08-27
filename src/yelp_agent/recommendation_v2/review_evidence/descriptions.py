@@ -29,8 +29,8 @@ class DescriptionGenerator(Protocol):
 
 class _SearchDescriptionItem(StrictModel):
     requirement_id: str = Field(min_length=1, max_length=200)
-    positive_descriptions: list[str] = Field(min_length=2, max_length=3)
-    negative_descriptions: list[str] = Field(min_length=2, max_length=3)
+    positive_descriptions: list[str] = Field(min_length=2, max_length=2)
+    negative_descriptions: list[str] = Field(min_length=2, max_length=2)
 
 
 class _SearchDescriptionProposal(StrictModel):
@@ -43,6 +43,7 @@ class DescriptionBuildResult(StrictModel):
     descriptions: list[PreferenceSearchDescription]
     call: LLMCallResult | None = None
     raw_json: str | None = None
+    warning: str | None = Field(default=None, max_length=500)
     failure_reason: str | None = None
 
 
@@ -70,7 +71,7 @@ class PreferenceDescriptionBuilder:
                 open_requirements,
                 key=lambda value: value.priority or 10_000,
             )
-            if item.behavior in {"prefer", "avoid"}
+            if item.behavior in {"must_have", "prefer", "avoid"}
         ]
         # 没有当前问题时保留原来的固定锚点，方便离线工具和旧调用方使用。
         # 在线推荐一定传 query_text，因此固定偏好也会经过一次上下文改写。
@@ -81,20 +82,39 @@ class PreferenceDescriptionBuilder:
             self._messages(query_text or "", fixed, long_tail)
         )
         if call.status != "success" or call.content is None:
+            reason = _short_reason(
+                call.failure_reason or "description_generation_failed"
+            )
+            if fixed and not long_tail:
+                return DescriptionBuildResult(
+                    descriptions=fixed,
+                    call=call,
+                    warning=f"使用固定检索说法：{reason}",
+                )
             return DescriptionBuildResult(
                 descriptions=fixed,
                 call=call,
-                failure_reason=call.failure_reason or "description_generation_failed",
+                failure_reason=reason,
             )
         try:
             proposal = _SearchDescriptionProposal.model_validate_json(call.content)
             expanded = self._validate_and_materialize(fixed, long_tail, proposal)
         except (ValidationError, ValueError) as exc:
+            reason = _short_reason(f"invalid search descriptions: {exc}")
+            # 当前只有固定14种偏好时，大模型改写失败不能让整轮推荐重跑。
+            # 直接使用已经定义好的正反锚点，相关性稍弱但语义和方向可靠。
+            if fixed and not long_tail:
+                return DescriptionBuildResult(
+                    descriptions=fixed,
+                    call=call,
+                    raw_json=call.content,
+                    warning=f"使用固定检索说法：{reason}",
+                )
             return DescriptionBuildResult(
                 descriptions=fixed,
                 call=call,
                 raw_json=call.content,
-                failure_reason=f"invalid search descriptions: {exc}",
+                failure_reason=reason,
             )
         return DescriptionBuildResult(
             descriptions=expanded,
@@ -149,12 +169,12 @@ class PreferenceDescriptionBuilder:
         )
         system = """
 你只负责为英文 Yelp 评论生成语义检索说法，不推荐商家，也不判断评论真假。
-你会同时看到用户当前问题和已经融合好的软偏好。一次处理全部要求，每项输出2到3条英文正向描述和2到3条英文反向描述。
+你会同时看到用户当前问题和已经融合好的软偏好。一次处理全部要求，每项恰好输出2条英文正向描述和2条英文反向描述。
 正向描述表示商家满足用户要求时评论可能表达的意思；反向描述表示商家违反用户要求时评论可能表达的意思。
 若 behavior=avoid，正向描述应表达成功避开该问题，反向描述应表达出现了用户想避开的情况。
 固定特征已经给出基础含义，你不能改变特征方向。当前问题中的具体菜品或菜系会改变特征含义时，应把它写进检索说法。例如用户想吃牛排且特征是菜品质量，应该检索牛排肉质、味道和熟度，而不是宽泛的“所有食物都很好”。
 环境、拥挤、停车、服务等商家整体特征不需要生硬地绑定菜品名称，继续表达餐厅层面的真实含义。
-描述应具体、互补、适合向量检索，不得编造商家、评论或数值。
+同一方向的两条有固定分工：第一条写评论可能给出的直接总体结论；第二条必须写可观察的原因或表现，例如原料、做法、味道、熟度、花椒麻感、偏甜偏淡、说话是否要提高声音，不能再次使用一组抽象近义词重复第一条。两条反向描述也不能只在正向描述前添加not/no：第一条写直接否定结论，第二条写具体失败表现。描述应短而具体，同时适合向量检索和关键词检索，不得编造商家、评论或数值。
 只返回严格 JSON：
 {"items":[{"requirement_id":"原编号","positive_descriptions":["...","..."],"negative_descriptions":["...","..."]}]}
 """.strip()
@@ -209,8 +229,13 @@ class PreferenceDescriptionBuilder:
                     requirement_id=requirement.key,
                     requirement_text=requirement.text,
                     kind="long_tail",
-                    priority=requirement.priority or 100,
-                    preference_strength=max(strengths, default=75),
+                    priority=requirement.priority or 1,
+                    preference_strength=max(
+                        strengths,
+                        default=(
+                            100 if requirement.behavior == "must_have" else 75
+                        ),
+                    ),
                     positive_descriptions=item.positive_descriptions,
                     negative_descriptions=item.negative_descriptions,
                 )
@@ -218,3 +243,10 @@ class PreferenceDescriptionBuilder:
         # 最终评论挑选也会沿用这里的顺序，所以必须让当前问题产生的第一
         # 优先要求真正排在画像和场景前面，不能只在打分公式里权重大。
         return sorted(result, key=lambda item: (item.priority, item.requirement_id))
+
+
+def _short_reason(value: str, maximum: int = 450) -> str:
+    """错误进入统一结果前先限长，避免错误说明本身再次触发校验失败。"""
+
+    cleaned = " ".join(value.split())
+    return cleaned if len(cleaned) <= maximum else cleaned[: maximum - 1] + "…"

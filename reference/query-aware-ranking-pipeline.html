@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Query-aware 推荐链路速查</title>
+  <link rel="stylesheet" href="../assets/teaching.css">
+</head>
+<body><main>
+  <h1>Query-aware 推荐链路速查</h1>
+  <p class="lede">一句话：History 管长期偏好，Query 管眼前需求；先各自找 500 家并全部保住，再让历史模型和当前语义共同粗排，最后只对 30 家做昂贵精排。</p>
+
+  <h2>总流程</h2>
+  <div class="formula">EffectiveSessionRequest → History 五路 Top-500 + Query 四路 Top-500 → 受保护并集 → 硬排除 → 32维 LambdaMART + Query信号 → 粗排 → Top-30 Cross-Encoder → Top-5</div>
+
+  <h2>History 五路</h2>
+  <table>
+    <tr><th>路线</th><th>人话解释</th><th>关键计算</th></tr>
+    <tr><td>Quality</td><td>大家普遍认为好、且评论证据足的店</td><td>0.8×贝叶斯评分 + 0.2×对数人气</td></tr>
+    <tr><td>Category</td><td>用户过去爱去哪些细分类餐厅</td><td>0.7×该类平均评分 + 0.3×访问频率</td></tr>
+    <tr><td>Text</td><td>商家描述像不像用户好评文本，并避开差评文本</td><td>0.5 + 0.5×正向TF-IDF相似度 − 0.5×负向相似度</td></tr>
+    <tr><td>Location</td><td>离用户历史活动中心近不近</td><td>exp(−距离/10km)</td></tr>
+    <tr><td>Item-KNN</td><td>和用户喜欢过的店，经常被相似人群共同喜欢的店</td><td>时点安全共现相似度 + 支持度收缩</td></tr>
+  </table>
+  <p>五路各取最多 500，再用 <code>Σ 1/(60+路线名次)</code> 合成 History Top-500。</p>
+
+  <h2>Query 四路</h2>
+  <table>
+    <tr><th>路线</th><th>人话解释</th><th>注意点</th></tr>
+    <tr><td>Category</td><td>用户现在明确要的菜系</td><td>按目标类别交集比例排序</td></tr>
+    <tr><td>Embedding</td><td>整句话的意思和商家静态文档像不像</td><td>本地 Qwen3 双塔，适合大范围初筛</td></tr>
+    <tr><td>Aspect</td><td>评论证据是否支持“安静、约会、停车”等要求</td><td>未知保持中性，不伪装成不满足</td></tr>
+    <tr><td>Location</td><td>离本次请求位置近不近</td><td>不同于 History 的历史活动中心</td></tr>
+  </table>
+  <p>四路当前权重均为 1，用同样的 RRF 合成 Query Top-500。硬类别、距离、价格和硬 Aspect 在召回前过滤。</p>
+
+  <h2>冻结粗排公式</h2>
+  <div class="formula">QuerySignal = 0.8×Query召回百分位 + 0.2×并集Embedding百分位<br>CoarseScore = 0.5×LambdaMART百分位 + 0.5×QuerySignal</div>
+  <p>LambdaMART 使用最终消融选中的 32 维：13 个基础召回特征、7 个 Item-KNN、7 个用户画像、5 个商家画像。完整池原有 36 维，但删除了 4 个不稳定的任务级 Review-Aspect 匹配特征。</p>
+
+  <h2>Top-30 精排</h2>
+  <div class="formula">SemanticScore = 0.4×Embedding + 0.5×CrossEncoder + 0.1×结构化条件匹配</div>
+  <p>Cross-Encoder 让 Query 和商家信息一起编码，判断更细但更贵，所以只处理粗排前 30。策略还限制最多上移 5 位、下移 3 位，并保护粗排 Top-3，避免一次语义误判颠覆整张榜单。</p>
+
+  <div class="recall"><strong>面试口诀：</strong>五路历史看“你以前是谁”，四路 Query 看“你今天要什么”；并集保证两边不丢人，LambdaMART 做大范围筛选，Cross-Encoder 做小范围精修。</div>
+</main></body>
+</html>

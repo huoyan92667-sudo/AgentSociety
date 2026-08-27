@@ -14,6 +14,8 @@ from yelp_agent.recommendation_v2.preference_fusion import (
     PreferenceFusion,
     PreferenceFusionProposal,
 )
+from yelp_agent.recommendation_v2.review_evidence import ReviewEvidenceRankingResult
+from yelp_agent.recommendation_v2.tools import StructuredHardFilterResult
 from yelp_agent.recommendation_v2.workflow import (
     RecommendationInput,
     RecommendationWorkflow,
@@ -54,6 +56,47 @@ class FakeProfileStore:
 
     def close(self) -> None:
         self.closed = True
+
+
+class FakeHardFilter:
+    def execute(self, *args: object, **kwargs: object) -> StructuredHardFilterResult:
+        return StructuredHardFilterResult(
+            source_business_count=0,
+            candidate_count=0,
+            candidate_business_ids=[],
+            candidates=[],
+            steps=[],
+            generated_sql="SELECT 1 WHERE FALSE",
+            sql_parameters=[],
+        )
+
+
+class CapturingReviewRanker:
+    def __init__(self) -> None:
+        self.reference_times: list[datetime] = []
+
+    def rank(
+        self,
+        *,
+        state: object,
+        hard_filter: StructuredHardFilterResult,
+        reference_time: datetime,
+        prepared_descriptions: object = None,
+    ) -> ReviewEvidenceRankingResult:
+        self.reference_times.append(reference_time)
+        return ReviewEvidenceRankingResult(
+            status="success",
+            hard_filtered_count=hard_filter.candidate_count,
+            recall_threshold=0.55,
+            acceptance_threshold=0.60,
+            direction_margin=0.05,
+            formula="test formula",
+            model_call_count=0,
+            latency_ms=1,
+        )
+
+    def close(self) -> None:
+        pass
 
 
 def _signal(kind: str, value: str, score: float) -> PreferenceSignal:
@@ -223,3 +266,29 @@ def test_explicit_visit_time_replaces_request_time_default() -> None:
         item.field == "open_at"
         for item in result.fusion.state.default_constraints
     )
+
+
+def test_review_retrieval_uses_current_request_time_not_profile_cutoff() -> None:
+    """画像生成时间不能再排除之后产生的真实商家评论。"""
+
+    ranker = CapturingReviewRanker()
+    workflow = RecommendationWorkflow(
+        fusion=PreferenceFusion(FakeGenerator(PreferenceFusionProposal())),
+        profile_store=FakeProfileStore(_real_shape_profile()),
+        hard_filter_tool=FakeHardFilter(),  # type: ignore[arg-type]
+        review_evidence_ranker=ranker,  # type: ignore[arg-type]
+    )
+    request_time = datetime(2026, 8, 26, 12, tzinfo=UTC)
+
+    workflow.process(
+        RecommendationInput(
+            user_id="real-user",
+            session_id="current-review-time",
+            query_text="今天想找一家餐厅",
+            request_time=request_time,
+        )
+    )
+
+    assert _real_shape_profile().cutoff_time != request_time
+    assert ranker.reference_times == [request_time]
+    workflow.close()

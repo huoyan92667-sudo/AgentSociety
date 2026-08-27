@@ -58,6 +58,7 @@ class ReviewEvidenceRanker:
         state: object,
         hard_filter: StructuredHardFilterResult,
         reference_time: datetime,
+        prepared_descriptions: list[PreferenceSearchDescription] | None = None,
     ) -> ReviewEvidenceRankingResult:
         """排序硬筛后的全部商家，不先用评分砍成前十。"""
 
@@ -67,11 +68,24 @@ class ReviewEvidenceRanker:
         if not isinstance(state, UnifiedRecommendationState):
             raise TypeError("state must be a UnifiedRecommendationState")
         started = time.perf_counter()
-        description_result = self._description_builder.build(
-            state.soft_preferences,
-            state.open_requirements,
-            query_text=state.latest_query_text,
-        )
+        description_started = time.perf_counter()
+        if prepared_descriptions is None:
+            # 保留离线工具和旧调用方兼容入口；真实推荐工作流会把融合模型
+            # 同一次生成的检索说法直接传进来，因此在线不再发生第二次调用。
+            description_result = self._description_builder.build(
+                state.soft_preferences,
+                state.open_requirements,
+                query_text=state.latest_query_text,
+            )
+        else:
+            from .descriptions import DescriptionBuildResult
+
+            description_result = DescriptionBuildResult(
+                descriptions=[item.model_copy(deep=True) for item in prepared_descriptions]
+            )
+        description_latency_ms = (
+            time.perf_counter() - description_started
+        ) * 1000
         call = description_result.call
         if description_result.failure_reason is not None:
             return ReviewEvidenceRankingResult(
@@ -86,6 +100,8 @@ class ReviewEvidenceRanker:
                 input_tokens=call.input_tokens if call is not None else None,
                 output_tokens=call.output_tokens if call is not None else None,
                 latency_ms=(time.perf_counter() - started) * 1000,
+                description_latency_ms=description_latency_ms,
+                description_warning=description_result.warning,
                 failure_reason=description_result.failure_reason,
             )
 
@@ -93,13 +109,17 @@ class ReviewEvidenceRanker:
         evidence_by_requirement: dict[
             str, dict[str, BusinessPreferenceEvidence]
         ] = {}
+        retrieval_metrics = None
         try:
+            retrieval = self._retriever.retrieve_many(
+                description_result.descriptions,
+                business_ids,
+                cutoff_time=reference_time,
+            )
+            retrieval_metrics = retrieval.metrics
+            scoring_started = time.perf_counter()
             for requirement in description_result.descriptions:
-                recalled = self._retriever.retrieve(
-                    requirement,
-                    business_ids,
-                    cutoff_time=reference_time,
-                )
+                recalled = retrieval.by_requirement[requirement.requirement_id]
                 evidence_by_requirement[requirement.requirement_id] = {
                     business_id: aggregate_business_evidence(
                         requirement,
@@ -125,6 +145,9 @@ class ReviewEvidenceRanker:
                 input_tokens=call.input_tokens if call is not None else None,
                 output_tokens=call.output_tokens if call is not None else None,
                 latency_ms=(time.perf_counter() - started) * 1000,
+                description_latency_ms=description_latency_ms,
+                description_warning=description_result.warning,
+                retrieval_metrics=retrieval_metrics,
                 failure_reason=f"review retrieval failed: {exc}",
             )
 
@@ -151,6 +174,7 @@ class ReviewEvidenceRanker:
             item.model_copy(update={"final_rank": index})
             for index, item in enumerate(ordered, start=1)
         ]
+        scoring_latency_ms = (time.perf_counter() - scoring_started) * 1000
         return ReviewEvidenceRankingResult(
             status="success",
             hard_filtered_count=hard_filter.candidate_count,
@@ -164,6 +188,10 @@ class ReviewEvidenceRanker:
             input_tokens=call.input_tokens if call is not None else None,
             output_tokens=call.output_tokens if call is not None else None,
             latency_ms=(time.perf_counter() - started) * 1000,
+            description_latency_ms=description_latency_ms,
+            description_warning=description_result.warning,
+            scoring_latency_ms=scoring_latency_ms,
+            retrieval_metrics=retrieval_metrics,
         )
 
     @staticmethod

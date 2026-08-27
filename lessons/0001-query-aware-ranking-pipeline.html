@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>从一句请求到五家餐厅</title>
+  <link rel="stylesheet" href="../assets/teaching.css">
+</head>
+<body><main>
+  <h1>从一句请求到五家餐厅</h1>
+  <p class="lede">目标：能用一个具体例子，讲清 History、Query、受保护并集、LambdaMART 和 Top-30 精排分别干了什么。</p>
+
+  <div class="callout good"><strong>贯穿示例：</strong>“我今天想在市政厅 5 公里内找一家安静、适合约会的牛排馆，别再推荐上次那家。”</div>
+
+  <h2>第一幕：先把话变成可执行请求</h2>
+  <p>系统保留用户原话，同时从会话记忆中取出仍然有效的偏好、硬条件和已拒绝商家，生成 <code>EffectiveSessionRequest</code>。受约束 Router 只从代码给出的合法动作中选出 <code>GET_QUERY_AWARE_RANKING</code>，它不生成商家 ID，也不亲自排序。</p>
+
+  <h2>第二幕：两支搜索队同时出发</h2>
+  <div class="grid">
+    <section class="card history"><h3>History 队</h3><p>不看“今天”这句话，主要根据用户截止当前的历史行为，从 Quality、Category、Text、Location、Item-KNN 五个角度各找最多 500 家，再用名次融合得到 History Top-500。</p></section>
+    <section class="card query"><h3>Query 队</h3><p>围绕“牛排、5公里、安静、约会”搜索当时已经存在的商家。先执行硬过滤，再从 Category、Embedding、Aspect、Location 四个角度各找最多 500 家，融合成 Query Top-500。</p></section>
+  </div>
+
+  <h2>第三幕：不是投票淘汰，而是先把两边都保住</h2>
+  <p>系统取两份 Top-500 的集合并集，最多 1000 家。只在 Query 队出现的店不会因为没有历史匹配而被提前扔掉；只在 History 队出现的店也不会因为一句 Query 表达不完整而消失。Query 路线判定违反硬条件的商家，以及 Session 中已拒绝的商家，会从整个并集中删除，所以 History 不能把违规商家重新带回来。</p>
+
+  <h2>第四幕：LambdaMART 给历史与可靠性打底</h2>
+  <p>冻结的 LambdaMART 对并集里的每家店计算分数。最终线上模型使用 32 维特征，包括召回名次与各路线分数、Item-KNN、用户画像和商家画像。Query-only 商家缺少 History 路线证据时用缺失标记和默认值表示，但仍然可以凭商家画像和后续 Query 信号继续竞争。</p>
+
+  <h2>第五幕：把“过去的你”和“今天的你”合成一张粗排榜</h2>
+  <p>系统还会对完整并集统一计算一次 Embedding，使 History-only 商家也拥有当前 Query 语义分。随后把 LambdaMART 名次、Query 召回名次和 Embedding 名次都变成 0～1 百分位，再按冻结权重融合。</p>
+  <div class="formula">QuerySignal = 0.8×Query召回百分位 + 0.2×Embedding百分位<br>CoarseScore = 0.5×LambdaMART百分位 + 0.5×QuerySignal</div>
+
+  <h2>第六幕：只请昂贵专家复核前 30 家</h2>
+  <p>Embedding 像先分别阅读 Query 和商家资料，再比较两个向量，便宜、适合大范围筛选。Cross-Encoder 则把 Query 和商家资料放在一起逐词判断，更细但更慢。因此系统只把粗排 Top-30 交给 Qwen3-Reranker。</p>
+  <p>精排分数同时考虑 Embedding、Cross-Encoder 和结构化条件证据，并限制名次移动、保护粗排 Top-3。最终保留完整排序，内部取 Top-10，再读取前 5 家详情展示给用户。</p>
+
+  <h2>自测</h2>
+  <ol>
+    <li>为什么这里取并集，而不是交集？</li>
+    <li>History Location 与 Query Location 的中心点分别来自哪里？</li>
+    <li>为什么 Query 召回里做过 Embedding，并集阶段还要再做一次？</li>
+    <li>正确商家如果粗排第 40，Cross-Encoder 能不能把它排进 Top-5？</li>
+  </ol>
+
+  <p>主参考：<a href="../src/yelp_agent/query_aware_ranking/engine.py">QueryAwareRecommendationEngine 源码</a>。速查版见 <a href="../reference/query-aware-ranking-pipeline.html">Query-aware 推荐链路速查</a>。任何一步不清楚，都可以继续让老师用数字例子或代码逐行解释。</p>
+</main></body>
+</html>

@@ -1,0 +1,38 @@
+你正在建立餐饮评论召回测试集，不是在推荐商家。
+
+当前输入中的所有评论都来自硬条件过滤后的真实商家。你必须逐条判断本批中的每一条完整评论，不能只选择少数看起来相关的评论。
+
+判断只能依据 review_text：
+
+- 不得根据商家名称、类别、外部知识或评分推断结论。
+- positive：评论明确支持当前评论需求。
+- negative：评论明确反对当前评论需求，或者明确指出相应风险。
+- mixed：同一评论对当前需求同时提供明确正面和反面证据，或者不同菜品、时间、条件下结论相反。
+- ambiguous：评论提到相关话题，但不足以判断满足还是不满足。
+- irrelevant：评论没有提供与当前评论需求直接相关的信息。
+
+证据程度：
+
+- direct：原文单独展示就能直接支持方向。
+- supporting：原文能够支持方向，但需要结合相邻语境。
+- weak：只是轻微提到，不能作为主要正确答案。
+- none：只允许 ambiguous 和 irrelevant 使用。
+
+证据字段规则：
+
+- positive 必须有 positive_spans，不得有 negative_spans 和 ambiguous_span。
+- negative 必须有 negative_spans，不得有 positive_spans 和 ambiguous_span。
+- mixed 必须同时有 positive_spans 和 negative_spans。
+- ambiguous 只能有 ambiguous_span。
+- irrelevant 的三个证据字段都必须为空。
+- 每段证据必须逐字复制 review_text 中连续出现的原文，不得翻译、改写或总结。
+- 每个方向最多复制两段，每段尽量短，但必须足以看懂判断依据。
+- condition_text 只在评论明确受时间、菜品、区域或其他条件影响时填写，否则为 null。
+
+完整性要求：
+
+1. 输入中的每个 review_id 必须且只能在输出中出现一次。
+2. 不得遗漏，不得重复，不得创造输入之外的编号。
+3. business_id 必须原样返回。
+4. 不得把评论星级当作文字证据。
+5. 只返回规定 JSON，不要添加说明文字。

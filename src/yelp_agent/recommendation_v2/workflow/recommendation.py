@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
+from time import perf_counter
+from collections.abc import Callable
 from typing import Protocol, Self
 
 from pydantic import Field
@@ -80,6 +82,18 @@ class RecommendationInput(StrictModel):
     )
 
 
+class RecommendationWorkflowTiming(StrictModel):
+    """把一轮推荐拆到足以定位性能问题的主要阶段。"""
+
+    profile_load_ms: float = Field(default=0, ge=0)
+    fusion_ms: float = Field(default=0, ge=0)
+    geography_ms: float = Field(default=0, ge=0)
+    hard_filter_ms: float = Field(default=0, ge=0)
+    review_ranking_ms: float = Field(default=0, ge=0)
+    answer_synthesis_ms: float = Field(default=0, ge=0)
+    total_ms: float = Field(default=0, ge=0)
+
+
 class RecommendationTurnResult(StrictModel):
     """保留真实画像、转换结果和最终状态，方便验证完整链路。"""
 
@@ -91,6 +105,7 @@ class RecommendationTurnResult(StrictModel):
     soft_ranking: SoftRankingAttempt | None = None
     review_evidence_ranking: ReviewEvidenceRankingResult | None = None
     answer: RecommendationAnswer | None = None
+    timing: RecommendationWorkflowTiming | None = None
 
 
 class RecommendationWorkflow:
@@ -119,7 +134,6 @@ class RecommendationWorkflow:
         self._answer_synthesizer = answer_synthesizer
         self._states: dict[tuple[str, str], UnifiedRecommendationState] = {}
         self._history: dict[tuple[str, str], list[ConversationHistoryTurn]] = {}
-        self._reference_times: dict[tuple[str, str], datetime] = {}
         self._closed = False
 
     def __enter__(self) -> Self:
@@ -139,11 +153,28 @@ class RecommendationWorkflow:
             self._profile_store.close()
             self._closed = True
 
-    def process(self, request: RecommendationInput) -> RecommendationTurnResult:
+    def restore_state(self, state: UnifiedRecommendationState) -> None:
+        """把数据库中的最新完整状态放回工作流，支持进程重启后继续多轮对话。"""
+
+        if self._closed:
+            raise RuntimeError("recommendation workflow is closed")
+        key = (state.user_id, state.session_id)
+        current = self._states.get(key)
+        if current is None or current.revision <= state.revision:
+            self._states[key] = state.model_copy(deep=True)
+
+    def process(
+        self,
+        request: RecommendationInput,
+        *,
+        on_answer_delta: Callable[[str], None] | None = None,
+    ) -> RecommendationTurnResult:
         """处理一轮问题；调用方不需要知道内部四路数据怎么准备。"""
 
         if self._closed:
             raise RuntimeError("recommendation workflow is closed")
+        total_started = perf_counter()
+        profile_started = perf_counter()
         key = (request.user_id, request.session_id)
         previous = self._states.get(key)
         raw_profile: UserProfileV1 | None = None
@@ -152,9 +183,10 @@ class RecommendationWorkflow:
         if previous is None:
             raw_profile, adapted_profile = self._profile_tool.load(request.user_id)
             user_location = self._profile_tool.location(raw_profile)
-            self._reference_times[key] = raw_profile.cutoff_time
+        profile_load_ms = (perf_counter() - profile_started) * 1000
 
         turn_index = 1 if previous is None else previous.turn_index + 1
+        fusion_started = perf_counter()
         attempt = self._fusion.fuse(
             PreferenceFusionRequest(
                 user_id=request.user_id,
@@ -169,11 +201,16 @@ class RecommendationWorkflow:
                 user_location=user_location,
             )
         )
+        fusion_ms = (perf_counter() - fusion_started) * 1000
         geography: GeographicDistanceResult | None = None
         hard_filter: StructuredHardFilterResult | None = None
         soft_ranking: SoftRankingAttempt | None = None
         review_evidence_ranking: ReviewEvidenceRankingResult | None = None
         answer: RecommendationAnswer | None = None
+        geography_ms = 0.0
+        hard_filter_ms = 0.0
+        review_ranking_ms = 0.0
+        answer_synthesis_ms = 0.0
         if attempt.state is not None:
             state = _ensure_open_time_constraint(
                 attempt.state,
@@ -185,34 +222,45 @@ class RecommendationWorkflow:
                 self._geography_tool is not None
                 and attempt.state.search_center is not None
             ):
+                geography_started = perf_counter()
                 geography = self._geography_tool.execute(attempt.state.search_center)
+                geography_ms = (perf_counter() - geography_started) * 1000
             if self._hard_filter_tool is not None:
+                hard_filter_started = perf_counter()
                 hard_filter = self._hard_filter_tool.execute(
                     attempt.state,
                     geography=geography,
                 )
+                hard_filter_ms = (perf_counter() - hard_filter_started) * 1000
             if (
                 hard_filter is not None
                 and self._review_evidence_ranker is not None
             ):
-                reference_time = self._reference_times.get(key)
-                if reference_time is None:
-                    raise RuntimeError("review evidence ranking needs a profile cutoff")
+                review_started = perf_counter()
                 review_evidence_ranking = self._review_evidence_ranker.rank(
                     state=attempt.state,
                     hard_filter=hard_filter,
-                    reference_time=reference_time,
+                    # 真实推荐只排除当前请求时间之后的评论。用户画像的
+                    # 生成时间只描述画像本身，不再限制可检索评论范围。
+                    reference_time=request.request_time,
+                    prepared_descriptions=attempt.review_search_descriptions,
                 )
+                review_ranking_ms = (perf_counter() - review_started) * 1000
                 if (
                     review_evidence_ranking.status == "success"
                     and review_evidence_ranking.ranking
                     and self._answer_synthesizer is not None
                 ):
+                    answer_started = perf_counter()
                     answer = self._answer_synthesizer.synthesize(
                         query_text=request.query_text,
                         state=attempt.state,
                         ranking=review_evidence_ranking,
+                        on_delta=on_answer_delta,
                     )
+                    answer_synthesis_ms = (
+                        perf_counter() - answer_started
+                    ) * 1000
             elif (
                 hard_filter is not None
                 and self._baseline_ranking_tool is not None
@@ -280,6 +328,15 @@ class RecommendationWorkflow:
             soft_ranking=soft_ranking,
             review_evidence_ranking=review_evidence_ranking,
             answer=answer,
+            timing=RecommendationWorkflowTiming(
+                profile_load_ms=profile_load_ms,
+                fusion_ms=fusion_ms,
+                geography_ms=geography_ms,
+                hard_filter_ms=hard_filter_ms,
+                review_ranking_ms=review_ranking_ms,
+                answer_synthesis_ms=answer_synthesis_ms,
+                total_ms=(perf_counter() - total_started) * 1000,
+            ),
         )
 
 
