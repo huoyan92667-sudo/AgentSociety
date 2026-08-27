@@ -254,9 +254,9 @@ class CompactReviewSearchPlan(StrictModel):
     direction: PreferenceDirection | None = None
     target_value: RequirementValue | None = None
     requirement_text: str | None = Field(default=None, min_length=1, max_length=500)
-    behavior: Literal["prefer", "avoid"] | None = None
-    positive_descriptions: list[str] = Field(min_length=2, max_length=3)
-    negative_descriptions: list[str] = Field(min_length=2, max_length=3)
+    behavior: Literal["must_have", "prefer", "avoid"] | None = None
+    positive_descriptions: list[str] = Field(min_length=2, max_length=2)
+    negative_descriptions: list[str] = Field(min_length=2, max_length=2)
 
     @field_validator("positive_descriptions", "negative_descriptions")
     @classmethod
@@ -685,9 +685,9 @@ def _messages(
 2. 结合 previous_state 判断新增、替换、放宽、收紧、删除和重新排序；输出完整当前状态，被取消的不要保留。
 3. evidence_text 必须逐字来自对应用户原话，evidence_turn_index 填原话轮次；不得引用助手回答、画像或程序说明。
 4. 软偏好 priority 从1连续排列，不填强度。“最重要、其次、先……再……”必须反映真实顺序。
-5. 同一次输出 review_search_plans，不再另调一次模型。只处理 required_fixed_review_plans、你新输出的菜品质量/分量/辣度偏好，以及 prefer/avoid 开放要求；其他固定特征由程序读取离线说法，不要重复生成。硬条件及距离、价格、评分等结构化偏好不要生成。
-6. 每个检索计划给2到3条英文正向说法和2到3条英文反向说法。正向表示满足，反向表示违反；结合 query_text 中的具体菜品，例如牛排+菜品质量应写牛排肉质、味道或熟度。环境、停车、服务等整体特征不必生硬绑定菜名。
-7. required_fixed_review_plans 是必须完成的平面清单。review_search_plans 必须逐条复制其中的 plan_id、field、direction、target_value并填写正反英文说法，一个都不能漏。你新输出的菜品质量、分量或辣度偏好如果不在清单中也要添加；其余固定特征不要添加。每条 prefer/avoid 开放要求也要添加长尾计划。
+5. 同一次输出 review_search_plans，不再另调一次模型。只处理 required_fixed_review_plans、你新输出的菜品质量/分量/辣度偏好、prefer/avoid 开放要求，以及确实能由评论查证的 must_have 开放要求；需要历史商家、距离或其他工具才能处理的 must_have 不要生成评论计划。其他固定特征由程序读取离线说法，不要重复生成。硬条件及距离、价格、评分等结构化偏好不要生成。
+6. 每个检索计划恰好给2条英文正向说法和2条英文反向说法。同一方向两条有固定分工：第一条写评论可能给出的直接总体结论；第二条必须写可观察原因或表现，例如原料、做法、味道、熟度、花椒麻感、偏甜偏淡、说话是否要提高声音，不能再次用抽象近义词重复第一条。反向第一条写直接否定结论，第二条写具体失败表现，不能只在正向前添加not/no。正向表示满足，反向表示违反；结合 query_text 中的具体菜品，例如牛排+菜品质量应写牛排肉质、味道或熟度。环境、停车、服务等整体特征不必生硬绑定菜名。
+7. required_fixed_review_plans 是必须完成的平面清单。review_search_plans 必须逐条复制其中的 plan_id、field、direction、target_value并填写正反英文说法，一个都不能漏。你新输出的菜品质量、分量或辣度偏好如果不在清单中也要添加；其余固定特征不要添加。每条 prefer/avoid 和每条能由评论查证的 must_have 开放要求要添加长尾计划，并原样复制 behavior。
 
 常用归类：
 - 明确想吃或排除某类餐饮：category 硬条件，目标只能从 category_candidates 原样选择；想吃用 any_of，不要用 none_of。候选只是检索结果，必须结合否定和上下文判断，不能见到候选就自动采用。
@@ -757,11 +757,11 @@ _OUTPUT_CONTRACT = {
     ),
     "review_search_plans": (
         "[{kind:fixed_aspect,plan_id:复制required_fixed_review_plans中的编号,field,direction,target_value:null|值,"
-        "requirement_text:null,behavior:null,positive_descriptions:[2到3条英文],"
-        "negative_descriptions:[2到3条英文]}或"
+        "requirement_text:null,behavior:null,positive_descriptions:[恰好2条英文],"
+        "negative_descriptions:[恰好2条英文]}或"
         "{kind:long_tail,plan_id:null,field:null,direction:null,target_value:null,"
-        "requirement_text,behavior:prefer|avoid,positive_descriptions:[2到3条英文],"
-        "negative_descriptions:[2到3条英文]}]"
+        "requirement_text,behavior:must_have|prefer|avoid,positive_descriptions:[恰好2条英文],"
+        "negative_descriptions:[恰好2条英文]}]"
     ),
     "hard_fields": (
         "category|distance_km|price_level|business_id|rating|review_count|"
@@ -1874,14 +1874,17 @@ def _materialize_review_search_descriptions(
         )
 
     for requirement in state.open_requirements:
-        if requirement.behavior not in {"prefer", "avoid"}:
-            continue
         matching = [
             item
             for item in long_tail_plans
             if item.requirement_text == requirement.text
             and item.behavior == requirement.behavior
         ]
+        # “第三家太远但历史里查不到第三家”也会暂存成 must_have 开放
+        # 要求。这类要求不能靠评论回答，没有评论计划时继续留在状态，
+        # 不能为了RAG让整轮融合失败。
+        if requirement.behavior == "must_have" and not matching:
+            continue
         if len(matching) != 1:
             raise ValueError(
                 "every active long-tail preference requires exactly one review plan"
@@ -1896,8 +1899,13 @@ def _materialize_review_search_descriptions(
                 requirement_id=requirement.key,
                 requirement_text=requirement.text,
                 kind="long_tail",
-                priority=requirement.priority or 100,
-                preference_strength=max(strengths, default=75),
+                # 无法结构化硬筛的“必须地道”等长尾要求仍然要查评论，
+                # 并作为最高优先证据，不能因为没有软偏好序号掉到最后。
+                priority=requirement.priority or 1,
+                preference_strength=max(
+                    strengths,
+                    default=(100 if requirement.behavior == "must_have" else 75),
+                ),
                 positive_descriptions=matching[0].positive_descriptions,
                 negative_descriptions=matching[0].negative_descriptions,
             )

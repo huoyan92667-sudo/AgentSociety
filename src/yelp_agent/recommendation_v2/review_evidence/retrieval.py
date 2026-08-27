@@ -48,6 +48,49 @@ class ReviewRetrievalBatch:
     metrics: ReviewRetrievalMetrics
 
 
+@dataclass(slots=True)
+class _SearchPass:
+    """一档检索结果及向量、关键词、融合三段可比较耗时。"""
+
+    results: list[dict[str, list[QdrantSegmentHit]]]
+    wall_latency_ms: float
+    dense_latency_ms: float
+    bm25_latency_ms: float = 0.0
+    fusion_latency_ms: float = 0.0
+    dense_hit_count: int = 0
+    bm25_hit_count: int = 0
+    bm25_only_hit_count: int = 0
+
+
+@dataclass(slots=True)
+class _MergedSegmentCandidate:
+    """同一片段被多条说法命中后，保留它在哪一侧、经哪条路线进入。"""
+
+    hit: QdrantSegmentHit
+    positive_route_score: float = 0.0
+    negative_route_score: float = 0.0
+    positive_dense_match: bool = False
+    negative_dense_match: bool = False
+    positive_bm25_match: bool = False
+    negative_bm25_match: bool = False
+
+    def add(self, hit: QdrantSegmentHit, *, side: str) -> None:
+        if hit.route_similarity > self.hit.route_similarity:
+            self.hit = hit
+        if side == "positive":
+            self.positive_route_score = max(
+                self.positive_route_score, hit.route_similarity
+            )
+            self.positive_dense_match |= hit.dense_rank is not None
+            self.positive_bm25_match |= hit.bm25_rank is not None
+        else:
+            self.negative_route_score = max(
+                self.negative_route_score, hit.route_similarity
+            )
+            self.negative_dense_match |= hit.dense_rank is not None
+            self.negative_bm25_match |= hit.bm25_rank is not None
+
+
 class ReviewEvidenceRetriever:
     """每家先各取正反候选，再按 P、N 差值直接判定方向。"""
 
@@ -67,6 +110,8 @@ class ReviewEvidenceRetriever:
         final_segment_group_size: int = 60,
         minimum_clear_evidence: int = 5,
         search_concurrency: int = 4,
+        enable_bm25: bool = False,
+        rrf_k: int = 60,
     ) -> None:
         if not -1 <= recall_threshold <= acceptance_threshold <= 1:
             raise ValueError("review similarity thresholds are invalid")
@@ -79,7 +124,7 @@ class ReviewEvidenceRetriever:
             or final_segment_group_size < middle_segment_group_size
         ):
             raise ValueError("review recall limits are invalid")
-        if minimum_clear_evidence < 1 or search_concurrency < 1:
+        if minimum_clear_evidence < 1 or search_concurrency < 1 or rrf_k < 1:
             raise ValueError("review retrieval controls must be positive")
         self._store = store
         self._encoder = encoder
@@ -94,6 +139,8 @@ class ReviewEvidenceRetriever:
         self._final_segment_group_size = final_segment_group_size
         self._minimum_clear_evidence = minimum_clear_evidence
         self._search_concurrency = search_concurrency
+        self._enable_bm25 = enable_bm25
+        self._rrf_k = rrf_k
 
     def close(self) -> None:
         self._full_reviews.close()
@@ -148,14 +195,15 @@ class ReviewEvidenceRetriever:
         query_vectors, embedding_latency_ms, embedding_batches = self._encode_all(
             descriptions
         )
-        first_started = perf_counter()
-        first_results = self._search_many(
+        first_pass = self._search_many(
+            descriptions,
             query_vectors,
             business_ids,
             cutoff_time=cutoff_time,
             group_size=self._initial_segment_group_size,
         )
-        first_search_ms = (perf_counter() - first_started) * 1000
+        first_results = first_pass.results
+        first_search_ms = first_pass.wall_latency_ms
 
         segments = self._empty_segment_map(requirements, business_ids)
         self._merge_search_results(
@@ -182,15 +230,17 @@ class ReviewEvidenceRetriever:
         middle_search_ms = 0.0
         middle_hit_count = 0
         middle_results: list[dict[str, list[QdrantSegmentHit]]] = []
+        middle_pass: _SearchPass | None = None
         if middle_ids:
-            middle_started = perf_counter()
-            middle_results = self._search_many(
+            middle_pass = self._search_many(
+                descriptions,
                 query_vectors,
                 middle_ids,
                 cutoff_time=cutoff_time,
                 group_size=self._middle_segment_group_size,
             )
-            middle_search_ms = (perf_counter() - middle_started) * 1000
+            middle_results = middle_pass.results
+            middle_search_ms = middle_pass.wall_latency_ms
             middle_hit_count = _search_hit_count(middle_results)
             self._merge_search_results(
                 segments,
@@ -216,15 +266,17 @@ class ReviewEvidenceRetriever:
         )
         final_search_ms = 0.0
         final_hit_count = 0
+        final_pass: _SearchPass | None = None
         if final_ids:
-            final_started = perf_counter()
-            final_results = self._search_many(
+            final_pass = self._search_many(
+                descriptions,
                 query_vectors,
                 final_ids,
                 cutoff_time=cutoff_time,
                 group_size=self._final_segment_group_size,
             )
-            final_search_ms = (perf_counter() - final_started) * 1000
+            final_results = final_pass.results
+            final_search_ms = final_pass.wall_latency_ms
             final_hit_count = _search_hit_count(final_results)
             self._merge_search_results(
                 segments,
@@ -275,8 +327,45 @@ class ReviewEvidenceRetriever:
             by_requirement=output,
             metrics=ReviewRetrievalMetrics(
                 query_vector_count=len(query_vectors),
+                query_description_count=len(descriptions),
+                bm25_enabled=self._enable_bm25,
                 embedding_batch_count=embedding_batches,
                 embedding_latency_ms=embedding_latency_ms,
+                dense_route_latency_ms=sum(
+                    item.dense_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_route_latency_ms=sum(
+                    item.bm25_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                rrf_fusion_latency_ms=sum(
+                    item.fusion_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                hybrid_search_wall_latency_ms=sum(
+                    item.wall_latency_ms
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                dense_segment_hit_count=sum(
+                    item.dense_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_segment_hit_count=sum(
+                    item.bm25_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
+                bm25_only_segment_hit_count=sum(
+                    item.bm25_only_hit_count
+                    for item in (first_pass, middle_pass, final_pass)
+                    if item is not None
+                ),
                 first_pass_search_latency_ms=first_search_ms,
                 middle_pass_search_latency_ms=middle_search_ms,
                 final_pass_search_latency_ms=final_search_ms,
@@ -320,15 +409,42 @@ class ReviewEvidenceRetriever:
 
     def _search_many(
         self,
+        query_texts: list[str],
         query_vectors: np.ndarray,
         business_ids: list[str],
         *,
         cutoff_time: datetime | None,
         group_size: int,
-    ) -> list[dict[str, list[QdrantSegmentHit]]]:
+    ) -> _SearchPass:
+        if self._enable_bm25:
+            hybrid_method = getattr(self._store, "search_hybrid_grouped_many", None)
+            if not callable(hybrid_method):
+                raise RuntimeError("BM25 is enabled but the review store has no hybrid search")
+            hybrid = hybrid_method(
+                query_texts,
+                [vector for vector in query_vectors],
+                business_ids,
+                score_threshold=self.recall_threshold,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+                max_concurrency=self._search_concurrency,
+                rrf_k=self._rrf_k,
+            )
+            return _SearchPass(
+                results=hybrid.results,
+                wall_latency_ms=hybrid.wall_latency_ms,
+                dense_latency_ms=hybrid.dense_latency_ms,
+                bm25_latency_ms=hybrid.bm25_latency_ms,
+                fusion_latency_ms=hybrid.fusion_latency_ms,
+                dense_hit_count=hybrid.dense_hit_count,
+                bm25_hit_count=hybrid.bm25_hit_count,
+                bm25_only_hit_count=hybrid.bm25_only_hit_count,
+            )
+
+        started = perf_counter()
         method = getattr(self._store, "search_grouped_many", None)
         if callable(method):
-            return method(
+            results = method(
                 [vector for vector in query_vectors],
                 business_ids,
                 score_threshold=self.recall_threshold,
@@ -336,23 +452,31 @@ class ReviewEvidenceRetriever:
                 group_size=group_size,
                 max_concurrency=self._search_concurrency,
             )
-        # 小型测试替身和旧调用方仍可以只实现单次查询接口。
-        return [
-            self._store.search_grouped(
-                vector,
-                business_ids,
-                score_threshold=self.recall_threshold,
-                cutoff_time=cutoff_time,
-                group_size=group_size,
-            )
-            for vector in query_vectors
-        ]
+        else:
+            # 小型测试替身和旧调用方仍可以只实现单次查询接口。
+            results = [
+                self._store.search_grouped(
+                    vector,
+                    business_ids,
+                    score_threshold=self.recall_threshold,
+                    cutoff_time=cutoff_time,
+                    group_size=group_size,
+                )
+                for vector in query_vectors
+            ]
+        elapsed = (perf_counter() - started) * 1000
+        return _SearchPass(
+            results=results,
+            wall_latency_ms=elapsed,
+            dense_latency_ms=elapsed,
+            dense_hit_count=_search_hit_count(results),
+        )
 
     @staticmethod
     def _empty_segment_map(
         requirements: list[PreferenceSearchDescription],
         business_ids: list[str],
-    ) -> dict[str, dict[str, dict[str, QdrantSegmentHit]]]:
+    ) -> dict[str, dict[str, dict[str, _MergedSegmentCandidate]]]:
         return {
             requirement.requirement_id: {
                 business_id: {} for business_id in business_ids
@@ -362,22 +486,27 @@ class ReviewEvidenceRetriever:
 
     @staticmethod
     def _merge_search_results(
-        target: dict[str, dict[str, dict[str, QdrantSegmentHit]]],
+        target: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
         requirements: list[PreferenceSearchDescription],
         requirement_slices: dict[str, tuple[int, int, int]],
         search_results: list[dict[str, list[QdrantSegmentHit]]],
     ) -> None:
         for requirement in requirements:
-            start, _, end = requirement_slices[requirement.requirement_id]
-            for grouped in search_results[start:end]:
+            start, positive_end, end = requirement_slices[requirement.requirement_id]
+            for query_index, grouped in enumerate(
+                search_results[start:end], start=start
+            ):
+                side = "positive" if query_index < positive_end else "negative"
                 for business_id, hits in grouped.items():
                     destination = target[requirement.requirement_id].get(business_id)
                     if destination is None:
                         continue
                     for hit in hits:
-                        previous = destination.get(hit.segment_id)
-                        if previous is None or hit.route_similarity > previous.route_similarity:
-                            destination[hit.segment_id] = hit
+                        merged = destination.get(hit.segment_id)
+                        if merged is None:
+                            merged = _MergedSegmentCandidate(hit=hit)
+                            destination[hit.segment_id] = merged
+                        merged.add(hit, side=side)
 
     def _businesses_needing_expansion(
         self,
@@ -385,7 +514,7 @@ class ReviewEvidenceRetriever:
         business_ids: list[str],
         requirement_slices: dict[str, tuple[int, int, int]],
         query_vectors: np.ndarray,
-        segments: dict[str, dict[str, dict[str, QdrantSegmentHit]]],
+        segments: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
         current_results: list[dict[str, list[QdrantSegmentHit]]],
         *,
         group_size: int,
@@ -420,13 +549,14 @@ class ReviewEvidenceRetriever:
 
     def _aggregate_reviews(
         self,
-        hits: list[QdrantSegmentHit],
+        hits: list[_MergedSegmentCandidate],
         positive_vectors: np.ndarray,
         negative_vectors: np.ndarray,
         vectors_by_point: dict[int, np.ndarray],
     ) -> list[_ReviewAggregate]:
         by_review: dict[str, _ReviewAggregate] = {}
-        for hit in hits:
+        for merged in hits:
+            hit = merged.hit
             vector = np.asarray(vectors_by_point[hit.point_id], dtype=np.float32)
             vector /= max(float(np.linalg.norm(vector)), 1e-12)
             positive = float((positive_vectors @ vector).max())
@@ -435,22 +565,32 @@ class ReviewEvidenceRetriever:
             if aggregate is None:
                 aggregate = _ReviewAggregate(hit)
                 by_review[hit.review_id] = aggregate
-            aggregate.add(hit, positive=positive, negative=negative)
+            aggregate.add(
+                hit,
+                positive=positive,
+                negative=negative,
+                positive_route_score=merged.positive_route_score,
+                negative_route_score=merged.negative_route_score,
+                positive_dense_match=merged.positive_dense_match,
+                negative_dense_match=merged.negative_dense_match,
+                positive_bm25_match=merged.positive_bm25_match,
+                negative_bm25_match=merged.negative_bm25_match,
+            )
         return list(by_review.values())
 
     def _load_missing_vectors(
         self,
-        segments: dict[str, dict[str, dict[str, QdrantSegmentHit]]],
+        segments: dict[str, dict[str, dict[str, _MergedSegmentCandidate]]],
         destination: dict[int, np.ndarray],
     ) -> float:
         """跨偏好、正反说法和商家统一去重后，再从本地文件读取。"""
 
         point_ids = [
-            hit.point_id
+            merged.hit.point_id
             for requirement_map in segments.values()
             for business_map in requirement_map.values()
-            for hit in business_map.values()
-            if hit.point_id not in destination
+            for merged in business_map.values()
+            if merged.hit.point_id not in destination
         ]
         unique_ids = list(dict.fromkeys(point_ids))
         if not unique_ids:
@@ -464,12 +604,32 @@ class ReviewEvidenceRetriever:
         aggregates: list[_ReviewAggregate],
     ) -> list[_ReviewAggregate]:
         positive = sorted(
-            (item for item in aggregates if item.positive >= self.recall_threshold),
-            key=lambda item: (-item.positive, -item.useful, item.review_id),
+            (
+                item
+                for item in aggregates
+                if item.positive >= self.recall_threshold
+                or item.positive_bm25_match
+            ),
+            key=lambda item: (
+                -item.positive_route_score,
+                -item.positive,
+                -item.useful,
+                item.review_id,
+            ),
         )[: self._recall_each_side]
         negative = sorted(
-            (item for item in aggregates if item.negative >= self.recall_threshold),
-            key=lambda item: (-item.negative, -item.useful, item.review_id),
+            (
+                item
+                for item in aggregates
+                if item.negative >= self.recall_threshold
+                or item.negative_bm25_match
+            ),
+            key=lambda item: (
+                -item.negative_route_score,
+                -item.negative,
+                -item.useful,
+                item.review_id,
+            ),
         )[: self._recall_each_side]
         selected = {item.review_id: item for item in positive}
         selected.update({item.review_id: item for item in negative})
@@ -493,6 +653,12 @@ class ReviewEvidenceRetriever:
             matched_segment_text=item.best_hit.segment_text,
             positive_similarity=item.positive,
             negative_similarity=item.negative,
+            positive_retrieval_score=item.positive_route_score,
+            negative_retrieval_score=item.negative_route_score,
+            positive_dense_match=item.positive_dense_match,
+            negative_dense_match=item.negative_dense_match,
+            positive_bm25_match=item.positive_bm25_match,
+            negative_bm25_match=item.negative_bm25_match,
             direction=self._direction(item.positive, item.negative),
         )
 
@@ -553,12 +719,40 @@ class _ReviewAggregate:
         self.review_text_sha256 = hit.review_text_sha256
         self.positive = -1.0
         self.negative = -1.0
+        self.positive_route_score = 0.0
+        self.negative_route_score = 0.0
+        self.positive_dense_match = False
+        self.negative_dense_match = False
+        self.positive_bm25_match = False
+        self.negative_bm25_match = False
         self.best_hit = hit
         self._best_similarity = -1.0
 
-    def add(self, hit: QdrantSegmentHit, *, positive: float, negative: float) -> None:
+    def add(
+        self,
+        hit: QdrantSegmentHit,
+        *,
+        positive: float,
+        negative: float,
+        positive_route_score: float,
+        negative_route_score: float,
+        positive_dense_match: bool,
+        negative_dense_match: bool,
+        positive_bm25_match: bool,
+        negative_bm25_match: bool,
+    ) -> None:
         self.positive = max(self.positive, positive)
         self.negative = max(self.negative, negative)
+        self.positive_route_score = max(
+            self.positive_route_score, positive_route_score
+        )
+        self.negative_route_score = max(
+            self.negative_route_score, negative_route_score
+        )
+        self.positive_dense_match |= positive_dense_match
+        self.negative_dense_match |= negative_dense_match
+        self.positive_bm25_match |= positive_bm25_match
+        self.negative_bm25_match |= negative_bm25_match
         best = max(positive, negative)
         if best > self._best_similarity:
             self._best_similarity = best

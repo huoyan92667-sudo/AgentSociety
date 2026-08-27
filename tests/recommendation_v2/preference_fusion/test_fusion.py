@@ -262,6 +262,49 @@ def test_one_fusion_call_also_prepares_long_tail_review_search_descriptions() ->
     assert description.positive_descriptions[0] == "authentic Sichuan flavor"
 
 
+def test_must_have_long_tail_requirement_is_not_dropped_from_review_search() -> None:
+    proposal = PreferenceFusionProposal(
+        open_requirements=[
+            CompactOpenRequirement(
+                text="川菜必须地道正宗",
+                behavior="must_have",
+                priority=None,
+                evidence_text="川菜必须地道正宗",
+                evidence_turn_index=1,
+            )
+        ],
+        review_search_plans=[
+            CompactReviewSearchPlan(
+                kind="long_tail",
+                requirement_text="川菜必须地道正宗",
+                behavior="must_have",
+                positive_descriptions=[
+                    "authentic Sichuan flavor with proper mala balance",
+                    "traditional Sichuan ingredients and cooking technique",
+                ],
+                negative_descriptions=[
+                    "sweet Americanized Chinese flavor",
+                    "bland food without Sichuan peppercorn aroma",
+                ],
+            )
+        ],
+    )
+
+    attempt = PreferenceFusion(FakeGenerator(proposal)).fuse(
+        PreferenceFusionRequest(
+            user_id="user-1",
+            session_id="session-1",
+            turn_index=1,
+            query_text="川菜必须地道正宗",
+        )
+    )
+
+    assert attempt.status == "success"
+    assert len(attempt.review_search_descriptions) == 1
+    assert attempt.review_search_descriptions[0].priority == 1
+    assert attempt.review_search_descriptions[0].preference_strength == 100
+
+
 def test_compact_output_does_not_ask_model_for_fixed_technical_fields() -> None:
     """编号、单位、商家字段和来源不属于大模型输出。"""
 

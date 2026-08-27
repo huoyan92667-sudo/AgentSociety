@@ -99,6 +99,32 @@ def test_all_long_tail_requirements_share_one_model_call() -> None:
     assert generator.call_count == 1
 
 
+def test_must_have_long_tail_requirement_is_retrieved_as_top_priority() -> None:
+    generator = _Generator()
+    requirement = OpenRequirement(
+        key="open.authentic",
+        text="川菜必须地道正宗",
+        behavior="must_have",
+        priority=None,
+        controlling_source="current_query",
+        sources=[
+            RequirementBasis(
+                source="current_query",
+                text="川菜必须地道正宗",
+                turn_index=1,
+                preference_strength=100,
+            )
+        ],
+    )
+
+    result = PreferenceDescriptionBuilder(generator).build([], [requirement])
+
+    assert result.failure_reason is None
+    assert result.descriptions[0].priority == 1
+    assert result.descriptions[0].preference_strength == 100
+    assert generator.call_count == 1
+
+
 def test_online_fixed_aspect_is_rewritten_with_current_query() -> None:
     generator = _Generator()
     preference = get_scene_baseline("date").soft_preferences[0]

@@ -23,8 +23,12 @@ class PreferenceSearchDescription(StrictModel):
     kind: RequirementKind
     priority: int = Field(ge=1, le=100)
     preference_strength: int = Field(ge=1, le=100)
-    positive_descriptions: list[str] = Field(min_length=2, max_length=3)
-    negative_descriptions: list[str] = Field(min_length=2, max_length=3)
+    # 兼容已经保存的两条说法，同时允许新提示词生成最多五个互补角度。
+    # 实际使用几条由召回对照实验决定，不在数据结构里提前写死成三条。
+    # 在线提示词当前固定生成2条；上限保留到5只为复放评测实验，
+    # 不能据此让正式流程默认执行5倍查询。
+    positive_descriptions: list[str] = Field(min_length=2, max_length=5)
+    negative_descriptions: list[str] = Field(min_length=2, max_length=5)
     preference: SoftPreference | None = None
 
     @field_validator("positive_descriptions", "negative_descriptions")
@@ -56,7 +60,12 @@ class QdrantSegmentHit(StrictModel):
     segment_index: int = Field(ge=0)
     segment_text: str = Field(min_length=1)
     review_text_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    route_similarity: float = Field(ge=-1, le=1)
+    # 向量路线返回0～1附近的余弦分，关键词路线返回的BM25原始分可大于1；
+    # 两者只会按各自名次融合，绝不会把原始数值直接相加。
+    route_similarity: float = Field(ge=0)
+    # 两路原始名次用于RRF融合审计。向量或关键词任一路没有命中时为None。
+    dense_rank: int | None = Field(default=None, ge=1)
+    bm25_rank: int | None = Field(default=None, ge=1)
 
     @field_validator("review_time")
     @classmethod
@@ -79,6 +88,12 @@ class ReviewSimilarityCandidate(StrictModel):
     matched_segment_text: str = Field(min_length=1)
     positive_similarity: float = Field(ge=-1, le=1)
     negative_similarity: float = Field(ge=-1, le=1)
+    positive_retrieval_score: float = Field(default=0, ge=0)
+    negative_retrieval_score: float = Field(default=0, ge=0)
+    positive_dense_match: bool = False
+    negative_dense_match: bool = False
+    positive_bm25_match: bool = False
+    negative_bm25_match: bool = False
     direction: EvidenceDirection
 
     @field_validator("review_time")
@@ -144,8 +159,17 @@ class ReviewRetrievalMetrics(StrictModel):
     """记录评论检索每个主要步骤的真实耗时和数据量。"""
 
     query_vector_count: int = Field(default=0, ge=0)
+    query_description_count: int = Field(default=0, ge=0)
+    bm25_enabled: bool = False
     embedding_batch_count: int = Field(default=0, ge=0)
     embedding_latency_ms: float = Field(default=0, ge=0)
+    dense_route_latency_ms: float = Field(default=0, ge=0)
+    bm25_route_latency_ms: float = Field(default=0, ge=0)
+    rrf_fusion_latency_ms: float = Field(default=0, ge=0)
+    hybrid_search_wall_latency_ms: float = Field(default=0, ge=0)
+    dense_segment_hit_count: int = Field(default=0, ge=0)
+    bm25_segment_hit_count: int = Field(default=0, ge=0)
+    bm25_only_segment_hit_count: int = Field(default=0, ge=0)
     first_pass_search_latency_ms: float = Field(default=0, ge=0)
     middle_pass_search_latency_ms: float = Field(default=0, ge=0)
     final_pass_search_latency_ms: float = Field(default=0, ge=0)

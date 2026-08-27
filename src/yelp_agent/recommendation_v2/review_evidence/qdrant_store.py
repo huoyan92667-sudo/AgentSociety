@@ -7,8 +7,10 @@ import hashlib
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from time import perf_counter
 from typing import Literal
 
 import numpy as np
@@ -20,18 +22,43 @@ from yelp_agent.models import StrictModel
 
 from .schema import QdrantSegmentHit
 
-DEFAULT_COLLECTION_NAME = "recommendation_v2_review_segments_v2"
+DEFAULT_COLLECTION_NAME = "recommendation_v2_review_segments_v3_hybrid"
+DENSE_VECTOR_NAME = "dense"
+BM25_VECTOR_NAME = "bm25"
+BM25_MODEL_NAME = "qdrant/bm25"
+BM25_AVERAGE_LENGTH = 91.09041914634108
+BM25_K = 1.5
+BM25_B = 0.75
+RRF_K = 60
 
 
 class QdrantImportManifest(StrictModel):
     """记录 Qdrant 中的数据与本地片段、向量文件严格对应。"""
 
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     collection_name: str = Field(min_length=1)
     segments_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     embeddings_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     dimension: int = Field(ge=1)
     point_count: int = Field(ge=1)
+    dense_vector_name: str = DENSE_VECTOR_NAME
+    bm25_vector_name: str = BM25_VECTOR_NAME
+    bm25_model_name: str = BM25_MODEL_NAME
+    bm25_average_length: float = Field(gt=0)
+
+
+@dataclass(frozen=True, slots=True)
+class QdrantHybridSearchResult:
+    """一次批量混合检索的融合结果和两路真实耗时。"""
+
+    results: list[dict[str, list[QdrantSegmentHit]]]
+    wall_latency_ms: float
+    dense_latency_ms: float
+    bm25_latency_ms: float
+    fusion_latency_ms: float
+    dense_hit_count: int
+    bm25_hit_count: int
+    bm25_only_hit_count: int
 
 
 def _sha256_file(path: Path) -> str:
@@ -99,7 +126,9 @@ class QdrantReviewSegmentStore:
             "segments": _sha256_file(segments_path),
             "embeddings": _sha256_file(embeddings_path),
         }
-        manifest_path = root.parent / "qdrant_import_manifest.json"
+        # 新混合集合使用独立清单，旧纯向量集合和清单继续保留，导入失败时
+        # 正式流程仍可切回旧集合，不需要破坏已有数据。
+        manifest_path = root.parent / "qdrant_hybrid_import_manifest.json"
         existing_manifest = self._load_manifest(manifest_path)
         if self._client.collection_exists(self.collection_name):
             if recreate:
@@ -120,11 +149,19 @@ class QdrantReviewSegmentStore:
 
         self._client.create_collection(
             collection_name=self.collection_name,
-            vectors_config=models.VectorParams(
-                size=dimension,
-                distance=models.Distance.COSINE,
-                on_disk=True,
-            ),
+            vectors_config={
+                DENSE_VECTOR_NAME: models.VectorParams(
+                    size=dimension,
+                    distance=models.Distance.COSINE,
+                    on_disk=True,
+                )
+            },
+            sparse_vectors_config={
+                BM25_VECTOR_NAME: models.SparseVectorParams(
+                    modifier=models.Modifier.IDF,
+                    index=models.SparseIndexParams(on_disk=True),
+                )
+            },
             # 批量导入期间先不反复重建搜索索引，全部点写完后再统一开启。
             optimizers_config=models.OptimizersConfigDiff(indexing_threshold=0),
         )
@@ -138,15 +175,22 @@ class QdrantReviewSegmentStore:
             expected_ids = list(range(start, start + len(ids)))
             if ids != expected_ids:
                 raise ValueError("segment row indices must be contiguous")
-            payloads = [self._payload(row) for row in rows]
-            self._client.upload_collection(
+            points = [
+                models.PointStruct(
+                    id=point_id,
+                    vector={
+                        DENSE_VECTOR_NAME: np.asarray(
+                            vectors[point_id], dtype=np.float32
+                        ).tolist(),
+                        BM25_VECTOR_NAME: _bm25_document(str(row["text"])),
+                    },
+                    payload=self._payload(row),
+                )
+                for point_id, row in zip(ids, rows, strict=True)
+            ]
+            self._client.upsert(
                 collection_name=self.collection_name,
-                vectors=np.asarray(vectors[ids], dtype=np.float32),
-                payload=payloads,
-                ids=ids,
-                batch_size=batch_size,
-                parallel=1,
-                max_retries=3,
+                points=points,
                 wait=True,
             )
             uploaded += len(ids)
@@ -177,6 +221,7 @@ class QdrantReviewSegmentStore:
             embeddings_sha256=hashes["embeddings"],
             dimension=dimension,
             point_count=point_count,
+            bm25_average_length=BM25_AVERAGE_LENGTH,
         )
         partial = manifest_path.with_name(manifest_path.name + ".partial")
         partial.write_text(
@@ -225,6 +270,7 @@ class QdrantReviewSegmentStore:
             groups = self._client.query_points_groups(
                 collection_name=self.collection_name,
                 query=vector.tolist(),
+                using=DENSE_VECTOR_NAME,
                 query_filter=models.Filter(must=conditions),
                 group_by="business_id",
                 limit=len(batch_ids),
@@ -236,7 +282,64 @@ class QdrantReviewSegmentStore:
             )
             for group in groups.groups:
                 business_id = str(group.id)
-                result[business_id] = [self._hit(item) for item in group.hits]
+                result[business_id] = [
+                    self._hit(item).model_copy(update={"dense_rank": rank})
+                    for rank, item in enumerate(group.hits, 1)
+                ]
+        return result
+
+    def search_keyword_grouped(
+        self,
+        query_text: str,
+        business_ids: list[str],
+        *,
+        cutoff_time: datetime | None = None,
+        group_size: int = 60,
+        business_batch_size: int = 100,
+    ) -> dict[str, list[QdrantSegmentHit]]:
+        """用Qdrant内置BM25在同一硬筛商家范围内按关键词找片段。"""
+
+        unique_ids = list(dict.fromkeys(business_ids))
+        if len(unique_ids) != len(business_ids):
+            raise ValueError("business IDs must be unique")
+        if not unique_ids:
+            return {}
+        cleaned = query_text.strip()
+        if not cleaned:
+            raise ValueError("BM25 query text must be nonempty")
+        result: dict[str, list[QdrantSegmentHit]] = {item: [] for item in unique_ids}
+        for offset in range(0, len(unique_ids), business_batch_size):
+            batch_ids = unique_ids[offset : offset + business_batch_size]
+            conditions: list[models.Condition] = [
+                models.FieldCondition(
+                    key="business_id",
+                    match=models.MatchAny(any=batch_ids),
+                )
+            ]
+            if cutoff_time is not None:
+                conditions.append(
+                    models.FieldCondition(
+                        key="review_timestamp",
+                        range=models.Range(lt=_unix_timestamp(cutoff_time)),
+                    )
+                )
+            groups = self._client.query_points_groups(
+                collection_name=self.collection_name,
+                query=_bm25_document(cleaned),
+                using=BM25_VECTOR_NAME,
+                query_filter=models.Filter(must=conditions),
+                group_by="business_id",
+                limit=len(batch_ids),
+                group_size=group_size,
+                with_payload=True,
+                with_vectors=False,
+            )
+            for group in groups.groups:
+                business_id = str(group.id)
+                result[business_id] = [
+                    self._hit(item).model_copy(update={"bm25_rank": rank})
+                    for rank, item in enumerate(group.hits, 1)
+                ]
         return result
 
     def search_grouped_many(
@@ -270,6 +373,106 @@ class QdrantReviewSegmentStore:
         workers = min(max_concurrency, len(query_vectors))
         with ThreadPoolExecutor(max_workers=workers) as executor:
             return list(executor.map(search, query_vectors))
+
+    def search_keyword_grouped_many(
+        self,
+        query_texts: list[str],
+        business_ids: list[str],
+        *,
+        cutoff_time: datetime | None = None,
+        group_size: int = 25,
+        max_concurrency: int = 4,
+    ) -> list[dict[str, list[QdrantSegmentHit]]]:
+        """有限并行执行多种关键词说法，返回顺序与输入文字完全一致。"""
+
+        if not query_texts:
+            return []
+        if max_concurrency < 1:
+            raise ValueError("max_concurrency must be positive")
+
+        def search(text: str) -> dict[str, list[QdrantSegmentHit]]:
+            return self.search_keyword_grouped(
+                text,
+                business_ids,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+            )
+
+        workers = min(max_concurrency, len(query_texts))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            return list(executor.map(search, query_texts))
+
+    def search_hybrid_grouped_many(
+        self,
+        query_texts: list[str],
+        query_vectors: list[np.ndarray],
+        business_ids: list[str],
+        *,
+        score_threshold: float,
+        cutoff_time: datetime | None = None,
+        group_size: int = 25,
+        max_concurrency: int = 4,
+        rrf_k: int = RRF_K,
+    ) -> QdrantHybridSearchResult:
+        """并行执行向量和BM25两路查询，再按每家商户的名次做RRF融合。"""
+
+        if len(query_texts) != len(query_vectors):
+            raise ValueError("query texts and vectors must have the same length")
+        if rrf_k < 1:
+            raise ValueError("RRF k must be positive")
+        wall_started = perf_counter()
+
+        def dense_route() -> tuple[list[dict[str, list[QdrantSegmentHit]]], float]:
+            started = perf_counter()
+            values = self.search_grouped_many(
+                query_vectors,
+                business_ids,
+                score_threshold=score_threshold,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+                max_concurrency=max_concurrency,
+            )
+            return values, (perf_counter() - started) * 1000
+
+        def bm25_route() -> tuple[list[dict[str, list[QdrantSegmentHit]]], float]:
+            started = perf_counter()
+            values = self.search_keyword_grouped_many(
+                query_texts,
+                business_ids,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+                max_concurrency=max_concurrency,
+            )
+            return values, (perf_counter() - started) * 1000
+
+        # 两条路线彼此独立，同时查询能够避免把混合检索简单变成双倍串行等待。
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            dense_future = executor.submit(dense_route)
+            bm25_future = executor.submit(bm25_route)
+            dense_results, dense_latency_ms = dense_future.result()
+            bm25_results, bm25_latency_ms = bm25_future.result()
+
+        fusion_started = perf_counter()
+        fused = _fuse_grouped_results(
+            dense_results,
+            bm25_results,
+            business_ids,
+            group_size=group_size,
+            rrf_k=rrf_k,
+        )
+        fusion_latency_ms = (perf_counter() - fusion_started) * 1000
+        dense_ids = _segment_ids(dense_results)
+        bm25_ids = _segment_ids(bm25_results)
+        return QdrantHybridSearchResult(
+            results=fused,
+            wall_latency_ms=(perf_counter() - wall_started) * 1000,
+            dense_latency_ms=dense_latency_ms,
+            bm25_latency_ms=bm25_latency_ms,
+            fusion_latency_ms=fusion_latency_ms,
+            dense_hit_count=_grouped_hit_count(dense_results),
+            bm25_hit_count=_grouped_hit_count(bm25_results),
+            bm25_only_hit_count=len(bm25_ids - dense_ids),
+        )
 
     def _collection_point_count(self) -> int:
         return int(self._client.get_collection(self.collection_name).points_count or 0)
@@ -327,3 +530,105 @@ def _unix_timestamp(value: datetime) -> int:
     if value.tzinfo is None:
         return calendar.timegm(value.utctimetuple())
     return int(value.timestamp())
+
+
+def _bm25_document(text: str) -> models.Document:
+    """统一导入和查询的BM25分词配置，并保留not/no等否定词。"""
+
+    options = models.Bm25Config(
+        k=BM25_K,
+        b=BM25_B,
+        avg_len=BM25_AVERAGE_LENGTH,
+        language="english",
+        # 默认英文停用词会删除not，正反证据检索不能接受这种信息损失。
+        stopwords=models.StopwordsSet(languages=[], custom=[]),
+        stemmer=models.SnowballParams(type="snowball", language="english"),
+    )
+    return models.Document(
+        text=text,
+        model=BM25_MODEL_NAME,
+        # qdrant-client 1.x 的gRPC转换器只接受普通映射；REST与gRPC
+        # 都能读取同一份序列化结果，因此导入和在线查询保持完全一致。
+        options=options.model_dump(mode="json", exclude_none=True),
+    )
+
+
+def _fuse_grouped_results(
+    dense_results: list[dict[str, list[QdrantSegmentHit]]],
+    bm25_results: list[dict[str, list[QdrantSegmentHit]]],
+    business_ids: list[str],
+    *,
+    group_size: int,
+    rrf_k: int,
+) -> list[dict[str, list[QdrantSegmentHit]]]:
+    """两路原始分数不可直接相加，按各自名次融合后再保留相同数量。"""
+
+    if len(dense_results) != len(bm25_results):
+        raise ValueError("dense and BM25 result batches must align")
+    output: list[dict[str, list[QdrantSegmentHit]]] = []
+    for dense_grouped, bm25_grouped in zip(
+        dense_results, bm25_results, strict=True
+    ):
+        per_query: dict[str, list[QdrantSegmentHit]] = {}
+        for business_id in business_ids:
+            rows: dict[str, tuple[QdrantSegmentHit, float]] = {}
+            for route, hits in (
+                ("dense", dense_grouped.get(business_id, [])),
+                ("bm25", bm25_grouped.get(business_id, [])),
+            ):
+                for rank, hit in enumerate(hits, 1):
+                    previous = rows.get(hit.segment_id)
+                    score = 1.0 / (rrf_k + rank)
+                    if previous is None:
+                        merged = hit.model_copy(
+                            update={
+                                "dense_rank": rank if route == "dense" else None,
+                                "bm25_rank": rank if route == "bm25" else None,
+                                "route_similarity": score,
+                            }
+                        )
+                        rows[hit.segment_id] = (merged, score)
+                        continue
+                    merged, previous_score = previous
+                    update = {
+                        "dense_rank": (
+                            rank if route == "dense" else merged.dense_rank
+                        ),
+                        "bm25_rank": (
+                            rank if route == "bm25" else merged.bm25_rank
+                        ),
+                        "route_similarity": previous_score + score,
+                    }
+                    rows[hit.segment_id] = (
+                        merged.model_copy(update=update),
+                        previous_score + score,
+                    )
+            ordered = sorted(
+                rows.values(),
+                key=lambda item: (
+                    -item[1],
+                    -item[0].useful,
+                    -item[0].review_time.timestamp(),
+                    item[0].segment_id,
+                ),
+            )
+            per_query[business_id] = [item[0] for item in ordered[:group_size]]
+        output.append(per_query)
+    return output
+
+
+def _grouped_hit_count(
+    results: list[dict[str, list[QdrantSegmentHit]]],
+) -> int:
+    return sum(len(hits) for grouped in results for hits in grouped.values())
+
+
+def _segment_ids(
+    results: list[dict[str, list[QdrantSegmentHit]]],
+) -> set[str]:
+    return {
+        hit.segment_id
+        for grouped in results
+        for hits in grouped.values()
+        for hit in hits
+    }

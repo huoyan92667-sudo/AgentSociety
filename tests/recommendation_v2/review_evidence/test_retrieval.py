@@ -7,6 +7,9 @@ import numpy as np
 from yelp_agent.recommendation_v2.review_evidence.retrieval import (
     ReviewEvidenceRetriever,
 )
+from yelp_agent.recommendation_v2.review_evidence.qdrant_store import (
+    QdrantHybridSearchResult,
+)
 from yelp_agent.recommendation_v2.review_evidence.schema import (
     PreferenceSearchDescription,
     QdrantSegmentHit,
@@ -103,6 +106,55 @@ class _BatchStore:
             {business_id: list(repeated) for business_id in business_ids}
             for _ in query_vectors
         ]
+
+    def close(self) -> None:
+        pass
+
+
+class _SameDirectionEncoder(_Encoder):
+    """让测试评论与全部稠密查询都不相似，只能由BM25带回。"""
+
+    def encode(self, texts: list[str], *, input_type: str) -> object:
+        assert input_type == "query"
+        self.calls.append(list(texts))
+        return SimpleNamespace(
+            vectors=tuple(np.asarray([1.0, 0.0]) for _ in texts),
+            latency_ms=2.0,
+        )
+
+
+class _HybridStore:
+    def __init__(self, hit: QdrantSegmentHit) -> None:
+        self.hit = hit
+
+    def search_hybrid_grouped_many(
+        self,
+        query_texts: list[str],
+        query_vectors: list[np.ndarray],
+        business_ids: list[str],
+        **kwargs: object,
+    ) -> QdrantHybridSearchResult:
+        results = [{"business-1": []} for _ in query_texts]
+        results[0] = {
+            "business-1": [
+                self.hit.model_copy(
+                    update={
+                        "bm25_rank": 1,
+                        "route_similarity": 1 / 61,
+                    }
+                )
+            ]
+        }
+        return QdrantHybridSearchResult(
+            results=results,
+            wall_latency_ms=3,
+            dense_latency_ms=2,
+            bm25_latency_ms=2.5,
+            fusion_latency_ms=0.1,
+            dense_hit_count=0,
+            bm25_hit_count=1,
+            bm25_only_hit_count=1,
+        )
 
     def close(self) -> None:
         pass
@@ -250,3 +302,39 @@ def test_yelp_review_time_without_timezone_is_treated_as_utc() -> None:
     )
 
     assert hit.review_time.tzinfo is UTC
+
+
+def test_bm25_only_hit_survives_dense_recall_threshold() -> None:
+    hit = _hit("keyword-only", [0.0, 1.0], "f")
+    retriever = ReviewEvidenceRetriever(
+        store=_HybridStore(hit),  # type: ignore[arg-type]
+        encoder=_SameDirectionEncoder(),
+        segment_vectors=_VectorStore(),
+        full_reviews=_FullReviews(),  # type: ignore[arg-type]
+        enable_bm25=True,
+    )
+    requirement = PreferenceSearchDescription(
+        requirement_id="tail",
+        requirement_text="authentic Szechuan",
+        kind="long_tail",
+        priority=1,
+        preference_strength=100,
+        positive_descriptions=["authentic Szechuan", "traditional recipes"],
+        negative_descriptions=["westernized Szechuan", "not authentic"],
+    )
+
+    batch = retriever.retrieve_many(
+        [requirement],
+        ["business-1"],
+        cutoff_time=datetime(2026, 8, 26, tzinfo=UTC),
+    )
+    candidate = batch.by_requirement["tail"]["business-1"][0]
+
+    assert candidate.review_id == "keyword-only"
+    assert candidate.positive_similarity == 0
+    assert candidate.positive_bm25_match is True
+    assert candidate.positive_dense_match is False
+    # 本轮只改召回，不改变现有正反方向规则。
+    assert candidate.direction == "ambiguous"
+    assert batch.metrics.bm25_enabled is True
+    assert batch.metrics.bm25_only_segment_hit_count == 1

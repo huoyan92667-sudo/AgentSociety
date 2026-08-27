@@ -97,6 +97,8 @@ def build_review_evidence_ranker(
         final_segment_group_size=60,
         minimum_clear_evidence=5,
         search_concurrency=4,
+        enable_bm25=True,
+        rrf_k=60,
     )
     return ReviewEvidenceRanker(
         description_builder=PreferenceDescriptionBuilder(generator),
