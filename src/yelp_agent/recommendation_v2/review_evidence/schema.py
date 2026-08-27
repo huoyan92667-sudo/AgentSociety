@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal, Self
 
 from pydantic import Field, field_validator, model_validator
@@ -43,7 +43,7 @@ class PreferenceSearchDescription(StrictModel):
 
 
 class QdrantSegmentHit(StrictModel):
-    """Qdrant 返回的一条评论片段和它的向量。"""
+    """Qdrant 只返回片段事实；向量随后按 point_id 从本地文件读取。"""
 
     point_id: int = Field(ge=0)
     segment_id: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -57,7 +57,11 @@ class QdrantSegmentHit(StrictModel):
     segment_text: str = Field(min_length=1)
     review_text_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     route_similarity: float = Field(ge=-1, le=1)
-    vector: list[float] = Field(min_length=1)
+
+    @field_validator("review_time")
+    @classmethod
+    def normalize_review_time(cls, value: datetime) -> datetime:
+        return _utc_datetime(value)
 
 
 class ReviewSimilarityCandidate(StrictModel):
@@ -77,6 +81,11 @@ class ReviewSimilarityCandidate(StrictModel):
     negative_similarity: float = Field(ge=-1, le=1)
     direction: EvidenceDirection
 
+    @field_validator("review_time")
+    @classmethod
+    def normalize_review_time(cls, value: datetime) -> datetime:
+        return _utc_datetime(value)
+
 
 class RankedReviewEvidence(StrictModel):
     """参与商家分数计算、同时可以原样展示给用户的真实评论。"""
@@ -92,6 +101,11 @@ class RankedReviewEvidence(StrictModel):
     relevance_score: float = Field(ge=0, le=1)
     time_weight: float = Field(ge=0, le=1)
     evidence_weight: float = Field(ge=0, le=1)
+
+    @field_validator("review_time")
+    @classmethod
+    def normalize_review_time(cls, value: datetime) -> datetime:
+        return _utc_datetime(value)
 
 
 class BusinessPreferenceEvidence(StrictModel):
@@ -126,6 +140,28 @@ class RankedEvidenceBusiness(StrictModel):
     preference_evidence: list[BusinessPreferenceEvidence]
 
 
+class ReviewRetrievalMetrics(StrictModel):
+    """记录评论检索每个主要步骤的真实耗时和数据量。"""
+
+    query_vector_count: int = Field(default=0, ge=0)
+    embedding_batch_count: int = Field(default=0, ge=0)
+    embedding_latency_ms: float = Field(default=0, ge=0)
+    first_pass_search_latency_ms: float = Field(default=0, ge=0)
+    middle_pass_search_latency_ms: float = Field(default=0, ge=0)
+    final_pass_search_latency_ms: float = Field(default=0, ge=0)
+    local_vector_load_latency_ms: float = Field(default=0, ge=0)
+    full_review_load_latency_ms: float = Field(default=0, ge=0)
+    first_pass_segment_hit_count: int = Field(default=0, ge=0)
+    middle_pass_segment_hit_count: int = Field(default=0, ge=0)
+    final_pass_segment_hit_count: int = Field(default=0, ge=0)
+    middle_pass_business_count: int = Field(default=0, ge=0)
+    final_pass_business_count: int = Field(default=0, ge=0)
+    loaded_vector_count: int = Field(default=0, ge=0)
+    requirement_segment_relation_count: int = Field(default=0, ge=0)
+    unique_segment_count: int = Field(default=0, ge=0)
+    full_review_count: int = Field(default=0, ge=0)
+
+
 class ReviewEvidenceRankingResult(StrictModel):
     """新版评论证据排序的完整输出。"""
 
@@ -141,6 +177,10 @@ class ReviewEvidenceRankingResult(StrictModel):
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
     latency_ms: float = Field(ge=0)
+    description_latency_ms: float = Field(default=0, ge=0)
+    description_warning: str | None = Field(default=None, max_length=500)
+    scoring_latency_ms: float = Field(default=0, ge=0)
+    retrieval_metrics: ReviewRetrievalMetrics | None = None
     failure_reason: str | None = Field(default=None, max_length=500)
 
     @model_validator(mode="after")
@@ -154,3 +194,11 @@ class ReviewEvidenceRankingResult(StrictModel):
         elif self.failure_reason is None:
             raise ValueError("failed ranking requires a failure reason")
         return self
+
+
+def _utc_datetime(value: datetime) -> datetime:
+    """Yelp 原始时间没有时区标记，数据集语义统一按 UTC 处理。"""
+
+    if value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)

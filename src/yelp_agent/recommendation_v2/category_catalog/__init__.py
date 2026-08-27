@@ -8,6 +8,7 @@ from .schema import (
     FixedCategoryManifest,
     FixedCategoryRow,
 )
+from .search import CategoryCandidateSearch, CategorySearchCandidate
 
 __all__ = [
     "FIXED_CATEGORY_SCHEMA",
@@ -15,6 +16,8 @@ __all__ = [
     "FixedCategoryCatalog",
     "FixedCategoryManifest",
     "FixedCategoryRow",
+    "CategoryCandidateSearch",
+    "CategorySearchCandidate",
     "build_fixed_category_catalog",
     "load_fixed_category_catalog",
 ]

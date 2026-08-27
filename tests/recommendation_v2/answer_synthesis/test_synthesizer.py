@@ -5,6 +5,7 @@ from yelp_agent.agent.llm import LLMCallResult, LLMMessage
 from yelp_agent.recommendation_v2.answer_synthesis import (
     RecommendationAnswerSynthesizer,
 )
+from yelp_agent.recommendation_v2.answer_synthesis.synthesizer import _review_context
 from yelp_agent.recommendation_v2.business_facts import BusinessFact, WeeklyHours
 from yelp_agent.recommendation_v2.review_evidence.schema import (
     BusinessPreferenceEvidence,
@@ -14,8 +15,10 @@ from yelp_agent.recommendation_v2.review_evidence.schema import (
     ReviewEvidenceRankingResult,
 )
 from yelp_agent.recommendation_v2.schema import (
+    GeoPoint,
     HardConstraint,
     RequirementBasis,
+    SearchCenter,
     UnifiedRecommendationState,
 )
 
@@ -161,6 +164,11 @@ def test_synthesis_sends_only_compact_full_review_evidence_and_returns_free_text
         revision=1,
         turn_index=1,
         latest_query_text="今晚九点去费城唐人街吃地道川菜",
+        search_center=SearchCenter(
+            kind="named_place",
+            label="费城唐人街",
+            location=GeoPoint(latitude=39.9557, longitude=-75.1596),
+        ),
         hard_constraints=[
             HardConstraint(
                 key="hard.open_at.test",
@@ -189,16 +197,39 @@ def test_synthesis_sends_only_compact_full_review_evidence_and_returns_free_text
 
     assert answer.status == "success"
     assert answer.text == "首选测试川菜馆：评论直接提到川味足，但也有人觉得偏咸。"
-    assert len(answer.selected_review_ids_by_business["business-1"]) == 4
+    assert len(answer.selected_review_ids_by_business["business-1"]) == 2
     assert "r3" in answer.selected_review_ids_by_business["business-1"]
     payload = json.loads(generator.messages[1].content)
+    assert payload["top_count"] == 1
     sent_reviews = payload["top5"][0]["evidence"]
-    assert len(sent_reviews) == 4
+    assert len(sent_reviews) == 2
+    assert {item["role"] for item in sent_reviews} == {"positive", "negative"}
+    assert all("matched_part" not in item for item in sent_reviews)
     assert payload["top5"][0]["straight_line_distance_km"] == 0.4
     assert "distance_km" not in payload["top5"][0]
-    assert all(item["full_review"].startswith("完整真实评论") for item in sent_reviews)
+    assert all(item["review_context"].startswith("完整真实评论") for item in sent_reviews)
+    assert all("full_review" not in item for item in sent_reviews)
     assert payload["current_query"] == state.latest_query_text
+    assert payload["search_center"] == {
+        "label": "费城唐人街",
+        "latitude": 39.9557,
+        "longitude": -75.1596,
+    }
     assert "weekly_hours" not in payload["top5"][0]["business"]
+    assert set(payload["top5"][0]["business"]) == {
+        "business_id",
+        "name",
+        "address",
+        "city",
+        "state",
+        "postal_code",
+        "categories",
+        "price_level",
+        "price_lower_usd",
+        "price_upper_usd",
+        "rating",
+        "review_count",
+    }
     assert payload["top5"][0]["visit_context"] == {
         "local_datetime": "2026-08-25T21:00-04:00",
         "weekday": "周二",
@@ -208,3 +239,26 @@ def test_synthesis_sends_only_compact_full_review_evidence_and_returns_free_text
     }
     assert "不需要返回 JSON" in generator.messages[0].content
     assert "不是步行、驾车或路线距离" in generator.messages[0].content
+
+
+def test_long_review_keeps_match_and_neighboring_sentences() -> None:
+    review = _review("context-review", "positive", 0.9).model_copy(
+        update={
+            "review_text": (
+                "Opening sentence that is not relevant. "
+                "The server brought water quickly. "
+                "The steak was juicy and cooked perfectly. "
+                "We would order it again. "
+                + "Unrelated ending. " * 200
+            ),
+            "matched_segment_text": "The steak was juicy and cooked perfectly.",
+        }
+    )
+
+    context = _review_context(review, maximum_characters=300)
+
+    assert "The server brought water quickly." in context
+    assert "The steak was juicy and cooked perfectly." in context
+    assert "We would order it again." in context
+    assert "Opening sentence" not in context
+    assert len(context) <= 300

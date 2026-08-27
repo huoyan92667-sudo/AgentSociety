@@ -42,6 +42,17 @@ class _Generator:
         )
 
 
+class _InvalidGenerator:
+    def generate(self, messages: list[object]) -> LLMCallResult:
+        return LLMCallResult(
+            status="success",
+            content='{"items":[]}',
+            model="fake",
+            latency_ms=1,
+            attempt_count=1,
+        )
+
+
 def _open(key: str, text: str, priority: int) -> OpenRequirement:
     return OpenRequirement(
         key=key,
@@ -101,6 +112,21 @@ def test_online_fixed_aspect_is_rewritten_with_current_query() -> None:
     assert result.failure_reason is None
     assert result.descriptions[0].kind == "fixed_aspect"
     assert generator.call_count == 1
+
+
+def test_invalid_online_rewrite_falls_back_to_fixed_aspect_without_failing_turn() -> None:
+    preference = get_scene_baseline("date").soft_preferences[0]
+
+    result = PreferenceDescriptionBuilder(_InvalidGenerator()).build(
+        [preference],
+        [],
+        query_text="我想吃牛排",
+    )
+
+    assert result.failure_reason is None
+    assert result.warning is not None
+    assert result.descriptions[0].requirement_id == preference.key
+    assert result.descriptions[0].positive_descriptions
 
 
 def test_current_long_tail_requirement_is_returned_before_weaker_fixed_aspect() -> None:

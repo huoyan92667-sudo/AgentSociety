@@ -66,6 +66,45 @@ class RecordingTransport:
         )
 
 
+class StreamingTransport(RecordingTransport):
+    def stream(self, **kwargs: object) -> LLMTransportResponse:
+        self.requests.append(kwargs)
+        on_delta = kwargs["on_delta"]
+        on_delta("第一段")
+        on_delta("第二段")
+        return LLMTransportResponse(
+            content="第一段第二段",
+            input_tokens=80,
+            output_tokens=12,
+            total_tokens=92,
+            provider_request_id="stream-request-1",
+        )
+
+
+def test_stream_forwards_each_delta_and_returns_complete_usage() -> None:
+    transport = StreamingTransport()
+    llm = OpenAICompatibleLLM.from_environment(
+        _agent_config(),
+        environment={
+            "OPENAI_API_KEY": "secret-test-key",
+            "OPENAI_MODEL": "deepseek-v4-flash",
+        },
+        transport=transport,
+    )
+    deltas: list[str] = []
+
+    result = llm.stream(
+        [LLMMessage(role="user", content="生成推荐")],
+        deltas.append,
+    )
+
+    assert deltas == ["第一段", "第二段"]
+    assert result.status == "success"
+    assert result.content == "第一段第二段"
+    assert result.input_tokens == 80
+    assert result.output_tokens == 12
+
+
 def test_successful_call_forwards_deterministic_settings_and_usage() -> None:
     transport = RecordingTransport()
     llm = OpenAICompatibleLLM.from_environment(

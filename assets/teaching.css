@@ -1,0 +1,41 @@
+:root {
+  color-scheme: light;
+  --ink: #172033;
+  --muted: #5c667a;
+  --paper: #f6f8fc;
+  --card: #ffffff;
+  --line: #dfe5ef;
+  --blue: #2855d9;
+  --cyan: #087f8c;
+  --amber: #9a5b00;
+  --red: #a23838;
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--paper); line-height: 1.72; }
+main { max-width: 1080px; margin: 0 auto; padding: 44px 24px 80px; }
+h1 { margin: 0 0 8px; font-size: clamp(30px, 5vw, 50px); line-height: 1.15; }
+h2 { margin-top: 42px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+h3 { margin: 0 0 8px; }
+p { margin: 8px 0 14px; }
+a { color: var(--blue); }
+.lede { color: var(--muted); font-size: 18px; max-width: 850px; }
+.flow { display: grid; gap: 10px; margin: 24px 0; }
+.step, .card, .callout { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+.step { display: grid; grid-template-columns: 54px 1fr; align-items: start; }
+.num { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--blue); color: white; font-weight: 700; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.history { border-top: 5px solid var(--blue); }
+.query { border-top: 5px solid var(--cyan); }
+.rank { border-top: 5px solid var(--amber); }
+.warn { border-left: 5px solid var(--red); }
+.good { border-left: 5px solid var(--cyan); }
+.formula { font-family: Consolas, monospace; background: #edf1fa; padding: 12px 14px; border-radius: 10px; overflow-x: auto; }
+.tag { display: inline-block; padding: 2px 9px; margin: 2px 4px 2px 0; border-radius: 999px; background: #edf1fa; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; background: var(--card); }
+th, td { text-align: left; padding: 10px 12px; border: 1px solid var(--line); vertical-align: top; }
+th { background: #edf1fa; }
+code { background: #edf1fa; padding: 2px 5px; border-radius: 5px; }
+.recall { margin-top: 30px; padding: 20px; background: #fff8e8; border: 1px solid #efd59e; border-radius: 14px; }
+@media print { body { background: white; } main { max-width: none; padding: 18mm; } .card, .step { break-inside: avoid; } }

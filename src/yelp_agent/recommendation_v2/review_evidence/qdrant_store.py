@@ -6,6 +6,7 @@ import calendar
 import hashlib
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
@@ -229,13 +230,46 @@ class QdrantReviewSegmentStore:
                 limit=len(batch_ids),
                 group_size=group_size,
                 with_payload=True,
-                with_vectors=True,
+                # 完整向量在本机的 .npy 文件中按 point_id 读取。
+                with_vectors=False,
                 score_threshold=score_threshold,
             )
             for group in groups.groups:
                 business_id = str(group.id)
                 result[business_id] = [self._hit(item) for item in group.hits]
         return result
+
+    def search_grouped_many(
+        self,
+        query_vectors: list[np.ndarray],
+        business_ids: list[str],
+        *,
+        score_threshold: float,
+        cutoff_time: datetime | None = None,
+        group_size: int = 25,
+        max_concurrency: int = 4,
+    ) -> list[dict[str, list[QdrantSegmentHit]]]:
+        """有限并行执行多种评论说法，返回顺序与查询向量完全一致。"""
+
+        if not query_vectors:
+            return []
+        if max_concurrency < 1:
+            raise ValueError("max_concurrency must be positive")
+
+        def search(vector: np.ndarray) -> dict[str, list[QdrantSegmentHit]]:
+            return self.search_grouped(
+                vector,
+                business_ids,
+                score_threshold=score_threshold,
+                cutoff_time=cutoff_time,
+                group_size=group_size,
+            )
+
+        # Qdrant 客户端内部使用连接池；限制并行数可以缩短串行等待，
+        # 又不会让十几条查询同时把本地服务压满。
+        workers = min(max_concurrency, len(query_vectors))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            return list(executor.map(search, query_vectors))
 
     def _collection_point_count(self) -> int:
         return int(self._client.get_collection(self.collection_name).points_count or 0)
@@ -260,9 +294,6 @@ class QdrantReviewSegmentStore:
     @staticmethod
     def _hit(point: models.ScoredPoint) -> QdrantSegmentHit:
         payload = point.payload or {}
-        raw_vector = point.vector
-        if not isinstance(raw_vector, list):
-            raise TypeError("Qdrant did not return the dense segment vector")
         return QdrantSegmentHit(
             point_id=int(point.id),
             segment_id=str(payload["segment_id"]),
@@ -276,7 +307,6 @@ class QdrantReviewSegmentStore:
             segment_text=str(payload["segment_text"]),
             review_text_sha256=str(payload["review_text_sha256"]),
             route_similarity=float(point.score),
-            vector=[float(value) for value in raw_vector],
         )
 
     @staticmethod

@@ -43,6 +43,7 @@ class DescriptionBuildResult(StrictModel):
     descriptions: list[PreferenceSearchDescription]
     call: LLMCallResult | None = None
     raw_json: str | None = None
+    warning: str | None = Field(default=None, max_length=500)
     failure_reason: str | None = None
 
 
@@ -81,20 +82,39 @@ class PreferenceDescriptionBuilder:
             self._messages(query_text or "", fixed, long_tail)
         )
         if call.status != "success" or call.content is None:
+            reason = _short_reason(
+                call.failure_reason or "description_generation_failed"
+            )
+            if fixed and not long_tail:
+                return DescriptionBuildResult(
+                    descriptions=fixed,
+                    call=call,
+                    warning=f"使用固定检索说法：{reason}",
+                )
             return DescriptionBuildResult(
                 descriptions=fixed,
                 call=call,
-                failure_reason=call.failure_reason or "description_generation_failed",
+                failure_reason=reason,
             )
         try:
             proposal = _SearchDescriptionProposal.model_validate_json(call.content)
             expanded = self._validate_and_materialize(fixed, long_tail, proposal)
         except (ValidationError, ValueError) as exc:
+            reason = _short_reason(f"invalid search descriptions: {exc}")
+            # 当前只有固定14种偏好时，大模型改写失败不能让整轮推荐重跑。
+            # 直接使用已经定义好的正反锚点，相关性稍弱但语义和方向可靠。
+            if fixed and not long_tail:
+                return DescriptionBuildResult(
+                    descriptions=fixed,
+                    call=call,
+                    raw_json=call.content,
+                    warning=f"使用固定检索说法：{reason}",
+                )
             return DescriptionBuildResult(
                 descriptions=fixed,
                 call=call,
                 raw_json=call.content,
-                failure_reason=f"invalid search descriptions: {exc}",
+                failure_reason=reason,
             )
         return DescriptionBuildResult(
             descriptions=expanded,
@@ -218,3 +238,10 @@ class PreferenceDescriptionBuilder:
         # 最终评论挑选也会沿用这里的顺序，所以必须让当前问题产生的第一
         # 优先要求真正排在画像和场景前面，不能只在打分公式里权重大。
         return sorted(result, key=lambda item: (item.priority, item.requirement_id))
+
+
+def _short_reason(value: str, maximum: int = 450) -> str:
+    """错误进入统一结果前先限长，避免错误说明本身再次触发校验失败。"""
+
+    cleaned = " ".join(value.split())
+    return cleaned if len(cleaned) <= maximum else cleaned[: maximum - 1] + "…"

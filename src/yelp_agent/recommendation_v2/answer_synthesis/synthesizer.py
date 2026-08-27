@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import re
+from collections.abc import Callable
 from typing import Protocol
 
 from pydantic import Field
@@ -26,7 +28,7 @@ from yelp_agent.recommendation_v2.schema import UnifiedRecommendationState
 PROMPT_VERSION = "personalized-recommendation-answer-v1"
 
 _SYSTEM_PROMPT = """
-你负责把已经完成硬过滤和证据排序的五家餐厅，写成给用户看的中文推荐回答。
+你负责把已经完成硬过滤和证据排序的餐厅，写成给用户看的中文推荐回答。实际可能少于五家。
 
 你可以自然组织语言，不需要返回 JSON，也不必机械填写固定栏目。但必须遵守：
 1. 围绕 current_query 回答，不能只泛泛介绍餐厅。
@@ -38,12 +40,13 @@ _SYSTEM_PROMPT = """
 7. 结合软偏好的先后顺序解释个性化原因，但不要暴露内部字段名、相似度、公式和计算过程。
 8. 每家控制在一小段：核心推荐理由、最相关的真实证据、必要的风险或条件。
 9. 营业时间来自历史 Yelp 数据；如果提到，只能表述为“数据记录显示”，不能声称实时准确。
-10. 按 rank=1 到 rank=5 依次介绍，介绍完第五家直接结束。禁止在末尾再次比较、重新排序或另选“最好、首选、最稳妥”的商家。
+10. top_count 是本轮真实商家数。只按已有 rank 从1介绍到 top_count，介绍完最后一家直接结束。严禁补写不存在的名次、道歉段落、额外商家，也禁止在末尾再次比较或重新排序。
 11. visit_context 是程序按到店时间算好的结果。星期、当天营业时段和是否营业必须原样使用，禁止自己从日期推算星期，禁止拿其他星期的营业时间代替。
 12. straight_line_distance_km 是经纬度直线距离，不是步行、驾车或路线距离。只能说“直线距离约多少”，不能改写成步行可达或步行多少公里。
 13. 禁止使用模型自身知道的餐厅背景。除非商家事实或所给评论直接写明，否则不能说“知名、连锁、老字号、核心区、最佳位置”。
 14. 评论里的外送经历只能说明外送，不能推导堂食普遍如何。只有一条评论时不能写“普遍、多次、多条评论都认为”。
 15. 正反证据混合时必须保留风险，不能新造“最稳妥、口味有保障、位置最佳”等更强结论。
+16. 输出必须由现有商家的编号段落组成。最后一家风险写完就立刻停止；禁止另写“综合来看、总体来说、如果更看重、前几家、后几家”等总结或二次比较段落。
 """.strip()
 
 
@@ -68,7 +71,7 @@ class RecommendationAnswer(StrictModel):
 
 
 class RecommendationAnswerSynthesizer:
-    """每家最多选四条完整评论，一次调用生成整份 Top5 推荐。"""
+    """每家最多两条完整评论，一次调用生成本轮全部推荐。"""
 
     def __init__(self, generator: AnswerGenerator) -> None:
         self._generator = generator
@@ -79,6 +82,7 @@ class RecommendationAnswerSynthesizer:
         query_text: str,
         state: UnifiedRecommendationState,
         ranking: ReviewEvidenceRankingResult,
+        on_delta: Callable[[str], None] | None = None,
     ) -> RecommendationAnswer:
         selected_by_business: dict[str, list[RankedReviewEvidence]] = {}
         businesses: list[dict[str, object]] = []
@@ -91,8 +95,7 @@ class RecommendationAnswerSynthesizer:
             selected_by_business[business_id] = selected
             # 完整的一周营业表既浪费上下文，也容易让模型读错星期。程序只把
             # 本轮真正到店那一天和已经计算好的营业结论交给最终总结。
-            business_facts = ranked.business.model_dump(mode="json")
-            business_facts.pop("weekly_hours", None)
+            business_facts = _answer_business_facts(ranked.business)
             businesses.append(
                 {
                     "rank": ranked.final_rank,
@@ -105,8 +108,9 @@ class RecommendationAnswerSynthesizer:
                             "role": item.role,
                             "review_time": item.review_time.isoformat(),
                             "stars": item.stars,
-                            "full_review": item.review_text,
-                            "matched_part": item.matched_segment_text,
+                            # 完整评论仍保存在排序结果文件中。最终回答只读取
+                            # 命中内容及相邻句，既保留语境也避免传入整篇长文。
+                            "review_context": _review_context(item),
                             "supports_requirement": _requirement_for_review(
                                 item.review_id,
                                 ranked.preference_evidence,
@@ -123,29 +127,60 @@ class RecommendationAnswerSynthesizer:
         }
         payload = {
             "current_query": query_text,
+            "top_count": len(businesses),
             "active_hard_constraints": [
-                item.model_dump(mode="json") for item in state.hard_constraints
+                {
+                    "field": item.field,
+                    "operator": item.operator,
+                    "value": item.value,
+                }
+                for item in state.hard_constraints
             ],
             "ordered_soft_preferences": [
-                item.model_dump(mode="json") for item in state.soft_preferences
+                {
+                    "field": item.field,
+                    "direction": item.direction,
+                    "target_value": item.target_value,
+                    "priority": item.priority,
+                }
+                for item in state.soft_preferences
             ],
-            "scene": None if state.scene is None else state.scene.model_dump(mode="json"),
+            "scene": (
+                None
+                if state.scene is None
+                else {
+                    "kind": state.scene.kind,
+                    "custom_label": state.scene.custom_label,
+                }
+            ),
             "search_center": (
                 None
                 if state.search_center is None
-                else state.search_center.model_dump(mode="json")
+                else {
+                    "label": state.search_center.label,
+                    # 搜索中心本身只保存计算起点；距离上限属于硬条件，
+                    # 已经在 active_hard_constraints 中单独提供给回答模型。
+                    "latitude": state.search_center.location.latitude,
+                    "longitude": state.search_center.location.longitude,
+                }
             ),
             "top5": businesses,
         }
-        call = self._generator.generate(
-            [
-                LLMMessage(role="system", content=_SYSTEM_PROMPT),
-                LLMMessage(
-                    role="user",
-                    content=json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
-                ),
-            ]
-        )
+        messages = [
+            LLMMessage(role="system", content=_SYSTEM_PROMPT),
+            LLMMessage(
+                role="user",
+                content=json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
+            ),
+        ]
+        stream = getattr(self._generator, "stream", None)
+        if on_delta is not None and callable(stream):
+            call = stream(messages, on_delta)
+        else:
+            call = self._generator.generate(messages)
+            # 旧生成器没有逐片能力时仍维持回调语义，但真实运行时不会走这里。
+            if on_delta is not None and call.status == "success" and call.content:
+                on_delta(call.content)
         if call.status != "success" or call.content is None:
             return RecommendationAnswer(
                 status="failure",
@@ -208,20 +243,23 @@ def _visit_context(
 def _select_business_evidence(
     assessments: list[BusinessPreferenceEvidence],
 ) -> list[RankedReviewEvidence]:
-    """优先覆盖不同偏好，再用强证据补满；同一评论只送入一次。"""
+    """每家只给一条高优先正面和一条重要风险，避免20条长评论撑爆上下文。"""
 
     selected: list[RankedReviewEvidence] = []
     seen: set[str] = set()
-    # 先从优先级靠前的每项各拿一条正面，最多两条。
+    # assessments 已按融合后的偏好顺序生成，所以先出现的证据对应更重要要求。
     for assessment in assessments:
         positives = assessment.positive_evidence
-        if positives and len([item for item in selected if item.role == "positive"]) < 2:
+        if positives:
             _append_unique(selected, seen, positives[0])
-    # 至少保留一条最重要的反面或条件风险；有空间时可保留第二条。
+            break
+    # 反面证据不能因为节省词元被吞掉；优先保留最高优先要求的风险。
     for assessment in assessments:
         negatives = assessment.negative_evidence
-        if negatives and len([item for item in selected if item.role == "negative"]) < 1:
+        if negatives:
             _append_unique(selected, seen, negatives[0])
+            break
+    # 某一方向完全没有证据时，用剩余最强证据补到两条，但绝不超过两条。
     remaining = sorted(
         [
             item
@@ -235,10 +273,73 @@ def _select_business_evidence(
         key=lambda item: (-item.evidence_weight, item.review_id),
     )
     for item in remaining:
-        if len(selected) >= 4:
+        if len(selected) >= 2:
             break
         _append_unique(selected, seen, item)
-    return selected[:4]
+    return selected[:2]
+
+
+def _review_context(
+    item: RankedReviewEvidence,
+    *,
+    maximum_characters: int = 1200,
+) -> str:
+    """截取命中句及前后各一句；短评论直接保留全文。"""
+
+    full_text = item.review_text.strip()
+    if len(full_text) <= maximum_characters:
+        return full_text
+    sentences = [
+        value.strip()
+        for value in re.split(r"(?<=[.!?。！？])\s+", full_text)
+        if value.strip()
+    ]
+    if len(sentences) <= 3:
+        return full_text[:maximum_characters].rstrip()
+
+    matched = item.matched_segment_text.strip()
+    matched_lower = matched.casefold()
+    match_index = next(
+        (
+            index
+            for index, sentence in enumerate(sentences)
+            if sentence.casefold() in matched_lower
+            or matched_lower in sentence.casefold()
+        ),
+        None,
+    )
+    if match_index is None:
+        matched_terms = set(re.findall(r"\w+", matched_lower))
+        match_index = max(
+            range(len(sentences)),
+            key=lambda index: len(
+                matched_terms
+                & set(re.findall(r"\w+", sentences[index].casefold()))
+            ),
+        )
+    start = max(0, match_index - 1)
+    end = min(len(sentences), match_index + 2)
+    context = " ".join(sentences[start:end])
+    return context[:maximum_characters].rstrip()
+
+
+def _answer_business_facts(business: BusinessFact) -> dict[str, object]:
+    """只把本轮推荐理由会使用的商家事实交给最终总结模型。"""
+
+    return {
+        "business_id": business.business_id,
+        "name": business.name,
+        "address": business.address,
+        "city": business.city,
+        "state": business.state,
+        "postal_code": business.postal_code,
+        "categories": business.categories,
+        "price_level": business.price_level,
+        "price_lower_usd": business.price_lower_usd,
+        "price_upper_usd": business.price_upper_usd,
+        "rating": business.rating,
+        "review_count": business.review_count,
+    }
 
 
 def _append_unique(

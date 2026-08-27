@@ -8,6 +8,7 @@ from yelp_agent.agent.llm import LLMCallResult, LLMMessage
 from yelp_agent.recommendation_v2.preference_fusion import (
     CompactHardRequirement,
     CompactOpenRequirement,
+    CompactReviewSearchPlan,
     CompactSceneSelection,
     CompactSearchCenter,
     CompactSoftRequirement,
@@ -187,6 +188,78 @@ def test_model_receives_only_dialogue_context_and_hides_program_managed_sources(
     assert "scene_baseline" not in payload
     assert "profile_preferences" not in payload
     assert payload["available_tool"]["name"] == "lookup_history_business"
+
+
+def test_model_receives_only_retrieved_category_candidates_and_compact_contract() -> None:
+    """类别先在本地召回，不能把179个类别和完整模型定义重复发给大模型。"""
+
+    generator = FakeGenerator(PreferenceFusionProposal())
+    attempt = PreferenceFusion(generator).fuse(
+        PreferenceFusionRequest(
+            user_id="user-1",
+            session_id="session-1",
+            turn_index=1,
+            query_text="我今天晚上7点想吃牛排",
+        )
+    )
+
+    assert attempt.status == "success"
+    payload = json.loads(generator.calls[0][1].content)
+    candidates = payload["category_candidates"]
+    assert candidates[0]["category"] == "Steakhouses"
+    assert len(candidates) <= 5
+    assert "allowed_dining_categories" not in payload
+    assert "final_output_schema" not in payload
+    assert "output_contract" in payload
+    assert len(generator.calls[0][1].content) < 8_000
+
+
+def test_one_fusion_call_also_prepares_long_tail_review_search_descriptions() -> None:
+    """开放要求的正反检索说法必须随融合结果一起生成，不再另调模型。"""
+
+    proposal = PreferenceFusionProposal(
+        open_requirements=[
+            CompactOpenRequirement(
+                text="地道川菜",
+                behavior="prefer",
+                priority=1,
+                evidence_text="要地道川菜",
+                evidence_turn_index=1,
+            )
+        ],
+        review_search_plans=[
+            CompactReviewSearchPlan(
+                kind="long_tail",
+                requirement_text="地道川菜",
+                behavior="prefer",
+                positive_descriptions=[
+                    "authentic Sichuan flavor",
+                    "proper numbing spicy balance",
+                ],
+                negative_descriptions=[
+                    "watered down Sichuan flavor",
+                    "inauthentic generic Chinese food",
+                ],
+            )
+        ],
+    )
+    generator = FakeGenerator(proposal)
+
+    attempt = PreferenceFusion(generator).fuse(
+        PreferenceFusionRequest(
+            user_id="user-1",
+            session_id="session-1",
+            turn_index=1,
+            query_text="要地道川菜",
+        )
+    )
+
+    assert attempt.status == "success"
+    assert len(generator.calls) == 1
+    assert len(attempt.review_search_descriptions) == 1
+    description = attempt.review_search_descriptions[0]
+    assert description.requirement_text == "地道川菜"
+    assert description.positive_descriptions[0] == "authentic Sichuan flavor"
 
 
 def test_compact_output_does_not_ask_model_for_fixed_technical_fields() -> None:
