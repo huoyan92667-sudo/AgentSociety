@@ -15,6 +15,7 @@ dist/
 # IDE files
 .idea/
 .vscode/
+.claude/
 
 # Large and generated Yelp artifacts
 data/raw/*.tar
