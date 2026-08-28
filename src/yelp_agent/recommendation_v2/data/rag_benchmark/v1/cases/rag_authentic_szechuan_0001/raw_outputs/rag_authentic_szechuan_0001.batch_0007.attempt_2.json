@@ -1,0 +1,703 @@
+{
+  "is_error": false,
+  "duration_api_ms": 121085,
+  "num_turns": 2,
+  "stop_reason": "tool_use",
+  "session_id": "d8a1a256-0687-49bd-8d05-3a17ccd513d4",
+  "total_cost_usd": 0.20957399999999995,
+  "usage": {
+    "input_tokens": 132,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 16128,
+    "output_tokens": 8034,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "glm-5.1": {
+      "inputTokens": 132,
+      "outputTokens": 8034,
+      "cacheReadInputTokens": 16128,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.20957399999999995,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "canonicalModel": "glm-5.1",
+      "provider": "firstParty",
+      "costBasis": "unknown"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"batch_id\":\"rag_authentic_szechuan_0001.batch_0007\",\"case_id\":\"rag_authentic_szechuan_0001\",\"labels\":[{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"NYXaL2IO3q8LjpZuvXlIJg\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"u-7vx0q8JkTN2SmfYWcKMA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"I was very pleased and it was hot enough to make me sweat a little.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":\"(I'd asked them to make it spicy.)\",\"review_id\":\"_RelJERQYlVcmpDzaNQd0Q\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"boiled dumplings in hot sauce (very traditional Szechuan dish)\",\"WOW the food here is spicy! Which is a giant plus for me\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"GL1vfVRsq0csIrNTC5ymyA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"iE8UyZL3pSMROQ4Wlmh-Sg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"The real star was the shredded beef with long hots. This was just spicy enough and delicious\"],\"negative_spans\":[\"The noodles were okay, but they don't hold a candle to the ones at Han Dynasty.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"_WpALkKKNxfsBolMuqLT5Q\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"The saliva chicken was a different spice, which was a good spice... aromatic and tasty\"],\"negative_spans\":[\"The mo po tofu tasted a bit bitter.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"zcEiZ4v6aLdikQ2KgpHJGA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"The food there is extremely authentic and spicy!\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"LVmxZfE7hndCPEWT1aELCA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"This restaurant is definitely good for Szechuan style food\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"7l40YZYBvSGzn3CQfapQ3g\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"negative\",\"positive_spans\":[],\"negative_spans\":[\"i wouldn't necessarily classify this as a sichuan restaurant, as their spicy dishes are not THAT spicy and their cooking lacks the signature peppercorns indicative of sichuan food.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"6gaGpCd1LtgPPmK5PGjA_w\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"Cumin Lamb, excellent.\"],\"negative_spans\":[\"Lot's of hot chili oil but not enough szechuan pepper corn.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"6JNPUMKi-qKThGIM8RrApQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"love the kung pao chicken, fish filet in spicy sauce\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"Rd7VwnOI-_elrkEpO5MATw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"Spicy and flavorful dishes made with quality ingredients in a nice space.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"oU-TJf5yCKhpJOIZGOhH6w\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"I have to say their's...It was realllllllyyyyy good.\"],\"negative_spans\":[\"Although not as spicy as I liked\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"ZGiaGFBpMv-3tCgKeKxboA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"Sometimes the fishes taste great\"],\"negative_spans\":[\"sometimes it only taste \\\"okay\\\"\"],\"ambiguous_span\":null,\"condition_text\":\"the only complain we have is the \\\"inconsistency\\\"\",\"review_id\":\"f9IgryVoohLhYHK5Q0Cm8A\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"I was interested to see whether these guys were really legit when it comes to Sichuan type cuisine.\",\"Twice cooked pork- Flavor was on\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"Qv8Odq4QOpdIFJ4h_5jGcg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"This restaurant has one very unique advantage in the Philly area; authentic hot pot.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"dJU2yOAeEJbV1DIn1Qgv0Q\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"The kung pao chicken and dan dan noodles were flavorful.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"5_mCYNTB5gmcqsCOzBELYQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"E Mei is simply the best \\\"honest-to-goodness\\\", mouth-numbing, seriously spicy Szechuan restaurant I have been to in the U.S.\",\"the liberal (and authentic) use of Szechuan pepper-corns in many of the dishes.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"fG5LJcXY_JIhUyhjGr7DIQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"Recently I've been told the food was getting better so I went there last Saturday. It was good.\"],\"negative_spans\":[\"At the beginning the food was great but then it's getting worse so I stopped going there.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"pksWb87ZRemvbr8aXuCknQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"1qBmSsH8vnFsTZE7CdDY4g\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"The dishes here have probably the best balance of great flavors and heat that I've had to date.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"y5BeneufKvjENxB48Bhlxg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"g8lOGcjKt4WJ448B5bTXbw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"The beef with long peppers was, hands down, the best dish we tried.\"],\"negative_spans\":[\"I actually wasn't a huge fan of the dan dan noodles\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"Oo1T107ASqMLtRUGxsSvnw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"This place is the best Sichuan resto that I have been to.\",\"they use real Sichuan peppercorns, not just additional chilies for the heat.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"d0mHmnNl_tPuAFF-Eb6ECg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"Szechuan food with a good amount of spice.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"tG60thlAE_Igtgbw9g5UDQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"X-ZkYEYbYODOqKyaFyyA8A\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"mixed\",\"positive_spans\":[\"E Mei is where you want your authentic Szechuan food, if you know what to order.\"],\"negative_spans\":[\"E Mei disappointed me with their performance\"],\"ambiguous_span\":null,\"condition_text\":\"点普通中餐菜（如糖醋 pork）会失望，需点川菜招牌菜\",\"review_id\":\"cMLpI_4I8kORKs9PWxFmlg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"you should know what you want to order before you get there (authentic Szechuan dishes, the other reviewers covered this already), and skip the Americanized stuff on their lunch special\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":\"需点正宗川菜，跳过午餐特供的美式菜\",\"review_id\":\"Kj6BzI6HDqXhR-JKwmSGww\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"The shredded beef with long hots was delicious.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"A3iU8JR0apDWEOVAN5rqZA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"the spicy lamb with cumin...and it was amazing.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"4kP3XAPqCUCAPo0BTHngTQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"positive_spans\":[],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"cRDUj-CwXwvMxL4tHn6bSg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"But the spicy chicken was nice and crispy. A little on the oily side but overall, very good and hot.\"],\"negative_spans\":[\"The chow fun was really bad.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"oD7t1RMac9pxqk40sxWLjg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"This place has great authentic SiChuan food.\",\"the spicy wasn't only hot... it was numbing\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"iA6NRaTOSsXdaXylVo1ObA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"loved the non-fried option that was just spicy enough\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"JL9yE8MCsO2NJfyuB6pMPw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"As a native chinese, I like to explore authentic Chinese restaurants and this one comes on top of my list.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"9RtgT3aZzAyl8hvb91wFxA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"the bold flavors of  proper Szechuan Chinese\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"z1Qq6cYBvh1tV3GXms9eXA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"All of the dishes were out of the world.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"lbitgKMhfjVTw3Ln6CLAPA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"It's a true Szechuan experience.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"31up5xLuw5NEiIj7357m3g\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"This screams authenticity.\",\"the peppercorns pack a better punch\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"B90JZM3td5cDYXsZ-2dX7g\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"they've got great food\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":\"需主动要求服务员降辣，否则有时辣到无法入口\",\"review_id\":\"kaSkZg8gwWO5XF6Z1LpiGw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"I love their fried meats, and it's pretty cheap!\"],\"negative_spans\":[\"still not spicy enough\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"SB03QJpXcTGUL270PJ_Zog\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"positive_spans\":[\"The sliced beef and tripe and chongqing spicy chicken had bold, spicy flavors\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"vDWx35VCNrmT4Z_VkQrOIg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"The hotpot is true Sichuan style\",\"This place is a primary hang out spot for Sichuan exchange students from China for a reason\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"-4VVFeRYheaDQ6V505GyEg\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"Extremely authentic Sichuan style food!!\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"NZcsn4-1PUq-zRAR_bfpnA\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"negative\",\"positive_spans\":[],\"negative_spans\":[\"not authentic enough. still very americanized sweet sauce kind of stuff in almost every dish.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"EigocVh1JtiNRGsgI_H_PQ\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"positive_spans\":[\"One of the most authentic Si-Chuan cuisine you can find in east coast\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"tMrbG6R6LjOyMxAdTiecng\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"weak\",\"label\":\"positive\",\"positive_spans\":[\"Spicy and delicious.\"],\"negative_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"EzG1NiaLOIJ_cCSV5vA_4A\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"negative\",\"positive_spans\":[],\"negative_spans\":[\"The sauces on the dishes were sickly sweet and were thick and gloomy.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"nQRI_BNaJXaoIMDwS0Rlbw\"},{\"business_id\":\"s9ceDy-cVHe0uzvZpWq87Q\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"positive_spans\":[\"the Chongqing spicy chicken was seriously one of the best dishes I've ever had!!\"],\"negative_spans\":[\"The vermicelli - ehhhhhhhhh. That was NOT my cup of tea!\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"aNdbQtLBihMyyVS-w-kYOg\"}]}",
+  "structured_output": {
+    "batch_id": "rag_authentic_szechuan_0001.batch_0007",
+    "case_id": "rag_authentic_szechuan_0001",
+    "labels": [
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "NYXaL2IO3q8LjpZuvXlIJg"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "u-7vx0q8JkTN2SmfYWcKMA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "I was very pleased and it was hot enough to make me sweat a little."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": "(I'd asked them to make it spicy.)",
+        "review_id": "_RelJERQYlVcmpDzaNQd0Q"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "boiled dumplings in hot sauce (very traditional Szechuan dish)",
+          "WOW the food here is spicy! Which is a giant plus for me"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "GL1vfVRsq0csIrNTC5ymyA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "iE8UyZL3pSMROQ4Wlmh-Sg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "The real star was the shredded beef with long hots. This was just spicy enough and delicious"
+        ],
+        "negative_spans": [
+          "The noodles were okay, but they don't hold a candle to the ones at Han Dynasty."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "_WpALkKKNxfsBolMuqLT5Q"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "The saliva chicken was a different spice, which was a good spice... aromatic and tasty"
+        ],
+        "negative_spans": [
+          "The mo po tofu tasted a bit bitter."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "zcEiZ4v6aLdikQ2KgpHJGA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "The food there is extremely authentic and spicy!"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "LVmxZfE7hndCPEWT1aELCA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "This restaurant is definitely good for Szechuan style food"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "7l40YZYBvSGzn3CQfapQ3g"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "negative",
+        "positive_spans": [],
+        "negative_spans": [
+          "i wouldn't necessarily classify this as a sichuan restaurant, as their spicy dishes are not THAT spicy and their cooking lacks the signature peppercorns indicative of sichuan food."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "6gaGpCd1LtgPPmK5PGjA_w"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "Cumin Lamb, excellent."
+        ],
+        "negative_spans": [
+          "Lot's of hot chili oil but not enough szechuan pepper corn."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "6JNPUMKi-qKThGIM8RrApQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "love the kung pao chicken, fish filet in spicy sauce"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "Rd7VwnOI-_elrkEpO5MATw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "Spicy and flavorful dishes made with quality ingredients in a nice space."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "oU-TJf5yCKhpJOIZGOhH6w"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "I have to say their's...It was realllllllyyyyy good."
+        ],
+        "negative_spans": [
+          "Although not as spicy as I liked"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "ZGiaGFBpMv-3tCgKeKxboA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "Sometimes the fishes taste great"
+        ],
+        "negative_spans": [
+          "sometimes it only taste \"okay\""
+        ],
+        "ambiguous_span": null,
+        "condition_text": "the only complain we have is the \"inconsistency\"",
+        "review_id": "f9IgryVoohLhYHK5Q0Cm8A"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "I was interested to see whether these guys were really legit when it comes to Sichuan type cuisine.",
+          "Twice cooked pork- Flavor was on"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "Qv8Odq4QOpdIFJ4h_5jGcg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "This restaurant has one very unique advantage in the Philly area; authentic hot pot."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "dJU2yOAeEJbV1DIn1Qgv0Q"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "The kung pao chicken and dan dan noodles were flavorful."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "5_mCYNTB5gmcqsCOzBELYQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "E Mei is simply the best \"honest-to-goodness\", mouth-numbing, seriously spicy Szechuan restaurant I have been to in the U.S.",
+          "the liberal (and authentic) use of Szechuan pepper-corns in many of the dishes."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "fG5LJcXY_JIhUyhjGr7DIQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "Recently I've been told the food was getting better so I went there last Saturday. It was good."
+        ],
+        "negative_spans": [
+          "At the beginning the food was great but then it's getting worse so I stopped going there."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "pksWb87ZRemvbr8aXuCknQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "1qBmSsH8vnFsTZE7CdDY4g"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "The dishes here have probably the best balance of great flavors and heat that I've had to date."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "y5BeneufKvjENxB48Bhlxg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "g8lOGcjKt4WJ448B5bTXbw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "The beef with long peppers was, hands down, the best dish we tried."
+        ],
+        "negative_spans": [
+          "I actually wasn't a huge fan of the dan dan noodles"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "Oo1T107ASqMLtRUGxsSvnw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "This place is the best Sichuan resto that I have been to.",
+          "they use real Sichuan peppercorns, not just additional chilies for the heat."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "d0mHmnNl_tPuAFF-Eb6ECg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "Szechuan food with a good amount of spice."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "tG60thlAE_Igtgbw9g5UDQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "X-ZkYEYbYODOqKyaFyyA8A"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "mixed",
+        "positive_spans": [
+          "E Mei is where you want your authentic Szechuan food, if you know what to order."
+        ],
+        "negative_spans": [
+          "E Mei disappointed me with their performance"
+        ],
+        "ambiguous_span": null,
+        "condition_text": "点普通中餐菜（如糖醋 pork）会失望，需点川菜招牌菜",
+        "review_id": "cMLpI_4I8kORKs9PWxFmlg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "you should know what you want to order before you get there (authentic Szechuan dishes, the other reviewers covered this already), and skip the Americanized stuff on their lunch special"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": "需点正宗川菜，跳过午餐特供的美式菜",
+        "review_id": "Kj6BzI6HDqXhR-JKwmSGww"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "The shredded beef with long hots was delicious."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "A3iU8JR0apDWEOVAN5rqZA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "the spicy lamb with cumin...and it was amazing."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "4kP3XAPqCUCAPo0BTHngTQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "positive_spans": [],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "cRDUj-CwXwvMxL4tHn6bSg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "But the spicy chicken was nice and crispy. A little on the oily side but overall, very good and hot."
+        ],
+        "negative_spans": [
+          "The chow fun was really bad."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "oD7t1RMac9pxqk40sxWLjg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "This place has great authentic SiChuan food.",
+          "the spicy wasn't only hot... it was numbing"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "iA6NRaTOSsXdaXylVo1ObA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "loved the non-fried option that was just spicy enough"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "JL9yE8MCsO2NJfyuB6pMPw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "As a native chinese, I like to explore authentic Chinese restaurants and this one comes on top of my list."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "9RtgT3aZzAyl8hvb91wFxA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "the bold flavors of  proper Szechuan Chinese"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "z1Qq6cYBvh1tV3GXms9eXA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "All of the dishes were out of the world."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "lbitgKMhfjVTw3Ln6CLAPA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "It's a true Szechuan experience."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "31up5xLuw5NEiIj7357m3g"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "This screams authenticity.",
+          "the peppercorns pack a better punch"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "B90JZM3td5cDYXsZ-2dX7g"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "they've got great food"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": "需主动要求服务员降辣，否则有时辣到无法入口",
+        "review_id": "kaSkZg8gwWO5XF6Z1LpiGw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "I love their fried meats, and it's pretty cheap!"
+        ],
+        "negative_spans": [
+          "still not spicy enough"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "SB03QJpXcTGUL270PJ_Zog"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "positive_spans": [
+          "The sliced beef and tripe and chongqing spicy chicken had bold, spicy flavors"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "vDWx35VCNrmT4Z_VkQrOIg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "The hotpot is true Sichuan style",
+          "This place is a primary hang out spot for Sichuan exchange students from China for a reason"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "-4VVFeRYheaDQ6V505GyEg"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "Extremely authentic Sichuan style food!!"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "NZcsn4-1PUq-zRAR_bfpnA"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "negative",
+        "positive_spans": [],
+        "negative_spans": [
+          "not authentic enough. still very americanized sweet sauce kind of stuff in almost every dish."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "EigocVh1JtiNRGsgI_H_PQ"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "positive_spans": [
+          "One of the most authentic Si-Chuan cuisine you can find in east coast"
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "tMrbG6R6LjOyMxAdTiecng"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "weak",
+        "label": "positive",
+        "positive_spans": [
+          "Spicy and delicious."
+        ],
+        "negative_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "EzG1NiaLOIJ_cCSV5vA_4A"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "negative",
+        "positive_spans": [],
+        "negative_spans": [
+          "The sauces on the dishes were sickly sweet and were thick and gloomy."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "nQRI_BNaJXaoIMDwS0Rlbw"
+      },
+      {
+        "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "positive_spans": [
+          "the Chongqing spicy chicken was seriously one of the best dishes I've ever had!!"
+        ],
+        "negative_spans": [
+          "The vermicelli - ehhhhhhhhh. That was NOT my cup of tea!"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "aNdbQtLBihMyyVS-w-kYOg"
+      }
+    ]
+  },
+  "ttft_ms": 55356,
+  "ttft_stream_ms": 4720,
+  "time_to_request_ms": 197,
+  "type": "result",
+  "duration_ms": 121281,
+  "uuid": "d4a571d6-b4a3-44d6-ab24-887311f47ad1",
+  "queued_turn_count": 0
+}

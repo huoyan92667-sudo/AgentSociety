@@ -1,0 +1,368 @@
+{
+  "batch_id": "rag_authentic_szechuan_0001.batch_0010",
+  "case_id": "rag_authentic_szechuan_0001",
+  "user_query": "费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？",
+  "evidence_requirement": {
+    "text": "评论需直接说明川菜味道是否地道、正宗。",
+    "positive_definition": "评论明确称赞味道地道、正宗，提到典型的川菜风味特征（如麻辣鲜香、花椒麻味、复合味型）或与四川当地口味一致。",
+    "negative_definition": "评论明确指出味道不地道、不正宗，为迎合当地口味而过度改良、降辣减麻，或整体更像一般中餐/美式川菜而非真正的川菜。"
+  },
+  "hard_filtered_businesses": [
+    {
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "name": "Delightful Garden",
+      "categories": [
+        "Food",
+        "Chinese",
+        "Karaoke",
+        "Nightlife",
+        "Desserts",
+        "Restaurants",
+        "Szechuan"
+      ],
+      "address": "906 Arch St"
+    },
+    {
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "name": "Bai Wei",
+      "categories": [
+        "Chinese",
+        "Food",
+        "Bubble Tea",
+        "Restaurants",
+        "Dim Sum",
+        "Szechuan"
+      ],
+      "address": "1038 Race St"
+    },
+    {
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "name": "E Mei Restaurant",
+      "categories": [
+        "Szechuan",
+        "Chinese",
+        "Restaurants",
+        "Noodles",
+        "Soup"
+      ],
+      "address": "915 Arch St"
+    },
+    {
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "name": "Tango",
+      "categories": [
+        "Szechuan",
+        "Bars",
+        "Lounges",
+        "Nightlife",
+        "Restaurants",
+        "Sushi Bars",
+        "Chinese",
+        "Karaoke"
+      ],
+      "address": "1021 Arch St"
+    }
+  ],
+  "review_batch": [
+    {
+      "review_id": "AQh_I7dOO0Z3Rnd5Fo0L8w",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-09-18T03:37:41",
+      "review_text": "Wow... now I really know what people mean when they say how terrible Americanized Chinese food is! Seriously, some of the best food I've ever had! I went with a group of friends and ordered way too much food, but yet we ate every last bit. The service is friendly and the food comes out quick so eat fast!. They have an expansive menu so you're hard pressed to find something you won't like. I highly, highly, HIGHLY recommend the lamb with cumin. (I am still dreaming about this dish almost two months later). The chongqing chicken and shredded pork with long hot pepper were also very good. If you're a more adventurous eater, I'd recommend starting with the beef tendon in hot oil. Go with the dan dan noodles if you're not. I'm a chilihead so the heat didn't bother me too much, order it extra spicy and enjoy the burn!"
+    },
+    {
+      "review_id": "3fUC2s5aIZ6UeNAVGxRYRg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-10-18T16:06:35",
+      "review_text": "If you're a huge fan of Szechuan food like me, definitely give E Mei a try. I came here for lunch yesterday, and I was super surprised about how authentic the food was here. The lunch dishes combos are super worth it - dishes are under $10, and although there are many americanized Chinese food dishes on the list, there are some authentic Szechuan gems tucked in there too. I definitely think that with the soup that comes with the lunch combo, one is enough to share with two people who aren't super duper hungry (my friend and I ordered two dishes with an appetizer, and we had lots to take home). I ordered the Ma Po Tofu, and it brought me back to China - it was that good. Very authentic flavors and generous portions, and the spiciness and numbness were both refreshing after a long break from Szechuan food. My friend ordered the Pepper Steak (which had a lot of peppers, not enough steak), but he said the flavors of that dish were pretty mediocre, especially compared to the rest of the food that we ordered. I love Dan Dan Noodles, and the ones here are definitely very tasty - highly recommend ordering them, especially because the price is so cheap. The sauce of the noodles had some very authentic Szechuan flavorings to them since they made my tongue so numb.\n\nLove the little peanut bowl as an appetizer. I was so upset that I checked in on Yelp towards the end of our meal because you can receive a free dish of Boiled Dumpling with Hot Oil upon check-in. The servers are also very nice and have pretty good recommendations if you ask.\n\nSo if you're new to Szechuan food and want to see what it's really like (rather than sticking to that Americanized crap), give E Mei a try. Warning though: if you can't handle spicy food, this is not the place for you. Bring lots and lots of water, and eat lots of rice."
+    },
+    {
+      "review_id": "tAC8aomgu0hRn5pEUUv0tQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-10-22T02:16:51",
+      "review_text": "This place is legit.\n\nFirst off, you get free wontons in hot oil for the table when you check in on yelp.\n\nSecond, if you're a non-Asian like me, you'll likely be the only English speaking and non-Asian table there which is exactly what I want when I'm in Chinatown. Talk about authentic.\n\nThird, the waiters are friendly enough and speak English which can be a problem at many Chinatown restaurants.\n\nFourth, the food is amazing. I normally order the shredded pork with garlic sauce since that's what was recommended the first time I walked in and it was fantastic. Jumbo shrimp with broccoli was great too. Shrimp was so fresh. Oh and the egg roll is cooked to perfection, best I've ever had. \n\nFifth, value. My buddy and I came in here for lunch. Meal with rice, egg roll and free dumplings in hot oil for 16 bucks tip and tax included.\n\nbravo! I just wish I knew how to pronounce the name lol"
+    },
+    {
+      "review_id": "a3ZBK7cjHCK1_G_VpKWTwg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-10-22T23:21:34",
+      "review_text": "Last week, I went to E Mei Mountain with my friend Vivien and Sharon in Chinatown. This is the most authentic Chinese food restaurant compare with other restaurants that I know from my friends. It is a braw restaurant, I have already came here for several times and I have been addicted to this restaurant when I first time came here. The food here is hot and I enjoyed it; however, it is not super hot, but it is much hotter than other restaurants. We ordered five dishes: the Boiled Wonton with Hot oil, the Fish Fillet in Hot & Pique, the Toothpick Beef, the Vermicelli w, and the Rice Ball in Sweet soup. And the food comes out quickly.\nThe best one among them is the Fish Fillet in Hot & Pique; it is delicacy. I ordered it every time when I came here. This dish is hot, the fish is tender and it has many vegetables as well, it was melting in the mouth. The quantity of this dish was large; we didn't finish it. One thing I didn't like is the oil in the fish because it makes it looks like oily.\nToothpick Beef is also palatable. It was forsooth delicate. I think this dish may spend a plenty of time to cook because every beef stick sticked with a toothpick. It is a little complex, but it was toothsome. It made me feel like in China, because I always eat this dish in China and it has the same tastes like China.\nAnother dish I love is Vermicelli w. I ordered this dish by mistake. I thought it is a pique and hot dish like fish and it may have plenty vegetables and it taste cool. However, it is like soup and it just had salt, and it doesn't hot at all. But it was ambrosial. It made me feel warm to eat it; it has tofu and some silk noodles, the flavor is fantastic, which also helped me to wiped oil cause I ate some oily fish and beef. It was fantastic to eat it during a cold day.\nI appreciated the service they had; the waiter and waitress were polite and helpful. They introduced some characteristic dishes to us and they were patient. We had four people and all of us have different require for the drinks; one is a cup of ice, one is a cup of Sprite, one is a cup of hot water and one is a cup of iced water. The\nwaitress was patient and remembered them carefully and they did everything like refilling the water without we asked for. They asked for advice after we eating. Therefore, the serve was fine.\nThe outside environment here is a kind of disordered: the door looks old and messy. The inside is much better and every table has tablecloth, they clean it everyday. The price is reasonable because it is not expensive.\nI saw some reviews on yelp about this restaurant, most of them are some positive reviews, and I agree with them. One of a review said it is the Authentic Szechuan cuisine, and I strongly agree with him. But one thing I want to say is you should try to eat some other food, don't only eat ma po tofu every time. You should try more dishes and you will find more surprise."
+    },
+    {
+      "review_id": "5o6bjUqlqb2Ud7W19RLqdA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-10-27T14:30:50",
+      "review_text": "I came here on a Monday, didn't make reservations but got seated quickly. I got the beef tendon. It was around 20 (including tip and tax). I also got a sprite. The dish itself was around 16. It was a decent sized plate, enough to feed two but I decided I could finish it myself. Super Spicy!!!!! Flavor was really good. I'd recommend coming here if you love spicy food like extra spicy!"
+    },
+    {
+      "review_id": "hlLk2MdP7dB4fucZ3HOW6g",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-02T23:04:58",
+      "review_text": "My coworker wanted to try sze chuan hotpot and found this place. The hot pot is not on the regular menu, you have to indicate to the servers and they'll bring you a hotpot menu to check off. They have the half and half pot, which is perfect - we got half spicy and half herbal chicken soup. Broth was good but I do agree with some other reviews that it's a little on the pricey side - $1.50 for a side of sauce is a little much."
+    },
+    {
+      "review_id": "TQjkFfaV2WCVhBpeDM9NhA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-09T13:29:14",
+      "review_text": "This place is pretty authentic, come here if you like spicy food!  You must try...\n\nGriddle Cooked Fish Fillet in Hot Oil!!!\n-     The fish was light and flakey\n-     Clear Noodles tucked away in the bottom\n\nPork Dumplings!!!!\n-     6 pieces\n-     Juicy & plump \n-     Dough on dumplings was thin & crispy\n\nTofu with Pork & Shrimp\n-     Solid non-spicy dish\n\nSpicy Lamb with Cumin \n-     Interesting with the cumin but a bit salty \n\nDan Dan Noodles\n-     The noodles were fresh and had a good bite but lacking the thick broth pork flavor \n\nDow Mew & Cucumber!!!\n-     Must!  Also the cucumber helps cleanse your palate before every bite \n-     Both veggies were fresh!\n\nBtw, they serve complimentary roasted & salted peanuts and vinegar & spicy cabbage!!!, so good. \n\nGenerous portions, take credit cards, great service, comfortable seating, great for large groups, comfort food."
+    },
+    {
+      "review_id": "EjEbWo6v8DUVGcurM41fww",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-10T04:36:39",
+      "review_text": "This place is OK good but nothing was as spicy as I expected which was a little disappointing. There was generous use of Szechuan peppercorn which added warmth and a numbing affect to the palette, but nothing was really chili pepper type spicy.   Also, be warned that everything is very very greasy. My favorite dish I had there was their Singapore noodles--theirs is really good and I highly recommend it. Another dish that I enjoyed was the beef with spinach; it was probably the only dish that wasn't super greasy. \n\nThe restaurant was clean and service was reasonably friendly and quick. I do want to go back to try out other dishes since they have such a big menu, but I will be asking them to up the spice level for sure."
+    },
+    {
+      "review_id": "7ysdCo2XmvfNNvas9un6TQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-15T01:09:05",
+      "review_text": "This was first time eating in Chinatown and by far this was the best Chinese food I have ever had.  Everything was delicious!"
+    },
+    {
+      "review_id": "dK-EUavl2NFA9N3zSYOkQA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-15T13:38:05",
+      "review_text": "I don't have the greatest connection to the Chinese community of Philadelphia, so when my Chinese friend gave me this recommendation, I jumped on it. The restaurant does not disappoint. It is spicy and numbing with their Sichuan peppers, and they have kidney meat that I haven't had in years! I gave one star less for service and environment, but no surprise there for an asian restaurant. It's clean enough."
+    },
+    {
+      "review_id": "XE0iLk09XU478JDTv0MiGg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-20T21:04:01",
+      "review_text": "My boyfriend and I watched Bizarre Foods with Andrew Zimmern and his trip to Chengdu had us craving delicious spicy Sichuan food. After reading all Yelp reviews we decided to come here. We went on a Friday for lunch and they were quite busy but we managed to grab a seat. We had the pork stew, spicy dumplings, pork griddle and Dan Dan noodles. We loved the Dan Dan noodles, very flavorful with a hint of spice, the meat is minced very fine so everything was very tender and the noodles were cooked perfectly. The spicy dumplings were soaked in chili oil, doesn't sound appetizing but to my surprise it was really really awesome and they were free with the check in! The pork griddle is where it went downhill, they were overcooked and dry. The pork stew was the worst. The pork stew came with every part of the pig which is totally fine but it was completely greasy to the point where you can't enjoy any of the flavors because it all tasted like oil. Overall, I wasn't completely satisfied with my meal. I probably could've done better somewhere else in Chinatown."
+    },
+    {
+      "review_id": "yR3O2A3lpcLSzL_zSQH9kg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-11-27T22:05:24",
+      "review_text": "The service here is mediocre when I came as a group of five on a Saturday night (around 7PM). we had to wait approximately 30 minutes when we showed up, so I would suggest calling in advance.\n\nThe hot pot we ordered was half spicy, half house. It took at least three requests and 15 min before they were refilled.\n\nOn the upside, there was a lot of food. Good amounts of meat, generous portions of the veggies and glass noodles. Definitely worth the price ($13/person) because we were stuffed by the end, but the service wasn't too good. At the end, our waiter actually asked for more tip... (it was 14% originally because we thought the service was meh, and in the end we gave them approx. 19% tip)"
+    },
+    {
+      "review_id": "DA_9TEtebkek0vjyEnR3lA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-06T17:33:58",
+      "review_text": "Love thIs place! Everytime I go I am never disappointed with the good. They stopped being byob which is really disappointing.  I would say it's comparable to Han dynasty but closer and with out the wait for a table."
+    },
+    {
+      "review_id": "YOqXfF4JXwx4bRFmxCH9Tw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-14T07:31:08",
+      "review_text": "This restaurant comes highly recommended; the staff are friendly and accommodating and the food is excellent. \n\nI was here earlier this year in a group of 17; they have a reserved room which accommodates large parties. Although we were late for our reservation by about 20 minutes, the manager was very friendly, and had kept the tables open. When we got in to the room, we noticed that they had a karaoke machine. Even before we got our food, the group renditions of Hotel California and Baby One More Time made this experience very positive. \n\nHowever, it was not only the ambiance that made E Mei great, the food was excellent. While I guess this might not have been the best Sichuan food I've had, I have to say that it was the best in the last few months. Since I have few complaints, I'll point out a few highlights (really actually just staples of Sichuan cuisine)\n\nSome dishes you might want to try are\nAppetizers\nBeef Tendon in Chili Oil\nSliced Beef and Tripe (There are many apocryphal stories about this, which a strict translation would be \"Husband and Wife's Tripe\")\nDiced Rabbit with Peanuts (There are Chinese stories that people who are pregnant and eat rabbit will give birth to children with cleft lips - I doubt that it is true medically, but if the waiter gives you a weird look, it might be for this reason)\n\nEntree\nThe fish fillet in hot and spicy sauce (shui zhu yu = water boiled fish; 水煮鱼) comes highly recommended. \nSliced lamb in hot and spicy sauce - very tender, very flavorful\nDried Shrimp with Winter Melon (not spicy)\nHome Style Tofu\nTea Duck (a favorite of a few non-Chinese friends too)\n\nDessert\nYou're better off spending the money at a bakery\n\nAlso, rice was free, which was great because you can't get through spicy food without large amounts of rice. \n\nA lot of people have left good reviews of their DanDan noodles; personally I felt as if their DanDan noodles were fairly disappointing compared to the rest of their dishes. \n\nI really ask that you probably do yourself a favor and skip the dumplings, chowfun and the friend rice. Its like ordering New England Clam Chowder at a Texas Steakhouse."
+    },
+    {
+      "review_id": "0p2RTfuOWshmuW5-F0k4Bw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-14T19:40:22",
+      "review_text": "Make sure to unlock free dumplings offer but do it in front of the waiter. Very delicious! Not the americanized type of chinese food! The real deal! Highly recommend! Spicy on menu is Super Spicy so be careful))"
+    },
+    {
+      "review_id": "6Mh_-3IuhqEFUJJ5cdvqfQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-16T21:18:30",
+      "review_text": "Met up with a few friend here for lunch.  \nThe lunch special is cheap.  For $7-8, you can choose from a selection of soups, pick an entree,  and get a bowl of white rice or fried rice.  \nPortion wise, it's a lot. If you're not sharing,  you'll definitely have some left over to take home.  \n\nI had the hot and sour soup. It was ok.  They could have tone it down with the ground pepper. It was just too much.\n\nEntree wise, my group decided to share.  We order the chicken with garlic,  shredded pork with dry tofu and celery, shredded pork with  long hot pepper, General tso chicken,  sliced beef with hot and spicy sauce. \n\nEverything was spicy except the tofu dish.  My favorite dish is the shredded pork with long hot pepper.  That dish was really spicy,  but It was really good.  \n\nThe bill for 6 people was around $40 something.  That's really cheap! \nI will definitely come back here again for lunch."
+    },
+    {
+      "review_id": "tt4MPhoC9_BmJpylz2zGwg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-26T03:45:43",
+      "review_text": "This is where I had dinner on December 25th, 2014.\n\nAll Chinatown was abustle. Showed up at 6:30 and had a surprisingly long wait - more than 30 minutes. Was entertained for exactly 24 seconds by a dancing plastic 'I am Groot' toy in the waiting area. \n\nThe owner - a kind and gracious host.\n\nThe food is good and authentic. I'll be back for the whole fish (prepared several different ways). Also, try this - shredded pork with pickle soup."
+    },
+    {
+      "review_id": "rmldvGgp8u1C7INGj_eDwQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2014-12-30T11:52:36",
+      "review_text": "My company had their holiday party here. Food was very good, although we should have had a bigger table for the number if people we had in our party. The wait staff was OK for the most part. Did not bring out at least one of the appetizers (the Conch )...."
+    },
+    {
+      "review_id": "hdWVxuF56Ps21s-C22Fzpg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-01-15T19:41:04",
+      "review_text": "We love this place: cheap and very flavorful food, service is very quick and the staff are nice (surprising as staff in Chinese restaurants can be hit or mis).  We always get the wontons in hot chili oil, spicy lamb with cumin and Chongqing chicken.  The portions are huge and this order for two ppl will be a lot of food but the combination is great and I love that the dishes are \"dry\" - not overly sauced as is the case with a lot of chinese food.  One star is taken off as these dishes don't come with veggies and a veggie dish would really round out the order (though we've not found a veggie 'go to' dish that we like here)."
+    },
+    {
+      "review_id": "z_FmkMlq9pKbQyCXnC4slA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-01-21T00:50:32",
+      "review_text": "E mei has very good food, but the waitress is very unfriendly. I don't think she smiled a single time and made it seem like it was a hassle to wait on us.\n\nThe wonton soup and dumpling in hot oil were tasty and unique."
+    },
+    {
+      "review_id": "6PmwidVMZg2DWo95RIEjWQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-02-09T01:39:10",
+      "review_text": "I spent my Christmas Day 2014 here and it was So damn good.  We had the spicy sole in a hot pot or whatever (bring the alka seltzer) I have literally been seen toasting it with my bf here ..true romance lol. I like spicy and if you do as well ....this will NOT disappoint.  The hot pots are just awesome their fish was so fresh and has quickly become a dish I crave at least once a week I love that damn chili oil.  I had table envy Everytime I was here everything looks grand.  The veggies are done right here just like Tai Lake (which is also nearby and amazing) E Mei is perfect for the family crowd.  This for me was the most idyllic chinese joint...and my bfs Chinese born and raised stepmom approves (so the food is totally authentic)."
+    },
+    {
+      "review_id": "P9g3WOCzLMsmaIluAIzEJQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-02-15T23:52:27",
+      "review_text": "All I can say is that in Philadelphia, this is as good as Szichuan food is gonna get."
+    },
+    {
+      "review_id": "unxVNS0UKnWlf7jjd5mw2Q",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-02-27T19:09:25",
+      "review_text": "The shredded pork with long pepper is amazing, but for those who don't like garlic. I am a huge fan of Sichuan food and e mei tastes authentic. The flavors are wonderful and tickles your tongue. They offer lunch specials for $7-8 that comes with soup. The hot and sour soup is a good balance of sour and spice. Highly recommend. The chongqing spicy chicken is also good for $14.95. Check-in on yelp and receive a huge bowl of dumplings in chili oil!"
+    },
+    {
+      "review_id": "NXDXF-l9vSSzhwNL4y0C6w",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-03-08T03:59:44",
+      "review_text": "The customer service was fanastic and we really got what we paid for at this restaurant! The Dan Dan noodles were phenomenal as well as the soups that we tried. The tea was a nice touch as well! The other entrees were pretty average but definitely not bad."
+    },
+    {
+      "review_id": "Lw8W-o7EDEcRi2uNRLhRwQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-03-09T03:29:45",
+      "review_text": "I came here for Christmas dinner with friends to recreate the annual Chinatown Christmas dinner I always had with my parents growing up. We had a party of 10 and were seated in the back room. The party consisted of a mix of Chinese and non-Chinese friends. The waiter we had was not attentive to our needs for water or tea. He took forever to take our order. When we did try to order, he would shoot down dishes we wanted to order, saying our \"American\" friends wouldn't like them. This was wrong on so many levels. After serving the food, he forgot about us for a full hour.\n\nThe good side was the food he did let us order was fairly delicious, and the dinner ended up being cheap (20 bucks per person with tip and beer included). Based on the other reviews, perhaps service here can be hit or miss. Let's be honest; no one really goes to Chinatown for awesome service or friendly waitstaff, but our Christmas experience here was a little ridiculous, hence 2 stars deducted.\n\nI'll just stick to delivery from other Chinatown restaurants via diningin.com."
+    },
+    {
+      "review_id": "ePQo3z0Aqp9PfTDavAMPbA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-03-14T19:43:22",
+      "review_text": "very terrible service！And they ask us for a high tips. their waiter are so bad，they cannot provide any service. I can say that their waiter almost in stealing money！！！much nice sichuang resturants，emei is not a good choice！Because of the brutal waiter！！！"
+    },
+    {
+      "review_id": "lpVo-tkeIcRMSveZpDZ7ag",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-03-29T20:49:03",
+      "review_text": "The place was actually nicer than i expected. We ordered a bunch of food which came out pretty quickly. The beef in spicy sauce was just ok. The sauce wasn't what we cared too much for. The spicy stir fried shrimp was delicious though. The food want super spicy but it had a little kick to it. All the dishes had a bunch of peppers in them but not super spicy."
+    },
+    {
+      "review_id": "ffCeaFqbgMchTBWEI5jaPg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-04-06T18:43:32",
+      "review_text": "Lunch specials are not recommended. But definitely a good restaurant for spicy food (group especially). Also love their hot pot!"
+    },
+    {
+      "review_id": "q0lqKQ_V0EFd4uqGB8zl9g",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-04-30T18:02:05",
+      "review_text": "Excellent service.  Huge portions. Unbelievably fresh ingredients.  If you're looking to treat yourself,  look no further."
+    },
+    {
+      "review_id": "F3sngZINaVbYdT3yu4XuCA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-05-05T00:16:49",
+      "review_text": "This is the worst restaurant I ever went!!!!! I gave it one star is because there is no zero star to rate!!! I am so disappointed about this restaurant's  terrible service and dishes!!! \nI went to this restaurant for lunch, and got spicy beef. The beef was raw and red inside!! And it was tasted like just taking out from a refrigerator. I asked the waiter to heat it, he was very rude and unfriendly, he just pretended to don't understand what I am talking about and said I am picky....that waiter ( an mid age man) is the worst waiter I met. He took the beef to reheat, using microwave!!!!\nCan you believe that someone heat raw meat with Microwave?!?!  They are so irresponsible for customers' health!!! \nI didn't eat a lot during lunch, but what happened in paying the bill really pissed me off. I was not happy with the service, so it's my right to not give so many tips, but after I signed the check, a waitress just took the check and asked me to put more tips! That's so terrible and I felt I was insulted!!\nThis is my first time write an review in Yelp, I wouldn't do this if I am not pissed off!! I don't want somebody else get the same treat as me!! \nA big \"No!\" to this ridiculous E mei restaurant!\n\nAnd all I wrote are true, if you guys don't believe can contact me!"
+    },
+    {
+      "review_id": "xpQJNjSXfmxQVo9MG8bckg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-05-05T16:22:55",
+      "review_text": "My favorite Chinese restaurant in all of Philadelphia. Their lunch specials are very good and proportions generous. The hot and sour soup is the best I've ever had."
+    },
+    {
+      "review_id": "i6qoVhb9Xw2-D4-uwvqVRg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-05-06T05:46:21",
+      "review_text": "Philadelphia has a large and vibrant Chinatown area.  Even so, on many previous visits I've tried several different restaurants and have always  come away faintly disappointed.\n\nBut with the discovery of E Mei Traditional Szechuan Restaurant, those days are over for good.  Absolutely loved this place.\n\nWas fighting off the effects of a bad head cold, so decided to try to burn it out with all spicy items.\n\nExtensive menu has the usual dishes, some of it segregated in a menu section called \"American Chinese Food\".  So there.  Lots of other selections you won't find outside of a real Chinatown setting in a big city.\n\nHot & sour soup was good, though I've had better.\n\nAppetizer of Boiled Dumplings in Hot Oil were absolutely fantastic. When the waiter brought my main course, I jokingly waved it away and told him to bring me more dumplings.\n\nMain course of Chungking -style Spicy Chicken was comprised of popcorn-sized bits of chicken meat with about a double-handful of chilies and a few scallions, all quickly deep fried.  Actually eating the chilies is basically for extra punishment, since they've already given up their sweat-inducing essence to the rest of the dish in the wok.  Huge portion looked like I couldn't possibly make a dent, but like popcorn, it's hard to sstop eating the pieces.  \n\nOwner came by the table, took a look at what I was having and commented, \"..ooh, very spicy..\".  Of course, the beads of sweat on my forehead had nothing to do with it.\n\nService is  ind of \"big city Chinatown standard\", meaning your waitstaff may not all speak English, and don't expect friendly or especially attentive service.  Competent, prompt and there when you want something - what else do you really need?\n\nOverall, highly recommended."
+    },
+    {
+      "review_id": "hByOVwG3PXBXO-Ehcc_t5w",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-05-07T02:05:39",
+      "review_text": "We wound up here after walking out of another place while waiting for a table.  We read a few review and thought it sounded good.  The atmosphere is clean and fairly quiet.  The staff was very attentive and helpful, offering several suggestions.  In ordered the hot and sour soup, Dan Dan noodles, and the whole stepped didn TN\nIn bean sauce.  \n\nI sound have stopped at the soup!  The soup was great.  Everything's else was so oily that it didn't sit very well. \n\nI would suggest ordering one thing at s time."
+    },
+    {
+      "review_id": "IJl-9NcYV8TErEUj9p3Tsg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-05-11T00:06:29",
+      "review_text": "I have now tried hotpot in about 4 different restaurants in Chinatown. I think E Mei has the best hotpot - best ingredients and best flavors."
+    },
+    {
+      "review_id": "m5eKeIYCCy44JrLiwqyf-g",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-06-02T17:36:44",
+      "review_text": "One of my favorite places in Chinatown. I come here weekly due to work. \n\nI always like a place that starts you off with a little something. Peanuts on the table with hot tea is a great way to curb your appetite while you wait. \n\nThe dumplings with hot chili oil are a must - and free if you check-in on yelp. The chonquin chicken is addictive. The bok choy with black mushrooms is tasty too. The hot and sour soup is flavorful. I love spicy food but WOAH... the shredded pork with long hots is SPICY! Delicious flavor. The dried and sauteed string beans are one of new favorites."
+    },
+    {
+      "review_id": "uI-OytnKCdXtkPDWfcEsGQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-06-19T01:46:26",
+      "review_text": "Love E Mei. Has been here three times over the course of 30 days and I always have a pleasant, yet tasty experience.\n\nRecommended:\n- any of the spicy hot pot dish. I always have the fish, big enough to share 2-3pp \n- any of the dry pot pepper dish: beef, lamb, chicken, all good. I got the crab one\n- chongqing spicy chicken. Spicy and crispy!\n- sesame oil pepper potato - a Szechuan must!\n- dan dan mian - peanut sauce noodle and minced pork. Love it!\n- sliced beef in chili oil\nAND hotpot! I think E Mei has the best hot pot in Chinatown. It's not ayce but it's a lot of food and reasonable priced if your party has 4+ ppl\n\nBest Szechuan restaurant in Philly."
+    },
+    {
+      "review_id": "fQXFKiQObur6sxIWH12G2Q",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-07-01T23:44:18",
+      "review_text": "Authentic Szechuan dishes in Chinatown! \n\nOrdered:\n- the pork dumplings in hot oil (free if you checkin on yelp!)\n-Griddle cooked Chicken hot dish (comes with white rice)\n- Kung pao lunch special (comes with soup + white rice)\n\nMy friend and I love our spicy food and after reading the reviews we had to try it out! The griddle chicken by far was my favorite. so spicy and the pieces are the right size.  The dumplings rival Han Dynasty's for sure... not as tangy as Han's and the portions are so much bigger here!\n\nYou are served with water, and complementary tea. Service is 6 out of 10, but who cares! the food was bangin!"
+    },
+    {
+      "review_id": "_4NNnxyaHpJ-zIjJBlAACw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-07-05T21:40:23",
+      "review_text": "Definitely going back there. One of the best Chinese food. Loved the Singapore Mein Fun Noodles."
+    },
+    {
+      "review_id": "VIsl3DtGlOae6g5zLCVueQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-07-21T03:37:11",
+      "review_text": "My friend brought me here yesterday because she heard really good things about it from her fellow international Chinese friends. \n\nWe ordered the house spicy grilled fish. It comes out in a huge tray. I think the dish was around $24 and I thought it was pretty expensive, but when it came out I understood why. The dish can feed 3-4 people. We also tried this cold mun bean appetizer--it tasted like cold noodles. Most of the specialties are spicy given that it's szechuan food!! I really enjoyed my meal and my friend who has experience with Szechuan dishes enjoyed her meal as well. The \"spicy\" dishes weren't that spicy. I have moderate tolerance to spicy food and I was able to enjoy my dinner without having to gulp down a glass of water.\n\nThis place is LEGIT! Check it out!"
+    },
+    {
+      "review_id": "5yA6jCoTsnyRViLSdOG6-Q",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-07-23T20:55:24",
+      "review_text": "Hands down the BEST Chinese food I've ever had and I used to live in San Francisco.\nI had the Dan Dan noodles and the Chongqing spicy chicken.  More than I could eat, but I was more than happy to carry the leftovers around all day.\nA coworker recommended this place to me while I was on a business trip to Philly.  I'm SO happy I went.  I'm going to spend months trying to find a place back here in Florida that makes something close to that spicy chicken.\nIf you have the chance, GO!!!!!!  You won't be disappointed, I promise!"
+    },
+    {
+      "review_id": "9BZdoALtQTYnQium3t2u_A",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-08-04T17:04:59",
+      "review_text": "Food is consistently good. Wait time varies. Sometimes you get your food quickly, sometimes not, but I still come here frequently, since I work nearby."
+    },
+    {
+      "review_id": "yOULNC5Ww2z2iaxod6t9-g",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-08-07T22:47:00",
+      "review_text": "As good as Szechuan is going to get in this country. \n\nHot day, even hotter food, and cold beer makes for a nice combination. \n\nWe asked for the Chongqing Chicken with Dry Chile \"da la\" ( the only Chinese that I need to know ),  the waiter smiled and boy did it come to the table loaded with peppers.\n\nWe also had steamed pork dumplings and a minced Szechuan pork over noodles. There was a diced rabbit dish that I was tempted to order but the song of that chicken won me over.\n\nRestaurant's pretty big . We seemed to be the first people in, around 11:30, and by noon it was packed with local Asian folks, which is a great sign.\n\nLots of Chinese choices in Philly and this is one of the best."
+    },
+    {
+      "review_id": "l0z_xf2_5o-u4Co6ga1QuA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-08-12T18:54:20",
+      "review_text": "Excellent! We walked in off the street. Took a chance.  Excellent atmosphere and awesome  food.  Lunch special prices very good $8 including tea,  water,  rice,  soup,  and main dish. Great service."
+    },
+    {
+      "review_id": "w-G_2hnado0egxkAJieIsQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-08-21T03:00:34",
+      "review_text": "I've been passing this place for many times, but I never bothered to check because the sign was unimpressive, and the outside looked so old. Today, After visiting this place, I admit: I was ignorant and biased. I'm sorry, E Mei. \n\nMy mom and I really wanted to try Chinese hotpot. As usually, I looked up Yelp and this place popped up. So I thought \"why not, let's try.\"  Although the outside of the restaurant was sketchy, the inside was much larger and probably one of the cleanest Chinese restaurant I've ever been. \n\nThe food was great. The broth was a tad salty, but I think that's because we kept boiling the pot until we finish the meal. All the ingredients were great. I was especially impressed by the beef tripe, beef and oyster mushroom. The beef was properly seasoned in starch. The portion was more than enough and the price was reasonable. Also, I saw a lot of Chinese having lunch there, so this place is legit.\n\nWhat really impressed us was their service.  I don't expect much from a Chinese restaurant, but they really exceeded our expectation. The manager was really friendly and attentive, not just to us but to others as well, whether the customer was Asian or not. He wasn't just commanding people from his high chair. He would actually get up and serve the guests. The servers were sensitive too - getting to you even if you didn't call them out and knowing what you need."
+    },
+    {
+      "review_id": "h86_gezkJyyJ9xNLeGoiqA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-08-28T22:25:08",
+      "review_text": "Great place to eat! Szchuan food, great！Write comment can give you free dumpling~(´`)*ﾟ*"
+    },
+    {
+      "review_id": "6fv3iu8_F8bF1j_vAffi6A",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-09-15T19:48:45",
+      "review_text": "Cumin Lamb was amazing.  Hint of sweetness in the lamb coating; spicy hot peppers that make your mouth and tongue go numb, with small burst of cilantro to lighten it up.  Best cumin lamb I;ve had so far."
+    },
+    {
+      "review_id": "R8CYfFrWNqrDqONZmi7KxA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-09-19T14:00:42",
+      "review_text": "Ate there last night after reading several reviews on Yelp, we where not disappointed food was plentiful, tasty,and service was friendly and fast.\nWe had starter main course and beer and bill was under $60.\nWell worth a visit if you are in Chinatown"
+    },
+    {
+      "review_id": "4CXeS7CjUf-_DHO-_YP0EA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-09-25T15:53:53",
+      "review_text": "Sorely disappointed! Honestly, you have to take in my review with a grain of salt, since I am not Chinese and I probably do not have a palate for authentic Chinese food. I was recently introduced to  Szechuan cuisine and fell in love! I love spicy food, and it hit the spot every time. With that being said, I walked into E Mei with hopes of trying more authentic, \"family-oriented\" Szechuan food. I ordered what everyone else recommended, the classic \"Dan-Dan noodles,\"  Chongqing Chicken, and Dumplings with Chili oil. Food came out extremely quickly. They were all spicy and salty, which is generally what I like, but it wasn't anything more than that. I expected more umami going on, I mean that's what Chinese food is all about right? But it was literally just hot and salty. And nothing else. It definitely lacked a lot of flavors that I was expecting (at least compared to other Szechuan food I tried in the past). May be I would give this place another try, if I can get a hold of my Chinese friends who'd probably have a better idea what to order."
+    },
+    {
+      "review_id": "lNtXfY0AUK4xM7M7irJBYw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-09-27T14:59:45",
+      "review_text": "This place is highly recommended. Family environment, very friendly. I came when there was basically no one and I was skeptical but the food was exceptional. The griddle lamb was phenomenal and could easily serve for 2. The flame under the food plate at the table is an awesome detail. Quality Chinese food and service."
+    },
+    {
+      "review_id": "TKRPDxHuWJ2F45UftDxQzg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "review_time": "2015-09-30T00:19:11",
+      "review_text": "I came here on Friday night with a large group on the popecopalypse lol.\nThere was only three other tables here as it was a ghost town in Philadelphia this past weekend. The waiters and waitresses are very quick here & the food is always delicious and spicy! They're always accommodating for our big group and patient with the fact that we took hours to eat and chat.\nOf course family style is the best option ! We got the double cooked pork which was sooo...good. The squash was also a party favorite. Let's not forget our favorites, the eggplant with garlic sauce, sautéed string beans, mapo tofu, spicy shredded pork, crispy duck & the dumplings in chili oil. After eating two full plates, I still wanted more!\nBTW if you check in you get the dumplings for free - 8 of them :)"
+    }
+  ]
+}

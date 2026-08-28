@@ -1,0 +1,368 @@
+{
+  "batch_id": "rag_authentic_szechuan_0001.batch_0005",
+  "case_id": "rag_authentic_szechuan_0001",
+  "user_query": "费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？",
+  "evidence_requirement": {
+    "text": "评论需直接说明川菜味道是否地道、正宗。",
+    "positive_definition": "评论明确称赞味道地道、正宗，提到典型的川菜风味特征（如麻辣鲜香、花椒麻味、复合味型）或与四川当地口味一致。",
+    "negative_definition": "评论明确指出味道不地道、不正宗，为迎合当地口味而过度改良、降辣减麻，或整体更像一般中餐/美式川菜而非真正的川菜。"
+  },
+  "hard_filtered_businesses": [
+    {
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "name": "Delightful Garden",
+      "categories": [
+        "Food",
+        "Chinese",
+        "Karaoke",
+        "Nightlife",
+        "Desserts",
+        "Restaurants",
+        "Szechuan"
+      ],
+      "address": "906 Arch St"
+    },
+    {
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "name": "Bai Wei",
+      "categories": [
+        "Chinese",
+        "Food",
+        "Bubble Tea",
+        "Restaurants",
+        "Dim Sum",
+        "Szechuan"
+      ],
+      "address": "1038 Race St"
+    },
+    {
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "name": "E Mei Restaurant",
+      "categories": [
+        "Szechuan",
+        "Chinese",
+        "Restaurants",
+        "Noodles",
+        "Soup"
+      ],
+      "address": "915 Arch St"
+    },
+    {
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "name": "Tango",
+      "categories": [
+        "Szechuan",
+        "Bars",
+        "Lounges",
+        "Nightlife",
+        "Restaurants",
+        "Sushi Bars",
+        "Chinese",
+        "Karaoke"
+      ],
+      "address": "1021 Arch St"
+    }
+  ],
+  "review_batch": [
+    {
+      "review_id": "4WSpPB8nbAn0P_tUS54bsA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-08-23T18:22:08",
+      "review_text": "Been here many times when they were Sakura and then few times as Bai Wei. Seems like the food similar for the most part. The scallion pancake is usually buttery but wasn't today but still good. I like the texture of their scallion pancake, not too thick either. The pork soup dumplings are are good. The skin is a bit thicker than before but best in the area for now. Tried the spicy soup today for the first time, pretty good. \nDecor is light colored. Reminds me of a beach spot. Large painting of a an Asian couple having tea as the backdrop. Some booth seating. \n\nOnly accepts cash, Alipay or Venmo. I actually like that they accept Venmo, wish other places did this too. ATM available in house."
+    },
+    {
+      "review_id": "6zjwphMLqLb08R4ADB57yw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-08-25T02:05:14",
+      "review_text": "My friend and her boyfriend claim they visit here twice every weekend so I had to give it a try. Situated on the outskirts of philly chinatown, I completely missed this location the past times I visited Philly . \n\nWe got the sizzling Japanese tofu with shrimp, beef in spicy chili sauce, and the chinese water spinach. Let's say I now see the reason why they like this place so much.\n\nFirst of all I have not yet found any other place that serves Japanese tofu in either Philly or DC, and it was one of my favorite childhood dish. Seeing the sizzling Japanese tofu on the menu already hyped me up, and I was definitely not disappointed by the taste of it either. It definitely brought back memories of when I had this in China.\n\nThe beef in spicy chili sauce was perfectly within my spice tolerance range. The beef slices were really tender and easy to chew, and the flavor of the sauce really seeped in as well. I even enjoyed eating the bean sprouts on the bottom. Personally I do wish this dish was less salty, especially for this genre of Sichuan spice dish. \n\nThe competition for authentic chinese food in Philly Chinatown is fierce, but I would still recommend giving it a try. It definitely checked all the checkmarks for a tasty Sichuan meal for me."
+    },
+    {
+      "review_id": "su0V9Gz-OGw-7oPnxGfqBQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-08-25T20:56:23",
+      "review_text": "One of our new favorite dim-sum spots!!\n\nThe boyfriend and I traveled into the city for Comic Con....Walked into Chinatown for some good eats--short walk from the Convention Center, and a short 5 minute walk back to Jefferson Station to catch the train home. This place came recommended to us by good friends, and it did not disappoint! \nWe arrived and there was a short line..about a 10-minute wait. Hostess was kind and handed us a buzzer/beeper.  Informed us that they only accepted cash or Venmo payment. \nOnly frustrating thing about our visit was that it took our waiter a little while to take our drink and food order. But other than that, the service was friendly and prompt.  \nScallion Pancakes--YUM! Crispy and light.  Delicious dipping sauce that we used for the soup dumplings. \nSteamed Pork Soup Dumplings--Delicious! Watch out, they came out SUPER hot.  I didn't care for the dipping sauce--too much vinegar for my taste buds. \nSpicy Stir Fry Pot-- The boyfriend loved this! Ordered this as \"regular\" spicy: flavorful;  he expected  it to be a little spicier, which turned out to be the perfect level of spicy for me to enjoy as well. \nDrunken Noodle with Beef-- Good, solid drunken noodle dish. \nDiced Chicken with Hot Peppers-- This was my personal favorite. I did ask our server to take it to a milder spice level...I will definitely be back for this dish!!\n\nWe will absolutely be back!!"
+    },
+    {
+      "review_id": "VgCwfUcFlhmhETGyRwVAJw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-03T20:43:19",
+      "review_text": "Food is very good. Kind of out there. A lot of very spicy dishes which i love. Accepts Venmo which makes things very convenient. Setting is nice.  Service is good. Price is a little higher than your average Chinese food."
+    },
+    {
+      "review_id": "ix4PoHFEBb8gvWLilYc4xw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-04T21:06:42",
+      "review_text": "One of my friends recommended this place for me! Overall, I think the food was good and the service was great! One of the good things is that they accept venmo, which is really great and handy! I had their mushroom dry pot which was so flavorful! However, I wasnt too impressed with flavor of the lo mein. Apart from that I loved their drinks and desserts!"
+    },
+    {
+      "review_id": "VcoGIId5M7tcC_RuxGEbPA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-08T22:57:43",
+      "review_text": "Update: we saw the same guy again, but he is not waiting our table this time. He seems to be a lot better than we last saw him. I decided to give it 5 stars for his improvement :) \n\n\nWe have been here before they changed the name to Bai Wei. We usually have fairly good customer service, and the wait staff are attentive. However, we just had one of the worst services today. We came in when the restaurant was completely empty. The waiters were just standing around and chatting. It took them 10 minutes to notice us, and we had to ask for the water. After they brought the food, our waiter never came back again. I'm not sure if he is just young or lack theexperience, but if you have the time to stand there and stare into space the whole time, I'm sure you can spare one minute to ask us if we need anything just once. My boyfriend and I are generous tippers but not this time."
+    },
+    {
+      "review_id": "Nulx1gxMYRC58BmMuX7S5A",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-09T02:03:43",
+      "review_text": "\"Good things come to those who wait\" (so they say). Bai Wei has been saved in my collections for a while now & I'm glad to say I finally made my way here (though it wasn't planned)!\n\nArrived shortly before closing and although you can tell they were preparing for that, the waiter was super nice and took his time attending to my guest & I. \n\nWe ordered the Shrimp & Vegetables dumplings along with two separate orders of fried rice. Even though I am not a beef fried rice fan, I decided to try their Beef Fried Rice with Black Truffle. TBH! The idea of truffle in fried rice did not sound all that appealing, but since the waiter recommended it I decided to go with his suggestion. Thank God! Because, WOW! I have never had anything like it. If you ever get a chance to visit Ba Wei, I would highly suggest trying this dish out. \nThe dumplings were also pretty good. \n\nFairly priced, located in Chinatown and the decor is super chic and modern. Would definitely recommend (However, bring cash because they were not taking cards at the time.)"
+    },
+    {
+      "review_id": "YpiCCNzjAJfxX5E_IxGbbQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-11T14:14:01",
+      "review_text": "It is really good.  Quality good, genuine portion, and their food says they care.  \n\n\nSoup dumplings are the best in town.  My h still likes Tom's but he has agreed that Bai Wei is tasty,  most importantly it is not fatty and greasy."
+    },
+    {
+      "review_id": "WQiYlVQwxfOo7isHLoSQsw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-12T16:43:47",
+      "review_text": "Amazing pickled cabbage fish. Service is amazing and the decor is very chic! Just remember, cash only."
+    },
+    {
+      "review_id": "14o4PD4oZXx8553ts27Hcg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-14T21:04:52",
+      "review_text": "If i could give this place zero stars I would. AWFUL service. We waited 20 mins just to get orders in. Then they brought my food but not my friends for ANOTHER 20 minutes. THEN the waiter who refused to give me his name DEMANDED a tip."
+    },
+    {
+      "review_id": "rTFXa7e8eg9cBX8EjVOxcQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-09-15T14:01:03",
+      "review_text": "First sign of trouble: We thought we were trying new restaurant but this is actually rebranding of former Sakura Mandarin that occupied the same space, which was a decent place when it first opened many years ago (known initially for its soup dumplings when these were rare to find) but had since become mediocre enough to point that we had stopped eating there. We had already been seated so decided to stay.\n\nSecond sign of trouble: Almost immediately after we placed our order, our pan fried soup dumplings (these are actually little buns) were delivered to the table. They were tepid and clearly had been sitting in the kitchen for a while. There was no soup in the dumplings either (perhaps soaked up by the dumpling dough while they sat in the kitchen).\n\nThird sign of trouble: In contrast to the dumplings, our order of Dan Dan noodles didn't arrive until we were basically finished with our meal and only after asking about its status. By this time, we had already decided that despite the interior makeover (which you will recognize in the innumerable cheap 'hip' restaurants in China if you spend any time there) of new Sakura, the mediocre food quality was as we had remembered it and wouldn't be returning, again. The noodles, which were delivered cold, made sure of it. We brought the cold noodles to the attention of staff, who told us that Dan Dan noodles are served cold. I am Chinese and just returned not long ago from spending a year in Chengdu, where my family ate Dan Dan noodles several times weekly (yes, the real thing is that tasty!) and were never served it cold across dozens of restaurants we visited - there are various cold noodles in Sichuan cuisine but these are types of Liang Mian. There's also the fact that the noodles were served warm when we previously ate it in the restaurant's Sakura days. I switched from speaking English to Chinese and called them out, but they insisted the noodles are served cold. Fed up at the staff's lack of scruples, we returned the noodles and left no tip (first time ever!) to register our poor experience with the restaurant. As we left, the staff angrily chased us about not tipping. I explained we didn't have a good experience. Given one last chance to own up to their lie or even say something like our restaurant's version is served cold, the waiter just called me an asshole."
+    },
+    {
+      "review_id": "04ol92z-QIt84wjF97Pd3g",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-10-17T22:11:13",
+      "review_text": "Food was delicious! Service was good! They only take cash, Venmo and Alipay tho. I would definitely recommend this place to anyone."
+    },
+    {
+      "review_id": "E44bJH1uwmoJxWho_Fnosw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-10-18T18:50:19",
+      "review_text": "Worst service ever. Called twice here tried to order take out. The girl taking the cal could not understand me. Rather than getting someone else who understands. She just hung up instead. Price is a little more than usual places and service is terrible. Would recommend"
+    },
+    {
+      "review_id": "sP9-GhqUKxsikBxDzaa8OA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-10-24T21:07:21",
+      "review_text": "I was in the neighborhood the other day, and Bai Wei's menu taped to the window really caught my eye. One of the best things you can do in a neighborhood that serves a lot of the same dishes, is catch the eye of your possible patrons with pictures! We walked around for a bit and all I kept thinking about was the dumplings in the window. \n\nWe ended up coming back to slate our craving and were not disappointed. We ordered a bunch of things to share and had more than enough to go around for 4 people for about $50.00 (not including tip).\n\nThe soup dumplings were a hit, albeit not the best I've had in my life, but pretty good nevertheless. Seeing as we ordered a bunch of different things our server brought things out as we finished almost without a gap in between, it was perfect. \n\nOverall the menu was pretty lengthy, so the next time I visit I'd probably get the soup dumplings again, but try something different for the larger dishes."
+    },
+    {
+      "review_id": "ExmQXkH8Cnr3BdKbK30E6g",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-10-28T15:17:54",
+      "review_text": "Bai Wei is a really unique restaurant in Chinatown - they serve dishes that I don't think you could get at any other restaurant here that feel very traditional.  The interior is cute, and there's no need to make a reservation it seems. Our service was wonderful as well.\n\nFor our meal, we ordered the century egg with eggplant, duck tongue, lamb dry pot, and truffle pork soup dumplings.  We also ordered a pot of red tea that was recommended.\n\nThe duck tongue is hard to comment on, I'm not going to lie we just went out of our comfort zone and tried it since we've never had it. For us, we personally didn't like it but that's not to say it wasn't prepared well!  Everything else was just spectacular - the lamb was spicy and tender and marinated super well.  The soup dumplings were so juicy and the pork was tender - my partner said they could now be his favorite soup dumplings, although next time we'd probably get the regular and not the black truffle as the truffle flavor was slightly overwhelming.  The eggplant and century egg was so good! This we also tried for the first time and loved it, and I really don't know of another restaurant that would serve this. Don't let the egg make you feel put off - it really just tastes like a salty egg. For people who don't know, the dish comes with a pestle that you can use to mash everything together. Don't eat the egg straight! Mash it in with everything else.\n\nThey had a great dessert selection that looks super cute and delicious but unfortunately they were out of everything we wanted to try! I would definitely come back to try other things on their extensive menu, and to expand my horizons more (and hopefully get some of their desserts!). \n\nJust as a heads up, they are cash only and they charge for rice."
+    },
+    {
+      "review_id": "nLl40TcxLI9hzXLkuc2zgg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-11-05T01:14:03",
+      "review_text": "Perfect for cold weather! We chose the \" stinky pot \" consist off beef and tofu , the noodle dishes are good too . Can see why they are busy. Server was very nice and accommodating. Only thing is that they only take cash , might be inconvenient for some and restricted some guests who might've order more"
+    },
+    {
+      "review_id": "FKJ8kOgqazOlJDllm9VMXQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-11-10T05:05:49",
+      "review_text": "I was out with a friend the other day, trying to find a new place to eat at when the bears outside caught my eye. We ordered the House Special Smelly Pot with Chicken (Schechuan Spicy) and the Beef Stew & Dry Bean Curd Casserole.\n\nThe chicken was cooked really well, and it was very flavorful. However, we were late to realize that the Smelly Pot had stinky tofu in it which contaminated the whole dish (both of us do not like stinky tofu). The Beef Stew & Dry Bean Curd Casserole was also pretty good and tasted exactly as I expected. \n\nOverall, I would come back to try other dishes (but will never order the Smelly Pot again).\n\nAlso, it is good to note that this place is CASH ONLY (or Venmo)."
+    },
+    {
+      "review_id": "LApVADeliCJ1lclIR7OFyQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-11-23T23:04:38",
+      "review_text": "There's like, a 20% surcharge on their grubhub prices which I didn't realize was there until I dined in last week for the first time, so I recommend NOT USING GRUBHUB for Bai Wei. Even for a cash/venmo only restaurant, 20% is a little insane. A dish I paid $18 for on grubhub was only $15 on the menu, and the fish I got on Wednesday that cost me $16 at the restaurant is listed at $20 on grubhub! And that's not counting if you then pay for delivery and tip your delivery driver.\n\nBut anyway, on to the food. The first time I got sizzling Japanese tofu and shrimp off grubhub, it looked nothing like another reviewer's picture, the shrimp were tiny \"medium\" sized shrimp barely the size of a nickel (why grocery stores call those medium shrimp and then have to go up to large, extra large, and then jumbo, I'll never understand, marketing, I guess), there were some diced carrots and onions which were undercooked, and the entire dish was orange and tasted of, what I guess I'd call \"shrimp blood\". Now, my mom uses fresh head-on shrimp in her pork steamed buns  and it's great, but when she tried to do the same trying out a chiang fun recipe, it was an orange disaster. In a dish that's more mild such as tofu, using head-on shrimp is more disaster territory than a good idea, just stick with headless frozen shrimp please. Japanese tofu is always tasty though, no matter how bad you screw up the rest of the dish, so I still ate the whole thing.\n\nBut because TT Skewer and I are forever starcrossed (that's another story), I decided to give Bai Wei another chance, and I'm glad I did (and not just because I caught the grubhub thing). I got fish fillet in spicy sauce (水煮鱼 and the server had to verify I wanted the spicy dish and not literally boiled fish, which was topkek). And now, the only restaurant I've ever had this at served it with tofu and peanuts which is about as far from traditional as you can get, so my perception of this dish is way out of whack. Bai Wei does it more typically with cabbage and bean sprouts and it was equally good and I felt healthy getting some vegetables in.\n\nThe server did not stop by at all during my meal because I was all set with a gigantic pot of tea and it's typical in China to flag down waiters rather than wait for them to come to you (my parents HATE it when servers pop by to ask how we're doing), but within a few minutes of finishing eating and pulling out my phone, a server came by to ask if I was finished, so I assume they're relatively attentive and quick to respond, so just don't be shy you'll be fine at Bai Wei. \n\nThe white furniture and elevated dining area is also pretty cute, so I'd dine in again sometime, just not grubhub, never mix grubhub and this place."
+    },
+    {
+      "review_id": "wJXPgZ9l0OlVAytyNZkQcA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-01T04:24:00",
+      "review_text": "This place was excellent! Loved eating here with my (Chinese immigrant) parents and my boyfriend :). There were lots of other Chinese families eating here on a busy Saturday night, which I always take as a good sign for a Chinese restaurant in America (speaking as a Twinkie ;)). Every table was occupied at 7:30 pm-8:30pm. We came in around 7 and waited 20-25 minutes to get a table for a table for 4. This restaurant was very clean.\n\nThis place is cash only/Venmo/Alipay. For a big and higher end Chinese restaurant, it's kind of annoying they don't take credit cards, but maybe this'll change in the future.\n\nThe service was excellent. The waiter refilled our Longjing Tea pot ($5) at least 3-4 times and the restaurant used high quality tea; despite the ongoing 20+ minute wait for tables after 7:30 pm, we never felt rushed during our meal and the service was quick when we received our food. \n\nThis restaurant has excellent authentic/traditional tasting xiao long bao soup dumplings - I would argue they were as good tasting as the ones you find at Nan Xiang in Flushing NY! My boyfriend happily devoured the XLB. The pan-fried pork soup dumplings were great texture-wise (there's a bit of an extra \"crunch\" at the bottom of them), but only good/okay taste-wise (the meat filling is more savory-tasting than slightly sweet/salty like at some other Shanghai-cuisine restaurants - also, I didn't really taste much of the \"soup\" that was supposed to be in these (but the dough was a little thicker/heartier like in regular bao-zi, so maybe it just absorbed the soup). The vinegar/ginger that came with the XLB was great.\n\nWe also had a more traditional dish, pickled cabbage soup with tilapia ($28), that was fantastic! The soup came with a whole fish that was de-scaled. The broth had a rich, creamy texture with a deep flavor that clearly showed they used fresh, live fish in their soup and it was a huge portion for the 4 of us. This was my favorite dish in terms of flavor/depth and my Caucasian boyfriend (who can sometimes be hesitant/not-super-adventurous when it comes to Chinese food) was pleasantly surprised and even enjoyed this soup - he ate a huge portion of it.\n\nThe salt/pepper double delight fried squid & shrimp dish was also great - the batter was light and crunchy and not too heavy/oily, so I didn't feel like we were eating ourselves into a greasy food coma like some other restaurants that serve this dish. We also had the eggplant with garlic sauce and this dish was also made well - a little sweeter and not spicy enough for my own personal taste, but the texture of the eggplant was firm/cooked well and it was a good-sized portion for the 4 of us. Pretty reasonably priced meal for the 4 of us that came out to approximately $102 with tax & 18% tip with 1 tea pot, 2 XLB orders, 1 pan-fried XLB dish, 1 huge multi-portion fish soup, 1 veggie dish and 1 protein dish.\n\nI would definitely come here again! Thanks for the awesome dinner with my family and boyfriend :D"
+    },
+    {
+      "review_id": "lR9nKpIv5bGrKgRgwtO9rA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-03T18:42:08",
+      "review_text": "I love love love this place! They have the best shrimp fried rice in the city. Everything I get from here is always tasty. Soup dumplings are delicious as well. I try to try something new every time i come here. I definitely recommend it! Lunch, dinner, with family, friends or by yourself!"
+    },
+    {
+      "review_id": "RvqAIS7pANe0BJHxoXwm3g",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-06T19:31:51",
+      "review_text": "Service is AWFUL and the food is subpar. Our server looked like he didn't want to be there. I ordered something and didn't like it after the first bite or two, and he refused to bring it back to the kitchen unless I paid for it. Definitely not worth the money."
+    },
+    {
+      "review_id": "iBeojMMxxD5ZbnI9qlX_VA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-07T00:08:59",
+      "review_text": "Delicious. We stopped here after a conference in the convention Center. Cash or venmo only. Scallion pancakes were amazing fried bread, wontons in chili sauce, pork dumpling in soup, and pan fried beef dumplings. Everything was good. Quick service"
+    },
+    {
+      "review_id": "uwC0xipcqavhL6pei13-uw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-09T06:04:46",
+      "review_text": "We used to go here before they upgraded and we are still very impressed! The pork wontons in chili oil stole the show! It came flavored with peanut sauce - it was unique and spot on love. The truffle pork soup dumplings are an interesting twist but not enough soup in them  (Dim Sun Garden is better)- still good though. Their place is one of the more \"Americanized\" spots in Chinatown in terms of service & atmosphere.  We'll be back for those wontons again!"
+    },
+    {
+      "review_id": "S-VBhnczdQjYAZ88lN16nw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-12T18:32:10",
+      "review_text": "The food was excellent. Came here for lunch and had the truffle soup dumplings. I loved the Dan Dan noodles also. IMO, I'm happy they don't use a lot of sichuan peppercorn. Highly recommend to anyone that loves modernized authentic Chinese food."
+    },
+    {
+      "review_id": "5kOtJInclzL_D4_9_Uq7Xg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-25T01:14:14",
+      "review_text": "Waiters lying about the waiting time and keep finding excuses. They make us wait from 30min to 1h and then 1h and 15min. Terrible experience."
+    },
+    {
+      "review_id": "MS-9Ah7rZfytxOOs34Pd5Q",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2019-12-28T01:54:19",
+      "review_text": "Not good.  Made the mistake of trying to avoid the line at dim sum garden.  Soup dumplings mushy.  Spaghetti noodles.  Fishy flavors in the pork dish.  Chili oil has peanut butter...no thanks.  Cucumbers flavorless.  Scallion pancakes overly oily and dense.  Offers Thai, Chinese, Japanese options...Classic case of trying to make everyone happy but ends up disappointing all.  It was clean and relatively quick.  Should have headed the warning of seeing a half empty restaurant on a Friday night."
+    },
+    {
+      "review_id": "TpVuQEkwMOkJntRd6xI3Sw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-01-05T21:58:41",
+      "review_text": "The place is super nice. It's bright modern and food is delicious. The wait staff was diligently working with the Christmas Eve rush. They were attentive despite the place being packed. We ordered the pork and crab soup dumplings, spicy fish filets, shrimp with walnut and mayo sauce and our dessert called the Tangerine which looked like it came out of a Michelin Star restaurant it was that pretty. The only down side of this establishment is that they only accept cash or Venmo. So keep that in mind. It's also BYOB."
+    },
+    {
+      "review_id": "CVKlB9KJZki5hoPu890aEw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-01-06T00:20:40",
+      "review_text": "Went for Christmas dinner! I liked it quite a bit. Cash only , big menu. Modernist looking for Chinatown. We ordered everything. Soup dumplings were quality. Two others were good. Scallion pancake great , chive pretty good. Two noodle dishes were solid. Dan Dan and pan fried. Many more dishes. Good tea selection. Service was a bit scattered. But friendly. It will go on the rotation."
+    },
+    {
+      "review_id": "koVr6yTZkkDOC_2y7BCi2w",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-01-10T04:51:06",
+      "review_text": "I've been here twice now since they changed their name, and have been very satisfied with the quality of food I got. I tried out different soup dumplings each time (regular pork soup dumplings and pork soup dumplings with black truffled), and I was satisfied with the dumpling skin thickness, the amount/taste of the \"soup\", and also appreciate that they provided enough vinegar and ginger shreds to go with them. I didn't like how sometimes the dumplings would be stuck to each other and they end up rupturing before even getting off the rack.\n\nDuring my first visit, I tried out the lamb with cilantro (because I love cilantro), and it was so good I had to try the beef cilantro on my second visit, which also left me very satisfied.\n\nI think this place has a lot of interesting options on the menu which I am down to try in the future (might leave the famous stinky tofu dish to the last since I've never had a food like that before)"
+    },
+    {
+      "review_id": "9z8EL4LtGHyU7l5HwDwV-A",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-01-24T19:32:14",
+      "review_text": "I ordered lunch for take out. \n\nBeing a huge fan of dumplings, I had to try the Steamed Crab and Pork Soup Dumplings. You won't be disappointed; They we're so yummy.\n\nI also ordered the general tso's chicken lunch option- served with white rice and your option of soup (wonton or hot and sour).\n\nI'll make sure to give this place a try dining in just so I can have those dumplings again!"
+    },
+    {
+      "review_id": "d9SjoCCQ75Rxr7xA7r6fWw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-01-27T21:55:36",
+      "review_text": "Reservation for 14 people - we were in town for the Midnight Lion Dance, everything was fantastic. We brought many bottles of wine (and baijiu) - glasses and teacups were provided as soon as we sat. We put in 10 orders of soup dumplings right off the bat, of which were brought out in time for us to put in a large food order. We ordered multiple orders of scallion beef, kung pao chicken, bao buns, truffle beef fried rice, rock shrimp, pork belly. All excellent.  Our servers were fantastic. We had a great night! Cash only - but you can pay via Venmo, we've been there before so it was as expected."
+    },
+    {
+      "review_id": "Vii0ciYJmxwI-VKll8X2QA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-07T03:02:39",
+      "review_text": "One of my favorite Chinese restaurant in the Philly area. They have a very modern-esque vibe to the place and there's plenty of seating. The only thing that some people may not like is that they only accept cash, venmo or alipay. For me it's never been an issue, because I am a big venmo person, but this may be a turn off for some. \n\nI have been to Bai Wei several times at this point and I have never ordered anything that I have disliked. The food always comes out hot and fresh and this is also one of the places I always bring friends to if they've never tried \"real Asian\" food before. \n\nService has always been pretty good, however nothing too memorable. I have always had speedy and good service while I have eaten here. I also like how they partner up with A La Mousse for their desserts, you can sometimes see the desserts at the counter window, but if they don't have what you want A La Mousse is right around the corner not even a minute walk away."
+    },
+    {
+      "review_id": "XxJ0BFF-0T0O1zfxWcghHA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-10T22:45:57",
+      "review_text": "This place was called Sakura before and wanted to try the bai weei food. The quality of the food anD the service is good. Tried their soup dumpling, dry pot and the dessert. Not the fan of their dessert but enjoyed the food."
+    },
+    {
+      "review_id": "yS1dhsd6VzMuvUznNtDKeg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-14T01:59:25",
+      "review_text": "I have been here a few times already. There dim sum is limited but the szechuan style food is amazing. MUST order items.\n\nCrispy fried fish. This dish is slightly spicy, crispy on the outside and tender on the inside. Fish will never be the same if you try this dish.\n\nMopo is a silken tofu dish. Mild in flavor but softens the spicy crispy fried fish. It pairs very well together. It has minced pork, silken tofu, carrots and peas and hot peppers. But there is no spice to this dish at all.\n\nFlaming stinky pots. Actually. I don't know the name of these dishes, But I can tell you have a pungent smell to it. It has that numbing peppercorn spice that makes the dish super unique. I love it.\n\nOrder a side of rice and get the black tea. These 2 must go hand in hand with all of their meals. \n\nA beautiful asian couple mural makes this place very modern and gives it a classy asian ambiance. Cash only or venmo. Parking is crazy around here but there is a parking lot right next door."
+    },
+    {
+      "review_id": "TBK0q0qpGpPHztXdsh3p4w",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-16T02:34:33",
+      "review_text": "Sensational service coupled by solid food\n\nService:\n\nWent on a Saturday, and it was quite busy. With a reservation, though, we were seated in about 5 mins, although there was a wait to the door. \n\nWe ordered the food swiftly as we were in a bit of a rush. They didn't disappoint. It felt like a bit of a procession with the food just perpetually coming out in what was seemingly perfectly spaced intervals. We were in and out in 35 minutes \n\nFood:\nScallion pancake- unlike your conventionally doughy, decadent scallion pancake you get, this was cracker thin, buttery, with a delightful crisp.\n\nBlack truffle soup dumplings- they were ok. The texture of the actual dumpling was adequate, being robust enough to encase the insides safely. The porky soup of the dumpling, though, was lacking that rich umami flavor I long for in a soup dumpling, rendering this dish inert for me.\n\nBlack truffle, beef fried rice- I can see why there is some fanfare for this dish. With the truffle, it adds this mystical flavor profile that I can't really pinpoint, but is tantalizingly yummy. \n\n\nIn actuality, I'd give them a 4.5. But I'll give them the benefit and knock them up to 5"
+    },
+    {
+      "review_id": "PMeVaveb0blZUaoUwo2XuQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-19T03:57:57",
+      "review_text": "I have tried the place 2x now.   Chicken dumplings were served raw inside and sliced beef served was rancid.  Disgusting...I will never return."
+    },
+    {
+      "review_id": "7x2HAI1opB6m1C_9gPfGvQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-20T04:58:22",
+      "review_text": "Amazingly high quality Chinese food. My friends and I visited here during Lunar New Year weekend, and it was a great choice. Loved the vegetarian dishes like eggplant and string beans. The beef soup had really good glass noodles which a great spice kick in the soup. The chicken was also quite spicy (make sure you don't accidentally eat the peppers if you have a low spice tolerance!!!) We also ordered the thousand year egg, which came with eggplant. It was fun to mash it-they give you a pestle to mix the ingredients of the egg, eggplant and sauce together. That was probably my favorite dish because it was so rich with flavor. It's the move to eat family style eating here because the portions are so large, and you can try out all the various dishes they offer. The menu is large so try not be too overwhelmed. OH AND THEY DO NOT TAKE CARD- cash, venmo, and wechat pay are available."
+    },
+    {
+      "review_id": "yWMMv-xAtO3O6rPqLqy3fg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-20T19:31:22",
+      "review_text": "I've been here a couple of times and it's taken all those times for me to finalize an opinion so I could share with the world lol. This place serves dim sum and szechuan style food. If you're looking for true authentic dim sum, then you might want to consider the other dim sum places in chinatown. However, if you're craving some dim sum at like 8pm (which I normally do) then Bai Wei serves enough dishes to satisfy your craving. Although their dim sum options are limited, they are pretty good. I love their appetizers. The scallion pancake, cheese fried wontons and rock shrimp don't sound like anything amazing, but I always have to order these when I go because they're just THAT good. Anytime I come here with friends we always end up ordering soup dumplings. They aren't bad, but they're definitely not my favorite. My partner really enjoys their salt baked squid (which is the dish he orders at EVERY Chinese restaurant so you could say he's a salt baked squid connoisseur). I, on the other hand really love their noodles! I enjoy szechuan food because I like a little spice to my dishes. The dandan noodles and their drunken noodles with beef are my go-to's. I definitely have to come back and try more of their options, but from what I've had so far, I really enjoyed. Their staff is very friendly and the atmosphere is a great place to catch up with friends. Just know that it's cash only, but they also accept venmo, so plan ahead! There's an ATM if you need to grab some cash too."
+    },
+    {
+      "review_id": "6vPtJ1UsfFTUvF4iMP_KfQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-27T23:18:17",
+      "review_text": "Decorations were beautiful and the dessert was cute, but soup dumplings were not as flavorful as I anticipated them to be. The pork belly though was amazing!!"
+    },
+    {
+      "review_id": "zoh1O0BW4juoQTEL6T3CXg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-02-28T23:07:04",
+      "review_text": "Omg! I read the reviews on here and they were correct! I got the crispy fried fish and the dice chicken and the plum spare ribs. Also the soup dumplings. They had to bring us another table because we ordered so much for our table.\n\nThe food did not disappoint! The place was packed on a Saturday night. But our wait was only about 15 minutes. Service was good for being so busy.\n\nI'm still thinking of the crispy fish days later."
+    },
+    {
+      "review_id": "yCjHNsGYNKvNPYelCIEDlA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-03-01T01:05:01",
+      "review_text": "I wish we could do half a star because is it 3.5. The food was just okay. The best thing we ate was the Peking Pork. If everything had the attention and flavor that this pork dish had, this would have been 5 star rating. I would not make a special trip to eat here again. The restaurant is nice clean and comfortable. My dinner companions and I shared everything we ate. We all agreed the food wasn't bad but it wasnt spectacular."
+    },
+    {
+      "review_id": "Ckg2xbdRL2n39rHVCxLt9Q",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-03-12T02:18:47",
+      "review_text": "02/01/20;\nKnown here for a while (peeked inside before cuz the interior looks good)\nTurned out that they have legit Chinese food! The 麻辣香锅 is probably the best one I've ever had in philly. Other dishes are good as well.\nIt's a somehow pricy but, hope to go eat again!!"
+    },
+    {
+      "review_id": "3LCLLUbosaA5obEg0O9yuQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-04-26T00:38:06",
+      "review_text": "Everything here is good! My favorite is the beef fried rice with black truffles. OMG!! Also the scallion beef and the soup dumplings. I always pay via Venmo makes life so much easier."
+    },
+    {
+      "review_id": "gJvrnzID5Kn2-mYuvaIqdg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-04-26T00:59:53",
+      "review_text": "I read a Craig LaBan review that he liked this place so strayed from other solid places. The chicken lo main smelled weird and was kind of mushy and greasy. the fried pork soup dumplings were average, better than the lo main. These items were highlighted as popular favs - WTF."
+    },
+    {
+      "review_id": "_k9FDe4iAqUgyRRqQE8mjA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-05-11T19:23:19",
+      "review_text": "Very nice decor and modern. It's defiantly a place that you can't miss as you walk around Chinatown. The staff are attentive and the food comes out in a reasonable time.\n\nWhen you order food from here I feel like it could be very much a miss or hit depending on your palate. The shrimp, double cooked pork, and dumplings were amazing! Savory with just the right amount of sauce to not overpower or make the food slimy. The stir fried radish with egg can be a pretty big miss for some. They use the yolk of salted eggs to make it creating a very meat and savory flavor with a slight gritty texture.\n\nOverall for me it was a decent meal. Very filling and lots of food. The price wasn't too bad either. A great place to come and try out once in a while."
+    },
+    {
+      "review_id": "dwHE-HuHPHH5OyFeTjUKhA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-06-07T12:29:01",
+      "review_text": "This has become a take out staple for me. \nThe scallion pancakes are a must. The crispy and spicy fish filet still show up at my house mostly crispy.  It's got that nice numb at the end spice!\nThe soup dumplings, while tasty, tend to travel less well. \nThe beef and bean curd casserole was overly greasy but the flavors are amazing.\n\nDefinitely give this place a try."
+    },
+    {
+      "review_id": "NdFTw4kQQZNwFCKfDAth5w",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-07-08T17:55:50",
+      "review_text": "I went to Bai wei and it was absolutely disgusting I would never eat here again. I used to eat here when it used to be Sakura and it was amazing and really delicious. But now they dint even sell the soup dumplings I would not recommend this place at all. They should change it back to Sakura!"
+    },
+    {
+      "review_id": "_GYRz3s3dp1WqVVlpxNPOQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-07-27T22:09:38",
+      "review_text": "---SAFETY CONCERN---\n There is a huge fly in fried chicken wings.  Gross... \n\nCustomer care was like hell. No apologies from the business. \n\nTerrible experience"
+    },
+    {
+      "review_id": "L0n1gvoA9VyMV4-49Z4zRA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-07-30T04:18:33",
+      "review_text": "I have ordered from Bai Wei for at least 20 times, but now, I really worry about their food health problem, especially during COVID-19, we have no idea about how they cook, pack, and deliver. In the last order, I found a feather in the box. I contacted the restaurant, they claimed that \"there is no way that a feather could exist in our food\", and they only willing to return 1/4 of the dish's price. That's almost a humiliation and a representative of how they ignore their food health problem."
+    },
+    {
+      "review_id": "MqQSzxOpJVA6Qng2fvBSyg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "review_time": "2020-08-09T05:19:36",
+      "review_text": "So glad we came back and they now have new outdoor dining and seafood menu. We tried the garlic butter and lemon pepper flavor, both were amazing. The snow crab legs and very fresh, mussels are juicy and shrimps are big. We also had pancake and dumplings appetizers and both were delicious. Everything was delicious, good service and clean tables. Highly recommended."
+    }
+  ]
+}

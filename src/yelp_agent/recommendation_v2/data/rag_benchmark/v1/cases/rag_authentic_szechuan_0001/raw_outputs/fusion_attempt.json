@@ -1,0 +1,13 @@
+{
+  "status": "invalid_output",
+  "raw_json": "{\n  \"hard_constraints\": [\n    {\n      \"field\": \"category\",\n      \"operator\": \"any_of\",\n      \"value\": [\"Szechuan\"],\n      \"evidence_text\": \"有川菜馆吗\",\n      \"evidence_turn_index\": 1,\n      \"supporting_fact_ids\": []\n    }\n  ],\n  \"open_requirements\": [\n    {\n      \"text\": \"川菜味道地道正宗吗\",\n      \"behavior\": \"must_have\",\n      \"priority\": null,\n      \"evidence_text\": \"川菜味道地道正宗吗\",\n      \"evidence_turn_index\": 1,\n      \"supporting_fact_ids\": []\n    }\n  ],\n  \"review_search_plans\": [\n    {\n      \"kind\": \"fixed_aspect\",\n      \"plan_id\": \"fixed.food_quality.higher.74234e98\",\n      \"field\": \"food_quality\",\n      \"direction\": \"higher\",\n      \"target_value\": null,\n      \"requirement_text\": null,\n      \"behavior\": null,\n      \"positive_descriptions\": [\n        \"The food quality is excellent.\",\n        \"The ingredients are fresh and the dishes are well-prepared.\"\n      ],\n      \"negative_descriptions\": [\n        \"The food quality is poor.\",\n        \"The dishes taste stale and are poorly cooked.\"\n      ]\n    },\n    {\n      \"kind\": \"long_tail\",\n      \"plan_id\": null,\n      \"field\": null,\n      \"direction\": null,\n      \"target_value\": null,\n      \"requirement_text\": \"川菜味道地道正宗吗\",\n      \"behavior\": \"must_have\",\n      \"positive_descriptions\": [\n        \"The Szechuan food is authentic and traditional.\",\n        \"The dishes have the proper numbing and spicy flavors of authentic Szechuan cuisine.\"\n      ],\n      \"negative_descriptions\": [\n        \"The Szechuan food is not authentic.\",\n        \"The dishes are bland and lack the characteristic Szechuan peppercorn heat.\"\n      ]\n    }\n  ],\n  \"scene\": null,\n  \"search_center\": {\n    \"label\": \"费城唐人街中心\",\n    \"latitude\": null,\n    \"longitude\": null,\n    \"radius_km\": 0.3,\n    \"evidence_text\": \"费城唐人街中心300米以内\",\n    \"evidence_turn_index\": 1\n  },\n  \"soft_preferences\": []\n}",
+  "state": null,
+  "review_search_descriptions": [],
+  "failure_reason": "schema_validation_failed:search_center.latitude:float_type",
+  "model": "deepseek-v4-flash",
+  "latency_ms": 4685.27020001784,
+  "input_tokens": 1393,
+  "output_tokens": 507,
+  "model_call_count": 1,
+  "tool_observations": []
+}

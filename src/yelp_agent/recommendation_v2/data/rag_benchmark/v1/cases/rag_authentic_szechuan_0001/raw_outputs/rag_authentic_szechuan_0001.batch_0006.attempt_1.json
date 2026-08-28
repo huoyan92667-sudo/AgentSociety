@@ -1,0 +1,632 @@
+{
+  "is_error": false,
+  "duration_api_ms": 113165,
+  "num_turns": 2,
+  "stop_reason": "tool_use",
+  "session_id": "5c00c0bd-bd41-4c8a-a057-1a547c603cd3",
+  "total_cost_usd": 0.21891799999999997,
+  "usage": {
+    "input_tokens": 9106,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2176,
+    "output_tokens": 6892,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "glm-5.1": {
+      "inputTokens": 9106,
+      "outputTokens": 6892,
+      "cacheReadInputTokens": 2176,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.21891799999999997,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "canonicalModel": "glm-5.1",
+      "provider": "firstParty",
+      "costBasis": "unknown"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"batch_id\":\"rag_authentic_szechuan_0001.batch_0006\",\"case_id\":\"rag_authentic_szechuan_0001\",\"labels\":[{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"negative\",\"negative_spans\":[\"The dan dan noodles were absolutely not authentic (or even mildly tasty). The noodles they use are like spaghetti noodles.\"],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":\"担担面（dan dan noodles）一道菜\",\"review_id\":\"YS61nfc5KuOkhtXKiLkfYQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"UwYLxCHSoCTIvOpcg8AsHw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"E-PmVdIPu1tmyVr6x5S90w\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"PjziDCPaXbjV5vM35SzUZw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"IQrXSC3W3U3X0PivRfMWvA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"qiUVyzrqcp9G2WpD4Mmf0Q\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":\"very tasty although I wished it was a bit spicer!\",\"condition_text\":\"Beef Drunk Noodles 一道菜\",\"review_id\":\"haqJ5SstRln1IUv0BhyxrA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"DRCt8FpEY0B7MHn32rjEpA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"UxN3NqquPe74rDkRg9D_oQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":\"Got the assorted mushrooms dry pot (cut the heat on everything else and really good)\",\"condition_text\":\"外带时主动要求减辣\",\"review_id\":\"k07MHc1PSnAF0JV_C3Bsug\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"This spot is pretty good if u are craving for Szechuan cuisine. I personally like the Dan dan noodle\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"mMbLRloAwtWA5z6cQ9xrxA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"i_ygoltvcW4wnrNABKfPyA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"lwAZx6padPdmothBI6-h2A\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":\"much of the food we ordered was over flavored. I know this sounds ridiculous to say but there is such thing as too much spice\",\"condition_text\":null,\"review_id\":\"pSNMGunk5dXWbI9DtuxxLg\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"I really liked the spices and flavors from this place. It really surprised me how much \\\"punch\\\" it had\"],\"ambiguous_span\":null,\"condition_text\":\"fried fish dish\",\"review_id\":\"VJcbmVvx0FupGCjk4sH3gA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"GM8STG99IXL_4onr8GqHiA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"Authentic Chinese food, great environment and service!\",\"everything on the menu is pretty legit\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"FA0CnO6Nc-llM9EflBhmUA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"SeNGcrs-_EKo6ksCoM6-Ng\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"X14tDFSOXZj3CddEb3Gdjg\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"negative_spans\":[\"it was branded as a Shanghai stir fried thick noodle and it resembled more of a Japanese stir-fried udon\"],\"positive_spans\":[\"Pan fried dumplings: These were solid with a plump, juicy filling and nicely crispy pan fried shell.\"],\"ambiguous_span\":null,\"condition_text\":\"不同菜品结论相反\",\"review_id\":\"I6HtcAUITv_cUKHWpG-HDA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"yVqnqO_Exhuu6rYEyGDODQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"mixed\",\"negative_spans\":[\"the chili oil wasn't what we expected. It had a nice kick to it and also a strong peanut taste.\"],\"positive_spans\":[\"The pork wonton was good\",\"shrimp and vegetable dumplings was the best thing we had tonight\"],\"ambiguous_span\":null,\"condition_text\":\"不同菜品结论相反\",\"review_id\":\"wxS5GFuyvJ5o9n_TcDhs0Q\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"My go to spot for authentic Chinese.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"J4E4oIAz8qRQ3YYwIsGHJA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"_YR2XEHpokgyLNlWKSwwHg\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"L15hGLvUwo1H4Zip2XL3aw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"the lovely Sichuan pepper taking front and center in the savory beef dish\"],\"ambiguous_span\":null,\"condition_text\":\"beef in chili sauce\",\"review_id\":\"GvESNh4HZZVNUv4xiUr0wQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":\"the spicy stir fry bowl wasn't what it used to be when the restaurant used to be called Sakura\",\"condition_text\":\"spicy stir fry bowl\",\"review_id\":\"k0-hCy5GzBGhSL_q45IBIA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"JqhDxXedFan4vD1Qh-9Wcw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"mixed\",\"negative_spans\":[\"Food isn't that spicy, so if you can't tolerate it then nothing to worry about.\"],\"positive_spans\":[\"One of the best authentic Chinese food places in Chinatown Philly.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"XBDYmPoACAYqObmGvWURIw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"VKtZBNUcshMNZ0FbbNozuw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"QC3H9_lDgnyxleuSgWhd2g\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"If you're looking for some good Szechuan food, you can check this place out.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"gsxOKiH_nL2pxISDkCjCMw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"Authentic food.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"FjObu8WxjtCBJr92m2l4zA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"1GGdYR3lvk2SZjM7MMwLAQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"Spicy Szechuan style food and seafood boiled options.\",\"However, food is still delicious so that's good.\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"oT8Hv5OspB_Q2TF_3CSzwA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"the food is very good and authentic, especially the soup dumplings and spicy cucumber\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"JTTmUSmUVP-GijJV0puekw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"The pig trotters 木桶蹄花 smells good when it's first serve. The portion is enough and the taste is legit too.\"],\"ambiguous_span\":null,\"condition_text\":\"木桶蹄花（pig trotters）一道菜\",\"review_id\":\"hyIrYmInMiEBVS_8UFPJfA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"cz76_2WkqHOP4ka7woxoSw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"XgLTrpHm-leHI_mhYc8YxA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"direct\",\"label\":\"mixed\",\"negative_spans\":[\"The spicy chicken was just okay. Not the usual Chinese style, but more Americanized...\"],\"positive_spans\":[\"Ordered the soup dumplings with black truffle. Love it! A lot of soup inside!\"],\"ambiguous_span\":null,\"condition_text\":\"不同菜品结论相反\",\"review_id\":\"Mb_Oby3_dDmEDCegLMfwoA\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":\"We ordered the marinated duck, the House Special Spicy bowl and the mushroom dry pot.\\n\\nThe food was bland\",\"condition_text\":\"marinated duck、House Special Spicy bowl、mushroom dry pot\",\"review_id\":\"9oRmp9jybMneStJBCY5WTw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"PW52bwOEFVis-2_3aKyz2w\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"clzhgzHq9U1WSGFiR9w6uw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"supporting\",\"label\":\"positive\",\"negative_spans\":[],\"positive_spans\":[\"On the Szechuan side, you have all sorts of dry pot, stir fry, and pepper based dishes.\",\"The cumin dry pot is tasty and not as spicy as I suspected it would be\"],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"yqHKvutH17J65lX9SyQX7g\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"3mLwuBCW3nnt6tDAdDvatw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"J6UlyG2Db4L_NNfOlth9Lg\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"d9VjLGJWL6hlp11F3X9sWw\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"PGJOTmBY-zX_ekm9ikMbuQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"gvPAkjIpnHMghdhg2QzjJQ\"},{\"business_id\":\"SADPX8WX34EQDj_jqtacMw\",\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"ambiguous_span\":null,\"condition_text\":null,\"review_id\":\"UVvGdOaiFyR8auFDWDwttA\"}]}",
+  "structured_output": {
+    "batch_id": "rag_authentic_szechuan_0001.batch_0006",
+    "case_id": "rag_authentic_szechuan_0001",
+    "labels": [
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "negative",
+        "negative_spans": [
+          "The dan dan noodles were absolutely not authentic (or even mildly tasty). The noodles they use are like spaghetti noodles."
+        ],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": "担担面（dan dan noodles）一道菜",
+        "review_id": "YS61nfc5KuOkhtXKiLkfYQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "UwYLxCHSoCTIvOpcg8AsHw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "E-PmVdIPu1tmyVr6x5S90w"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "PjziDCPaXbjV5vM35SzUZw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "IQrXSC3W3U3X0PivRfMWvA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "qiUVyzrqcp9G2WpD4Mmf0Q"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": "very tasty although I wished it was a bit spicer!",
+        "condition_text": "Beef Drunk Noodles 一道菜",
+        "review_id": "haqJ5SstRln1IUv0BhyxrA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "DRCt8FpEY0B7MHn32rjEpA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "UxN3NqquPe74rDkRg9D_oQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": "Got the assorted mushrooms dry pot (cut the heat on everything else and really good)",
+        "condition_text": "外带时主动要求减辣",
+        "review_id": "k07MHc1PSnAF0JV_C3Bsug"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "This spot is pretty good if u are craving for Szechuan cuisine. I personally like the Dan dan noodle"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "mMbLRloAwtWA5z6cQ9xrxA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "i_ygoltvcW4wnrNABKfPyA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "lwAZx6padPdmothBI6-h2A"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": "much of the food we ordered was over flavored. I know this sounds ridiculous to say but there is such thing as too much spice",
+        "condition_text": null,
+        "review_id": "pSNMGunk5dXWbI9DtuxxLg"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "I really liked the spices and flavors from this place. It really surprised me how much \"punch\" it had"
+        ],
+        "ambiguous_span": null,
+        "condition_text": "fried fish dish",
+        "review_id": "VJcbmVvx0FupGCjk4sH3gA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "GM8STG99IXL_4onr8GqHiA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "Authentic Chinese food, great environment and service!",
+          "everything on the menu is pretty legit"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "FA0CnO6Nc-llM9EflBhmUA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "SeNGcrs-_EKo6ksCoM6-Ng"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "X14tDFSOXZj3CddEb3Gdjg"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "negative_spans": [
+          "it was branded as a Shanghai stir fried thick noodle and it resembled more of a Japanese stir-fried udon"
+        ],
+        "positive_spans": [
+          "Pan fried dumplings: These were solid with a plump, juicy filling and nicely crispy pan fried shell."
+        ],
+        "ambiguous_span": null,
+        "condition_text": "不同菜品结论相反",
+        "review_id": "I6HtcAUITv_cUKHWpG-HDA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "yVqnqO_Exhuu6rYEyGDODQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "mixed",
+        "negative_spans": [
+          "the chili oil wasn't what we expected. It had a nice kick to it and also a strong peanut taste."
+        ],
+        "positive_spans": [
+          "The pork wonton was good",
+          "shrimp and vegetable dumplings was the best thing we had tonight"
+        ],
+        "ambiguous_span": null,
+        "condition_text": "不同菜品结论相反",
+        "review_id": "wxS5GFuyvJ5o9n_TcDhs0Q"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "My go to spot for authentic Chinese."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "J4E4oIAz8qRQ3YYwIsGHJA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "_YR2XEHpokgyLNlWKSwwHg"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "L15hGLvUwo1H4Zip2XL3aw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "the lovely Sichuan pepper taking front and center in the savory beef dish"
+        ],
+        "ambiguous_span": null,
+        "condition_text": "beef in chili sauce",
+        "review_id": "GvESNh4HZZVNUv4xiUr0wQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": "the spicy stir fry bowl wasn't what it used to be when the restaurant used to be called Sakura",
+        "condition_text": "spicy stir fry bowl",
+        "review_id": "k0-hCy5GzBGhSL_q45IBIA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "JqhDxXedFan4vD1Qh-9Wcw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "mixed",
+        "negative_spans": [
+          "Food isn't that spicy, so if you can't tolerate it then nothing to worry about."
+        ],
+        "positive_spans": [
+          "One of the best authentic Chinese food places in Chinatown Philly."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "XBDYmPoACAYqObmGvWURIw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "VKtZBNUcshMNZ0FbbNozuw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "QC3H9_lDgnyxleuSgWhd2g"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "If you're looking for some good Szechuan food, you can check this place out."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "gsxOKiH_nL2pxISDkCjCMw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "Authentic food."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "FjObu8WxjtCBJr92m2l4zA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "1GGdYR3lvk2SZjM7MMwLAQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "Spicy Szechuan style food and seafood boiled options.",
+          "However, food is still delicious so that's good."
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "oT8Hv5OspB_Q2TF_3CSzwA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "the food is very good and authentic, especially the soup dumplings and spicy cucumber"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "JTTmUSmUVP-GijJV0puekw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "The pig trotters 木桶蹄花 smells good when it's first serve. The portion is enough and the taste is legit too."
+        ],
+        "ambiguous_span": null,
+        "condition_text": "木桶蹄花（pig trotters）一道菜",
+        "review_id": "hyIrYmInMiEBVS_8UFPJfA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "cz76_2WkqHOP4ka7woxoSw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "XgLTrpHm-leHI_mhYc8YxA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "direct",
+        "label": "mixed",
+        "negative_spans": [
+          "The spicy chicken was just okay. Not the usual Chinese style, but more Americanized..."
+        ],
+        "positive_spans": [
+          "Ordered the soup dumplings with black truffle. Love it! A lot of soup inside!"
+        ],
+        "ambiguous_span": null,
+        "condition_text": "不同菜品结论相反",
+        "review_id": "Mb_Oby3_dDmEDCegLMfwoA"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": "We ordered the marinated duck, the House Special Spicy bowl and the mushroom dry pot.\n\nThe food was bland",
+        "condition_text": "marinated duck、House Special Spicy bowl、mushroom dry pot",
+        "review_id": "9oRmp9jybMneStJBCY5WTw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "PW52bwOEFVis-2_3aKyz2w"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "clzhgzHq9U1WSGFiR9w6uw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "supporting",
+        "label": "positive",
+        "negative_spans": [],
+        "positive_spans": [
+          "On the Szechuan side, you have all sorts of dry pot, stir fry, and pepper based dishes.",
+          "The cumin dry pot is tasty and not as spicy as I suspected it would be"
+        ],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "yqHKvutH17J65lX9SyQX7g"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "3mLwuBCW3nnt6tDAdDvatw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "J6UlyG2Db4L_NNfOlth9Lg"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "d9VjLGJWL6hlp11F3X9sWw"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "PGJOTmBY-zX_ekm9ikMbuQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "gvPAkjIpnHMghdhg2QzjJQ"
+      },
+      {
+        "business_id": "SADPX8WX34EQDj_jqtacMw",
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "ambiguous_span": null,
+        "condition_text": null,
+        "review_id": "UVvGdOaiFyR8auFDWDwttA"
+      }
+    ]
+  },
+  "ttft_ms": 53473,
+  "ttft_stream_ms": 4481,
+  "time_to_request_ms": 211,
+  "type": "result",
+  "duration_ms": 113374,
+  "uuid": "5a8c3959-d64b-431f-86fd-7f76f7664431",
+  "queued_turn_count": 0
+}

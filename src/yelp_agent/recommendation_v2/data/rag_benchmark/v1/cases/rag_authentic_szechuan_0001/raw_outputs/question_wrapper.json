@@ -1,0 +1,88 @@
+{
+  "is_error": false,
+  "duration_api_ms": 8392,
+  "num_turns": 2,
+  "stop_reason": "tool_use",
+  "session_id": "dd55f6a4-ed7d-4725-a839-3237071f37b1",
+  "total_cost_usd": 0.01184,
+  "usage": {
+    "input_tokens": 1668,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 140,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "glm-5.1": {
+      "inputTokens": 1668,
+      "outputTokens": 140,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.01184,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "canonicalModel": "glm-5.1",
+      "provider": "firstParty",
+      "costBasis": "unknown"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"evidence_requirement\":\"评论需直接说明川菜味道是否地道、正宗。\",\"negative_definition\":\"评论明确指出味道不地道、不正宗，为迎合当地口味而过度改良、降辣减麻，或整体更像一般中餐/美式川菜而非真正的川菜。\",\"positive_definition\":\"评论明确称赞味道地道、正宗，提到典型的川菜风味特征（如麻辣鲜香、花椒麻味、复合味型）或与四川当地口味一致。\",\"query_text\":\"费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？\"}",
+  "structured_output": {
+    "evidence_requirement": "评论需直接说明川菜味道是否地道、正宗。",
+    "negative_definition": "评论明确指出味道不地道、不正宗，为迎合当地口味而过度改良、降辣减麻，或整体更像一般中餐/美式川菜而非真正的川菜。",
+    "positive_definition": "评论明确称赞味道地道、正宗，提到典型的川菜风味特征（如麻辣鲜香、花椒麻味、复合味型）或与四川当地口味一致。",
+    "query_text": "费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？"
+  },
+  "ttft_ms": 8529,
+  "ttft_stream_ms": 5032,
+  "time_to_request_ms": 216,
+  "type": "result",
+  "duration_ms": 8606,
+  "uuid": "f954d9bd-8dd9-4562-9ee7-f57b881f72b9",
+  "queued_turn_count": 0
+}

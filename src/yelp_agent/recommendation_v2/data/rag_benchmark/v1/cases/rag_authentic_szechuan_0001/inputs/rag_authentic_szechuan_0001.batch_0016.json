@@ -1,0 +1,368 @@
+{
+  "batch_id": "rag_authentic_szechuan_0001.batch_0016",
+  "case_id": "rag_authentic_szechuan_0001",
+  "user_query": "费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？",
+  "evidence_requirement": {
+    "text": "评论需直接说明川菜味道是否地道、正宗。",
+    "positive_definition": "评论明确称赞味道地道、正宗，提到典型的川菜风味特征（如麻辣鲜香、花椒麻味、复合味型）或与四川当地口味一致。",
+    "negative_definition": "评论明确指出味道不地道、不正宗，为迎合当地口味而过度改良、降辣减麻，或整体更像一般中餐/美式川菜而非真正的川菜。"
+  },
+  "hard_filtered_businesses": [
+    {
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "name": "Delightful Garden",
+      "categories": [
+        "Food",
+        "Chinese",
+        "Karaoke",
+        "Nightlife",
+        "Desserts",
+        "Restaurants",
+        "Szechuan"
+      ],
+      "address": "906 Arch St"
+    },
+    {
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "name": "Bai Wei",
+      "categories": [
+        "Chinese",
+        "Food",
+        "Bubble Tea",
+        "Restaurants",
+        "Dim Sum",
+        "Szechuan"
+      ],
+      "address": "1038 Race St"
+    },
+    {
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "name": "E Mei Restaurant",
+      "categories": [
+        "Szechuan",
+        "Chinese",
+        "Restaurants",
+        "Noodles",
+        "Soup"
+      ],
+      "address": "915 Arch St"
+    },
+    {
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "name": "Tango",
+      "categories": [
+        "Szechuan",
+        "Bars",
+        "Lounges",
+        "Nightlife",
+        "Restaurants",
+        "Sushi Bars",
+        "Chinese",
+        "Karaoke"
+      ],
+      "address": "1021 Arch St"
+    }
+  ],
+  "review_batch": [
+    {
+      "review_id": "CkPPaYmVa5opyyUIU0CO0Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-10-01T19:13:25",
+      "review_text": "The private rooms are great and not that expensive as long as you plan on eating. I went with a group of eight people and we had an awesome time. The room was cool with little star lights and a large TV screen for the lyrics. We found lots of songs to sing from a variety of genres. The food was tasty and we went during happy hour, so the appetizers were all half off. \n\nWe only had two complaints with the experience that make it not five-star:\n1. It took us about half an hour to figure out how the karaoke system worked. And no, we weren't drunk. The system kept picking songs for us and we didn't want it to. Once we figured out the system, everything went smoothly. The song search function was poorly designed, however. If you tried to type in a song name, it wouldn't let you put in more than two letters. So we searched by artist, but they were only sort of in alphabetical order with some listed by first name, some by last name, and some in completely the wrong place. These were all system errors and not a reflection of the way the restaurant is run, however.\n2. No desserts :(\n\nWe would definitely go again as my whole group had an awesome time. Maybe we can BYOC (bring your own cake)."
+    },
+    {
+      "review_id": "cED0AyxVT1ulK0or8FxgTQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-10-07T18:31:14",
+      "review_text": "My stars are about a 31/2.  I bought a living social deal that pretty much wiped my room fee and gave me $100 towards food and non alcoholic drinks.  I booked my party after verifying it was for children and they told me the rooms can fit 25 comfortably.  We get there and they scheduled us in a small room in which my waiter said they scheduled us in the wrong room and they put us in the bigger room.  That was very nice(thank goodness) and they gave us an extra half hour due to the moving around.  Staff was very kind and courteous and food was amazing and can still take those chicken skewers....yum!!!!\nDownfalls: The machine is very complicated to use so we had to tolerate hearing the mics louder than the music and it was longer finding and picking songs.  The thing that upset me the most was I called a few times to clarify my living socal deal since it was too good to be true and I asked every single time what I needed to pay for.  We even clarified gratuity on the $100 which would be $20, but when the party was over I was given a bill for gratuity on the total of the room which was $300(which I did not pay for since that was the living social deal) and the food.  I was very disappointed I wasn't given the proper information as many times as my OCD self asked.  \nParking around the corner on 10th in the garage only cost us $8 for 3hrs unlike the lot next to Tango which was super expensive.\nAll in all the kids and the few adults had a ball and the food was so delicious!!!  Be prepared to spend money!"
+    },
+    {
+      "review_id": "1YZxFlkZ_9av_dpKaaQTxA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-10-24T02:45:48",
+      "review_text": "Love this place :) I don't care how crowded it gets. It's always a fun time with my girls! Bartenders are pretty attentive when you need something!"
+    },
+    {
+      "review_id": "EhFn_ugZbDgW_sZ7jnEULA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-11-03T19:50:15",
+      "review_text": "There is the potential for private karaoke to be an enjoyable experience, but the karaoke system is so complicated that it uses up all your time to figure out what's going on. There is no easy way to scroll through and browse song options -- you have to know what you want and then you can search for it. There is a TON of music, but limited U.S. artists, so it was hard for us to scroll through such a huge volume and find songs that we knew. I think a simple binder with the song list that's on their website could go a long way -- we eventually pulled up the song lists on our phones, browsed songs that way, then searched them on the in-room device to add to the queue.\n\nWe didn't figure out how to adjust music to mic volume ratio, and one mic was on a half second delay. The waitress said she'd help us figure that out, but didn't end up sorting it out. Service was otherwise fine, food was fine. Drinks are expensive. The building is beautiful and the rooms are nicely appointed. I wouldn't go again because of limited selection and difficulty in finding songs."
+    },
+    {
+      "review_id": "0micibXQxii25eEax9sfeA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-11-05T03:51:37",
+      "review_text": "I went to tango as a surprise for my 30th birthday party and at first everyone was confused on the reason we were there. So when you pull up you see a giant window with a image in it so you can actually see whats being sung from outside which i thought was different. We walked upstairs into the bar area. In there there are lots of TVs and people walking around with microphones and people singing at the bar. It was fun but this night I had a private room. So i was able to take my guest of 12 into a room just for us. In there we had our own personal jukebox with thousands of songs a TV and lots of comfortable seating. We sang we drank, until our face turned blue. We didn't even wanna leave when they closed it was so much fun. I will definitely be back and i definitely recommend this place."
+    },
+    {
+      "review_id": "MBSfe9ZRiCG6ak6CqBbf3A",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2013-12-25T01:08:41",
+      "review_text": "Another karaoke bar in china town.   Overall, just another bar.  I'm biased though, Yakitori Boy really knows their stuff and that was my first one in Philadelphia, so that's my benchmark.  We just had beer, so I didn't test their cocktail making skills and from what we could tell, food was limited on the karaoke level.\n\nI will say, it was awesome to see the number of microphones and karaoke monitors in the bar area - definitely no need to fight the crowd when it's your turn to sing."
+    },
+    {
+      "review_id": "NNtzNyAiewhqsEAk-654Vw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-01-31T20:56:49",
+      "review_text": "Ok lets get the Yaki stuff right out of the way right now. Yes Yaki was first. Yes they will always have a place somewhere in my heart but why can't we have two great places to sing and rent a room?... I went to Yaki for years and years too! Although I can't remember the last time I was at Yaki because that girl crazy manger was a huge thorn in my side! He is arrogant and annoying and I'm not going back till he's gone. Other than him the staff is great! But, Yaki also makes lots of money they need to keep the place up! They didn't improve their song system until Tango showed up seems to me a little healthy competition is good for em! They are two totally different experiences both have pros and cons get over it people! You like Yaki so much?... You feel so betrayed?...Go write a nice review for Yaki and  go about your day and get off Tangos you know what! Get over it. (I have spent thousands at Yaki I earned every right to say that!) Now that that's out of the way I can talk about who I came here to talk about, TANGO! \n\nYes ok we get it, Tango is a bit on the narrow side so lose a couple pounds and keep it moving! It is very sleek and modern and  trim is always in lol. So again I say, get over it!\n\nCan't get a song book?... You and your friends trying to all see it at once in the dark?...No new songs listed yet?... Pages missing?... Beer spilled on it?... Drunk guy took it while you asked the bartender for a drink?... No worries!!! You have a cell phone?... Good. Then you have a song book. Thousands of songs mostly all with original video await  just go to the website and download the list from the comfort of the clean (I hope)  palm of your hand. I'll do you one even  better wanna practice before you go? Look up the song book from home and pre pick the songs you want to sing. Ah hello?! No brainer. Awesome! And you save a few trees. Go green. Go Tango. Also you can sing with or with out the artist if you need help or your a pro just write \"with or without artist\" on the ticket or if your bartender isn't busy just tell them!\n\nThe food?.. Fab! Haven't tried anything I didnt like yet and I don't expect too. Food for everyone! Plus you can see the kitchen! Very clean and always smells great.\n\nOk Now, My Picks:              Lamb and Steak skewers $2.00\n                                            Cheese Steak Egg Rolls YUM! $3.00\n                                            Salt Baked Wings $8.00\n                                            Thai Sweet Chilli Wings $8.00\nI forget what it is called but they have an awesome soup too it's very popular I get it with beef because I'm allergic to shellfish but I hear wonderful things about the seafood soup. \n\nThey have a great happy hour and ladies?... On Wednesdays the first 50 girls get a free drink! They also have daily drink specials all night and happy hour has food on sale too (some of those skewers I mentioned). Can't beat it! \n\nStaff is excellent. Victor, Layla, and Tiki, should be among the first on your list to make you a drink they make sure you have a good time! Simon is the hardest working guy you'll ever see lol. he's a sweetie pie. I'm not done listing folks I tell ya the staff is great! I will be back to edit this review to add some more names! The owner?... Such a great guy! I like knowing who is pulling the strings and feeling appreciated for coming in! Another place I mentioned earlier seemed to forget that and would just take take take. \n\nTango made my birthday recently a dream.... a drunk dream lol I HAD A BALL!\nThank You Tango! \n\nSee you Sunday for that soup I talked about and lots of songs and great drinks!\nDon't let silly beef sway you. Your not cheating! Actually your are cheating. Cheating yourself out of a good time if you don't come! Geez?! Cant we all just sing a song?...."
+    },
+    {
+      "review_id": "jpujAPeUY4psvSpWnfeq6Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-02-11T21:57:24",
+      "review_text": "Tango is the spot for Monday nights! I've been here a few times for the Monday Industry Release Party hosted by DJ Ronnie D and DJ Ricky Lee. Time to get into ze details.\n\nThere's two floors to Tango (ha). The layout is similar to Yakitori Boy's. First floor is geared toward those who want to sit down, have a meal, maybe a nice bowl of Pho. I haven't really experienced the first floor all that much so I can't really say much, but there's a decently stocked bar right near the entrance, and some tables near the back of the restaurant. Decor is nice, very modern, and when you walk in, there's a worker in the front that will usually ask if you're here to eat and you'll be seated accordingly. \n\nThe second floor of Tango is strictly for 21+. The bouncer there on Mondays, Tee Fish, is THE MAN. Dude is one of the best, if not, THE best doorman in Philly, possibly the whole damn state. He's super friendly and just an awesome guy. Okay, so walk upstairs, and you're met with a huge bar with numerous flat-screen TV's. There's tables near the top of the steps, and when you walk to the back of the second floor, there's more tables there as well. There are drink specials all night, $5 Jameson and Fireball shots, $3 Bud Light drafts and $1 skewers, which are absolutely delicious! My favorite skewers to get are the lamb, rib-eye steak, and grilled shrimp. I heard great things about the salt baked wings and the fried rice and crab rangoons. Be warned that the kitchen closes at 1:00AM so watch your time. The music on Monday nights are fantastic, ranging from 80's to current hip hop, EDM,  and Top 40. Sound system is actually pretty impressive considering this is a small bar in Chinatown.\n\nNow, here's why I give it 4 stars instead of 5. Tango is VERY slim. If you're at one end of the bar and want to walk to the other side, it's tough to walk as it's usually packed and sometimes it feels like you're trying to walk through a packed house party. No bueno. Another gripe I know some people had was that when people sang karaoke, a few patrons would hog the mic and not spread it around. Final gripe is that one of the male bartenders last night took FOREVER to give my friend and I our check. My friend asked to close his tab and it took 10 minutes for the bartender to print out the receipt and hand my friend his card back. I don't remember the bartender's name, but he seemed too busy dancing by himself or socializing with people he knew. Really dude?\n\nBesides these few cons, Tango is definitely a dope spot to go to in Chinatown. They have decent happy hour specials and fairly priced drink specials on certain days. I'll definitely be back."
+    },
+    {
+      "review_id": "RXSGov4dub5as-POZhH67Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-02-16T07:20:58",
+      "review_text": "Pretty simple. We were having a great time. 2am came. The bouncers came and said \"this is the last song.\"  We switched to another song as the last song. They shut us down with no last song and threatened us that we had to leave. Fuck tango."
+    },
+    {
+      "review_id": "y_8vzqvIBk-EkyhCBz0FJA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-03-02T15:10:05",
+      "review_text": "At any karaoke place, if you've got a fun group of friends with a private room, you'll have a great time. I'm directing this review to the upstairs bar area. 1 song costs $2 and 3 songs costs $5. Instead of the DJ putting songs in the order they are received, he queues them up based on who bugs him. Throughout the night, if you want to hear the song you've paid for and requested 2 hours ago, you'll have to remind the DJ."
+    },
+    {
+      "review_id": "7tzzEfqOBwkHteIYDdK67g",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-03-09T22:40:02",
+      "review_text": "Come here and order some fried dumplings and beef chow fun, trust me you will not be disappointed!"
+    },
+    {
+      "review_id": "xrbB0gHkVwL-kgcpwpHPdA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-03-12T13:31:49",
+      "review_text": "Checked out Tango when I noticed a friend was working behind the bar.  While there, I discovered Tango has some pretty sweet happy hour specials.  We took advantage of the $1 Chicken Skewers, $3 Edamame, and $4 Crab Rangoon.  They also had $3 drafts.  \n\nWe hadn't eaten that long ago, but everything was tasty enough that we considered ordering another round.  The Edamame might have been a bit disappointing compared to high end sushi places, but else wise, no food complaints from me.  I'll be making a return trip (or two) to explore the bar/karaoke club further... In the meantime, swing by yourself and say hello to fellow yelper (and resident bartender) Victor C!"
+    },
+    {
+      "review_id": "T_Zxw6dh_KTr5lXyG2ruOA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-04-05T04:50:09",
+      "review_text": "Good service, horrible song selection. Take me back to NYC or Cali.  This place did not have any of the classics.  No BBD, no ll cool j, no notorious BIG. My friend was very disappointed.  \n\nCome for a Friday night sausage-fest. There's a surprising number of men out numbering the women at this establishment."
+    },
+    {
+      "review_id": "NhuvAJj0y5Cdgo-G6oPOow",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-05-01T00:46:55",
+      "review_text": "Went here on a Friday night, and had a pretty fun time. Wasn't over crowded, but wasn't awkwardly empty either. Drink prices were okay, a bit on the pricey side compared to Philly bars.\n\nKaraoke was fun and they pretty much have any song you would request. They charge 3 song for $5, and it did take awhile (~1.5 hours) for them to play all 3 of our requested songs. It was a fun time regardless and the servers were very friendly."
+    },
+    {
+      "review_id": "XoY02pMjCC5Sl27npqqHrA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-05-20T14:06:07",
+      "review_text": "MEH says it all. Bunch of super drunken peeps upstairs and not enough seats. Will not be going back."
+    },
+    {
+      "review_id": "Hp9hNK8cFrRfrS4jRRuxHg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-06-23T15:59:00",
+      "review_text": "This turned out to be a great spot to watch World Cup soccer.  No crowds, $3 beers, and $5 appetizers.  The wings were good, but otherwise the food was just ok.  They don't have sushi on Sundays.  Our server was very friendly, cheering with us.  Definitely worth going if you are in the area looking to watch a major sporting event."
+    },
+    {
+      "review_id": "_wTQ-l6Q7GOncz_WZ0DGEA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-07-06T00:32:18",
+      "review_text": "Reserved a room for karaoke. Party of five, two hours, $50/hr., no room charge if you drink at least $50/hr.. Not bad... Matches NY price. \nThe waitress was great, really sweet and kind... I thought we were gonna get some snobby girl, thank god she turned out to be so wonderful.\n\nAppetizer and drink prices were pretty decent, you really get what you pay for. No water down drinks...They have some really great specials. Songs are very up to date. Service was great. \n\nNo complaint here."
+    },
+    {
+      "review_id": "MB74JWEWrm3Y7elCtErl2g",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-07-18T17:48:42",
+      "review_text": "Like others have mentioned, Yaki-tori sets the standard for karaoke bars in Chinatown. I've been to Tango a few times over the past year or so, and most of the time its for a quick drink. And every time i'm at Tango, i just can't help but compare it to Yaki. I mean... this is Philadelphia, not NYC...we don't have many karaoke bars (with rooms). \n\nI would have rated this place a 3 stars, but my last visit Tuesday night kicked it up one star. The place was empty when we got there, which was fine with us (6-7pm?). We had the bar and bartender all to ourselves. Great drink special for those that like Heineken. I was starving, so the food portion was pretty dope too. The beef skewers were nice and the shrimp tempura roll was bomb! I'm not really a sushi roll person, but needed to eat something filling.. the tempura was fried really really well. I don't get easily impressed by something like this, but it stood out so much that i ordered another order after my first. \n\nThe bar tender, Tiki (spelling?) was pretty good and attentive. Even as the place got more crowded, never forgot about us. I guess I haven't been out in Philly in a long time, i didn't know they didn't charge for karaoke until the weekends? (or that's what my friend told me). If i had known, i'd sing some more BSB songs! lol. \n\nAnd did they just add the bar stools? I swear they weren't there last time i was here (i worked in NYC for a year, i'm back in Philly now). \n\nLike others have said, once this place is packed, there is bound to be horrible traffic getting around this place. The establishment is really slim, so the section between the bar and the stairs is where there will be huge issue, and i've experienced it a number of times. So, going from the front window to the bathroom is an excursion that will probably take 5-10minutes."
+    },
+    {
+      "review_id": "cmH8OQjZsJGK08kAy6vkZw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-07-30T05:06:27",
+      "review_text": "Pretty cool place with Karaoke (public) and huge cocktail selections!"
+    },
+    {
+      "review_id": "71Vt2eFKeIFbWn5bPYn18A",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-08-05T13:39:14",
+      "review_text": "TLDR: One of the worst service experiences I've had in about a decade.\n\nThe details: My friends and I arrived about 15 minutes after they opened, and were told we'd have to wait for drinks because there wasn't a bartender yet. Not a huge deal...we're having a good time with each other. We finally get drinks about 15 minutes later, and we request some songs. \n\nThat was the last time we saw the bartender for over a half hour. Despite the fact that there were only 4-8 more people there at all times, we had to wait about a half hour for each drink refill, and when we asked for cards to request songs, she actually ignored us. I asked her 20 minutes later for more cards again, and she was openly hostile while finally getting us cards and putting in our songs (openly saying \"Oh my god\" while we were singing). In fact, while her paying customers were waiting to be served, she decided to sing two songs herself...ignoring everyone else at the bar. When we decided to go because she was obviously making our fun day out into a nasty experience, she openly ignored our repeated requests several times...we finally had to shout at her to get her to acknowldge us...and she was literally about two feet away. We finally left and went to Yakitori Boy, where we should have gone in the first place, and had a great time.\n\nThat as my first and last experience with Tango...just don't bother."
+    },
+    {
+      "review_id": "toNzLLkMzYfWW2d87DFj5Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-08-05T21:41:30",
+      "review_text": "I've been to Tango a few times and Yakitori more often only because it's been open longer. It's much easier to compare, and I give my vote to Tango before Yakitori.\n1 - Tango is cleaner, MUCH cleaner.\n2 - Yakitori gets WAY too crowded. Waiting over an hr for my song? No thanks\n3 - Yakitori's books are gross to look at songs, whereas I like looking at the comfort of my phone to look up songs at Tango.\n4 - I feel like Tango's upstairs bar is longer than Yakitori's.\n5 - The bartenders at Tango check up on me often, asking if I want something else,  when standing at the bar. At Yakitori, I gotta push up the crowd to be seen.\n6 - I've only eaten here 2x, so I can't say much about the food, but it's pretty much the same food you can order at Yakitori, so to me Asian food is Asian food. \n7 - The bartenders are cute/pretty, etc. They have events that helps bring in crowds, as well as first 50 ladies to come on a certain night, free drink, etc.\n8 - The bartenders Deanna and Tikki are my favorite. They're fun and make the drinks right.\n9 - If you want to go somewhere less crowded, good drinks, and get attention go here."
+    },
+    {
+      "review_id": "mVFCNGeD5Komn33ruOoePg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-08-15T12:20:46",
+      "review_text": "they have many drink selections to choose from, food is decent. Upstair Bar can get overcrowded, last time I went a fight broke out but the staff handled it maturely. They play nice music, the kind of music you only listen to when your'e drunk tho. A spot to hang out with your crew, looking for a one night stand or so? not a good idea."
+    },
+    {
+      "review_id": "uJJUEGaLLnofL88SQmjVLA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-08-20T15:05:14",
+      "review_text": "Good food, a lot of fun, really cool spot. TERRIBLE SERVICE. It's a shame, I've never dealt with such attitude from the hostess and our server. We were a karaoke party, reserved a room late afternoon. We were literally the only people there and everyone treated us like crap, from the second we opened the door. They really made us feel unwelcomed and a nuisance. I don't yelp much, but figured I needed to put this on the interweb because of my experience. To add injury to insult, they added gratuity that came out to be an almost 33% tip. Never going back again."
+    },
+    {
+      "review_id": "b54Q5gq5HkJDdklovXPNAA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-08-30T14:39:19",
+      "review_text": "I came here with my girlfriend s for a night of drinking and singing. ..The food was good but later on I suffered horribly...okay the place is very nice with private rooms and nice decor. ..\nThe reason why this place loses stars is because of the customer service..I was carded when I first came in..about an hour goes by I want a drink the bouncer rudely asks for my id...I tried telling him that I shown it to the hostess prior to him coming...He still gave me attitude and wanted it...He never once said sorry for the inconvenience but it's policy....The bar tender looked annoyed that she was working. ..So I never ordered another drink...I will not come back to this place. .I was treated rudely and got sick...I can't and I wont...."
+    },
+    {
+      "review_id": "O9w8eapH3aer6nw8ass7tw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-09-01T20:53:05",
+      "review_text": "Caught in the rain, my friend and I ducked in here last night after an early dinner and caught the tail end of happy hour, which is every day between 4 p.m. and 7 p.m.\n\nSeated at the bar, we each ordered a $5 Belvedere pineapple and cranberry, respectively. While sipping our drinks, we took in the sheer size of Tango, which consists of a long first floor, complete with a bar, a kitchen, and a few booths, and were told that there is also an entire second floor that not only consists of a second bar, but also of big karaoke screens. I also couldn't help but notice how clean everything appeared to be, bathroom included.\n\nJust before 7, we placed a final happy hour order, my friend opting for $3 fries that came with sriracha alioli, which she said was tasty. Still full from dinner, I opted for a second round of drinks. However, because I still hadn't finished my first, the bartender  graciously offered to wait to make it.\n\nI highly recommend Tango if you are in the mood for a great happy hour, a clean karaoke place, or a bar just to hang out if you are in the area!"
+    },
+    {
+      "review_id": "kwajqMcm_NUskn1Hdtb2Mg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-09-03T23:27:09",
+      "review_text": "After actually going to a private karaoke party here, I am only giving them 3 stars on the selection of songs, difficulty level of the system.\n\nPrevious times at Tango were just for drinks and to watch a soccer match.  I enjoyed those experiences more than the karaoke because the service was very good and the food was tasty.  The drinks were inexpensive as others have mentioned.\n\nSo in essence, if you're looking for karaoke, I'd recommend elsewhere but if you want food and drinks, this spot is as good as any in the area."
+    },
+    {
+      "review_id": "xXYLPEDugt7oizCsNty-UQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-09-21T21:04:04",
+      "review_text": "Eh, it wasn't the best of places or the worst.  Almost entirely Asian crowd. Some nice drinks and pretty decent prices. It is a karaoke bar at heart and similar to Yakatori Boy.  There is an upstairs area for karyoke and downstairs bar area to lounge, drink and mingle."
+    },
+    {
+      "review_id": "6hq55oqiFIyFiKwVvW8xYg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-09-26T08:07:34",
+      "review_text": "Decent selection of karaoke songs and pretty spacious private rooms.  We came here after dinner at Penang and definitely liked the setup more than that at Yakitori Boy.  It easily fit all 20 of us and the interactive song selection screen was much easier to use.  The drinks themselves were pretty meh.  The sangria was very sweet and I couldn't taste any of the alcohol, which says a lot since I have a very low tolerance and very high sensitivity.  It was pretty neat, though, that they brought out sparklers with every new bottle of Ketel One.  Our hostess was friendly and helpful, and we did enjoy the ambiance and msuic selection.  The actual club itself is nothing to rave about and the majority of the clientele are 30-35+.  Overall, it's nicer and cleaner than Yakitori Boy, likely because of its younger age."
+    },
+    {
+      "review_id": "lhQEd7wt8inbAY9zcX7OGA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-09-30T20:54:28",
+      "review_text": "I've been to Tango a bunch of times and always have a good time. Good music, good service and you can't beat $1 skewers. Only downfall is that it is narrow and when it gets crowded it is very hard to move around."
+    },
+    {
+      "review_id": "Uc6uANRpLY3YzHqwPlVZig",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-10-26T02:36:37",
+      "review_text": "They lost our reservation after calling twice to confirm including the day before. Additionally they had up the reservation page on the computer as 10:30 yet they verbally told us that there was a mixup yet we were clearly in the computer for 10:30. They gave away our spot - poorly run business. \n\nUpdate: they let the group before us push their reservation back so they pushed us back BUT DID NOT TELL US. We booked this in September and confirmed etc. the management and hostesses are terrible. NEVER coming back."
+    },
+    {
+      "review_id": "jfnFbkcq91hSeKBN8JCi6A",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-11-12T16:43:53",
+      "review_text": "Great Food, Karaoke and Good Prices. I have been here twice once just to eat and I finally came back with a group of friends for Karaoke night. We all had a great time the next time I plan on renting a room."
+    },
+    {
+      "review_id": "qLdC8qXT9flLmY98_GiB-w",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-12-06T14:40:31",
+      "review_text": "NEVER COMING HERE AGAIN!!\nI booked a private room for my birthday, and let me just tell you- \nKaraoke options EXTREMELY LIMITED.\nKaraoke machine NOT user friendly, it kept reverting to a NON ENGLISH language, could not find half of the most common karaoke songs.\nService was HORRIBLE, there was a service light which was basically a waste since it served 0 purpose whatsoever.\nOrdered food, which didn't come out until 1.5 hours later\nWas over charged for the night\nManagement does not know how to run a business\nThe owner is very unprofessional and does not treat patrons to his establishment with any courtesy. \nI advise anyone who wants to have a good time on their birthday, or really just on a Friday night -  GO ANYWHERE BUT HERE."
+    },
+    {
+      "review_id": "bu7srFamlMJ2bFxmmkklNg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-12-10T16:24:51",
+      "review_text": "Came here on a Monday night for a friends event. The event was being held on the second story at the bar, not the kareoke rooms so I can't comment on those. But the bar was awesome if your looking for a cool vibe and want to dance! The DJ was awesome and the light/video effects were amazing! $2.50 bud lite on draft, can't beat that! We had a great time!"
+    },
+    {
+      "review_id": "n-YF5zqD9WoOsTM01wcX7Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2014-12-30T23:21:50",
+      "review_text": "Stopped in for happy hour, so glad I did! $3 any draft! I took in my fair share of Golden Monkey's with a deal like that (typically around $8). Bartender, Tang, was very polite, quick to respond, and didn't have any problem running upstairs for the beers we were ordering. \n\nTango is quite a long place- it is actually the full length of the city block. Wear your hiking shoes if you plan on visiting the bathroom- I exaggerate, but it is a walk. Very clean space, and I took the liberty to stop into the two private karaoke rooms on the way back to the bathroom. One was a bit larger than the other, with it's own private bathroom. Both were super cute, cozy, and would be really fun with the right group of people. Pricy though, $50 for 2 hours. I guess that's not bad if you have enough people, but with only three of us, it was a bit much. Karaoke upstairs was $3 per song, or $5 for three songs.\n\nI would definitely go back for that great happy hour!"
+    },
+    {
+      "review_id": "z966NIKFn3gGUhO8ImrdoQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-01-31T15:00:34",
+      "review_text": "Why the manager on duty decided to have a new waitress wait on my party on a busy Friday night is beyond me. She screwed up our food orders multiple times, took a while to come back with our food, then messed up with the bill. I'm not blaming the waitress- it's not her fault. I blame management for not having anyone assist her with our large party on a busy night. I was expecting the sushi to be great, but I've had better from local grocery stores. \nThe bar staff wasn't friendly, and the drink I ordered didn't taste great either. \nThe only reason why I'm giving two stars is because I liked my entree (chicken and broccoli) and the party room I rented was a nice atmosphere. \nI would not visit this place again or recommend it. There are much better places to spend an evening out in Philly."
+    },
+    {
+      "review_id": "7wbPrJX7MA2LM5WvkHjZsQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-02-08T22:43:06",
+      "review_text": "I randomly stopped by this place to meet up with a friend who was there with his co-workers. They had a Groupon deal for a 2 hour room rental and money to spend on food. The private rooms really are private. There is just a small window on the door where you can look inside. It was a very warm in the room and the waitress was pretty slow and messed up an order. We learned after we left that the waitress was new. The music selection for karaoke was pretty decent and when we left (around 9ish) the main bar area upstairs was getting pretty busy. There was an issue with the bill/Groupon redemption but that was quickly fixed and the employees were apologetic and friendly. I ordered the Hawaiian fried rice with shrimp and it was good. I tried my friend's pad thai and it was good as well. I also had a red sangria that was good. I'd definitely come back. If the service was better and the room wasn't so hot I'd give a higher rating."
+    },
+    {
+      "review_id": "VuuTKvODFo9a16Jg0Pxb5g",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-02-28T04:39:07",
+      "review_text": "Weekday happy hour deals are wonderful! 5-7pm every weekday you get $3 drafts, $5 house wines, and a slew of yummy finger foods or small portions. \n\nWe had a room for karaoke through the groupon deal, and it conveniently was during said happy hour. We ordered SO MUCH food! Bourbon chicken skewers were yummy, crab rangoons were addictive, seafood dumplings were really tasty. So much for so little. I am more than satisfied. As for the karaoke, really cool and normally worked well. Two minor issues, the search feature sometimes wouldn't bring up the artists that you could find if you scrolled through the pages. Also a few songs came on the speakers very quietly for some reason without us touching the volume. The surround sound and acoustics of the room were awesome once they were at the right level. \n\nBartenders and servers genuinely nice people. The open karaoke volume upstairs though was a little too loud and on some high notes, my eardrums were in pain. \n\nOverall great time and great happy hour deal."
+    },
+    {
+      "review_id": "72pRGZRysPOZugvMpt-_Xg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-03-03T20:25:59",
+      "review_text": "This place is money! The food is always good and I won't lie the girls that work here are great to look at! They throw an awesome monday night party that is such a great time. \n\nThis place is defiantly a cool spot to bring friends and enjoy a night out"
+    },
+    {
+      "review_id": "_n7uKECplfPjK184lBKOwA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-03-09T16:31:43",
+      "review_text": "I have been here before and enjoyed the food, but this review is just based on the karaoke that I just recently went to. We went on a Saturday when it was packed. I knew the drill. I knew I had to pay for the songs (which bugs me a little because I've done free karaokes around the city), and I did so. 2 out of 3 of our songs came up in less than 30 minutes. The last song, we waited to sing never came up in the karaoke queue! We waited at least an hour!\n\nThe \"DJ\" who is manning the karaoke either decided to completely not play the song or just totally mismanaged the order. It was disappointing because I paid for 3 and only did 2 songs. Also, I could really do without his song additions. I would rather hear other people sing. \n\nI also want to add that the security guard was unnecessarily cold. Just took my pepper spray right off my key chain and said, \"you'll get this back later.\" Tell me what you're doing and why! Say \"I need to check your belongings.\" Let me know what the protocol is rather than assuming I know what's going on. I know he'd probably been checking IDs all night, but It's better than him just standing there wordless.\n\nThis place goes on my hit or miss list now. I will probably go back on a night where it's less crowded and less likely that we'll get passed over in the song order."
+    },
+    {
+      "review_id": "oWKNw8XNXqx9kHn0iZW7oQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-04-09T01:58:13",
+      "review_text": "Had to update my old review to bring their review up a few notches! I recently got an awesome Groupon for Tango--spent $52 for 10-person room for 2 hours and $50 to spend on food. I reserved the room from 8-10pm on a Thursday night and we had such a good time that we stayed past midnight! The room was quite reasonable outside of the Groupon--$50 per hour and since there was at least 10 of us, we didn't spend too much extra. The cost actually got comped because we spent so much on drinks!\n\nThe actual karaoke was fun. I really like how updated the system was--we were able to find top 40 hits. Although they do a good job with the music, the actual program was not very intuitive. I did appreciate our server taking the time to give us a quick tutorial--if she hadn't we would've never figured out that we had to search artists by initials and not their name. Some people in our group came late and didn't hear the tutorial and couldn't figure out how to use the system. Other than that we were able to adjust the sound accordingly and skip songs when we realized we didn't know them as well.\n\nFood: pretty decent. I have to say we had a difficult time spending the $50 over the course of the 2 hours because skewers and appetizers are reasonably priced. We tried a variety of skewers from rib eye, fish balls, lamb, chicken, Japanese sausage etc. I really liked the rib eye. We also had Crab Rangoon, which was pretty good. We also ordered all of their sushi rolls--Spicy Tuna, Alaskan, Crunch, Spicy Kani, and California-- (they had a special that night), which were very tasty. We ended up going over the food by $20, but that's okay because we really enjoyed it. Drinks were decently priced--this is where we spent a lot of our money on.\n\nThe outside room seemed pretty packed on a Thursday evening, so people must have been really enjoying themselves in the main room. Overall, I'm quite pleased with my latest experience here. It's a big step up from the last time I've visited!"
+    },
+    {
+      "review_id": "Ru4c5c5iN68ggzrD54NNRQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-04-12T21:15:10",
+      "review_text": "Tango is well-priced with great karaoke and endless song options, including the most recent hits. The thai chili wings and fries were delicious appetizers to enjoy as we belted our hearts out. \n\nThe service was less than ideal, however. They did not bring us our food until 5 minutes before 2 AM, 45 minutes after we ordered. Shortly afterwards a waitress came and yelled at us for staying beyond closing time, even though we had just been served. Then the host at the front briefly misplaced my friend's ID and credit card that he had given to reserve the room. Everything was found but our fun karaoke night closed off in a rather unpleasant way. \n\nAlso keep in mind that Tango closes at 2 AM on Saturdays, NOT at 3 as Yelp says!"
+    },
+    {
+      "review_id": "ERmIyAVrfBzRnphxy2l8-g",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-04-14T03:05:14",
+      "review_text": "Took my friend here for her 21st bday. Right off the bat, you notice that the energy of the hostess were very rude. They obviously hate their job and would rather be at home. The owner was so rude as well, and did not pay attention to any requests or questions we needed answered. I should have went to the other kareoke place (Yakatori) i think thats what it is called, in Philadelphia because the customer service at Tango was SOOOO HORRIBLE. The Yakatori manager is so friendly and they have way more of a music selection. I feel so bad for my friend bc she had a horrible time here because they were bitching about every thing. They say the hostessess are hot, but my friends came in and my crew was actually hotter which was probably another reason why they were rude. Insecurity is so ugly *shakes finger*"
+    },
+    {
+      "review_id": "a2wf9oBsjP-nUP17b5lR9w",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-04-14T03:24:58",
+      "review_text": "I will start off by saying the customer service is one of the worst service I've ever experienced, I am saying this because I've worked as a server before. Everyone in the place is rude specially the Manager/owner. He is a complete asshole. You would think if you would spend $150 you would get decent service but nope!! Also, The security there are rude, and you would also think for a Saturday night it would be packed but there were atleast 5 people in the whole place. Definitely not worth time!! Yakatori is deff. Better than that dump! Don't go there you'll regret it! The worst part was when I saw a roach crawling up the floor near the food when they brought it in. Yuckkk!!"
+    },
+    {
+      "review_id": "UKH5C-02B-AGEZzL87RHvw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-04-20T15:36:43",
+      "review_text": "I love eating but I also love belting some Top 40's hits with my friends. Give me a microphone in one hand and some grilled meat-on-a-stick in the other, and you've got a happy camper. \n\nWe came on a late Saturday afternoon because we had some under-21s in our group and they're only allowed in before 9pm or something I think. It was kind of an awkward time but I didn't mind--the place was relatively empty so we were able to avoid the nighttime crowds! Plus, our servers were always very attentive in coming into give us water refills and taking away dirty plates. \n\nThe karaoke system was a little tricky to use, but our server Rachel was more than happy to walk us through it. Their song selection is pretty comprehensive and varied, they even have that silly Ew! song by Jimmy Fallon and will.i.am if that's any indication. Food was pretty good -- we ordered the bourbon chicken, steak, lamb, fish tofu and fish ball skewers; salt baked wings, pork and veggie dumplings, scallion pancakes and Tango fries (aka just regular fries). I really liked the steak and lamb skewers as well as the salt baked wings. The dumplings were greasy and I've definitely had better scallion pancakes elsewhere in Chinatown. But I can't complain, Tango isn't known for their food (and I don't think really aims to be?) so it didn't detract from a wonderful experience!\n\nI would definitely recommend getting a Groupon for this place (especially when Groupon is having a 20-30% off deal!) because it's cheap and comes with money to spend on food! I will be back...but probably only with a Groupon. If I wanted a cheap karaoke fix on any other day, I'd probably go to Rodeo at 69th St."
+    },
+    {
+      "review_id": "sX3LFkuT2x5mpdmvMx875A",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-05-03T13:03:27",
+      "review_text": "Got a groupon for this place and rented a room for my birthday party. So much fun! Food was good. Atmosphere was good. No complaints at all about this place! They have many songs choices from Demi Lovato and Pink to Queen's Bohemian rhapsody!"
+    },
+    {
+      "review_id": "R7I2qDe6Co0c6x8rImO0FQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-05-25T04:00:20",
+      "review_text": "Excellent location. Loved the private room that we got and my family and I had an awesome time. \n\nFood was great. I would recommend getting the Thai chili wings for sure. Looking forward to going back very soon."
+    },
+    {
+      "review_id": "lQJEUTOuasldWWMyFm5fLA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-06-10T07:50:36",
+      "review_text": "Nice  food, good service .Bartender was good enjoyed our drinks  ,had a great time.Will be back again."
+    },
+    {
+      "review_id": "jMpYSppj5DriJF0uoTyNag",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-07-12T13:24:05",
+      "review_text": "I have been to other karaoke establishments that actually edit the song lyrics on the screen so that they don't say the N word. This place actually had the nerve to show the full blown word...ER and all (NI**ER). Put in more effort. Every song that used the slang had it and it was really awkward when someone pointed it out (being that there was a very diverse group of people in the room).  I'm really easy going and laid back but that just wasn't cool. Do better. Will not be back."
+    },
+    {
+      "review_id": "6cNCqMB1LH4Ewr4cvwi8kA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-07-18T02:32:23",
+      "review_text": "Food and drink selections are okay. There's a different crowd every time I visit this place but the entertainment is pretty much consistent...karaoke and booze."
+    },
+    {
+      "review_id": "4ciT5oeWEI7F8uCmpKP-fQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "review_time": "2015-08-07T15:56:50",
+      "review_text": "I came here for happy hour with my boyfriend while in Chinatown. The $2 bourbon/curry chicken skewers is what caught our eyes. We were a little peckish from walking around the city all day and they had a great happy hour going on. We ordered coconut shrimp, crab Rangoon, bourbon chicken skewers, curry chicken skewers, and seafood dumplings from the happy hour menu. For the price I can't complain too much but it's definitely bar food and very fried which I'm not a fan of. I would probably get the bourbon chicken again if anything. \n\nThe drinks were the crowd pleaser for us. We got the $5 belvedere cocktail which was belvedere with whatever you'd like. We had it with a splash of cranberry and orange juice and that was pretty tasty.\n\nOverall it was a nice atmosphere but I don't think I would go there to eat at full price due to the quality (fried) of the food. But it got the job done and we got out under 40 bucks for two people so I think I would go back for drinks."
+    }
+  ]
+}

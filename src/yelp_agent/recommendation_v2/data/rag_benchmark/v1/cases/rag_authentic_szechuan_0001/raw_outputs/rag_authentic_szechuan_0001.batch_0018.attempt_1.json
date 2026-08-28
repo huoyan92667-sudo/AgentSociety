@@ -1,0 +1,518 @@
+{
+  "is_error": false,
+  "duration_api_ms": 33805,
+  "num_turns": 2,
+  "stop_reason": "tool_use",
+  "session_id": "d11c3441-cde8-4006-9cca-e4414de868c2",
+  "total_cost_usd": 0.149828,
+  "usage": {
+    "input_tokens": 10478,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 2176,
+    "output_tokens": 3854,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "modelUsage": {
+    "glm-5.1": {
+      "inputTokens": 10478,
+      "outputTokens": 3854,
+      "cacheReadInputTokens": 2176,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.149828,
+      "contextWindow": 200000,
+      "maxOutputTokens": 32000,
+      "canonicalModel": "glm-5.1",
+      "provider": "firstParty",
+      "costBasis": "unknown"
+    }
+  },
+  "permission_denials": [],
+  "terminal_reason": "completed",
+  "fast_mode_state": "off",
+  "fast_mode_disabled_reason": "sdk_opt_in_required",
+  "subagent_stats": {
+    "spawned": 0,
+    "requested": {
+      "background": 0,
+      "foreground": 0,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 0,
+    "spawned_by_subagents": 0,
+    "completed": 0,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {}
+  },
+  "subtype": "success",
+  "api_error_status": null,
+  "result": "{\"batch_id\":\"rag_authentic_szechuan_0001.batch_0018\",\"case_id\":\"rag_authentic_szechuan_0001\",\"labels\":[{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"lAu9qncFt7dQLfY1kNlOKQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"wf2ZLMPTLE39fW0PsC-C6w\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"6n7RzRwb8VxIYuxVxaRiiQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"8Zrci1fJ7e61I66Sf1KBlw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"q1EP0WYhIqDHUdVVqy_EuA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"xSN7dAKKexYfCvEeyVWqGA\"},{\"ambiguous_span\":\"I ordered the takoyaki and the Szechuan fried wings. The takoyaki was not bad while the wings were a new taste. It wasn't too too spicy but had a good flavor.\",\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"weak\",\"label\":\"ambiguous\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"N7nYRDk2fH3PS-zlPbnXmg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"zMX3wiWTcoL6-MF-0l-EJw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"o4dSvHNV1dPNPMzsccgypA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"-66ACLvNGwPf4LT2s0SwsA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"Jv6xPKn1mBAjGtOulGXyDw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"V0S5RerZPM9zndaaqL7t_w\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"d2XAJpv7sgGyxdjWKFQQHQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"Hs0LbTZwgMn1QA20d3eReA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"FNY8J9uomrQ9UZbOGYYexw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"DgfftKoXZwCKh6-xT2z7IQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"4KOT6QxMfc26s3Bj-bFaYw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"qhBtphnVHLmC5LMT-o05NQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"aG0yzRXR6hVYpTVVt0YpzQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"b9qKO4_TgfdOWp9YIo9G9Q\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"_3PoA5Q_6LK8kbM-HO-lQg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"Oox2cayVdYRXHPziQxJeag\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"jAZzALoGrsBTUF-bjcbnow\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"r3k05BnsckdWJLjpF6FymA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"AXGMb9b9cgOnL-gJrg095Q\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"d8-RM7JccEISOWLwv0Dgjg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"puhx09kx1pVAF1DqBzpFGg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"BDJqCveu4meuheiVaPVjOg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"5BkhzjfndC9HenB0vA316g\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"8CGRryA3gnbLldAz18pfHA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"-P93LJzp3sR_l_eLisvyRw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"62rkMuoGK_CouMTJJe9DRA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"BpABXtXtdI8NpxX9Kn4qzw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"8ObeGwMcoyE-EVs_VSRlBw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"7eCML6unmFh6qcOcsrRnKg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"C8vPwsZAu4w8KBqH-Byb9w\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"BQiLfHPDmnfahycfo4bGgg\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"yZfH-s-FjK_j-8CJbWUdbA\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"8UHpRBuEnpdFu1GGwuOLSQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"oRd5V1qTR6jhLKIM4FkvGw\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"qc0Kc5Mgvs471Ta5SvYWyQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"0Mdw76msAoFfAg626TODSQ\"},{\"ambiguous_span\":null,\"business_id\":\"tngXF4K4cojGHn-4PUpBLQ\",\"condition_text\":null,\"evidence_grade\":\"none\",\"label\":\"irrelevant\",\"negative_spans\":[],\"positive_spans\":[],\"review_id\":\"GuYeJqS6OtabWtJeuiUKSw\"}]}",
+  "structured_output": {
+    "batch_id": "rag_authentic_szechuan_0001.batch_0018",
+    "case_id": "rag_authentic_szechuan_0001",
+    "labels": [
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "lAu9qncFt7dQLfY1kNlOKQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "wf2ZLMPTLE39fW0PsC-C6w"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "6n7RzRwb8VxIYuxVxaRiiQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "8Zrci1fJ7e61I66Sf1KBlw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "q1EP0WYhIqDHUdVVqy_EuA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "xSN7dAKKexYfCvEeyVWqGA"
+      },
+      {
+        "ambiguous_span": "I ordered the takoyaki and the Szechuan fried wings. The takoyaki was not bad while the wings were a new taste. It wasn't too too spicy but had a good flavor.",
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "weak",
+        "label": "ambiguous",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "N7nYRDk2fH3PS-zlPbnXmg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "zMX3wiWTcoL6-MF-0l-EJw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "o4dSvHNV1dPNPMzsccgypA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "-66ACLvNGwPf4LT2s0SwsA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "Jv6xPKn1mBAjGtOulGXyDw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "V0S5RerZPM9zndaaqL7t_w"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "d2XAJpv7sgGyxdjWKFQQHQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "Hs0LbTZwgMn1QA20d3eReA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "FNY8J9uomrQ9UZbOGYYexw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "DgfftKoXZwCKh6-xT2z7IQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "4KOT6QxMfc26s3Bj-bFaYw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "qhBtphnVHLmC5LMT-o05NQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "aG0yzRXR6hVYpTVVt0YpzQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "b9qKO4_TgfdOWp9YIo9G9Q"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "_3PoA5Q_6LK8kbM-HO-lQg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "Oox2cayVdYRXHPziQxJeag"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "jAZzALoGrsBTUF-bjcbnow"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "r3k05BnsckdWJLjpF6FymA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "AXGMb9b9cgOnL-gJrg095Q"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "d8-RM7JccEISOWLwv0Dgjg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "puhx09kx1pVAF1DqBzpFGg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "BDJqCveu4meuheiVaPVjOg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "5BkhzjfndC9HenB0vA316g"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "8CGRryA3gnbLldAz18pfHA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "-P93LJzp3sR_l_eLisvyRw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "62rkMuoGK_CouMTJJe9DRA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "BpABXtXtdI8NpxX9Kn4qzw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "8ObeGwMcoyE-EVs_VSRlBw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "7eCML6unmFh6qcOcsrRnKg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "C8vPwsZAu4w8KBqH-Byb9w"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "BQiLfHPDmnfahycfo4bGgg"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "yZfH-s-FjK_j-8CJbWUdbA"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "8UHpRBuEnpdFu1GGwuOLSQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "oRd5V1qTR6jhLKIM4FkvGw"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "qc0Kc5Mgvs471Ta5SvYWyQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "0Mdw76msAoFfAg626TODSQ"
+      },
+      {
+        "ambiguous_span": null,
+        "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+        "condition_text": null,
+        "evidence_grade": "none",
+        "label": "irrelevant",
+        "negative_spans": [],
+        "positive_spans": [],
+        "review_id": "GuYeJqS6OtabWtJeuiUKSw"
+      }
+    ]
+  },
+  "ttft_ms": 7644,
+  "ttft_stream_ms": 4504,
+  "time_to_request_ms": 206,
+  "type": "result",
+  "duration_ms": 34009,
+  "uuid": "6ebf3cd8-eb8e-4abe-95a2-2fd8dbe5fc46",
+  "queued_turn_count": 0
+}
