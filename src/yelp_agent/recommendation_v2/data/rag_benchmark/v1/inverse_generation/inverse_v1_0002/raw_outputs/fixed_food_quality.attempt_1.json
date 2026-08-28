@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 65647,
+  "duration_api_ms": 65497,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"DD-bPurzGzWtTgIEgRtbKw\",\n      \"query_text\": \"想找一家菜品美味新鲜、做得很地道的餐厅，有推荐的吗？\",\n      \"requirement_text\": \"评论需直接说明菜品美味、新鲜、烹制得好。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"The food was delicious and fresh.\"\n    },\n    {\n      \"seed_review_id\": \"J1AtHI-ticMU9xEk7Hqvug\",\n      \"query_text\": \"请大家推荐一家菜的味道好、火候掌握得恰到好处的餐厅。\",\n      \"requirement_text\": \"评论需直接说明菜品入味、口感好、火候恰当。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Everything was full of flavor and cooked perfectly.\"\n    },\n    {\n      \"seed_review_id\": \"DLp5GIJRLP92x2hQsP075w\",\n      \"query_text\": \"哪种餐厅的菜品真正好吃、烹制用心？求推荐。\",\n      \"requirement_text\": \"评论需直接证明菜品难吃、夹生过老或质量差。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The potatoes were undercooked on the inside and overcooked on the outside, also flavorless.\"\n    },\n    {\n      \"seed_review_id\": \"sN_leRJK2GJ6MiDuACkZlw\",\n      \"query_text\": \"想去一家菜做得好吃、够入味的餐厅吃饭，哪里合适？\",\n      \"requirement_text\": \"评论需直接证明菜品乏味、调味不足、没有味道。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The food was bland and poorly seasoned. We ate a variety of dishes and without exception they were tasteless.\"\n    }\n  ]\n}",
+  "session_id": "c9ba1468-8e16-48b6-9355-ac9917492085",
+  "total_cost_usd": 0.0826074,
+  "usage": {
+    "input_tokens": 6427,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10688,
+    "output_tokens": 4008,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 6427,
+      "outputTokens": 4008,
+      "cacheReadInputTokens": 10688,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0826074,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "f0806811-470a-4a84-bd28-af1c9b0d049f"
+}

@@ -1,0 +1,38 @@
+你正在为餐饮评论召回系统建立逆向评测集。输入是同一个固定特征下的一批真实 Yelp 完整评论。
+
+当前固定特征：{{ASPECT}}
+中文含义：{{MEANING_ZH}}
+用户希望的方向：{{TARGET_DIRECTION}}
+满足要求的英文含义：{{SATISFYING_JSON}}
+违反要求的英文含义：{{CONTRADICTING_JSON}}
+
+请从输入评论中恰好选择4条：2条明确满足要求，expected_direction=positive；2条明确违反要求，expected_direction=negative。每条评论最多使用一次。
+
+要求：
+
+1. query_text 必须是自然的中文找餐馆问题，只表达当前固定特征和指定方向。
+2. query_text 不得出现商家名称、评论编号，也不得暗示已经知道答案。
+3. requirement_text 用简短中文写清需要评论回答的要求。
+4. evidence_span 必须逐字复制 review_text 中一段连续原文；不能翻译、改写、拼接或补字。
+5. 原文必须能够直接证明正面或反面。泛泛的总体好评、差评、星级倾向和意思不清楚的句子不能使用。
+6. 如果评论只提到相邻概念但不能证明当前特征，不要选择。
+7. 4条样本的问题可以换自然说法，但不能改变指定特征和用户希望的方向。
+8. 证据必须直接说明商家确实满足或违反要求。仅仅说“A比B更好/更差”、假设以后会怎样、或者只有在某个未满足条件下才成立，都不能当作明确证据。
+9. 只返回下面这一种JSON结构，不要增加字段，不要返回Markdown代码块，不要解释：
+
+{
+  "drafts": [
+    {
+      "seed_review_id": "必须来自候选的review_id",
+      "query_text": "自然中文问题",
+      "requirement_text": "简短中文要求",
+      "expected_direction": "positive或negative",
+      "evidence_span": "从对应review_text逐字复制的连续原文"
+    }
+  ]
+}
+
+drafts必须恰好有4项，且必须是2项positive和2项negative。
+
+真实评论候选：
+{{CANDIDATES_JSON}}

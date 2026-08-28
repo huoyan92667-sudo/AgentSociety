@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 42804,
+  "duration_api_ms": 42690,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"zVKY6wWvCSP0onSd9glMvg\",\n      \"query_text\": \"我们大概二十个人想找个能一起吃团建饭的地方，有没有很适合大型团体聚餐的餐厅？\",\n      \"requirement_text\": \"评论需要说明这家餐厅能否顺利接待二十人左右的大型团体，大家是否能坐在一起好好用餐。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Came in with a group of 20ish people a little after the new year and it was great! We dined family style, and the food was very promptly brought out, and each of us had enough to eat\"\n    },\n    {\n      \"seed_review_id\": \"mzpUNZZDlhvkk0hOeple4w\",\n      \"query_text\": \"计划办一场十二人左右的聚餐，找一家空间够大、接得住大团体的餐厅有什么推荐？\",\n      \"requirement_text\": \"评论需要说明这家餐厅确实能接纳十二人及以上的团体，并安排好座位共同就餐。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"I had a party of 12, called a few days in advance, and they accommodated both us and several other groups in their dining room that same evening.\"\n    },\n    {\n      \"seed_review_id\": \"8CUGevDZ8022mR8WdPxZKQ\",\n      \"query_text\": \"十二个同事想凑一桌吃饭，哪里的餐厅能坐得下我们这么大的团体？\",\n      \"requirement_text\": \"评论需要说明这家餐厅是否真的能把大团体安排在一桌正常用餐。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"When we arrived they had us at 2 separate tables, we were promised one table for our group.\"\n    },\n    {\n      \"seed_review_id\": \"RW4DhC1AHrtdajjiGDM3Iw\",\n      \"query_text\": \"六个人以上一起去吃饭，想找一家不会把大伙儿晾在一边、能好好接待团体的餐厅\",\n      \"requirement_text\": \"评论需要说明这家餐厅对六人以上的团体是否招待到位、能否顺利入座用餐。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"NOT ACCOMMODATING TO LARGE GROUPS!!!! Do not go if group is 6 or more! Forgot about us for 2 hours even though we went up every 20 minutes to check in.\"\n    }\n  ]\n}",
+  "session_id": "9b1cad7b-0213-4a00-8196-00fbf8e135d7",
+  "total_cost_usd": 0.076527,
+  "usage": {
+    "input_tokens": 9936,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 2897,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 9936,
+      "outputTokens": 2897,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.076527,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "f4fc71c7-3461-4f21-b5a9-bb60deab2b63"
+}

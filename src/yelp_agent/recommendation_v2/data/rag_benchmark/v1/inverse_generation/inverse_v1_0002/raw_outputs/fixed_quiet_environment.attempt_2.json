@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 139984,
+  "duration_api_ms": 139897,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"Zk1DC2bG6d008QpKknYPIA\",\n      \"query_text\": \"我想找一家环境安静、可以轻松聊天的餐厅，有什么推荐吗？\",\n      \"requirement_text\": \"评论需要说明这家餐厅的环境是否足够安静、顾客能否不用提高音量就正常交谈。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"We were sitting upstairs and it was really quiet which was great cause we could easily talk.\"\n    },\n    {\n      \"seed_review_id\": \"1qIR52_d5RZgU0ykn1Gqbg\",\n      \"query_text\": \"有没有比较清静的馆子？我们几个人吃饭时想坐下来好好聊聊天。\",\n      \"requirement_text\": \"评论里要直接写明店内环境是否安静、说话是否轻松。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"This place was fine when my friend and I were the only ones in the restaurant\"\n    },\n    {\n      \"seed_review_id\": \"RM_69MkflJ3eqKO9EuUTtA\",\n      \"query_text\": \"帮忙推荐个安静点的餐厅吧，吃饭的时候不想被吵得没法说话。\",\n      \"requirement_text\": \"评论需要直接说明餐厅噪音情况，以及顾客之间能否听清对方说话。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"the restaurant noise was so loud we could not hear each other\"\n    },\n    {\n      \"seed_review_id\": \"E3W9m6as6Ob6gly44fwo5A\",\n      \"query_text\": \"我在找一家安静平和、适合边吃边谈事情的餐馆，哪家合适？\",\n      \"requirement_text\": \"评论必须明确写出店里是不是太吵、能不能听清同伴讲话。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Good food but VERY NOISY. I could not hear my dinner companion.\"\n    }\n  ]\n}",
+  "session_id": "54889028-d94c-4189-9b49-b4b067680509",
+  "total_cost_usd": 0.12736920000000002,
+  "usage": {
+    "input_tokens": 45,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 17664,
+    "output_tokens": 8129,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 45,
+      "outputTokens": 8129,
+      "cacheReadInputTokens": 17664,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.12736920000000002,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "c3c44428-4831-4a7d-a836-22392a9775a6"
+}

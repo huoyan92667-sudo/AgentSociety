@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 71516,
+  "duration_api_ms": 71391,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"YEKGt0fW9OSIC_WZ3OjZwQ\",\n      \"query_text\": \"想找一家服务特别到位的餐厅，员工友好又上心的那种，大家有好推荐吗？\",\n      \"requirement_text\": \"评论中应明确描述店内员工是否友善、周到并及时照顾顾客。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"service was perfect. Staff was friendly, knowledgable, and attentive without being overbearing.\"\n    },\n    {\n      \"seed_review_id\": \"eeQnFw4IWuPXasncFcw0uw\",\n      \"query_text\": \"哪家餐馆的服务员热情主动、会随时关照客人的需求？\",\n      \"requirement_text\": \"评论需直接说明该店员工的态度以及对顾客需求的关注情况。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"the staff was amazingly friendly. The staff was very attentive to our needs and checked up on us to make sure everything was good.\"\n    },\n    {\n      \"seed_review_id\": \"DDn4OD1maO76noTx3AC2cQ\",\n      \"query_text\": \"有没有哪家餐厅服务差到叫服务员都无人理会的？想提前避雷。\",\n      \"requirement_text\": \"评论需说明店内员工是否怠慢顾客、不予回应或让顾客久等。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The waiter would not even answer you when there were only 3 customers in the restaurant. waited 20 minutes for the check.\"\n    },\n    {\n      \"seed_review_id\": \"TYvlXzDqtJTpjcVgralsyQ\",\n      \"query_text\": \"求问有没有店里人手不少却完全无视顾客的糟糕餐厅？\",\n      \"requirement_text\": \"评论需直接描述顾客到店后是否被员工冷落或无视。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"There was TONS of staff, standing behind the counter there, walking in and out of the kitchen.  I was there a WHILE with menus in hand.  Nobody even looked at me let alone greeted me.\"\n    }\n  ]\n}",
+  "session_id": "aa40137d-9158-4199-a7d5-c9ace3b1ef7c",
+  "total_cost_usd": 0.0928014,
+  "usage": {
+    "input_tokens": 8420,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10688,
+    "output_tokens": 4289,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 8420,
+      "outputTokens": 4289,
+      "cacheReadInputTokens": 10688,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0928014,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "69dfe946-9d21-46f0-a7ae-92298e4decda"
+}

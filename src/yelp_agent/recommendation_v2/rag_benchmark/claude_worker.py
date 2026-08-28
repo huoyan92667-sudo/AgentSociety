@@ -7,6 +7,7 @@ import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from collections.abc import Sequence
 from typing import TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -48,11 +49,17 @@ class ClaudeCodeWorker:
         *,
         model: str = "glm-5.1",
         timeout_seconds: int = 900,
-        executable: str = "claude",
+        executable: str | Sequence[str] = "claude",
+        legacy_cli: bool = False,
     ) -> None:
         self.model = model
         self.timeout_seconds = timeout_seconds
-        self.executable = executable
+        # Windows下的旧版Claude Code需要用“node + cli.js”启动，因此这里允许
+        # 调用入口由多个参数组成，而不是把整条命令拼成一个不安全的字符串。
+        self.command_prefix = (
+            (executable,) if isinstance(executable, str) else tuple(executable)
+        )
+        self.legacy_cli = legacy_cli
 
     def generate(self, prompt: str, output_model: type[T]) -> tuple[T, ClaudeWorkerTrace, dict[str, object]]:
         """把长输入走标准输入交给 Claude Code，避免 Windows 命令长度限制。"""
@@ -63,21 +70,40 @@ class ClaudeCodeWorker:
             separators=(",", ":"),
         )
         command = [
-            self.executable,
+            *self.command_prefix,
             "-p",
             "--model",
             self.model,
             "--output-format",
             "json",
-            "--tools",
-            "",
-            "--no-session-persistence",
-            "--safe-mode",
-            "--json-schema",
-            schema,
         ]
+        if self.legacy_cli:
+            # Z.AI验证过的Claude Code 2.0.14尚不支持--json-schema等新参数。
+            # 用最小系统说明约束其只完成结构化生成，再由Pydantic做同样严格的校验。
+            command.extend(
+                [
+                    "--permission-mode",
+                    "plan",
+                    "--system-prompt",
+                    "你只完成用户给出的结构化生成任务，不调用工具，不解释，只返回JSON。",
+                ]
+            )
+        else:
+            command.extend(
+                [
+                    "--tools",
+                    "",
+                    "--no-session-persistence",
+                    "--safe-mode",
+                    "--prompt-suggestions",
+                    "false",
+                    "--json-schema",
+                    schema,
+                ]
+            )
         environment = os.environ.copy()
         environment["MAX_THINKING_TOKENS"] = "0"
+        environment["CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC"] = "1"
         completed = subprocess.run(
             command,
             input=prompt,

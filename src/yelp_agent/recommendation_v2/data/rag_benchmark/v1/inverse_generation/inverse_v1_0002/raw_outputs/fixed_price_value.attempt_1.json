@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 35743,
+  "duration_api_ms": 35610,
+  "num_turns": 3,
+  "result": "{\"drafts\":[{\"seed_review_id\":\"BjsOBfJLe8V4YhwJ1WEKRQ\",\"query_text\":\"想找一家价格公道、花钱花得值的餐馆，有什么推荐吗？\",\"requirement_text\":\"评论需直接说明该店菜品美味、分量足且定价合理。\",\"expected_direction\":\"positive\",\"evidence_span\":\"The food was delicious, the portions good, and reasonably priced!\"},{\"seed_review_id\":\"j-dGfIdWnXEc-UBKGNTFjA\",\"query_text\":\"请问哪里能吃到便宜又给料很足的饭馆？\",\"requirement_text\":\"评论需直接证明这家店价格实惠且给的量多、物有所值。\",\"expected_direction\":\"positive\",\"evidence_span\":\"The food was affordable, and came with a lot!!\"},{\"seed_review_id\":\"nNLcqCdOV2gqX4zYi5Bj6A\",\"query_text\":\"帮我推荐一家性价比高、不坑人的餐厅呗。\",\"requirement_text\":\"评论需直接说明这家店定价过高、不值这个价钱。\",\"expected_direction\":\"negative\",\"evidence_span\":\"Incredibly overpriced for what we got.\"},{\"seed_review_id\":\"Zx0P0Kq56oKXBVTqzVFWSw\",\"query_text\":\"有没有那种量大实惠、不乱开价的店？\",\"requirement_text\":\"评论需直接指出该店分量小而价格高、花得不值。\",\"expected_direction\":\"negative\",\"evidence_span\":\"Portions were very small, prices were very high....$14 for a very very small plate of pasta is not acceptable.\"}]}",
+  "session_id": "f33431c8-e731-44c4-b51f-4db80c7d3207",
+  "total_cost_usd": 0.0590994,
+  "usage": {
+    "input_tokens": 7971,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10688,
+    "output_tokens": 2132,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 7971,
+      "outputTokens": 2132,
+      "cacheReadInputTokens": 10688,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.0590994,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "f0ea4e8c-6c1b-49b4-9453-796206254427"
+}

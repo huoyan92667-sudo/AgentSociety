@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 56344,
+  "duration_api_ms": 56251,
+  "num_turns": 3,
+  "result": "{\"drafts\":[{\"seed_review_id\":\"a2fMpX6nCjlbt867sLdZfw\",\"query_text\":\"想找一家停车方便、到了不愁找不到车位的餐厅，有什么推荐吗？\",\"requirement_text\":\"评论需说明这家餐厅附近停车方便、容易找到车位。\",\"expected_direction\":\"positive\",\"evidence_span\":\"Parking wasn't even an issue - there's a parking lot down the street\"},{\"seed_review_id\":\"mzsfMpeloNxm8omUlQVBwQ\",\"query_text\":\"哪家餐馆自带停车场、停车特别省心？\",\"requirement_text\":\"评论需说明该餐馆有可用的停车场，停车轻松方便。\",\"expected_direction\":\"positive\",\"evidence_span\":\"They have a parking lot around the block for easy parking too.\"},{\"seed_review_id\":\"n2AcWu7C7us5NXsHvBObxA\",\"query_text\":\"帮我找一家吃完饭附近也好停车的餐厅呗？\",\"requirement_text\":\"评论需能表明该餐厅没地方停车、找车位非常困难。\",\"expected_direction\":\"negative\",\"evidence_span\":\"Oh and there's literally no parking and it isn't in the greatest of neighborhoods, I drove around about 15 mins looking for parking.\"},{\"seed_review_id\":\"XRos7frwObImvJD0GgIuBg\",\"query_text\":\"打算开车去吃饭，哪家餐厅停车位不容易停满？\",\"requirement_text\":\"评论需证明该餐厅的车位已满、顾客绕了好几圈都找不到停车位。\",\"expected_direction\":\"negative\",\"evidence_span\":\"the parking lot was completely full. We had to drive around the block a few times looking for parking.\"}]}",
+  "session_id": "d0521889-3956-43a7-bfbe-71425f2b3326",
+  "total_cost_usd": 0.080382,
+  "usage": {
+    "input_tokens": 9186,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3304,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 9186,
+      "outputTokens": 3304,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.080382,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "3e2ed9fb-545f-4bdc-ae7f-a432002a6f6d"
+}
