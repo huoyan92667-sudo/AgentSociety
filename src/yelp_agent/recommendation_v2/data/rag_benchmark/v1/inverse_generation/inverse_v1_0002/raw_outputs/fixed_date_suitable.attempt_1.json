@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 62249,
+  "duration_api_ms": 62149,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"QPldFOpOQZEW0t2qX7jS4g\",\n      \"query_text\": \"能推荐一家氛围浪漫、适合情侣约会的餐厅吗？\",\n      \"requirement_text\": \"评论需要说明这家餐厅的氛围是否浪漫并且真的适合约会。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"It's a really romantic location for date night, the interior gives off a fancy flair and vibe.\"\n    },\n    {\n      \"seed_review_id\": \"5Qbje0bYxQDndbHtMFvA3w\",\n      \"query_text\": \"我在找一个有情调、安静又适合两个人约会的餐厅，有什么好去处？\",\n      \"requirement_text\": \"评论需回答餐厅的环境是否亲密浪漫、适不适合约会。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"The ambiance here is so intimate and romantic! Perfect place for date night and not too loud.\"\n    },\n    {\n      \"seed_review_id\": \"8RR-k93RIYkltWaLlDX5xw\",\n      \"query_text\": \"想找一家适合约会、可以安静聊天的浪漫餐厅，去哪家好？\",\n      \"requirement_text\": \"评论需说明这家店是否适合浪漫约会以及具体原因。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The place is way too crowded and loud to have a nice dinner. Don't go there expecting to have a romantic dinner with a significant other... The two seater tables are all shoved up against the bar so that you are elbowed my bar patrons and servers the entire time and it's so loud that you can't even have a conversation.\"\n    },\n    {\n      \"seed_review_id\": \"jumXtohZmC6l7twm3Zq9ng\",\n      \"query_text\": \"有没有适合约会晚餐、两个人坐得舒服又有情调的餐厅推荐？\",\n      \"requirement_text\": \"评论需说明这家餐厅对约会之夜是否友好、座位和氛围是否舒适。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"it presents an almost uninviting vibe for date night. The two person seated tables are wide and made it quite uncomfortable since we felt so far apart from each other.\"\n    }\n  ]\n}",
+  "session_id": "d71c02fe-14c6-40ab-8f07-dfc06388784f",
+  "total_cost_usd": 0.08322,
+  "usage": {
+    "input_tokens": 7577,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3815,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 7577,
+      "outputTokens": 3815,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.08322,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "e961cb21-a41d-4712-a762-33c6e22a0f47"
+}

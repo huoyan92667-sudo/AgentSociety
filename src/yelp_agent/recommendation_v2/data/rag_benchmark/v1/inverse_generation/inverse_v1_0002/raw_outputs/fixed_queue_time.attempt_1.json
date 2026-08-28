@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 56067,
+  "duration_api_ms": 55956,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"twE-FoaXA3oB1ukUzdQWWA\",\n      \"query_text\": \"我想找一家不用等位、到店就能马上入座吃饭的餐厅，有这样的地方推荐吗？\",\n      \"requirement_text\": \"评论需说明顾客到店后是否无需等待即可立即入座。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"We were seated immediately\"\n    },\n    {\n      \"seed_review_id\": \"MY10Pql8FgPoBH69mx0q3g\",\n      \"query_text\": \"周末去吃饭最怕排长队等桌位，想找一家基本不需要长时间等位的餐厅。\",\n      \"requirement_text\": \"评论需能证明顾客无需长时间等待即可入座。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"I've always been lucky enough to get seated without a long wait.\"\n    },\n    {\n      \"seed_review_id\": \"s4aAlQq_yMyJOB8Ix3YwdQ\",\n      \"query_text\": \"想吃顿早饭但特别讨厌等位，能不能推荐一家等桌时间短的餐厅？\",\n      \"requirement_text\": \"评论需说明顾客为了等到餐桌实际等候了多长时间。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"My husband and I waited over an hour for a table here\"\n    },\n    {\n      \"seed_review_id\": \"DC3NKdgTWUr-iLErOCzRxg\",\n      \"query_text\": \"计划周六晚上订个餐厅聚餐，我最怕已经订了位还要在门口排队苦等，大家有什么经验？\",\n      \"requirement_text\": \"评论需说明顾客即使有预约，实际等位入座花了多长时间。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"I wish I'd been better prepared to wait 35 minutes to be seated!\"\n    }\n  ]\n}",
+  "session_id": "2e911f00-249e-4526-b7d3-ecd6a28c3328",
+  "total_cost_usd": 0.08175600000000001,
+  "usage": {
+    "input_tokens": 9679,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3297,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 9679,
+      "outputTokens": 3297,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.08175600000000001,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "29da9387-b35b-44d0-b5ff-24a435463f65"
+}

@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 52534,
+  "duration_api_ms": 52419,
+  "num_turns": 3,
+  "result": "{\"drafts\":[{\"seed_review_id\":\"pP-n0CccSnAmTlvXjm1Z8Q\",\"query_text\":\"有没有哪家餐馆里面不那么拥挤、坐下来觉得宽敞舒服的？\",\"requirement_text\":\"评论需要说明这家餐馆是否不拥挤、座位空间是否宽裕。\",\"expected_direction\":\"positive\",\"evidence_span\":\"No matter where you are, you do not feel cramped -there's space to breathe\"},{\"seed_review_id\":\"ne04Zoaf3QhhVoiLk4TYFA\",\"query_text\":\"想找个客人不多、吃饭不用挤来挤去的餐厅，哪里有这样的地方？\",\"requirement_text\":\"评论需要说明餐厅当时客流是否稀少、是否不拥挤。\",\"expected_direction\":\"positive\",\"evidence_span\":\"There were empty tables around us so the restaurant was not packed.\"},{\"seed_review_id\":\"izQXKuMBw_eO26l2t0pCmg\",\"query_text\":\"求推荐一家不拥挤的餐厅，人多到走不动的地方我真受不了。\",\"requirement_text\":\"评论需要说明这家餐厅是否拥挤、顾客和服务员是否有足够的走动空间。\",\"expected_direction\":\"negative\",\"evidence_span\":\"But the restaurant was so crowded. I saw customers even the waiters/waitresses had difficulties to walk through tables.\"},{\"seed_review_id\":\"xaORCHzHbtqIwPSq8iHMpA\",\"query_text\":\"想找一家就餐空间宽松、不会跟邻桌挤在一起的餐馆。\",\"requirement_text\":\"评论需要说明这家餐馆是否为了塞下太多人而显得拥挤局促。\",\"expected_direction\":\"negative\",\"evidence_span\":\"they try to pack too many people in a small space\"}]}",
+  "session_id": "63e0bc71-a45b-41b3-a7a8-ec11a5cf9391",
+  "total_cost_usd": 0.07868699999999999,
+  "usage": {
+    "input_tokens": 8596,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3309,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 8596,
+      "outputTokens": 3309,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.07868699999999999,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "44140a84-dd50-465d-b317-ee82656ccfab"
+}

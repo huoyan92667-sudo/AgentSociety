@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 54756,
+  "duration_api_ms": 54672,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"41avPXSZbENXCJ5yLMJXSA\",\n      \"query_text\": \"想找一家卫生标准特别高、连窗帘和餐具都打理得一尘不染的餐厅，有推荐吗？\",\n      \"requirement_text\": \"评论需说明餐厅各处细节（如窗帘、踢脚线、杯子餐具）是否真正清洁到位。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"the drapes were free of dust, the baseboards were clean, the glasses were spotless, the table ware was impeccably CLEAN.\"\n    },\n    {\n      \"seed_review_id\": \"2sW2tXc_FNMUs-MQerVQiA\",\n      \"query_text\": \"请推荐一家店里没有异味油腻、整间餐厅都干净得发亮的餐馆。\",\n      \"requirement_text\": \"评论需直接说明餐厅整体环境是否非常干净、无异味无油腻。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"this place is very very clean!! Not smelly, not oily, the entire restaurant is spotless!!\"\n    },\n    {\n      \"seed_review_id\": \"TUSKmoc5X7y5uCuagR97-A\",\n      \"query_text\": \"我想找一家卫生间也打扫得干干净净的餐厅吃饭，哪里比较合适？\",\n      \"requirement_text\": \"评论需说明该餐厅卫生间是否脏乱、清洁严重不到位。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The bathrooms were terrible. First of all they were very airplane like and second of all absolutely FILTHY.\"\n    },\n    {\n      \"seed_review_id\": \"RXS6lLy5vzPbGS8DrzI-gg\",\n      \"query_text\": \"帮我推荐一家店内不黏腻、没有污渍、整体干净卫生的餐厅。\",\n      \"requirement_text\": \"评论需说明餐厅桌面等各处是否黏腻污渍遍布、明显缺乏清洁。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Everything is sticky, stained and filthy. The bathrooms are even worse.\"\n    }\n  ]\n}",
+  "session_id": "36808ce0-9fea-469c-a16a-6196bbf3d132",
+  "total_cost_usd": 0.078141,
+  "usage": {
+    "input_tokens": 7449,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3502,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 7449,
+      "outputTokens": 3502,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.078141,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "c04055bc-e9b0-4440-a289-1c8e43163b6d"
+}

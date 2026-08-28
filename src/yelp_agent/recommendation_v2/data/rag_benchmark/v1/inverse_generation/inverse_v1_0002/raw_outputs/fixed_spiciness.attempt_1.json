@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 73785,
+  "duration_api_ms": 73685,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"2dVylTlg1MtiAIhLSGAFsw\",\n      \"query_text\": \"我是无辣不欢的人，想找一家把菜做得特别辣、辣度非常猛的馆子，有推荐吗？\",\n      \"requirement_text\": \"评论需直接证明这家店的菜真的极辣，一口就能感受到强烈的热辣。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"I took one bite and DAM, everything was all of a sudden really hot.\"\n    },\n    {\n      \"seed_review_id\": \"H8SkBlg-2d6q_VZd6333ZA\",\n      \"query_text\": \"想吃一口就火辣冒汗的重辣料理，哪家店能把辣度真正做足？\",\n      \"requirement_text\": \"评论需表明店家标注或承诺的辣是真辣，实际菜品远远超过一般人承受的辣度。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Let me preface this next part with saying that I really enjoy spicy foods but this was way too spicy for me!!!\"\n    },\n    {\n      \"seed_review_id\": \"xt_W1pXn8tTJPdFQ-UN9-A\",\n      \"query_text\": \"平时只吃重辣，想找一家连招牌辣味菜都够劲儿的餐厅，哪里合适？\",\n      \"requirement_text\": \"评论需证明店里的辣味菜品实际上确实带足辣度；若实际上完全没辣味即视为违反。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"there was ZERO heat in the soup. If someone told me that this item was meant to be spicy, I wouldn't have believed them. It was less spicy than mild salsa.\"\n    },\n    {\n      \"seed_review_id\": \"H-zhT9f6dtRXAgcPF3OC9w\",\n      \"query_text\": \"想涮一顿辣得够劲、汤底麻辣十足的火锅，请帮忙找个这样的地方。\",\n      \"requirement_text\": \"评论需说明特辣锅底确实麻辣够劲；若点了特辣却几乎不辣则视为违反。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"We ordered extra spicy soup base, but it's not spicy at all, only a thin layer of chili oil floating on the top.\"\n    }\n  ]\n}",
+  "session_id": "b6194b31-3e47-48a0-bba4-94fa9fd1adfa",
+  "total_cost_usd": 0.094119,
+  "usage": {
+    "input_tokens": 8500,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 4357,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 8500,
+      "outputTokens": 4357,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.094119,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "8cb74369-ac0e-4016-826b-624a474436dd"
+}

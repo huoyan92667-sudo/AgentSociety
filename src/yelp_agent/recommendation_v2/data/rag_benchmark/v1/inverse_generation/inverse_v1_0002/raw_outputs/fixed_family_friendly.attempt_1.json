@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 52876,
+  "duration_api_ms": 52772,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"LNAHs2w3ZFf0XMVcF97WRg\",\n      \"query_text\": \"想找一家适合全家带孩子一起去吃饭的家庭友好餐厅，有什么推荐吗？\",\n      \"requirement_text\": \"评论需说明该餐厅是否适合家庭和儿童就餐。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"We liked that they were very kid friendly and the staff was very hospitable and pleasant.\"\n    },\n    {\n      \"seed_review_id\": \"5nYwpXsWmuLSCT1TtKFi9g\",\n      \"query_text\": \"打算周末带两个小孩出去吃饭，哪家餐厅对小客人招待得比较好？\",\n      \"requirement_text\": \"评论需说明餐厅能否妥善接待带孩子的家庭。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"We brought 2 kids under 7 and they were able to accommodate us with a comfortable booth. Kids menu had great options.\"\n    },\n    {\n      \"seed_review_id\": \"kHZHivBXD9SJzi7z11MS9A\",\n      \"query_text\": \"我们带着孩子想在外面好好吃顿饭，哪家餐厅是真正欢迎家庭顾客的？\",\n      \"requirement_text\": \"评论需说明餐厅对待儿童的态度以及孩子在那里的体验。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"They were not kid friendly though. My kids were playing the bean bag toss, and not be loud or anything , but the staff were getting anxious about them, and kicked them out of the bean bag toss area.\"\n    },\n    {\n      \"seed_review_id\": \"ZnrZrcJ6Pn1GHR8WQYWWSA\",\n      \"query_text\": \"想在假期带孩子出门下馆子，怎么找到适合亲子用餐的餐厅？\",\n      \"requirement_text\": \"评论需说明餐厅是否具备适合带小孩家庭的条件和氛围。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Also, this place isn't family friendly in the least. They didn't have high chairs and the server got all pissy because we brought the stroller to the table so my daughter would have somewhere to sit.\"\n    }\n  ]\n}",
+  "session_id": "2db6038c-cb3d-49dd-a73f-f772968409c8",
+  "total_cost_usd": 0.07245,
+  "usage": {
+    "input_tokens": 7177,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 3177,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 7177,
+      "outputTokens": 3177,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.07245,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "a5c939d3-2a1b-44c4-987f-7aefcd0ad896"
+}

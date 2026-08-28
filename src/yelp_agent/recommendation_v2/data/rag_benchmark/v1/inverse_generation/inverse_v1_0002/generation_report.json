@@ -1,0 +1,66 @@
+{
+  "status": "success",
+  "prompt_version": "inverse-generation-v2",
+  "teacher_model": "glm-5.3-flash[1m]",
+  "claude_model_alias": "haiku",
+  "target_case_count": 76,
+  "generated_case_count": 76,
+  "fixed_case_count": 56,
+  "long_tail_case_count": 20,
+  "fixed_counts": {
+    "cleanliness": 4,
+    "crowded": 4,
+    "date_suitable": 4,
+    "family_friendly": 4,
+    "food_quality": 4,
+    "group_suitable": 4,
+    "parking": 4,
+    "pet_friendly": 4,
+    "portion_size": 4,
+    "price_value": 4,
+    "queue_time": 4,
+    "quiet_environment": 4,
+    "service": 4,
+    "spiciness": 4
+  },
+  "direction_counts": {
+    "negative": 38,
+    "positive": 38
+  },
+  "batch_statuses": {
+    "fixed_cleanliness": "success",
+    "fixed_crowded": "success",
+    "fixed_date_suitable": "success",
+    "fixed_family_friendly": "success",
+    "fixed_food_quality": "success",
+    "fixed_group_suitable": "success",
+    "fixed_parking": "success",
+    "fixed_pet_friendly": "success",
+    "fixed_portion_size": "success",
+    "fixed_price_value": "success",
+    "fixed_queue_time": "success",
+    "fixed_quiet_environment": "success",
+    "fixed_service": "success",
+    "fixed_spiciness": "success",
+    "long_tail_01": "success",
+    "long_tail_02": "success"
+  },
+  "rejected_reasons": [
+    {
+      "batch_id": "fixed_parking",
+      "reason": "attempt_1: evidence is not an exact substring: XRos7frwObImvJD0GgIuBg"
+    },
+    {
+      "batch_id": "fixed_quiet_environment",
+      "reason": "attempt_1: expected 4 drafts but received 3"
+    }
+  ],
+  "model_call_count": 18,
+  "input_tokens": 132424,
+  "output_tokens": 93019,
+  "thinking_tokens": 0,
+  "reported_cost_usd": 1.8560130000000001,
+  "model_api_time_ms_sum": 1672432,
+  "wall_latency_ms": 670928.6399999983,
+  "draft_path": "C:\\Users\\29072\\.codex\\worktrees\\d63a\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\rag_benchmark\\v1\\inverse_generation\\inverse_v1_0002\\drafts\\inverse_cases.jsonl"
+}

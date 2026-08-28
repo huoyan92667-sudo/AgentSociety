@@ -149,6 +149,12 @@ _FIRST_PAIR_DIRECTION: dict[AspectField, str] = {
 }
 
 
+def aspect_meaning(aspect: AspectField) -> str:
+    """返回固定特征的中文量尺含义，供评测和展示复用。"""
+
+    return _MEANINGS[aspect]
+
+
 def preference_semantic_anchors(
     aspect: AspectField,
     direction: str,

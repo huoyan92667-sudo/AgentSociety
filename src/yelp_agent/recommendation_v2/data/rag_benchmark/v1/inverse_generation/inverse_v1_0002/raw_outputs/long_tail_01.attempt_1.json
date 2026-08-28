@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 223294,
+  "duration_api_ms": 222957,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"3u5XrD6RXqCgudXUA7mGpw\",\n      \"query_text\": \"有哪家餐厅能吃到泰式做法的海南鸡饭？\",\n      \"requirement_text\": \"需要评论表明该店提供泰式风味的海南鸡。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"This is Hainanese Chicken THAI style.\"\n    },\n    {\n      \"seed_review_id\": \"QE86jqVn9NoqviDR2d2yEQ\",\n      \"query_text\": \"有没有允许顾客自带酒水的餐厅推荐？\",\n      \"requirement_text\": \"需要评论说明该店是否是BYOB、支持自带酒水。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"They are a byob establishment with a very limited menu but what comes out of the kitchen will quickly capture your attention.\"\n    },\n    {\n      \"seed_review_id\": \"JtNvE71esHogmiqj9yOgnQ\",\n      \"query_text\": \"有没有点餐时可以要求少放味精的汤粉店？\",\n      \"requirement_text\": \"需要评论说明是否可以选择减少味精用量。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Admittedly, they use monosodium glutamate (MSG) but there is an option to reduce the amount used (interesting).\"\n    },\n    {\n      \"seed_review_id\": \"7AtPeY-RGsueThWQx2PVSA\",\n      \"query_text\": \"哪家粤菜馆设有挂着烧味的玻璃明档橱窗？\",\n      \"requirement_text\": \"需要评论提到店内设有玻璃明档的烧腊厨房。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Very good Cantonese house on Race Street near 9th, with front of the house glassed in roasting kitchen and regular food preparation room in back for the rest of the menu.\"\n    },\n    {\n      \"seed_review_id\": \"m3Amun7M1rFrtGFZ042kCA\",\n      \"query_text\": \"想找一家炸鱼外酥里嫩的小馆子，有推荐吗？\",\n      \"requirement_text\": \"需要评论描述炸鱼外壳酥脆、内部湿润细嫩。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Full of flavor, crispy on the edges, and moist on the inside. Good job.\"\n    },\n    {\n      \"seed_review_id\": \"9y0Lxyq0HEbzNX4lL9FTcA\",\n      \"query_text\": \"有没有意面煮得不粘连、根根分明的餐厅？\",\n      \"requirement_text\": \"需要评论说明端上来的面条是否粘连成坨。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Pasta noodles came out all stuck together and when we asked our server about it he brazenly told us this is how egg based noodles turn out.\"\n    },\n    {\n      \"seed_review_id\": \"Y1cZ7vp5psTsF_3uMmYkxg\",\n      \"query_text\": \"哪里能吃到皮薄入味的水饺？\",\n      \"requirement_text\": \"需要评论说明饺子的皮厚度和味道如何。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"So, while we wanted and thought we ordered beef soup with dumplings; what we got was just poorly crafted dumplings with thick skin and low flavor.\"\n    },\n    {\n      \"seed_review_id\": \"qssfFOgtlP9ALuRKNQIYxg\",\n      \"query_text\": \"想找一家不用提前预订、随时进店就能买到披萨的店？\",\n      \"requirement_text\": \"需要评论说明能否无需提前线上预订就直接购买披萨。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"you will need to pre-order your pies on their site and pick them up because they have a limited amount of dough per day.\"\n    },\n    {\n      \"seed_review_id\": \"T-CgYoNB6a4_MwrxAIBX9g\",\n      \"query_text\": \"哪家的法式吐司会带香草和肉桂的香气？\",\n      \"requirement_text\": \"需要评论评价法式吐司是否有香草肉桂风味。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"The Frenchie was okay, but really need a touch of vanilla and cinnamon to bring up the flavor profile.\"\n    },\n    {\n      \"seed_review_id\": \"zuwgbjbibiNrLTYFx27BRg\",\n      \"query_text\": \"想吃一碗地道好吃的咸豆花，哪家店值得去？\",\n      \"requirement_text\": \"需要评论评价该店咸豆花的口味是否令人满意。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"We were craving and ordered Salty Tofu Pudding with savory toppings. It looked ok, but wasn't very satisfying.\"\n    }\n  ]\n}",
+  "session_id": "90a84e1d-ed32-4a11-a139-0070de9ceebb",
+  "total_cost_usd": 0.21243,
+  "usage": {
+    "input_tokens": 10762,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 11792,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 10762,
+      "outputTokens": 11792,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.21243,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "4e93224e-638d-4652-a796-c0b2e687b965"
+}

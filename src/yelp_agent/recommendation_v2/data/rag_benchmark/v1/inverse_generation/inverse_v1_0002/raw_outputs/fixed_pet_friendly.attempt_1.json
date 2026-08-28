@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 80303,
+  "duration_api_ms": 80189,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"BtIFyQyNH6Tm1J55aXI6FA\",\n      \"query_text\": \"有没有欢迎顾客带狗狗进店、还会给小狗准备水碗和零食的餐厅？\",\n      \"requirement_text\": \"评论需要说明这家餐厅是否欢迎宠物狗入内，以及是否有善待狗狗的具体表现。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"Their outdoor seating is very dog friendly and before we even ordered the staff had brought a water bowl and treats for our pup.\"\n    },\n    {\n      \"seed_review_id\": \"STyrcCQtjGYBMILUQ8iIkA\",\n      \"query_text\": \"想带我家狗一起出门吃饭，哪家餐馆是对狗狗很友好、会招待宠物的？\",\n      \"requirement_text\": \"评论需要说明该餐馆是否对狗友好以及是如何对待带来店里的宠物的。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"They are dog friendly in the take out area and give the dogs bacon if you allow it.\"\n    },\n    {\n      \"seed_review_id\": \"CL262uz5kSJziU9_hj8Qwg\",\n      \"query_text\": \"请推荐一些可以让宠物狗跟着一起进店用餐的餐馆。\",\n      \"requirement_text\": \"评论需要说明餐馆是否允许狗狗进入、能否正常接待带宠物的顾客。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"I have a service dog and they told me no dogs allowed.\"\n    },\n    {\n      \"seed_review_id\": \"pxcUjsu6oMu0cExsmb9XxQ\",\n      \"query_text\": \"带着家里的狗狗去找吃的，有哪家的用餐区是真正宠物友好的吗？\",\n      \"requirement_text\": \"评论需要说明餐厅是否真的允许宠物进入其用餐区域。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Not dog friendly! We called ahead and asked specifically if they allow dogs/pets on their outdoor patio\"\n    }\n  ]\n}",
+  "session_id": "a99fed69-3a73-4a46-b8dc-c7e978784363",
+  "total_cost_usd": 0.09607800000000001,
+  "usage": {
+    "input_tokens": 7033,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 4781,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 7033,
+      "outputTokens": 4781,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.09607800000000001,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "99e8b09d-5107-403f-91e6-b57d2208173b"
+}

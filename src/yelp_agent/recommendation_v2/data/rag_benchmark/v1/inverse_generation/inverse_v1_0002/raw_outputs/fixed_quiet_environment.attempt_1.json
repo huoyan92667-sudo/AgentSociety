@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 247651,
+  "duration_api_ms": 247523,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"Zk1DC2bG6d008QpKknYPIA\",\n      \"query_text\": \"我想找一家环境安静、吃饭时能轻松聊天的餐厅，有推荐吗？\",\n      \"requirement_text\": \"评论需要说明这家餐厅环境是否足够安静，顾客能否不提高嗓门正常交谈。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"We were sitting upstairs and it was really quiet which was great cause we could easily talk\"\n    },\n    {\n      \"seed_review_id\": \"RM_69MkflJ3eqKO9EuUTtA\",\n      \"query_text\": \"哪家餐厅用餐时不会太吵，同伴说话能听得清楚？\",\n      \"requirement_text\": \"评论需要说明这家餐厅噪音大不大，同桌顾客能否听清彼此说话。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"the restaurant noise was so loud we could not hear each other\"\n    },\n    {\n      \"seed_review_id\": \"1qIR52_d5RZgU0ykn1Gqbg\",\n      \"query_text\": \"帮我找个安静一点、适合边吃边聊天的餐馆\",\n      \"requirement_text\": \"评论需要说明店内是否嘈杂，顾客交谈时是否需要大声喊叫。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"It was so noisy that we had to shout at each other from across our two-top\"\n    }\n  ]\n}",
+  "session_id": "f22f32c8-de77-4c37-a535-8c57d7637ea9",
+  "total_cost_usd": 0.19332000000000002,
+  "usage": {
+    "input_tokens": 6480,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 11200,
+    "output_tokens": 11368,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 6480,
+      "outputTokens": 11368,
+      "cacheReadInputTokens": 11200,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.19332000000000002,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "a3016289-76fe-4211-aa7f-3065fad321fa"
+}

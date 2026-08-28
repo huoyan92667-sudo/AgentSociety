@@ -1,0 +1,17 @@
+{
+  "dataset_path": "drafts/inverse_cases.jsonl",
+  "generated_case_count": 76,
+  "program_validated_case_count": 76,
+  "human_reviewed_case_count": 0,
+  "flagged_case_count": 1,
+  "flagged_cases": [
+    {
+      "case_id": "inverse_fixed_quiet_environment_positive_02",
+      "reason": "证据只说明两位顾客当时是店内唯一客人，没有直接说明环境安静；建议人工确认或替换后再升级为最终正确答案。"
+    }
+  ],
+  "notes": [
+    "当前76条属于模型生成并经程序检查的评测草稿，不冒充人工确认的最终正确答案。",
+    "长尾集中有两条不同评论都对应允许自带酒水，用于覆盖同一需求的不同自然问法，因此未标记为重复错误。"
+  ]
+}

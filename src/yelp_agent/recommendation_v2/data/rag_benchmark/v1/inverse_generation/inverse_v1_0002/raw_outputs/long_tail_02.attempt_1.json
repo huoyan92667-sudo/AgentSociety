@@ -1,0 +1,38 @@
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 236937,
+  "duration_api_ms": 236825,
+  "num_turns": 3,
+  "result": "{\n  \"drafts\": [\n    {\n      \"seed_review_id\": \"mbG910pWOHEi84i40qsZ5w\",\n      \"query_text\": \"我想带穆斯林朋友一起吃饭，有没有餐厅是正经的清真厨房、可以放心点的？\",\n      \"requirement_text\": \"需要评论说明该餐厅设有清真（halal）厨房，适合穆斯林顾客用餐。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"An interesting aspect of Don Panchito's is that it has a halal kitchen.\"\n    },\n    {\n      \"seed_review_id\": \"6AUMo8QHGy0rEUufcBI3Jg\",\n      \"query_text\": \"我买了瓶葡萄酒想自己带去配餐，附近哪些餐厅允许顾客自带酒水？\",\n      \"requirement_text\": \"需要评论说明该餐厅允许顾客自带酒水（BYOB）。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"BYOB with both beer and wine easy to buy near by.\"\n    },\n    {\n      \"seed_review_id\": \"hteMMB269n7rMqXCWCptuQ\",\n      \"query_text\": \"想要一顿有现场钢琴演奏伴奏的晚餐，哪家餐厅吃饭的时候会有live音乐？\",\n      \"requirement_text\": \"需要评论说明该餐厅用餐期间提供现场钢琴演奏。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"a gentleman plays the piano and sings recognizable tunes from an era gone by and a few holiday jingles.\"\n    },\n    {\n      \"seed_review_id\": \"z_45npk-zKY5-3rM9ixxhQ\",\n      \"query_text\": \"我很爱吃寿司，有没有哪家自助餐厅的寿司档口种类特别多？\",\n      \"requirement_text\": \"需要评论说明该自助餐厅提供的寿司种类非常丰富。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"They even had the largest sushi selection I've seen\"\n    },\n    {\n      \"seed_review_id\": \"eWIAIteXPxrbAnPmC69VKQ\",\n      \"query_text\": \"下雨天不想下车买东西吃，附近哪家快餐店有得来速车道可以直接开车取餐？\",\n      \"requirement_text\": \"需要评论说明该店设有得来速（drive-through）通道供顾客不开车窗购餐。\",\n      \"expected_direction\": \"positive\",\n      \"evidence_span\": \"opted for rapid food from the only drive through in sight\"\n    },\n    {\n      \"seed_review_id\": \"567zII4rZO23Yx7FombfBw\",\n      \"query_text\": \"我出门习惯不带现金，找一家可以刷卡或者手机扫码结账的餐馆，谁知道哪家不是只能付现金的？\",\n      \"requirement_text\": \"需要评论说明该店是否接受现金以外的支付方式。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Cash only.\"\n    },\n    {\n      \"seed_review_id\": \"4uSfsBk9QAfUb5VeZPPDeQ\",\n      \"query_text\": \"我在乎法吐司浇的是什么糖浆，有没有早餐店用的是真枫糖浆而不是人工调配的那种？\",\n      \"requirement_text\": \"需要评论说明该店早餐是否提供真正的枫糖浆，而非预包装代糖浆。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Wish they also offered real maple syrup rather than the pre-packaged sweeteners.\"\n    },\n    {\n      \"seed_review_id\": \"SK3sk9A1O96-V1HEXK6tWw\",\n      \"query_text\": \"打算今晚和朋友喝酒聊天到半夜，哪家酒吧打烊时间够晚、不会十一二点就关门？\",\n      \"requirement_text\": \"需要评论给出该酒吧的实际打烊时间，以判断能否营业到深夜。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"Surprised they closed at 11pm, seemed early as the night was young!!\"\n    },\n    {\n      \"seed_review_id\": \"hir8fCqxc9624CLvUeloFQ\",\n      \"query_text\": \"我喜欢Pad Thai里撒了香葱碎和花生碎的版本，哪家店的炒河粉这两种配料都会给齐？\",\n      \"requirement_text\": \"需要评论说明该店的Pad Thai是否加入香葱和花生这类配料。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"there were no shallots at all which made me a little sad\"\n    },\n    {\n      \"seed_review_id\": \"EzAcsopYbtOAWdsr_Ljrhg\",\n      \"query_text\": \"一个人嘴馋想尝尝苹果蛋糕，但整只买太多吃不完，哪家烘焙店的蛋糕可以单块零卖？\",\n      \"requirement_text\": \"需要评论说明该店的蛋糕能否按块购买，而不是必须整只买走。\",\n      \"expected_direction\": \"negative\",\n      \"evidence_span\": \"requiring the whole kubboodle go at once\"\n    }\n  ]\n}",
+  "session_id": "27b2242a-85e8-431f-9fea-24320d01ca99",
+  "total_cost_usd": 0.22158599999999998,
+  "usage": {
+    "input_tokens": 10434,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 10880,
+    "output_tokens": 12468,
+    "server_tool_use": {
+      "web_search_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    }
+  },
+  "modelUsage": {
+    "glm-5.3-flash[1m]": {
+      "inputTokens": 10434,
+      "outputTokens": 12468,
+      "cacheReadInputTokens": 10880,
+      "cacheCreationInputTokens": 0,
+      "webSearchRequests": 0,
+      "costUSD": 0.22158599999999998,
+      "contextWindow": 1000000
+    }
+  },
+  "permission_denials": [],
+  "uuid": "c7610769-ac19-4ca8-9896-e00a327efa41"
+}
