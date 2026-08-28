@@ -1,0 +1,1232 @@
+{
+  "experiment": "three_version_review_evidence_direction_comparison",
+  "query_text": "费城唐人街中心300米以内有川菜馆吗？川菜味道地道正宗吗？",
+  "candidate_count": 90,
+  "reference_policy": "以GLM保存的逐字证据位置为准；证据不在命中片段中时，片段标签记为irrelevant",
+  "reference_counts": {
+    "ambiguous": 7,
+    "irrelevant": 29,
+    "mixed": 3,
+    "negative": 6,
+    "positive": 45
+  },
+  "qwen_model": "Qwen2.5-3B-Instruct",
+  "qwen_output_policy": "只允许A-E五选一，正式结果只保存唯一标签",
+  "qwen_first_and_steady_labels_identical": true,
+  "qwen_first_metrics": {
+    "candidate_count": 90,
+    "batch_count": 23,
+    "input_token_count": 42698,
+    "truncated_candidate_count": 0,
+    "model_latency_ms": 13045.184900111053,
+    "wall_latency_ms": 13047.753000049852
+  },
+  "qwen_steady_metrics": {
+    "candidate_count": 90,
+    "batch_count": 23,
+    "input_token_count": 42698,
+    "truncated_candidate_count": 0,
+    "model_latency_ms": 12088.787099986803,
+    "wall_latency_ms": 12092.049399972893
+  },
+  "timing": {
+    "shared_retrieval_startup_ms": 12944.725000008475,
+    "shared_retrieval_wall_ms": 7597.434199997224,
+    "version_1_judgment_ms": 0.0,
+    "version_1_warm_total_ms": 7597.434199997224,
+    "version_1_cold_total_ms": 20542.1592000057,
+    "version_2_model_startup_ms": 9210.625600011554,
+    "version_2_judgment_ms": 3537.616799992975,
+    "version_2_warm_total_ms": 11135.050999990199,
+    "version_2_cold_total_ms": 33290.40160001023,
+    "version_3_model_startup_ms": 14484.008200000972,
+    "version_3_first_judgment_ms": 13047.753000049852,
+    "version_3_steady_judgment_ms": 12092.049399972893,
+    "version_3_warm_total_ms": 19689.483599970117,
+    "version_3_cold_total_ms": 48073.92040005652
+  },
+  "comparisons": {
+    "version_1_similarity_gap": {
+      "predicted_counts": {
+        "ambiguous": 79,
+        "negative": 5,
+        "positive": 6
+      },
+      "exact_count": 16,
+      "exact_rate": 0.17777777777777778,
+      "relevance_precision": 0.6777777777777778,
+      "relevance_recall": 1.0,
+      "per_class": {
+        "irrelevant": {
+          "reference_count": 29,
+          "correct_count": 0,
+          "recall": 0.0
+        },
+        "positive": {
+          "reference_count": 45,
+          "correct_count": 6,
+          "recall": 0.13333333333333333
+        },
+        "negative": {
+          "reference_count": 6,
+          "correct_count": 4,
+          "recall": 0.6666666666666666
+        },
+        "mixed": {
+          "reference_count": 3,
+          "correct_count": 0,
+          "recall": 0.0
+        },
+        "ambiguous": {
+          "reference_count": 7,
+          "correct_count": 6,
+          "recall": 0.8571428571428571
+        }
+      },
+      "confusion": {
+        "irrelevant": {
+          "ambiguous": 29
+        },
+        "positive": {
+          "ambiguous": 39,
+          "positive": 6
+        },
+        "negative": {
+          "ambiguous": 2,
+          "negative": 4
+        },
+        "mixed": {
+          "ambiguous": 3
+        },
+        "ambiguous": {
+          "ambiguous": 6,
+          "negative": 1
+        }
+      }
+    },
+    "version_2_cross_encoder": {
+      "predicted_counts": {
+        "ambiguous": 1,
+        "irrelevant": 62,
+        "mixed": 16,
+        "negative": 5,
+        "positive": 6
+      },
+      "exact_count": 37,
+      "exact_rate": 0.4111111111111111,
+      "relevance_precision": 0.9642857142857143,
+      "relevance_recall": 0.4426229508196721,
+      "per_class": {
+        "irrelevant": {
+          "reference_count": 29,
+          "correct_count": 28,
+          "recall": 0.9655172413793104
+        },
+        "positive": {
+          "reference_count": 45,
+          "correct_count": 5,
+          "recall": 0.1111111111111111
+        },
+        "negative": {
+          "reference_count": 6,
+          "correct_count": 2,
+          "recall": 0.3333333333333333
+        },
+        "mixed": {
+          "reference_count": 3,
+          "correct_count": 2,
+          "recall": 0.6666666666666666
+        },
+        "ambiguous": {
+          "reference_count": 7,
+          "correct_count": 0,
+          "recall": 0.0
+        }
+      },
+      "confusion": {
+        "irrelevant": {
+          "irrelevant": 28,
+          "positive": 1
+        },
+        "positive": {
+          "ambiguous": 1,
+          "irrelevant": 23,
+          "mixed": 13,
+          "negative": 3,
+          "positive": 5
+        },
+        "negative": {
+          "irrelevant": 3,
+          "mixed": 1,
+          "negative": 2
+        },
+        "mixed": {
+          "irrelevant": 1,
+          "mixed": 2
+        },
+        "ambiguous": {
+          "irrelevant": 7
+        }
+      }
+    },
+    "version_3_qwen_five_class": {
+      "predicted_counts": {
+        "ambiguous": 27,
+        "irrelevant": 23,
+        "mixed": 1,
+        "negative": 9,
+        "positive": 30
+      },
+      "exact_count": 53,
+      "exact_rate": 0.5888888888888889,
+      "relevance_precision": 0.8507462686567164,
+      "relevance_recall": 0.9344262295081968,
+      "per_class": {
+        "irrelevant": {
+          "reference_count": 29,
+          "correct_count": 19,
+          "recall": 0.6551724137931034
+        },
+        "positive": {
+          "reference_count": 45,
+          "correct_count": 27,
+          "recall": 0.6
+        },
+        "negative": {
+          "reference_count": 6,
+          "correct_count": 4,
+          "recall": 0.6666666666666666
+        },
+        "mixed": {
+          "reference_count": 3,
+          "correct_count": 0,
+          "recall": 0.0
+        },
+        "ambiguous": {
+          "reference_count": 7,
+          "correct_count": 3,
+          "recall": 0.42857142857142855
+        }
+      },
+      "confusion": {
+        "irrelevant": {
+          "ambiguous": 7,
+          "irrelevant": 19,
+          "positive": 3
+        },
+        "positive": {
+          "ambiguous": 14,
+          "irrelevant": 1,
+          "negative": 3,
+          "positive": 27
+        },
+        "negative": {
+          "ambiguous": 1,
+          "mixed": 1,
+          "negative": 4
+        },
+        "mixed": {
+          "ambiguous": 2,
+          "negative": 1
+        },
+        "ambiguous": {
+          "ambiguous": 3,
+          "irrelevant": 3,
+          "negative": 1
+        }
+      }
+    }
+  },
+  "details": [
+    {
+      "review_id": "sax3GgKP7Dim9Kkn6ybUuw",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "This place has become our favorite Szechuan restaurant. We have been here more than 5 times by now and we are literally eating our way through the entire menu... then we plan on starting it again. Hands down this is by far the most authentic of the Szechuan places in the City (better half is Chinese). And spiciest. So, if you are a complainer about hot food - just don't bother to come here. So, if you like americanized Chinese food - just don't bother to come here. There is a lot of dishes that we have not found on other menus in the US. Two thumbs up, and we will be back next weekend!"
+    },
+    {
+      "review_id": "ydRXcbTx-bDj9EMFAFjqFA",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "This place offers relatively authentic Szechuan food. Might not suitable for Americans because  food here is far more spicy than those in Han dynasty or Jane G's. Foods here are not being Americanized. I really like some of the appetizers here. They are special and I simply can't have them in other Szechuan restaurants. The staffs are polite and considerate. If you are people who love real spicy Szechuan  food, you should definitely  give a try."
+    },
+    {
+      "review_id": "W03A_lQ1Po3U-DhnL-O2CA",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "negative",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "There are so many Szechuan restaurant in Philly, but this one is really different and is my favorite one. \nNo American style Szechuan food, but authentic taste from China. I tried many kinds of dim sum that I've never seen or tried before, all of them are delicious. Although I've waited a long time for bamboo leaf wrap rice, it tasted really good. Another interesting dish is the new kind of hotpot with skewers, interesting and delicious. \nI love spicy food, and this place is just what I expected it to be- VERY spicy! Though no fancy decorations, the food is fancy. I recommend everyone who loves spicy food to check it out!"
+    },
+    {
+      "review_id": "kpvt4iA_Iwf2ZWEV2bO5aQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "negative",
+      "version_2_label": "mixed",
+      "version_3_label": "negative",
+      "matched_segment_text": "This place totally changed!! Nothing like what it was 4 years ago. Now it is expensive, not fresh and not tasty. Go to Jane G's to find authentic Szechuan food."
+    },
+    {
+      "review_id": "4yiIEVLxBRJ9iPLpenyq3g",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "mixed",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "negative",
+      "matched_segment_text": "Very good Szechuan food, a big menu with less heard of dishes, fresh ingredients, rarely do places pan fry their scallion pancakes nowadays, pork feet noodle soup is definitely worth trying.  Not as spicy as Szechuan food should be, but I like it very much"
+    },
+    {
+      "review_id": "A6E_TAg0aFpywK3wrJOw9A",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "mixed",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "I was born in Chengdu, Szechuan and dined here a few times. I can safely say that Szechuanese dim sum dishes here are authentic, like dandan noodles, honeyed garlic noodle, hot & sour noodles. However, other dishes here are among average in Chinatown.\nI talked to the Chef once and he is from Szechuan, too.\nThe service and management of the restaurant need improvement."
+    },
+    {
+      "review_id": "-jOBpuQ-C4uYR-gm4pidaQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "In Philadelphia, when I think of Szechuan, I think of Han Dynasty... Well not anymore. The recipes here are wide ranging, where as some Szechuan places you taste the same thing over and over again.\n\nThe dumplings in Chili oil are great because they are more creamier than oily. Pork Buns are very average, but everything else on the menu is above par.\n\nA must is the Szechuan Style Chicken. Is it crispy on the outside, and moist of the inside. Lightly coasted with chili oil and surrounded by fried chilis and peanuts.\n\nDon't expect much more than the food. The past couple times I went they were making space for Karaoke, which could a bit different feel, but for the most part this place is very causal."
+    },
+    {
+      "review_id": "q28stFoF3B4b6gNUtvE-qQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "negative",
+      "matched_segment_text": "Like another reviewer said, this place charge your tip (15%) in the receipt so be aware of that. I decided to have a quick lunch here after got off a two hour greyhound ride before I went home. Despite that the place was pretty empty(around 1pm), it took them more than 20 minutes to bring me the noodles I ordered and I had to ask multiple times to get my water refilled. They simply include 15% tips in the receipt. When I confronted them, they simply said \"yes that's how we do it here.\" I'm not going to this place again even though they have authentic Szechuan food."
+    },
+    {
+      "review_id": "dY6pr2kQy2YEb1rqdvOKNA",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "ambiguous",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Traditional Szechuan, not your Americanized chicken and broccoli dishes. Great food and great service. I ordered take-out and the woman offered me tea while I waited. Try the Dry Pot Style!"
+    },
+    {
+      "review_id": "WwVECZiY0lpQ7IKLnQkKRw",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "-------------------\nI was born in Chengdu, Szechuan and I can safe say that Szechuanese dim sum dishes here are authentic, like dandan noodles, honeyed garlic noodle, hot & noodles. Other dishes here are among average in Chinatown. I talked to the Chef once and he is from Szechuan, too.\n\nThe management of the restaurant need improvement, as they get flurried when there are too many customers."
+    },
+    {
+      "review_id": "xZjF2I8EuwtuNoEdnwSZGA",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "3.5 stars\nThere's something very homey about eating at a family-run Chinatown restaurant that turns out simple yet tasty plates of authentic Szechuan food. The \"small eats\" or appetizer-style dishes shared family-style are my favorite part of this mouth-numbing cuisine! We started with the Chengdu-style cold bean noodles, and the soft, slippery noodles were a great conduit for the slightly spicy chili sauce. The dan dan noodles with minced pork were a bit of a miss--the wheat noodles seemed a bit overcooked, and the sauce was rather flavorless. Similarly, the mapo tofu with ground meat was surprisingly bland and the sauce was way too soupy. The smashed cucumbers in vinegar/soy garlic sauce were tasty and refreshing, but the highlight dish here (also the owner's favorite dish) was the beef, tripe, and tendon in chili oil (fuqi feipian)."
+    },
+    {
+      "review_id": "2iqLzf8HKQqsQJTOiYzezQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "negative",
+      "version_2_label": "negative",
+      "version_3_label": "negative",
+      "matched_segment_text": "Normally I don't give bad reviews, cz i don't want to waste my time. But I was stuck in the rain. So I guess bad luck.\nI was on my way back to NYC, and stopped by for the Liberty Bell. I saw this restaurant after parking and decided to give it a shot after my visit to the Bell. The food is just not authentic Szechuan cuisine, in short. It is understandable since I am at USA. Yet they make the food spicy and extremely salty, barely edible. The worst thing was that the ribs they served was stale. You could tell by the texture and the weird taste. They also charged me with 15% tips. I usually tip at that much. But they just printed it out and said to me \"well we have included the tips\". That is not the right way to run business. Plus the service was not worthy of 15%."
+    },
+    {
+      "review_id": "Q-y5JivbxUklY7w5f-RSFA",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "This is the real deal. Authentic. Makes Han Dynasty, which is tastier, look a bit more domesticated. My Chinese friend was the expert I brought to help me navigate the menu. We shared three plates, tofu, mouth-watering chicken, and a soup with sweet potatoes noodles.  I enjoyed it quite a bit and the Szechuan peppers (numb nuts) certainly challenged my palate. I'd like to go back and keep venturing, but I know that this place is legit for now.\n\nA few weaknesses: presentation was lacking,and so was explanation. I needed my guide to help me through it. Not sure about the quality of ingredients either."
+    },
+    {
+      "review_id": "8BPWcr9kxOYIUE68tGL7EQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "positive",
+      "version_3_label": "positive",
+      "matched_segment_text": "Speaking of Ma Po Tofu, if you've never tried this sichuan staple, we suggest you give it a shot once. It wasn't love at first bite but over the years we have acquired a taste and love this dish for the fiery heat from red peppers along with a cool mouth numbing sensation produced by sichuan peppercorns, the combination of which is termed málà and is so addictive. The version that they served here was without ground pork but the flavor (oh my!) could put the average \"sichuan\" place to shame. This restaurant my foodie friends is the real deal!\n\nThe Szechuan style spicy chicken was another winner here. Super crispy chicken buried in a mound of red peppers and sichuan spices dry fried. This dish sort of reminded us of Chonqing chicken but this was way better. \n\nThe Wontons with Spicy sauce arrived last and were the least of our favorites for the night."
+    },
+    {
+      "review_id": "xZX1TS4jog7bsGgjYaxVew",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "A very good authentic Chinese/Szechuan restaurant spotted in the old Chinatown in Philly.\n\nThis place is totally not disappointed for someone like who has tasted known Chinese restaurant in Los Angeles and New York.\n\nEnvironment: very clean. Their napkin is of good quality compared to other Asian restaurants.\n\nFood: their dim sum style dishes are the most popular. Additionally, Fresh fish in boiled hot chili sauce is a must try - the whole fish well marinated within the hot sauce and the ingredients include different kinds of mushrooms.\n\nService: those young waiters and waitresses are very friendly.\n\nIn a nutshell, if you are a big fun of spicy food, don't miss out this place when you are in Philly!\n\nHope it helps!\nxoxo, Q"
+    },
+    {
+      "review_id": "Y6SAEQQuIJgcHiLUV0zCkQ",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "negative",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "they put too much capsicum in every dish we ordered, super oily also."
+    },
+    {
+      "review_id": "Ff2YUZ4aYre2gqT0tsEQRw",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "Great authentic Schezuan food! Very spicy which is something we love. \nWe love the spicy won ton and the house special soft tofu the most. \nHidden gem!"
+    },
+    {
+      "review_id": "8Hq-y_pCQ-xYq-URZWR02Q",
+      "business_id": "332MG0dFd8d2JUcszdRdYw",
+      "business_name": "Delightful Garden",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "The biggest and best surprise was the Eggplant.  It was sliced into lengths of a four/five inches, skinned, and somehow wok-ked to give a mild crispiness.  How did they do that? It was a neat trick, and it was piled high on a deep dish that created an island surrounded by red, shining, heat vapored, sauce.  The heart of the nightshade remained soft and contained a hint of sweetness.  This combo tag team between the Red Chili flame and unexpected sugar underneath was delicious and fun.  \n\nWe thoroughly enjoyed this repast.  If asked to compare with other hot houses in Ctown, it would fall somewhere just below Emei (across the street), on the same plane as Four Rivers and Spice C, and above Traditional Szechuan.  It really reminded me of the old Chili Szechuan on Baltimore Avenue, before it moved to larger digs and lost its edge."
+    },
+    {
+      "review_id": "TxIlUFcZnGCbSPPsgSLmGw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "One of the best Szechuan in Philly. Amazing soup dumplings and fresh. Overall great atmosphere and restaurant."
+    },
+    {
+      "review_id": "hCeuTUQDrPRDDbmwqlQBug",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "I was pleasantly surprised to find this restaurant with a perfect combination of my 2 favorites, dim sum and Sichuan cuisine. The inside looked very clean and modern, especially for a place in Chinatown. We ordered soup dumplings, spicy fried fish, and the dan dan noodles. The spicy fried fish was so crispy and fresh, I can't wait to order it again!"
+    },
+    {
+      "review_id": "YOfXEf8r5lVuvwC1zmlRUw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "negative",
+      "version_2_label": "irrelevant",
+      "version_3_label": "negative",
+      "matched_segment_text": "Came to Philly for business, wanted to find some authentic Sichuan restaurant.  The decorations of the restaurant is nice, but the food is not so great.   Portion is small and it's too pricy; scallions pancake is too oily and small, water boiled beef is small again, not a lot of meat and definitely can tell they use tenderizer, and most importantly, the flavor is not there at all!! Not spicy, not pungent, I feel I waste my stomach and one meal to this restaurant.  One more downside, they don't take credit card, only cash, very inconvenient!! If I ever come back to Philly again, this is definitely not a choice!! EMei is much much better!!"
+    },
+    {
+      "review_id": "kA54UADVtVpUn_yZJSM0VA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "The food is authentic. The Xiang style chicken was fresh and delicious. I don't think it might be anyone because it has bones, which is common in china. The service is prompt and attentive. Will try out other dishes next time. The restaurant has a quit good selection of authentic Chinese dishes."
+    },
+    {
+      "review_id": "yS1dhsd6VzMuvUznNtDKeg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "negative",
+      "matched_segment_text": "I have been here a few times already. There dim sum is limited but the szechuan style food is amazing. MUST order items.\n\nCrispy fried fish. This dish is slightly spicy, crispy on the outside and tender on the inside. Fish will never be the same if you try this dish.\n\nMopo is a silken tofu dish. Mild in flavor but softens the spicy crispy fried fish. It pairs very well together. It has minced pork, silken tofu, carrots and peas and hot peppers. But there is no spice to this dish at all.\n\nFlaming stinky pots. Actually. I don't know the name of these dishes, But I can tell you have a pungent smell to it. It has that numbing peppercorn spice that makes the dish super unique. I love it.\n\nOrder a side of rice and get the black tea. These 2 must go hand in hand with all of their meals. \n\nA beautiful asian couple mural makes this place very modern and gives it a classy asian ambiance."
+    },
+    {
+      "review_id": "2w6xBZo8S_3iNmEiFKvt2w",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "This place is new, not the same owners or menu. I've been here a few times now. I've had the dim sum and other items from the menu and must say, they are doing a great job. Service is better than most places in Chinatown. Dim sum is on par with other Chinatown places, but the rest of the menu is definitely above average. I can't remember all the names, but I'll try. I know I had the Szechuan beef, which was delicious and tender, the smelly pot with chicken which was also very good, the beef dish with peppercorn was very intense if you bite into a peppercorn, so avoid the peppercorn directly and you'll love it, but the best item I've had so far is the crispy fish, which I don't think is the name of it, but I'll put up a picture so you can order it. I'm not the biggest fan of fish dishes, but I guarantee you that you will love it! I know I did."
+    },
+    {
+      "review_id": "mMbLRloAwtWA5z6cQ9xrxA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "This spot is pretty good if u are craving for Szechuan cuisine. I personally like the Dan dan noodle and fried chicken that I ordered, but the frog leg dry pot was very salty. \n\nThey have a big menu, offering a variety of dishes including dimsum so it's perfect to share among a group of friends."
+    },
+    {
+      "review_id": "gsxOKiH_nL2pxISDkCjCMw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Food was great but the service was ok. If you're looking for some good Szechuan food, you can check this place out."
+    },
+    {
+      "review_id": "Q29UV3wHvYgnbiiw6fsNTw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "positive",
+      "version_3_label": "positive",
+      "matched_segment_text": "Really nice looking place that serves authentic szechuan dishes - beware.. only accepts venmo and cash!"
+    },
+    {
+      "review_id": "FA0CnO6Nc-llM9EflBhmUA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Authentic Chinese food, great environment and service! One of my fav places to go, everything on the menu is pretty legit"
+    },
+    {
+      "review_id": "YSDZ1JXjKafKONj6CwAjsw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "positive",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Great food and taste! Love the new spices. \n\nMust try their fish with sour cabbage and cauliflower. Their spicy hot pot is one of my favorites"
+    },
+    {
+      "review_id": "J4E4oIAz8qRQ3YYwIsGHJA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "My go to spot for authentic Chinese. Food is always on point and the staff is very nice. Would recommend the dry hot pot!"
+    },
+    {
+      "review_id": "Wvd6_pdyWQCbBBLZxzflwQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "Been to Chengdu three times and other parts of China as well. Some of the dishes we had were just like the dishes in China. Some Shanghai dishes too.  Very authentic, at least from my experiences. Yum"
+    },
+    {
+      "review_id": "JTTmUSmUVP-GijJV0puekw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "the food is very good and authentic, especially the soup dumplings and spicy cucumber. i've been here about 5 times and they've been very consistent except for once when we ordered a serving of pork soup dumplings and every single on was broken. they still tasted good however i would definitely come back."
+    },
+    {
+      "review_id": "_rti5pLfRXCMZ8d5juAtjg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "We loveeee this place! Great sushi and great Chinese. the soup dumplings are out of this world! Good prices and a super clean place. We go all the time!  It's definitely a great place to try if you want an authentic place in China town Philadelphia."
+    },
+    {
+      "review_id": "9ayvK3x9ihLgMKNX7jcwtg",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Ambiance is nice but either the owner or the staff's kids and relatives hang out there.  The little boy was crying and screaming at times and the girl was running back and forth behind the counter and the seating area.  Kitchen staff were walking in and out for smoking break.  This was during peak dining hour, 7:30 PM on a busy Friday.  We had 4 dishes and they were all too salty to us.  The soup dumplings weren't tasty.  We had been to many that were way better than this.  After dinner, we both kept drinking water so we suspected there were MSG."
+    },
+    {
+      "review_id": "su0V9Gz-OGw-7oPnxGfqBQ",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "mixed",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Watch out, they came out SUPER hot.  I didn't care for the dipping sauce--too much vinegar for my taste buds. \nSpicy Stir Fry Pot-- The boyfriend loved this! Ordered this as \"regular\" spicy: flavorful;  he expected  it to be a little spicier, which turned out to be the perfect level of spicy for me to enjoy as well. \nDrunken Noodle with Beef-- Good, solid drunken noodle dish. \nDiced Chicken with Hot Peppers-- This was my personal favorite. I did ask our server to take it to a milder spice level...I will definitely be back for this dish!!\n\nWe will absolutely be back!!"
+    },
+    {
+      "review_id": "yqHKvutH17J65lX9SyQX7g",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "I love nearly everything on their menu... and by this point I've nearly had everything on the menu!  I usually visit with a friend or two, but finally attended with a small crowd this weekend.  After another excellent experience, I wanted to get a review in.\n\nBai Wei offers a selection of Szechuan and Dim Sum.  While the dumpling and dim sum selection is limited, what they have is amazing.  Of course I'm going to tell you to get the crab and pork soup dumplings!\n\nOn the Szechuan side, you have all sorts of dry pot, stir fry, and pepper based dishes.  My top recommendation is the Lamb (or Beef) Cilantro. It was a hit for our group of six this weekend.  A dish I was surprised I loved so much was their assorted mushrooms.  The cumin dry pot is tasty and not as spicy as I suspected it would be and the eggplant is another solid order, especially for vegetarians."
+    },
+    {
+      "review_id": "xTvhgayKnj13tPnrANSwGw",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Great selection of food. Very authentic .\n\nHad this Crab Soup Dumpling, cost reasonably, and ready as good as the ones in PRC."
+    },
+    {
+      "review_id": "u-7vx0q8JkTN2SmfYWcKMA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "The wontons in the soup were pretty small and just tasted off. And both orders of soup dumplings had 0 soup in them and they were undercooked :/ \n\nMaybe my experience was slightly different than dining in since I ordered delivery - but that didn't affect that the overall taste and flavors, quality, and execution of the food preparation that was more than lacking. I don't think I'd even be willing to give this place another chance since there are way better options in Philly."
+    },
+    {
+      "review_id": "mYxf45pVLpv_mVdXda07zA",
+      "business_id": "SADPX8WX34EQDj_jqtacMw",
+      "business_name": "Bai Wei",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Very authentic Chinese food. Love it.i will recommend friends to this place. The favorite one is steamed bum"
+    },
+    {
+      "review_id": "F1ZpcCRi9wAYJeceRddKTw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "positive",
+      "version_3_label": "positive",
+      "matched_segment_text": "Authentic Szechuan food located in china town. Definitely a couple notches above typical Chinese restaurants. The conch in chili oil is awesome and spicy. Egg rolls are good and not overly greasy. They have fresh shrimp and fish prepared in a variety of ways. I really like the spicy tilapia and Szechuan shrimp. Fried rice and lo mein also solid. They also offer some more exotic dishes like jellyfish, beef tendon etc. I have been told that their beef dishes are good and the beef is good quality and properly cooked. This place gets pretty crowded on the weekends and the servers are fast but not particularly attentive so I would ask for a 2nd water up front."
+    },
+    {
+      "review_id": "LVmxZfE7hndCPEWT1aELCA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "I never had szechuan style cuisine in the US before and I am so glad that E Mei was my first! The food there is extremely authentic and spicy! The owner and waiters treated us like we were the only customer there when there was almost a full house! \n\nAt first I was very nervous due to the spiciness and oily of traditional szechuan style food, but I was glad the owner helped us order and give us a great balance of flavor! \n\nWe had a spicy fish dish that was BANGING! And a smoked duck dish! Holy cow was it amazing! \n\nDefinitely highly recommend checking out the place even it's in the dead part of Chinatown!"
+    },
+    {
+      "review_id": "1l2sL5n8JedChnUKZnu2ZQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "I may not be familiar with Szechuan cooking, but I do know good food. This place made me very happy and very satisfied. The dumplings, the dang dang noodles (you have to mix up the noodles and the stuff on top before you take ur first bite), spicy beef, crispy chicken and chilies, bok choy and the rabbit and bamboo...all on point. The attitude is stoic and food service is prompt. I didn't come to make friends...I came to eat!!!"
+    },
+    {
+      "review_id": "sfwDNAHOj11l-5wm0eenwg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "This hands down is my favorite Szechuan restaurant in philly. I've tried all of the other Szechuan places but nothing can compare. All of their dishes are super authentic. My favorite has to be the spicy crabs and double cooked pork. If you are spicy food lover this place is heaven."
+    },
+    {
+      "review_id": "ZAkzffV_o5zGP2Bbfd1qkw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "negative",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "I wouldn't pretend to know \"authentic\" Szechuan but I'm guessing this is close. At any rate it is hands down better than the breaded, corn starch laden glob you get at Americanized Chinese joints. The menu is huge and it was hard to choose. We settled on a crab and asparagus soup, a seafood noodle soup, and an order of  shredded duck with ginger. Holy crap it was way more food than we could eat!  If we got a do over we would get just one soup and one main dish to share and it would still be too much. BTW, if you want \"Americanized Chinese\", there is a section on the menu named that and I bet its pretty good."
+    },
+    {
+      "review_id": "mDegz1-B1lo8gLsnCdEPVA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "I've been to more than enough Szechuan restaurants having grown up in China and California. To be honest, outside of my times in Sichuan Province, this is probably the most authentic and satisfying Szechuan cuisine I have had. \n\nWhen I came here, it was on a cold spring night. My friend and I were desperate for a place to find a rain shelter and, at the same time, to fill up our stomachs. We picked (excuse my poor translation):\n \n-\"Water-boiled Fish\" (Shui zhu yu): So delicious, and mouth-watering just to look at! It's prepared in an authentic Chinese hot-pot, with the ethanol block still burning on the bottom. It reminded me of my childhood in China, when my dad picked this as one of his favorite dishes to ordered. The fish is so soft, and it's boiled in on top of a layer of amazing Chinese spices and chili pepper and chili oil."
+    },
+    {
+      "review_id": "s6vxvRkBDIAZzxyrlPeXEw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "Excellent authentic spicy szechuan food with great service. Don't let the fact that this restaurant is never crowded fool you. The food is delicious!"
+    },
+    {
+      "review_id": "tPw9_ZFATNaitAlZRktRCA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "This is my favorite restaurant for authentic Szechuan food. The place is usually crowded around dinner time, but the service is fast and above all, the food is really really good. If you like spicy food, they have some really nice food. Being a vegetarian is not a problem either - their MaPo Tofu and their Vegetable fried rice are simply out of this world!"
+    },
+    {
+      "review_id": "uqfJ-vi1m5OIohwoFNxpUA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "Authentic Szechuan cuisine. You can tell by their peppercorns and the numbness of the mouth afterwards. This place is a good break from most of the fast service places in the area. Also they have KTV if you like to sing"
+    },
+    {
+      "review_id": "H1-p1TXej6_-Q7KfgS7nvw",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "Authentic szechuan cuisine at a reasonable price and in a more casual setting, compared to Han Dynasty (which is much fancier). We got the fish hot pot, spicy chicken, and eggplant. Very spicy (clears the sinuses!)"
+    },
+    {
+      "review_id": "4CXeS7CjUf-_DHO-_YP0EA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "negative",
+      "version_2_label": "negative",
+      "version_3_label": "negative",
+      "matched_segment_text": "Sorely disappointed! Honestly, you have to take in my review with a grain of salt, since I am not Chinese and I probably do not have a palate for authentic Chinese food. I was recently introduced to  Szechuan cuisine and fell in love! I love spicy food, and it hit the spot every time. With that being said, I walked into E Mei with hopes of trying more authentic, \"family-oriented\" Szechuan food. I ordered what everyone else recommended, the classic \"Dan-Dan noodles,\"  Chongqing Chicken, and Dumplings with Chili oil. Food came out extremely quickly. They were all spicy and salty, which is generally what I like, but it wasn't anything more than that. I expected more umami going on, I mean that's what Chinese food is all about right? But it was literally just hot and salty. And nothing else."
+    },
+    {
+      "review_id": "QAI7pdqtMmmO9Bnt3bf0sQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "mixed",
+      "version_3_label": "positive",
+      "matched_segment_text": "We visited this restaurant when we traveled to Philadelphia for a ling weekend. It is a very authentic Szechuan restaurant. As good as some of the best places in Chengdu. I strongly recommend E Mei if you like Szechuan cuisine."
+    },
+    {
+      "review_id": "xxnNtxUTO0QLv8chFHDjBQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "positive",
+      "version_2_label": "positive",
+      "version_3_label": "positive",
+      "matched_segment_text": "Authentically spicy and delicious.. Service as swift and staff scrupulous with temperature taking and sanitizing between meals. There's something addictive about good Sichuan ma la-- the numbing spiciness-- so if you're a fan, this place'll definitely make you feel happy."
+    },
+    {
+      "review_id": "NZcsn4-1PUq-zRAR_bfpnA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "negative",
+      "version_3_label": "positive",
+      "matched_segment_text": "Extremely authentic Sichuan style food!! A huge menu with a very wide range of options. The spicy pork stew , which is basically the same as their various hot pots in terms of spiciness and vegetable ingredients, is an unforgettable; tear jerking chile experience!!!  Intestines, duck blood, tripe, pork, fish, a big variety of vegetables , and enough chile to make me cry for a week!! Serving size was very generous, I could only finish about a third of it, the rest became  my food for being a hurricane Sandy shut-in the next day. Generally sufficient for two people.  To be honest this dish was a little too hot for me, and I am a big fan of Mexican, Korean, Jamaican and Peruvian cuisine so no stranger to hotness. But the quality is fantastic. Probably next time I will choose something a little less spicy."
+    },
+    {
+      "review_id": "Z7-mHW3HL--Qyy_K9mwlyg",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "mixed",
+      "matched_segment_text": "Everything was super spicy, which is normally not a problem for me. Just didn't feel like the flavors were there though. I would try it again however."
+    },
+    {
+      "review_id": "G5DGMOojGetqJan7td1kxA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "A great balance of spice and flavor. Enough to feel the heat and also enough to actually taste the other components of the dish. Out of all the dishes we had, the stand out dish was the fish hot pot. Lots of fish for the price and it was deliciously​ seasoned. So good. \n\nWe also got dan dan noodles and dumplings in hot oil. Not that big of a fan of the dumplings, but the dan dan noodles were satisfying. \n\nOverall, a great place​ to get Sichuan​ food."
+    },
+    {
+      "review_id": "dNR4756DD1mwkASUHZ4JVA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "negative",
+      "full_review_reference_label": "negative",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Staff was friendly and fast. The drinks and food arrived quickly. I was looking for food with some spice, some heat. Unfortunately, neither of my dishes really had any. \n\nLooking at the other reviews, most people seem very happy with the flavors and spiciness of their dishes. . \n\nMaybe my friend and I just got unlucky today."
+    },
+    {
+      "review_id": "3k9tCgH1JiLWzKgIA7diJQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "The spice level is perfect. It will get your sinuses flowing but it also builds as you eat so if you pace yourself it is more than tolerable. It also doesn't linger too long on the palate, which is a problem I have with chilies such as habaneros. An atom bomb goes off in your mouth and just sits there and gets worse. Nothing like that here, the spiciness is artfully crafted. I love the tongue numbing effect the Sichuan peppercorns have, it almost helps you handle more spice than you could normally. I will definitely be back soon, I want to have a sit down meal here as the decor is fairly nice (for chinatown) and there are some interesting dishes, (rabbit in peanut sauce I have my eye on you!)."
+    },
+    {
+      "review_id": "eWlfKCbyUIKzvx1dJyaPGQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "Yummmmyyy!!! The dishes are spicy and delicious.  Prob one of my favorite restaurants now, love the variety if dishes they offer.  If you love spicy like I do, definitely worth it try!"
+    },
+    {
+      "review_id": "6fv3iu8_F8bF1j_vAffi6A",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Cumin Lamb was amazing.  Hint of sweetness in the lamb coating; spicy hot peppers that make your mouth and tongue go numb, with small burst of cilantro to lighten it up.  Best cumin lamb I;ve had so far."
+    },
+    {
+      "review_id": "-l9wEx0oUv6hGlj0NO-1MA",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "I really like this place. The food is saucy with the numbing kind of spiciness. However, the numbing isn't overpowering and goes really well with the dishes. I'm really particular about how spicy dishes are and this place does it well. It's spicy, but not too spicy you can't enjoy your food.\n\nFood comes out fast and service is good. Definitley come in a group and do family style as you'll be able to try a whole variety of food.\n\nAdded benefit is they're never too crazy busy and have plenty of seating to fit larger groups. \n\nTip: Don't drink water right away after eating the dumbing spice ;)"
+    },
+    {
+      "review_id": "6JNPUMKi-qKThGIM8RrApQ",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "mixed",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Again can use more szechuan pepper corn in the dish. \nShredded potatoes and green pepper, very good. Plain ingredients but well prepared. The pepper has a touch of heat that added favor to the otherwise sweetness of the potatoes. \n\nAll the dishes are good portioned and we took home half of everything."
+    },
+    {
+      "review_id": "3At8ViRUz2iSBZc3kqbR4A",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "positive",
+      "version_3_label": "negative",
+      "matched_segment_text": "Super delicious. Lots of rich flavored sauce with plenty of numbing burn. Lots of unusual options(pictured: spicy duck with mung bean jelly)  Not much under $15, but portions are massive, easily good for two, and I'm not generally one to have leftovers"
+    },
+    {
+      "review_id": "TQ-ShGHMjT_ykbyvUVdU-A",
+      "business_id": "s9ceDy-cVHe0uzvZpWq87Q",
+      "business_name": "E Mei Restaurant",
+      "segment_reference_label": "positive",
+      "full_review_reference_label": "positive",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "positive",
+      "matched_segment_text": "Great authentic Chinese food, even as a vegetarian. When you first sit down, you are provided some complimentary light tea, salted peanuts, and pickled vegetables. The tea was quite light and refreshing, while the peanuts were a bit too salty, but still good, while the pickled vegetables had very strong ginger tones that were a bit off-putting. For the main course, we ordered the Home Style Tofu as well as the vegetable lo mein. Both dishes were incredible! The home style tofu is actually the same as their braised tofu in brown sauce, but apparently it is a bit spicier. The spice levels in the dish were perfect, not requiring any additional hot sauce nor glasses of water to relieve the heat. The tofu itself was cooked wonderfully with a firm outer texture and soft inner texture. The dish also contained some vegetables like mushrooms and onions."
+    },
+    {
+      "review_id": "Uc_arj9s4KFvfPzr8u4VQQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "negative",
+      "matched_segment_text": "Food is disgusting. Dumplings were oily and were not actually dumplings. Wings had a small drizzle on top they do not toss them in sauce. They had no silverware and we had to eat with plastic and drink out of sketchy plastic cups. Service was also slow. I do not recommend."
+    },
+    {
+      "review_id": "9WYOPwieEKz-v9VtOEYa_g",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "I definitely prefer Yakitori. At least the bathroom wasn't 3 miles away and the walk space wasn't so tight. \n\nI did not try their food, nor do I even wish to because of the horrific experience I had. If they consider my rating as some angry sports fanatic then they are WRONG. It goes beyond that. I don't even understand the concept of the whole thing. Is it a restaurant since it has so many tables? Is it a karaoke bar since you can hear the karaoke from the first floor? Is it a place where you are to be judged by a bartender? I seriously do NOT get the concept, but all I know is that my friends and I are definitely never returning to this place.\n\nAnother thing I'd like to add is that the waitress/waiters did NOT know where they were sending the food to!!! They \"guessed\" which rooms and floors each food item belonged to."
+    },
+    {
+      "review_id": "qc0Kc5Mgvs471Ta5SvYWyQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "This is such a cool place! They have a nice vibe and even rooms for karaoke. Security was friendly from the time we walked in the door and we were seated swiftly. The ambience was beautiful with the dim lighting and candles on the tables. It was also cool to see the fresh sushi window in the back, where the chef prepared some items. We ordered the crab Rangoon and wings first and they tasted great! They were both a perfect crisp and savory flavor. I loved the lime on the side with my pad Thai dish. It created a good touch with the meal. As a lover of crab, the rice made me happy as well. This is a great spot to kick it on a chill evening."
+    },
+    {
+      "review_id": "P0LHBxqq_Ehm0Dct-_49bA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Later she comes back with a new bowl that IS vegetarian and explain that the two soup are next to each other in the kitchen and it was the kitchen's mistake and they are so sorry.  \n\nI get that there are mistaken in restaurants all the time BUT IMO with the amount of people that are allergic to shellfish, why would you have the two soup next to each other. Plus I thought it was not appropriate on how the server told my friend the first time that she was wrong.  Since I didn't see the bill in the end (just handed over my portion) I'm not sure if they compted the soup or not. \n\nOther than that, I'm not sure what goes into getting the rights for songs but the song selection is mediocre and some of the videos for the songs feel like they were filmed in another decade in other countries."
+    },
+    {
+      "review_id": "ilxNqhBUa4RMq59r6m95dw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "I went there because I was craving sushi. It was during happy hour so I figured why not give them a try. Ok, so I order my drink and it's good. I then try to order sushi and the bartender tells me they don't serve sushi., at this point I'm pissed and I'm confused at this point because their online menu has sushi on it. Anyways, I order the seafood egg rolls and it was absolutely disgusting- like straight from the freezer and fried. Then I had the seafood steamed dumplings and they were also nasty. The bartender was very nice. While the food wasn't the best I would go back because they play great music and the drinks are good."
+    },
+    {
+      "review_id": "8xMi_-uvlj1ND1rCDMNPIw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "I went here after a concert at the Troc in Philly for after show drinks and eats.  It took more than a few minutes to get served at the bar.  I ordered 3 apps -- crab rangoon, pork dumplings, and chicken fingers.  The food was average.  The crab rangoon tasted like all cream cheese, not much crab.  The pork dumplings were good, and were filled with a nice portion of meat.  The chicken fingers were basically a piece of chicken katsu sliced up, not what I was expecting.  It was okay. The music was way too loud at times, and it was hard to have a table conversation. It served its purpose for getting food after the show, but don't think I would go out of my way to go here anytime soon."
+    },
+    {
+      "review_id": "FNY8J9uomrQ9UZbOGYYexw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Awful experience, they are fooling their customers by making us sign contract at the very beginning that we are confirming to pay 20% of gratuity which is ok for us but the base they take for calculation is not fair. We bought coupon on groupon for 2 hours including food for 50$, and our check was 50$, but gratuity was calculated from 100$. Literally, we paid 40% of our check for tips which eliminate advantage of discount. We did not find many songs, the system is not very comfortable to use and search quickly for the songs. Food prices are affordable and dishes are big."
+    },
+    {
+      "review_id": "NNtzNyAiewhqsEAk-654Vw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Thai Sweet Chilli Wings $8.00\nI forget what it is called but they have an awesome soup too it's very popular I get it with beef because I'm allergic to shellfish but I hear wonderful things about the seafood soup. \n\nThey have a great happy hour and ladies?... On Wednesdays the first 50 girls get a free drink! They also have daily drink specials all night and happy hour has food on sale too (some of those skewers I mentioned). Can't beat it! \n\nStaff is excellent. Victor, Layla, and Tiki, should be among the first on your list to make you a drink they make sure you have a good time! Simon is the hardest working guy you'll ever see lol. he's a sweetie pie. I'm not done listing folks I tell ya the staff is great! I will be back to edit this review to add some more names! The owner?... Such a great guy!"
+    },
+    {
+      "review_id": "S7093-L9GA9VMUC6UdE2gw",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Overrated, crowded, and you call that VIP? Drinks are too expensive."
+    },
+    {
+      "review_id": "q1EP0WYhIqDHUdVVqy_EuA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Nope. Just nope.  Don't do it.  So many other places that do karaoke and food so much better, not to mention ambiance and service. Came here after watching a show at Trocadero.  We had already paid for parking (right next door) so rather than leave the area and go someplace else, we decided to go to Tango mainly because of proximity. We didn't check Yelp first, what were we thinking!?!?\n\nThis place needs a major overhaul. My bar chair was barely being held together, it easily swayed 2-3 inches in any direction as I sat on it.  Yikes.  I was scared to move.  Bar had one bartender for a Friday night and barback was in training. He actually took my honey's drink away before he even finished it R.I.P. spice rum & coke. The bartender was busy to say the least and tried his best to tend to us quickly but he busts couldn't keep up with the crowd."
+    },
+    {
+      "review_id": "jpujAPeUY4psvSpWnfeq6Q",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "My friend asked to close his tab and it took 10 minutes for the bartender to print out the receipt and hand my friend his card back. I don't remember the bartender's name, but he seemed too busy dancing by himself or socializing with people he knew. Really dude?\n\nBesides these few cons, Tango is definitely a dope spot to go to in Chinatown. They have decent happy hour specials and fairly priced drink specials on certain days. I'll definitely be back."
+    },
+    {
+      "review_id": "z966NIKFn3gGUhO8ImrdoQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Why the manager on duty decided to have a new waitress wait on my party on a busy Friday night is beyond me. She screwed up our food orders multiple times, took a while to come back with our food, then messed up with the bill. I'm not blaming the waitress- it's not her fault. I blame management for not having anyone assist her with our large party on a busy night. I was expecting the sushi to be great, but I've had better from local grocery stores. \nThe bar staff wasn't friendly, and the drink I ordered didn't taste great either. \nThe only reason why I'm giving two stars is because I liked my entree (chicken and broccoli) and the party room I rented was a nice atmosphere. \nI would not visit this place again or recommend it. There are much better places to spend an evening out in Philly."
+    },
+    {
+      "review_id": "13h7QTmrqSVVPu0ZVsVVMA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Had a great time here at the soft opening night! This is the new sweet lounge bar to hit with friends in Philly. If you love Ramen, Karaoke, drinks and are looking for a new modern and stylist bar, come to TANGO~!\n\nOn the first floor, there's a bar and seating available to grab a bit to eat. On the menu, there are lots of great drinks and food to choose from. We grabbed a booth and tried the Sweet Thai Chicken Wings, Salt Baked Wings, Veg Tempera, Pork Belly Ramen noodles, Pork Katsu, Teriyaki Steak and Fried Squid Rings. Our favorite was the Sweet Thai Chicken Wings, it was flavorful, crunchy and perfect to go with any drink! Everything was very fresh and kicking with flavor and the steak was juicy and filling. \n\nWe also visited the bar upstairs, the bar was already so packed by 10 pm so we grabbed a room and had more DELICIOUS DRINKS!"
+    },
+    {
+      "review_id": "V0S5RerZPM9zndaaqL7t_w",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Nothing disappointed honestly. Everything was pretty top notch even including the waitress service who was attentive and helpful throughout the entire time and assisted with guiding and navigating us through the karaoke software. \n\nIf you're into the karaoke thing and want something that has the upscale city look, than this is truly the place to have an event. I'd go back and would definitely recommend."
+    },
+    {
+      "review_id": "lrs6dL5ADlPE7HpihcueVg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "This place is absolutely the worse. Over priced for nothing. Booked this for my daughters 21st birthday party, was 150 a hour for max time of 2 hours. Or you buy 300 dollars worth of food and drinks. Plus 20% gratuity. The food was ok. People didn't really eat it. So at the end of the night. The waiter packed it up for us. What should have been about 4 containers of food left over we only got 2. The waiter seemed very disinterested in serving, so what the 20% was for I don't know other then to rip off the customer. The music selection was pretty bad. Not to much old school or newer music. If you go with a large group they will only split the bill 3 ways. So be careful with a large party ur bill could be over 300 quickly. After your 2 hrs are up u have the option to go upstairs which was small with 2 sections blocked off for VIP. In order to set there in VIP u had to order a 150$ bottle."
+    },
+    {
+      "review_id": "L8LTX3sTNpUKmLFVxHq9JA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "The service was abysmal and delayed. The management was in disarray and couldn't even manage reservations. I would discourage Tango from hosting parties as large as ours (30) because they were clearly too incompetent to serve us."
+    },
+    {
+      "review_id": "_wTQ-l6Q7GOncz_WZ0DGEA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Reserved a room for karaoke. Party of five, two hours, $50/hr., no room charge if you drink at least $50/hr.. Not bad... Matches NY price. \nThe waitress was great, really sweet and kind... I thought we were gonna get some snobby girl, thank god she turned out to be so wonderful.\n\nAppetizer and drink prices were pretty decent, you really get what you pay for. No water down drinks...They have some really great specials. Songs are very up to date. Service was great. \n\nNo complaint here."
+    },
+    {
+      "review_id": "cED0AyxVT1ulK0or8FxgTQ",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "Downfalls: The machine is very complicated to use so we had to tolerate hearing the mics louder than the music and it was longer finding and picking songs.  The thing that upset me the most was I called a few times to clarify my living socal deal since it was too good to be true and I asked every single time what I needed to pay for.  We even clarified gratuity on the $100 which would be $20, but when the party was over I was given a bill for gratuity on the total of the room which was $300(which I did not pay for since that was the living social deal) and the food.  I was very disappointed I wasn't given the proper information as many times as my OCD self asked.  \nParking around the corner on 10th in the garage only cost us $8 for 3hrs unlike the lot next to Tango which was super expensive.\nAll in all the kids and the few adults had a ball and the food was so delicious!!!"
+    },
+    {
+      "review_id": "xSN7dAKKexYfCvEeyVWqGA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "I've been here twice now with some friends and we have fun. I have not been to other places so I don't know how it compares. But we like this spot. \n\nThe people serving us were really nice and fun. They even got in on in the signing when we invited them to sing along. \n\nWhen it comes to food it's about what you would expect. I would put it on the same level as Applebee's and a corner store takeout spot. They also have some deals on Groupon so that's nice. If you're looking for a fun hangout check this place out."
+    },
+    {
+      "review_id": "PwB3NKHS_1s7Oa9z-lMZeA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "You would need to reserve a room and a room size ahead of time. \n\nThe big thing is that Tango just opened up not too long ago, so you can get the room special during the weekends versus Yakitori boy where the special is like Monday-Thursday (Yaki does have these specials during holidays and random weekends too). \n\nI hear the waitresses here are alot cuter too. \n\nThe one thing I have to say/complain about is the food. The menu is so small and overpriced. If you're looking to drink and eat, I'd go to Yakitori Boy. But the whole night, we ate crab rangoons and stuff like that. I was still hungry at the end of the night, and if you go with friends who drink.. most likely you're paying for their drinks. If you're just looking to drink and eating something so that you don't get too drunk too fast, Tango is fine. \n\nThe food was okay.."
+    },
+    {
+      "review_id": "C8vPwsZAu4w8KBqH-Byb9w",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "I give the one star to the staff downstairs because they seemed pleasant during our brief interaction. \n\nNothing else about this place is enjoyable. The drinks are watered down, the karoake list is obscure and lacking, the lyrics lag far behind the song's pace and the upstairs servers were extremely unwelcoming.\n\nI'm actually convinced that the two young women who work upstairs are conspiring against the owner to get the place shut down. They seemed annoyed by the presence of customers and were wrapped up wholly in their conversation, halting it only to begrudgingly serve us drinks and eye rolls. \n\nBad music selection and laggy machinery can be overlooked but horrible service should never be acceptable."
+    },
+    {
+      "review_id": "N7nYRDk2fH3PS-zlPbnXmg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "ambiguous",
+      "full_review_reference_label": "ambiguous",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "ambiguous",
+      "matched_segment_text": "I came here with my friends to watch the Philadelphia Eagles play and grab a few drinks and a bite to eat. It was a good experience overall. The bouncer was relax and chill along with the bartender. My friends and I sat at the bar and there was tons of space even for a popular game. \n\nI ordered the takoyaki and the Szechuan fried wings. The takoyaki was not bad while the wings were a new taste. It wasn't too too spicy but had a good flavor. I think the big selling point was that there wasn't alot of people and the servers were really attentive and wanted to talk.\n\nOverall, the experience was pretty good. It renewed my opinion an impression of the place. I'll probably stop by again with some friends again.\n\n\nOverall: 3 (Rounded)\nFood: 4\nService: 3.5\nPrice: 3\nAtmosphere: 3"
+    },
+    {
+      "review_id": "-66ACLvNGwPf4LT2s0SwsA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "Super Updated!!! They put some money in this one high end lights and laser light shows with multiple colors this place is great! Now they have 2 bar spots where previously it was 1 super long bar, I should've taken pictures but you'll just have to go there to see it. I'm not sure about the food but it looked good, this place is super cool to take your friends or date to I highly recommend it! They have rooms to rent out and do private karaoke which is awesome and great for birthdays. Don't forget to tip your bartenders ;)"
+    },
+    {
+      "review_id": "IeJtajWgCxOuTOVc2rBdtg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "This is a chill hang-out kind of bar (downstairs).  I love the space - it's very open and relaxed, with the bar open completely to the street when it's nice out.\n\nWe were there on a Friday night, and it was pretty quiet; but I kind of like that.  You can actually have a conversation without losing your voice. \n\nI did not eat the food, so I cannot comment on it (although my sister did not care for her appetizers); but the lychee martini is probably one of the best one in and around Philly.  I'd come drink here again."
+    },
+    {
+      "review_id": "B4MUJFjhew5bAMELvFSiWA",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "This review is for the second floor karaoke experience only; haven't ordered anything on the regular menu to date....\n\nI've been here several times, both for happy hour and I also held a private party here. This place is quickly becoming 'my spot' for a great time, no matter what day of the week. The selection of songs is current, the bartenders are friendly, the guy DJ is awesome!!! (haven't met the lady DJ yet) and the crowd that tends to roll in after 9pm is hilarious; I always have had a great time!\n\nThe only reason why they aren't 5 stars was due to my experience renting a private karaoke room. Things seemed a bit disorganized with the staff and the self-serve karaoke machine wasn't very intuitive. \n\nI'll be hitting up this place quite frequently! Great layout, great music, great crowd!"
+    },
+    {
+      "review_id": "VoGtc4AuJEBFqDZDDlrIug",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "i booked a private karaoke room with groupon, made a reservation ahead for a group of 10.  but when arrived, not only hostess didn't have my name there and also was told i didn't  reserve a room but just an open karaoke tables, i don't know why these employees are so lack of common sense when i mentioned i reserved a private room over the phone and groupon said priviate room too.   we have 12 people waiting for almost half hour and still no room, and ended up leaving to another restaurant instead of karaoke, what a disappointment and bad experience!!!"
+    },
+    {
+      "review_id": "EdVmYE-lDkEFj6LKw7kacg",
+      "business_id": "tngXF4K4cojGHn-4PUpBLQ",
+      "business_name": "Tango",
+      "segment_reference_label": "irrelevant",
+      "full_review_reference_label": "irrelevant",
+      "version_1_label": "ambiguous",
+      "version_2_label": "irrelevant",
+      "version_3_label": "irrelevant",
+      "matched_segment_text": "I'll be honest I was 50/50 going to this place. But I'm glad my group of friends went there. So the setup is downstairs there is a DJ and upstairs is a Karaoke bar and you can also get private rooms, there were 5 of us so we decided just to have fun in the actual Karaoke bar. We all liked the experience! Singing with every random stranger and of course some dancing. Price here is great! Not expensive and not cheap! We got in around 11:30p and left around 1:30a. It wasn't too crowded for a Saturday. Will be back again to try more food and mixed drinks"
+    }
+  ]
+}

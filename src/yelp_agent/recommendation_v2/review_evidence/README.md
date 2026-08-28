@@ -35,6 +35,9 @@
 - `ranker.py`：多偏好、评分和距离的最终融合。
 - `runtime.py`：连接本地 Qdrant、本地向量模型和 DeepSeek。
 - `steak_real_api_demo.py`：真实执行“我想吃牛排”并保存完整结果。
+- `cross_encoder_judge.py`：第二版实验，先判断相关，再尝试区分正反。
+- `qwen_five_class.py`：第三版实验的单一入口，只返回五类之一。
+- `qwen_five_class_worker.py`：让 Qwen2.5-3B 常驻显卡并批量执行五选一。
 
 ## 本地数据位置
 

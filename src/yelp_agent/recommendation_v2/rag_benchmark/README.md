@@ -40,3 +40,24 @@ recommendation_v2/data/rag_benchmark/v1/cases/<case_id>/
 - 按意思和按关键词同时找，再按两边名次合并。
 
 每个组合默认重复三次，分别保存启动耗时、查询说法向量化耗时、两条查询路线耗时、合并耗时、召回数量和正确答案召回率。结果写入案例的 `audit/retrieval_ablation.json`。这项实验不修改评论正反方向、时间数量聚合和商家评分。
+
+## 三种评论方向判断对比
+
+当前保留三种相互独立的实验实现，不会彼此覆盖：
+
+1. 正面、反面检索说法分别计算相似度，再按差值判断；
+2. 本地交叉判断模型先判断相关，再判断正反；
+3. `Qwen2.5-3B-Instruct` 读取要求和评论片段，输出“无关、正面、反面、正反都有、无法判断”五类之一。
+
+第三版在 `qwen_five_class_experiment.py` 中运行。模型输出端只允许 `A` 到 `E` 五个单独标签，业务结果只保存最终类别，不把内部数值伪装成置信度。对比时三个版本必须使用同一批评论片段；完整评论中的正确证据没有落入当前片段时，该片段不能被算成正确证据。
+
+真实对比结果写入：
+
+```text
+recommendation_v2/data/rag_benchmark/v1/experiments/
+  qwen_five_class_authentic_szechuan_0001/
+    three_version_comparison.json
+    three_version_comparison.md
+```
+
+第三版目前只是评测版本，没有接入正式排序。后续轻量微调只需替换五分类模块内部模型，不需要修改评论召回和前两个版本。
