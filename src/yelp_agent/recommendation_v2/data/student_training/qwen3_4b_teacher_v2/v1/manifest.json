@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "source_dataset": "teacher_dataset/v2",
+  "sample_count": 2142,
+  "unique_review_count": 1897,
+  "split_rule": "grouped_by_review_id",
+  "split_ratios": {
+    "train": 0.8,
+    "validation": 0.1,
+    "test": 0.1
+  },
+  "seed": 20260831,
+  "split_search_trials": 1024,
+  "chosen_trial": 379,
+  "sample_counts": {
+    "train": 1723,
+    "validation": 220,
+    "test": 199
+  },
+  "unique_review_counts": {
+    "train": 1518,
+    "validation": 190,
+    "test": 189
+  },
+  "review_leakage_count": 0,
+  "system_prompt_sha256": "45c054e45158498ad72b03a911fcddd51e136971f63178fa7be78106021c02af",
+  "character_lengths": {
+    "model_input": {
+      "minimum": 433,
+      "average": 971.99,
+      "p50": 975,
+      "p90": 1317,
+      "p95": 1331,
+      "p99": 1355,
+      "maximum": 1364
+    },
+    "review_text": {
+      "minimum": 33,
+      "average": 538.94,
+      "p50": 538,
+      "p90": 881,
+      "p95": 893,
+      "p99": 900,
+      "maximum": 900
+    },
+    "note": "字符数不是模型词元数；上传模型后仍需用真实tokenizer检查截断。"
+  },
+  "test_set_status": "teacher_labeled_not_manually_verified",
+  "model_visible_fields": {
+    "user": [
+      "aspect_id",
+      "definition",
+      "relevance_scale",
+      "strength_scale",
+      "special_rules",
+      "review_text"
+    ],
+    "assistant": [
+      "relevance",
+      "strength"
+    ]
+  },
+  "trace_only_fields": [
+    "sample_id",
+    "review_id",
+    "business_id",
+    "aspect_id",
+    "split",
+    "line_number"
+  ],
+  "files": {
+    "train.jsonl": {
+      "bytes": 3743540,
+      "sha256": "837c946e1befef0541889780177dcfc32335d38c453562074c109e0c2899bf16"
+    },
+    "validation.jsonl": {
+      "bytes": 482155,
+      "sha256": "f9bb14517b632fcfb141bd4007df5a02e8e0d9129bdcc6a61473f53b036461cc"
+    },
+    "test.jsonl": {
+      "bytes": 432262,
+      "sha256": "8ed029534c9613663d5c7700565a9632fbde04fd8166d769aea23b257b4fab50"
+    },
+    "split_index.jsonl": {
+      "bytes": 370643,
+      "sha256": "27659b37190bcd913d07e8c0889208b5e929657845505aabd14d7da19986492e"
+    },
+    "dataset_info.json": {
+      "bytes": 994,
+      "sha256": "1e458da75bf2a009e351cafefc1807bf12fc9bc477acd724ccd13068b1269766"
+    },
+    "distribution.json": {
+      "bytes": 14758,
+      "sha256": "0e69e9702d9918ce58b1882955c7509a1864921ef006dc57e69dcd096f09cee4"
+    }
+  }
+}

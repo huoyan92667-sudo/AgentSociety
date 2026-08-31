@@ -1,0 +1,41 @@
+### 先用64条数据确认AutoDL环境、显存和输出格式都正常。
+model_name_or_path: Qwen/Qwen3-4B-Instruct-2507
+trust_remote_code: true
+quantization_bit: 4
+quantization_method: bnb
+
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+dataset_dir: src/yelp_agent/recommendation_v2/data/student_training/qwen3_4b_teacher_v2/v1
+dataset: teacher_v2_train
+eval_dataset: teacher_v2_validation
+template: qwen3_nothink
+cutoff_len: 1024
+max_samples: 64
+overwrite_cache: true
+preprocessing_num_workers: 4
+dataloader_num_workers: 2
+
+output_dir: outputs/qwen3-4b-teacher-v2/smoke
+overwrite_output_dir: true
+logging_steps: 1
+save_steps: 20
+eval_steps: 20
+eval_strategy: steps
+plot_loss: true
+report_to: none
+
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+learning_rate: 0.0001
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+seed: 20260831

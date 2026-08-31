@@ -1,0 +1,44 @@
+### 24GB显卡上的第一版正式基线；爆显存时把batch_size改为1、累计次数改为16。
+model_name_or_path: Qwen/Qwen3-4B-Instruct-2507
+trust_remote_code: true
+quantization_bit: 4
+quantization_method: bnb
+
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 8
+lora_target: all
+
+dataset_dir: src/yelp_agent/recommendation_v2/data/student_training/qwen3_4b_teacher_v2/v1
+dataset: teacher_v2_train
+eval_dataset: teacher_v2_validation
+template: qwen3_nothink
+cutoff_len: 1024
+overwrite_cache: true
+preprocessing_num_workers: 8
+dataloader_num_workers: 4
+
+output_dir: outputs/qwen3-4b-teacher-v2/baseline
+overwrite_output_dir: true
+logging_steps: 5
+save_steps: 25
+eval_steps: 25
+eval_strategy: steps
+save_total_limit: 3
+load_best_model_at_end: true
+metric_for_best_model: eval_loss
+greater_is_better: false
+plot_loss: true
+report_to: none
+
+per_device_train_batch_size: 2
+per_device_eval_batch_size: 2
+gradient_accumulation_steps: 8
+gradient_checkpointing: true
+learning_rate: 0.0001
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+seed: 20260831

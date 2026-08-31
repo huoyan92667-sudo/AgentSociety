@@ -1,0 +1,782 @@
+{
+  "train": {
+    "sample_count": 1723,
+    "unique_review_count": 1518,
+    "aspect_counts": {
+      "cleanliness": 121,
+      "crowded": 116,
+      "date_suitable": 124,
+      "family_friendly": 124,
+      "food_quality": 126,
+      "group_suitable": 123,
+      "parking": 127,
+      "pet_friendly": 128,
+      "portion_size": 123,
+      "price_value": 123,
+      "queue_time": 121,
+      "quiet_environment": 124,
+      "service": 123,
+      "spiciness": 120
+    },
+    "relevance_counts": {
+      "0": 331,
+      "1": 89,
+      "2": 163,
+      "3": 1140
+    },
+    "strength_counts": {
+      "0": 323,
+      "1": 325,
+      "2": 157,
+      "3": 276,
+      "4": 311,
+      "null": 331
+    },
+    "by_aspect": {
+      "cleanliness": {
+        "relevance": {
+          "0": 26,
+          "1": 1,
+          "2": 13,
+          "3": 81
+        },
+        "strength": {
+          "0": 33,
+          "1": 25,
+          "2": 8,
+          "3": 4,
+          "4": 25,
+          "null": 26
+        }
+      },
+      "crowded": {
+        "relevance": {
+          "0": 25,
+          "1": 8,
+          "2": 15,
+          "3": 68
+        },
+        "strength": {
+          "0": 10,
+          "1": 29,
+          "2": 11,
+          "3": 19,
+          "4": 22,
+          "null": 25
+        }
+      },
+      "date_suitable": {
+        "relevance": {
+          "0": 14,
+          "1": 27,
+          "2": 10,
+          "3": 73
+        },
+        "strength": {
+          "0": 7,
+          "1": 17,
+          "2": 15,
+          "3": 29,
+          "4": 42,
+          "null": 14
+        }
+      },
+      "family_friendly": {
+        "relevance": {
+          "0": 18,
+          "1": 6,
+          "2": 13,
+          "3": 87
+        },
+        "strength": {
+          "0": 17,
+          "1": 19,
+          "2": 7,
+          "3": 41,
+          "4": 22,
+          "null": 18
+        }
+      },
+      "food_quality": {
+        "relevance": {
+          "0": 1,
+          "1": 0,
+          "2": 6,
+          "3": 119
+        },
+        "strength": {
+          "0": 36,
+          "1": 39,
+          "2": 10,
+          "3": 14,
+          "4": 26,
+          "null": 1
+        }
+      },
+      "group_suitable": {
+        "relevance": {
+          "0": 17,
+          "1": 8,
+          "2": 9,
+          "3": 89
+        },
+        "strength": {
+          "0": 7,
+          "1": 26,
+          "2": 16,
+          "3": 25,
+          "4": 32,
+          "null": 17
+        }
+      },
+      "parking": {
+        "relevance": {
+          "0": 51,
+          "1": 0,
+          "2": 13,
+          "3": 63
+        },
+        "strength": {
+          "0": 7,
+          "1": 27,
+          "2": 8,
+          "3": 12,
+          "4": 22,
+          "null": 51
+        }
+      },
+      "pet_friendly": {
+        "relevance": {
+          "0": 36,
+          "1": 11,
+          "2": 15,
+          "3": 66
+        },
+        "strength": {
+          "0": 16,
+          "1": 7,
+          "2": 15,
+          "3": 26,
+          "4": 28,
+          "null": 36
+        }
+      },
+      "portion_size": {
+        "relevance": {
+          "0": 26,
+          "1": 1,
+          "2": 9,
+          "3": 87
+        },
+        "strength": {
+          "0": 22,
+          "1": 25,
+          "2": 4,
+          "3": 17,
+          "4": 29,
+          "null": 26
+        }
+      },
+      "price_value": {
+        "relevance": {
+          "0": 23,
+          "1": 7,
+          "2": 14,
+          "3": 79
+        },
+        "strength": {
+          "0": 23,
+          "1": 41,
+          "2": 12,
+          "3": 17,
+          "4": 7,
+          "null": 23
+        }
+      },
+      "queue_time": {
+        "relevance": {
+          "0": 31,
+          "1": 6,
+          "2": 22,
+          "3": 62
+        },
+        "strength": {
+          "0": 30,
+          "1": 8,
+          "2": 10,
+          "3": 21,
+          "4": 21,
+          "null": 31
+        }
+      },
+      "quiet_environment": {
+        "relevance": {
+          "0": 24,
+          "1": 5,
+          "2": 3,
+          "3": 92
+        },
+        "strength": {
+          "0": 45,
+          "1": 28,
+          "2": 8,
+          "3": 12,
+          "4": 7,
+          "null": 24
+        }
+      },
+      "service": {
+        "relevance": {
+          "0": 10,
+          "1": 1,
+          "2": 9,
+          "3": 103
+        },
+        "strength": {
+          "0": 60,
+          "1": 23,
+          "2": 8,
+          "3": 11,
+          "4": 11,
+          "null": 10
+        }
+      },
+      "spiciness": {
+        "relevance": {
+          "0": 29,
+          "1": 8,
+          "2": 12,
+          "3": 71
+        },
+        "strength": {
+          "0": 10,
+          "1": 11,
+          "2": 25,
+          "3": 28,
+          "4": 17,
+          "null": 29
+        }
+      }
+    }
+  },
+  "validation": {
+    "sample_count": 220,
+    "unique_review_count": 190,
+    "aspect_counts": {
+      "cleanliness": 17,
+      "crowded": 21,
+      "date_suitable": 18,
+      "family_friendly": 16,
+      "food_quality": 11,
+      "group_suitable": 19,
+      "parking": 10,
+      "pet_friendly": 14,
+      "portion_size": 19,
+      "price_value": 13,
+      "queue_time": 11,
+      "quiet_environment": 15,
+      "service": 18,
+      "spiciness": 18
+    },
+    "relevance_counts": {
+      "0": 45,
+      "1": 11,
+      "2": 20,
+      "3": 144
+    },
+    "strength_counts": {
+      "0": 42,
+      "1": 42,
+      "2": 21,
+      "3": 33,
+      "4": 37,
+      "null": 45
+    },
+    "by_aspect": {
+      "cleanliness": {
+        "relevance": {
+          "0": 5,
+          "1": 0,
+          "2": 2,
+          "3": 10
+        },
+        "strength": {
+          "0": 5,
+          "1": 4,
+          "2": 0,
+          "3": 0,
+          "4": 3,
+          "null": 5
+        }
+      },
+      "crowded": {
+        "relevance": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 15
+        },
+        "strength": {
+          "0": 3,
+          "1": 7,
+          "2": 3,
+          "3": 2,
+          "4": 4,
+          "null": 2
+        }
+      },
+      "date_suitable": {
+        "relevance": {
+          "0": 3,
+          "1": 5,
+          "2": 1,
+          "3": 9
+        },
+        "strength": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 7,
+          "4": 5,
+          "null": 3
+        }
+      },
+      "family_friendly": {
+        "relevance": {
+          "0": 2,
+          "1": 0,
+          "2": 1,
+          "3": 13
+        },
+        "strength": {
+          "0": 3,
+          "1": 4,
+          "2": 2,
+          "3": 4,
+          "4": 1,
+          "null": 2
+        }
+      },
+      "food_quality": {
+        "relevance": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 11
+        },
+        "strength": {
+          "0": 2,
+          "1": 2,
+          "2": 2,
+          "3": 1,
+          "4": 4,
+          "null": 0
+        }
+      },
+      "group_suitable": {
+        "relevance": {
+          "0": 4,
+          "1": 0,
+          "2": 3,
+          "3": 12
+        },
+        "strength": {
+          "0": 1,
+          "1": 4,
+          "2": 3,
+          "3": 3,
+          "4": 4,
+          "null": 4
+        }
+      },
+      "parking": {
+        "relevance": {
+          "0": 3,
+          "1": 0,
+          "2": 2,
+          "3": 5
+        },
+        "strength": {
+          "0": 0,
+          "1": 2,
+          "2": 2,
+          "3": 1,
+          "4": 2,
+          "null": 3
+        }
+      },
+      "pet_friendly": {
+        "relevance": {
+          "0": 3,
+          "1": 1,
+          "2": 2,
+          "3": 8
+        },
+        "strength": {
+          "0": 3,
+          "1": 1,
+          "2": 1,
+          "3": 3,
+          "4": 3,
+          "null": 3
+        }
+      },
+      "portion_size": {
+        "relevance": {
+          "0": 5,
+          "1": 0,
+          "2": 0,
+          "3": 14
+        },
+        "strength": {
+          "0": 6,
+          "1": 4,
+          "2": 2,
+          "3": 0,
+          "4": 2,
+          "null": 5
+        }
+      },
+      "price_value": {
+        "relevance": {
+          "0": 3,
+          "1": 1,
+          "2": 2,
+          "3": 7
+        },
+        "strength": {
+          "0": 1,
+          "1": 3,
+          "2": 0,
+          "3": 4,
+          "4": 2,
+          "null": 3
+        }
+      },
+      "queue_time": {
+        "relevance": {
+          "0": 5,
+          "1": 0,
+          "2": 0,
+          "3": 6
+        },
+        "strength": {
+          "0": 2,
+          "1": 0,
+          "2": 0,
+          "3": 1,
+          "4": 3,
+          "null": 5
+        }
+      },
+      "quiet_environment": {
+        "relevance": {
+          "0": 4,
+          "1": 0,
+          "2": 0,
+          "3": 11
+        },
+        "strength": {
+          "0": 5,
+          "1": 5,
+          "2": 0,
+          "3": 0,
+          "4": 1,
+          "null": 4
+        }
+      },
+      "service": {
+        "relevance": {
+          "0": 1,
+          "1": 0,
+          "2": 2,
+          "3": 15
+        },
+        "strength": {
+          "0": 10,
+          "1": 2,
+          "2": 0,
+          "3": 3,
+          "4": 2,
+          "null": 1
+        }
+      },
+      "spiciness": {
+        "relevance": {
+          "0": 5,
+          "1": 2,
+          "2": 3,
+          "3": 8
+        },
+        "strength": {
+          "0": 0,
+          "1": 3,
+          "2": 5,
+          "3": 4,
+          "4": 1,
+          "null": 5
+        }
+      }
+    }
+  },
+  "test": {
+    "sample_count": 199,
+    "unique_review_count": 189,
+    "aspect_counts": {
+      "cleanliness": 15,
+      "crowded": 16,
+      "date_suitable": 11,
+      "family_friendly": 13,
+      "food_quality": 16,
+      "group_suitable": 11,
+      "parking": 16,
+      "pet_friendly": 11,
+      "portion_size": 11,
+      "price_value": 17,
+      "queue_time": 21,
+      "quiet_environment": 14,
+      "service": 12,
+      "spiciness": 15
+    },
+    "relevance_counts": {
+      "0": 33,
+      "1": 6,
+      "2": 16,
+      "3": 144
+    },
+    "strength_counts": {
+      "0": 48,
+      "1": 35,
+      "2": 15,
+      "3": 31,
+      "4": 37,
+      "null": 33
+    },
+    "by_aspect": {
+      "cleanliness": {
+        "relevance": {
+          "0": 2,
+          "1": 0,
+          "2": 1,
+          "3": 12
+        },
+        "strength": {
+          "0": 3,
+          "1": 6,
+          "2": 0,
+          "3": 1,
+          "4": 3,
+          "null": 2
+        }
+      },
+      "crowded": {
+        "relevance": {
+          "0": 5,
+          "1": 0,
+          "2": 2,
+          "3": 9
+        },
+        "strength": {
+          "0": 1,
+          "1": 2,
+          "2": 0,
+          "3": 5,
+          "4": 3,
+          "null": 5
+        }
+      },
+      "date_suitable": {
+        "relevance": {
+          "0": 1,
+          "1": 3,
+          "2": 0,
+          "3": 7
+        },
+        "strength": {
+          "0": 1,
+          "1": 2,
+          "2": 1,
+          "3": 1,
+          "4": 5,
+          "null": 1
+        }
+      },
+      "family_friendly": {
+        "relevance": {
+          "0": 4,
+          "1": 1,
+          "2": 1,
+          "3": 7
+        },
+        "strength": {
+          "0": 2,
+          "1": 2,
+          "2": 1,
+          "3": 3,
+          "4": 1,
+          "null": 4
+        }
+      },
+      "food_quality": {
+        "relevance": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 16
+        },
+        "strength": {
+          "0": 9,
+          "1": 2,
+          "2": 1,
+          "3": 3,
+          "4": 1,
+          "null": 0
+        }
+      },
+      "group_suitable": {
+        "relevance": {
+          "0": 2,
+          "1": 1,
+          "2": 1,
+          "3": 7
+        },
+        "strength": {
+          "0": 2,
+          "1": 1,
+          "2": 2,
+          "3": 2,
+          "4": 2,
+          "null": 2
+        }
+      },
+      "parking": {
+        "relevance": {
+          "0": 5,
+          "1": 0,
+          "2": 2,
+          "3": 9
+        },
+        "strength": {
+          "0": 0,
+          "1": 4,
+          "2": 1,
+          "3": 2,
+          "4": 4,
+          "null": 5
+        }
+      },
+      "pet_friendly": {
+        "relevance": {
+          "0": 1,
+          "1": 0,
+          "2": 3,
+          "3": 7
+        },
+        "strength": {
+          "0": 2,
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 2,
+          "null": 1
+        }
+      },
+      "portion_size": {
+        "relevance": {
+          "0": 2,
+          "1": 0,
+          "2": 0,
+          "3": 9
+        },
+        "strength": {
+          "0": 3,
+          "1": 2,
+          "2": 1,
+          "3": 1,
+          "4": 2,
+          "null": 2
+        }
+      },
+      "price_value": {
+        "relevance": {
+          "0": 2,
+          "1": 0,
+          "2": 1,
+          "3": 14
+        },
+        "strength": {
+          "0": 6,
+          "1": 4,
+          "2": 1,
+          "3": 3,
+          "4": 1,
+          "null": 2
+        }
+      },
+      "queue_time": {
+        "relevance": {
+          "0": 5,
+          "1": 1,
+          "2": 2,
+          "3": 13
+        },
+        "strength": {
+          "0": 8,
+          "1": 0,
+          "2": 2,
+          "3": 1,
+          "4": 5,
+          "null": 5
+        }
+      },
+      "quiet_environment": {
+        "relevance": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 13
+        },
+        "strength": {
+          "0": 5,
+          "1": 6,
+          "2": 0,
+          "3": 0,
+          "4": 2,
+          "null": 1
+        }
+      },
+      "service": {
+        "relevance": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 12
+        },
+        "strength": {
+          "0": 6,
+          "1": 0,
+          "2": 1,
+          "3": 3,
+          "4": 2,
+          "null": 0
+        }
+      },
+      "spiciness": {
+        "relevance": {
+          "0": 3,
+          "1": 0,
+          "2": 3,
+          "3": 9
+        },
+        "strength": {
+          "0": 0,
+          "1": 3,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "null": 3
+        }
+      }
+    }
+  }
+}
