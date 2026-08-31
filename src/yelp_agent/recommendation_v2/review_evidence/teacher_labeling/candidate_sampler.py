@@ -257,10 +257,15 @@ def _select_bucket(
         for row in pool:
             if len(selected) >= count:
                 break
+            review_id = str(row["review_id"])
+            # 第二轮会再次遍历同一个候选池；必须跳过第一轮已加入的评论，
+            # 否则同一条评论会占据两个训练样本位置。
+            if review_id in used:
+                continue
             if distinct_business and row["business_id"] in businesses:
                 continue
-            selected.append(row)
-            used.add(str(row["review_id"]))
+            selected.append(dict(row))
+            used.add(review_id)
             businesses.add(str(row["business_id"]))
         if len(selected) >= count:
             break
@@ -297,6 +302,10 @@ def _fill_bucket_by_semantic_distance(
         for row in pool:
             if len(selected) >= count:
                 break
+            review_id = str(row["review_id"])
+            # 和精确等级挑选一样，补位的第二轮也不能重复选择第一轮的评论。
+            if review_id in used:
+                continue
             if distinct_business and str(row["business_id"]) in businesses:
                 continue
             item = dict(row)
@@ -304,7 +313,7 @@ def _fill_bucket_by_semantic_distance(
             item["selection_strength"] = bucket
             item["selection_fallback"] = True
             selected.append(item)
-            used.add(str(item["review_id"]))
+            used.add(review_id)
             businesses.add(str(item["business_id"]))
         if len(selected) >= count:
             break
@@ -321,7 +330,7 @@ def build_teacher_candidates(
     output_root: str | Path,
     per_bucket: int = 5,
 ) -> dict[str, Any]:
-    """生成每种特征45条教师种子候选，并写成按特征分片的JSONL。"""
+    """按指定规模生成教师候选，并写成按特征分片的JSONL。"""
 
     if per_bucket < 1:
         raise ValueError("per_bucket must be positive")
@@ -481,7 +490,8 @@ def build_teacher_candidates(
             "unclear_added": unclear_added,
             "unrelated_added": unrelated_added,
             "fallback_bucket_count": sum(bool(item.get("selection_fallback")) for item in selected),
-            "output": str(output_path.resolve()),
+            # 清单随项目目录一起移动，因此这里只保存相对于本批数据根目录的路径。
+            "output": output_path.relative_to(destination).as_posix(),
         }
 
     manifest_path = destination / "candidate_manifest.json"

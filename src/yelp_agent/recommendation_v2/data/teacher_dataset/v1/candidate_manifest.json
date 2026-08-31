@@ -22,7 +22,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\food_quality.jsonl"
+      "output": "candidates/food_quality.jsonl"
     },
     "service": {
       "candidate_count": 45,
@@ -44,7 +44,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\service.jsonl"
+      "output": "candidates/service.jsonl"
     },
     "price_value": {
       "candidate_count": 45,
@@ -66,7 +66,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\price_value.jsonl"
+      "output": "candidates/price_value.jsonl"
     },
     "quiet_environment": {
       "candidate_count": 45,
@@ -88,7 +88,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\quiet_environment.jsonl"
+      "output": "candidates/quiet_environment.jsonl"
     },
     "crowded": {
       "candidate_count": 45,
@@ -110,7 +110,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\crowded.jsonl"
+      "output": "candidates/crowded.jsonl"
     },
     "queue_time": {
       "candidate_count": 45,
@@ -132,7 +132,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\queue_time.jsonl"
+      "output": "candidates/queue_time.jsonl"
     },
     "portion_size": {
       "candidate_count": 45,
@@ -154,7 +154,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\portion_size.jsonl"
+      "output": "candidates/portion_size.jsonl"
     },
     "parking": {
       "candidate_count": 45,
@@ -176,7 +176,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 5,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\parking.jsonl"
+      "output": "candidates/parking.jsonl"
     },
     "pet_friendly": {
       "candidate_count": 45,
@@ -190,15 +190,15 @@
       "relevance_counts": {
         "0": 5,
         "1": 15,
-        "2": 9,
-        "3": 16
+        "2": 11,
+        "3": 14
       },
       "source_relation_count": 49055,
       "unique_source_reviews": 49055,
       "unclear_added": 15,
       "unrelated_added": 5,
-      "fallback_bucket_count": 2,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\pet_friendly.jsonl"
+      "fallback_bucket_count": 6,
+      "output": "candidates/pet_friendly.jsonl"
     },
     "family_friendly": {
       "candidate_count": 45,
@@ -220,7 +220,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 5,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\family_friendly.jsonl"
+      "output": "candidates/family_friendly.jsonl"
     },
     "date_suitable": {
       "candidate_count": 45,
@@ -242,7 +242,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 10,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\date_suitable.jsonl"
+      "output": "candidates/date_suitable.jsonl"
     },
     "group_suitable": {
       "candidate_count": 45,
@@ -264,7 +264,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 10,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\group_suitable.jsonl"
+      "output": "candidates/group_suitable.jsonl"
     },
     "spiciness": {
       "candidate_count": 45,
@@ -278,15 +278,15 @@
       "relevance_counts": {
         "0": 5,
         "1": 15,
-        "2": 11,
-        "3": 14
+        "2": 12,
+        "3": 13
       },
       "source_relation_count": 50483,
       "unique_source_reviews": 50483,
       "unclear_added": 15,
       "unrelated_added": 5,
-      "fallback_bucket_count": 8,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\spiciness.jsonl"
+      "fallback_bucket_count": 9,
+      "output": "candidates/spiciness.jsonl"
     },
     "cleanliness": {
       "candidate_count": 45,
@@ -308,7 +308,7 @@
       "unclear_added": 15,
       "unrelated_added": 5,
       "fallback_bucket_count": 0,
-      "output": "C:\\Users\\29072\\.codex\\worktrees\\b919\\AgentSociety\\src\\yelp_agent\\recommendation_v2\\data\\teacher_dataset\\v1\\candidates\\cleanliness.jsonl"
+      "output": "candidates/cleanliness.jsonl"
     }
   }
 }

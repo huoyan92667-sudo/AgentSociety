@@ -1,0 +1,314 @@
+{
+  "schema_version": "1.0",
+  "per_bucket": 17,
+  "aspects": {
+    "food_quality": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 24,
+        "2": 29,
+        "3": 83
+      },
+      "source_relation_count": 185866,
+      "unique_source_reviews": 185866,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/food_quality.jsonl"
+    },
+    "service": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 10,
+        "3": 75
+      },
+      "source_relation_count": 83867,
+      "unique_source_reviews": 83867,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/service.jsonl"
+    },
+    "price_value": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 43,
+        "2": 21,
+        "3": 72
+      },
+      "source_relation_count": 68122,
+      "unique_source_reviews": 68122,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/price_value.jsonl"
+    },
+    "quiet_environment": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 50,
+        "2": 9,
+        "3": 77
+      },
+      "source_relation_count": 55240,
+      "unique_source_reviews": 55240,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/quiet_environment.jsonl"
+    },
+    "crowded": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 13,
+        "3": 72
+      },
+      "source_relation_count": 75382,
+      "unique_source_reviews": 75382,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/crowded.jsonl"
+    },
+    "queue_time": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 18,
+        "3": 67
+      },
+      "source_relation_count": 55267,
+      "unique_source_reviews": 55267,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/queue_time.jsonl"
+    },
+    "portion_size": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 32,
+        "3": 53
+      },
+      "source_relation_count": 52919,
+      "unique_source_reviews": 52919,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 9,
+      "output": "candidates/portion_size.jsonl"
+    },
+    "parking": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 39,
+        "3": 46
+      },
+      "source_relation_count": 49445,
+      "unique_source_reviews": 49445,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 27,
+      "output": "candidates/parking.jsonl"
+    },
+    "pet_friendly": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 40,
+        "3": 45
+      },
+      "source_relation_count": 49055,
+      "unique_source_reviews": 49055,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 30,
+      "output": "candidates/pet_friendly.jsonl"
+    },
+    "family_friendly": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 50,
+        "2": 17,
+        "3": 69
+      },
+      "source_relation_count": 49349,
+      "unique_source_reviews": 49349,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 17,
+      "output": "candidates/family_friendly.jsonl"
+    },
+    "date_suitable": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 39,
+        "3": 46
+      },
+      "source_relation_count": 51969,
+      "unique_source_reviews": 51969,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 34,
+      "output": "candidates/date_suitable.jsonl"
+    },
+    "group_suitable": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 39,
+        "3": 46
+      },
+      "source_relation_count": 49829,
+      "unique_source_reviews": 49829,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 34,
+      "output": "candidates/group_suitable.jsonl"
+    },
+    "spiciness": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 41,
+        "3": 44
+      },
+      "source_relation_count": 50483,
+      "unique_source_reviews": 50483,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 33,
+      "output": "candidates/spiciness.jsonl"
+    },
+    "cleanliness": {
+      "candidate_count": 153,
+      "strength_counts": {
+        "0": 17,
+        "1": 17,
+        "2": 85,
+        "3": 17,
+        "4": 17
+      },
+      "relevance_counts": {
+        "0": 17,
+        "1": 51,
+        "2": 11,
+        "3": 74
+      },
+      "source_relation_count": 53033,
+      "unique_source_reviews": 53033,
+      "unclear_added": 51,
+      "unrelated_added": 17,
+      "fallback_bucket_count": 0,
+      "output": "candidates/cleanliness.jsonl"
+    }
+  }
+}

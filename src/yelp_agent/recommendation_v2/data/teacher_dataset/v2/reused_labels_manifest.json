@@ -1,0 +1,23 @@
+{
+  "source_label_count": 630,
+  "target_candidate_count": 2142,
+  "reused_label_count": 630,
+  "unmatched_source_label_count": 0,
+  "remaining_for_teacher": 1512,
+  "reused_by_aspect": {
+    "food_quality": 45,
+    "service": 45,
+    "price_value": 45,
+    "quiet_environment": 45,
+    "crowded": 45,
+    "queue_time": 45,
+    "portion_size": 45,
+    "parking": 45,
+    "pet_friendly": 45,
+    "family_friendly": 45,
+    "date_suitable": 45,
+    "group_suitable": 45,
+    "spiciness": 45,
+    "cleanliness": 45
+  }
+}

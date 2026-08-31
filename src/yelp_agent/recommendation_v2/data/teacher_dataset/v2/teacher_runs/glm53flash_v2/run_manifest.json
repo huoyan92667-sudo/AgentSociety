@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "run_id": "glm53flash_v2",
+  "model": "glm-5.3-flash",
+  "dataset_candidate_count": 2142,
+  "template_sha256": "9789d2ac615cbd60ca74fdd01e8e669fc04aff7dcdbb58f3cd485bb0f2cb42ab",
+  "candidate_manifest_sha256": "eab7d2744b8e3321ab94cd2d6b268a9a29641dd4be1d5769ecba02e231fe50f2",
+  "system_prompt_sha256": "45c054e45158498ad72b03a911fcddd51e136971f63178fa7be78106021c02af",
+  "system_prompt": "你只依据给出的评论文字判断指定餐厅特征。relevance表示评论与该特征的相关程度，不表示好坏；strength表示该特征在由低到高客观刻度上的位置，不表示是否符合某位用户。评论同时包含高低两端内容时，仍可具有较高relevance，应根据整体描述判断strength。relevance为0时strength必须为null。不得使用外部知识猜测评论没有表达的内容。只返回包含relevance和strength两个字段的JSON，不得解释。",
+  "max_attempts": 3,
+  "created_at": "2026-08-31T03:30:39.011004+00:00"
+}

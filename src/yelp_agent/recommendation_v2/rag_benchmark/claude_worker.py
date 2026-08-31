@@ -61,8 +61,14 @@ class ClaudeCodeWorker:
         )
         self.legacy_cli = legacy_cli
 
-    def generate(self, prompt: str, output_model: type[T]) -> tuple[T, ClaudeWorkerTrace, dict[str, object]]:
-        """把长输入走标准输入交给 Claude Code，避免 Windows 命令长度限制。"""
+    def generate(
+        self,
+        prompt: str,
+        output_model: type[T],
+        *,
+        system_prompt: str | None = None,
+    ) -> tuple[T, ClaudeWorkerTrace, dict[str, object]]:
+        """把输入走标准输入交给Claude Code，并允许调用方固定系统要求。"""
 
         schema = json.dumps(
             output_model.model_json_schema(),
@@ -85,7 +91,8 @@ class ClaudeCodeWorker:
                     "--permission-mode",
                     "plan",
                     "--system-prompt",
-                    "你只完成用户给出的结构化生成任务，不调用工具，不解释，只返回JSON。",
+                    system_prompt
+                    or "你只完成用户给出的结构化生成任务，不调用工具，不解释，只返回JSON。",
                 ]
             )
         else:
@@ -101,6 +108,10 @@ class ClaudeCodeWorker:
                     schema,
                 ]
             )
+            if system_prompt is not None:
+                # --system-prompt会替换Claude Code默认系统说明，避免项目上下文
+                # 和工具说明混进教师模型的判断输入。
+                command.extend(["--system-prompt", system_prompt])
         environment = os.environ.copy()
         environment["MAX_THINKING_TOKENS"] = "0"
         environment["CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC"] = "1"

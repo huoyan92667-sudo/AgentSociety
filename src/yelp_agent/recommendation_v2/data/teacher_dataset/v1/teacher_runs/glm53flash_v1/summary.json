@@ -1,0 +1,26 @@
+{
+  "run_id": "glm53flash_v1",
+  "model": "glm-5.3-flash",
+  "dataset_total": 630,
+  "selected_total": 630,
+  "completed_total": 630,
+  "pending_at_invocation_start": 0,
+  "success_this_invocation": 0,
+  "rejected_this_invocation": 0,
+  "attempt_count_total": 637,
+  "attempt_status_counts": {
+    "success": 630,
+    "invalid_output": 0,
+    "provider_failure": 7
+  },
+  "input_tokens_total": 497421,
+  "output_tokens_total": 208729,
+  "thinking_tokens_total": 0,
+  "reported_cost_usd_total": 7.7155380000000005,
+  "model_duration_ms_total": 8080208,
+  "wall_latency_ms_this_invocation": 0.00100000761449337,
+  "max_workers": 4,
+  "max_attempts": 3,
+  "request_timeout_seconds": 120,
+  "updated_at": "2026-08-30T15:09:39.139241+00:00"
+}
