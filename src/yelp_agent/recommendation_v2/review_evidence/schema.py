@@ -9,10 +9,23 @@ from pydantic import Field, field_validator, model_validator
 
 from yelp_agent.models import StrictModel
 from yelp_agent.recommendation_v2.business_facts import BusinessFact
-from yelp_agent.recommendation_v2.schema import SoftPreference
+from yelp_agent.recommendation_v2.schema import (
+    RequirementField,
+    SoftPreference,
+    SourceKind,
+)
 
 type EvidenceDirection = Literal["positive", "negative", "ambiguous"]
 type RequirementKind = Literal["fixed_aspect", "long_tail"]
+type EvidenceSource = Literal["dynamic_review_retrieval", "offline_business_profile"]
+type SatisfactionLevel = Literal[
+    "明确满足",
+    "比较满足",
+    "一般",
+    "证据不足",
+    "比较不满足",
+    "明确不满足",
+]
 
 
 class PreferenceSearchDescription(StrictModel):
@@ -107,12 +120,17 @@ class RankedReviewEvidence(StrictModel):
 
     review_id: str = Field(min_length=1)
     role: Literal["positive", "negative"]
+    evidence_source: EvidenceSource = "dynamic_review_retrieval"
     review_time: datetime
     stars: float = Field(ge=1, le=5)
+    useful: int = Field(default=0, ge=0)
     review_text: str = Field(min_length=1)
     matched_segment_text: str = Field(min_length=1)
-    positive_similarity: float = Field(ge=-1, le=1)
-    negative_similarity: float = Field(ge=-1, le=1)
+    # 动态检索有正反相似度；离线微调结果没有相似度，不能编造一个数填入。
+    positive_similarity: float | None = Field(default=None, ge=-1, le=1)
+    negative_similarity: float | None = Field(default=None, ge=-1, le=1)
+    model_relevance: int | None = Field(default=None, ge=1, le=3)
+    model_strength: int | None = Field(default=None, ge=0, le=4)
     relevance_score: float = Field(ge=0, le=1)
     time_weight: float = Field(ge=0, le=1)
     evidence_weight: float = Field(ge=0, le=1)
@@ -128,6 +146,7 @@ class BusinessPreferenceEvidence(StrictModel):
 
     business_id: str = Field(min_length=1)
     requirement_id: str = Field(min_length=1)
+    evidence_source: EvidenceSource = "dynamic_review_retrieval"
     positive_evidence: list[RankedReviewEvidence] = Field(max_length=5)
     negative_evidence: list[RankedReviewEvidence] = Field(max_length=5)
     positive_component: float = Field(ge=0, le=1)
@@ -140,10 +159,35 @@ class BusinessPreferenceEvidence(StrictModel):
     max_positive_similarity: float | None = Field(default=None, ge=-1, le=1)
     max_negative_similarity: float | None = Field(default=None, ge=-1, le=1)
     max_direction_gap: float | None = Field(default=None, ge=0, le=2)
+    # 以下字段只在固定14项离线画像中出现。原始程度永远沿用训练定义，
+    # 满足程度则已经按用户要“更高”还是“更低”转换，并向0.5按充分程度收缩。
+    objective_degree: float | None = Field(default=None, ge=0, le=1)
+    direction_adjusted_degree: float | None = Field(default=None, ge=0, le=1)
+    evidence_sufficiency: float | None = Field(default=None, ge=0, le=1)
+    evidence_sufficiency_level: str | None = None
+    controversy: float | None = Field(default=None, ge=0, le=1)
+    controversy_level: str | None = None
+    usable_for_ranking: bool | None = None
+    unusable_reasons: list[str] = Field(default_factory=list)
+    satisfaction_level: SatisfactionLevel | None = None
+
+
+class PreferenceRankingLayer(StrictModel):
+    """一家商家在某一优先级上的档位；排序只比较档位，不比较小数。"""
+
+    priority: int = Field(ge=1, le=100)
+    requirement_id: str = Field(min_length=1)
+    requirement_text: str = Field(min_length=1)
+    field: RequirementField | None = None
+    controlling_source: SourceKind | None = None
+    satisfaction_score: float = Field(ge=0, le=1)
+    satisfaction_level: SatisfactionLevel
+    # 4到0依次表示明确满足、比较满足、一般或未知、比较不满足、明确不满足。
+    satisfaction_tier: int = Field(ge=0, le=4)
 
 
 class RankedEvidenceBusiness(StrictModel):
-    """偏好、评分和距离融合后的最终一家餐厅。"""
+    """先按偏好档位逐层比较，再用基础事实打破平局的一家餐厅。"""
 
     final_rank: int = Field(ge=1)
     business: BusinessFact
@@ -152,6 +196,7 @@ class RankedEvidenceBusiness(StrictModel):
     rating_score: float = Field(ge=0, le=1)
     distance_score: float = Field(ge=0, le=1)
     final_score: float = Field(ge=0, le=1)
+    priority_layers: list[PreferenceRankingLayer] = Field(default_factory=list)
     preference_evidence: list[BusinessPreferenceEvidence]
 
 

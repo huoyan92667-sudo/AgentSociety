@@ -30,6 +30,7 @@ from yelp_agent.recommendation_v2.review_evidence.schema import (
     PreferenceSearchDescription,
 )
 from yelp_agent.recommendation_v2.review_features.definitions import (
+    aspect_meaning,
     preference_semantic_anchors,
 )
 from yelp_agent.recommendation_v2.schema import (
@@ -113,9 +114,7 @@ class RecommendationSnapshot(StrictModel):
 
     state_revision: int = Field(ge=1)
     ordered_business_ids: list[str] = Field(min_length=1, max_length=5)
-    evidence_review_ids_by_business: dict[str, list[str]] = Field(
-        default_factory=dict
-    )
+    evidence_review_ids_by_business: dict[str, list[str]] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_evidence_businesses(self) -> Self:
@@ -360,9 +359,7 @@ class PreferenceFusionRequest(StrictModel):
     session_id: str = Field(min_length=1)
     turn_index: int = Field(ge=1)
     query_text: str = Field(min_length=1, max_length=4000)
-    request_time: datetime = Field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    request_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
     previous_state: UnifiedRecommendationState | None = None
     conversation_history: list[ConversationHistoryTurn] = Field(
         default_factory=list,
@@ -607,9 +604,7 @@ class PreferenceFusion:
                     if len(observations) >= MAX_TOOL_CALLS:
                         raise ValueError("model exceeded the business tool call limit")
                     tool_call = BusinessFactsFusionToolCall.model_validate(payload)
-                    visible_ids = {
-                        item.business_id for item in businesses
-                    }
+                    visible_ids = {item.business_id for item in businesses}
                     if not set(tool_call.arguments.business_ids) <= visible_ids:
                         raise ValueError(
                             "business facts may only be queried for visible history"
@@ -642,7 +637,12 @@ class PreferenceFusion:
                     )
                     continue
                 proposal = PreferenceFusionProposal.model_validate(payload)
-            except (json.JSONDecodeError, TypeError, ValueError, ValidationError) as exc:
+            except (
+                json.JSONDecodeError,
+                TypeError,
+                ValueError,
+                ValidationError,
+            ) as exc:
                 return _loop_result(
                     status="invalid_output",
                     reason=_safe_reason(exc),
@@ -685,15 +685,18 @@ def _messages(
 2. 结合 previous_state 判断新增、替换、放宽、收紧、删除和重新排序；输出完整当前状态，被取消的不要保留。
 3. evidence_text 必须逐字来自对应用户原话，evidence_turn_index 填原话轮次；不得引用助手回答、画像或程序说明。
 4. 软偏好 priority 从1连续排列，不填强度。“最重要、其次、先……再……”必须反映真实顺序。
-5. 同一次输出 review_search_plans，不再另调一次模型。只处理 required_fixed_review_plans、你新输出的菜品质量/分量/辣度偏好、prefer/avoid 开放要求，以及确实能由评论查证的 must_have 开放要求；需要历史商家、距离或其他工具才能处理的 must_have 不要生成评论计划。其他固定特征由程序读取离线说法，不要重复生成。硬条件及距离、价格、评分等结构化偏好不要生成。
-6. 每个检索计划恰好给2条英文正向说法和2条英文反向说法。同一方向两条有固定分工：第一条写评论可能给出的直接总体结论；第二条必须写可观察原因或表现，例如原料、做法、味道、熟度、花椒麻感、偏甜偏淡、说话是否要提高声音，不能再次用抽象近义词重复第一条。反向第一条写直接否定结论，第二条写具体失败表现，不能只在正向前添加not/no。正向表示满足，反向表示违反；结合 query_text 中的具体菜品，例如牛排+菜品质量应写牛排肉质、味道或熟度。环境、停车、服务等整体特征不必生硬绑定菜名。
-7. required_fixed_review_plans 是必须完成的平面清单。review_search_plans 必须逐条复制其中的 plan_id、field、direction、target_value并填写正反英文说法，一个都不能漏。你新输出的菜品质量、分量或辣度偏好如果不在清单中也要添加；其余固定特征不要添加。每条 prefer/avoid 和每条能由评论查证的 must_have 开放要求要添加长尾计划，并原样复制 behavior。
+5. fixed_soft_preference_fields 中的14项已经有离线商家分数。当前话语能由其中任何一项表达时，必须写入 soft_preferences，严禁降级成 open_requirements。只有14项和其他结构化字段都无法表达的意思才能进入 open_requirements。
+6. 同一次输出 review_search_plans，不再另调一次模型。只处理 required_fixed_review_plans、prefer/avoid 开放要求，以及确实能由评论查证的 must_have 开放要求；需要历史商家、距离或其他工具才能处理的 must_have 不要生成评论计划。当前新产生的固定14项由程序读取离线分数和证据，不需要生成检索计划。硬条件及距离、价格、评分等结构化偏好不要生成。
+7. 每个检索计划恰好给2条英文正向说法和2条英文反向说法。同一方向两条有固定分工：第一条写评论可能给出的直接总体结论；第二条必须写可观察原因或表现，例如原料、做法、味道、熟度、花椒麻感、偏甜偏淡、说话是否要提高声音，不能再次用抽象近义词重复第一条。反向第一条写直接否定结论，第二条写具体失败表现，不能只在正向前添加not/no。正向表示满足，反向表示违反。
+8. required_fixed_review_plans 是必须完成的平面清单。review_search_plans 必须逐条复制其中的 plan_id、field、direction、target_value并填写正反英文说法，一个都不能漏。每条真正的 prefer/avoid 开放要求和每条能由评论查证的 must_have 开放要求要添加长尾计划，并原样复制 behavior。
 
 常用归类：
 - 明确想吃或排除某类餐饮：category 硬条件，目标只能从 category_candidates 原样选择；想吃用 any_of，不要用 none_of。候选只是检索结果，必须结合否定和上下文判断，不能见到候选就自动采用。
 - 明确数值上限/下限、商家编号、真假属性和到店营业：硬条件。
 - 近一点、安静、辣度、价格档位左右等用于排序：软偏好。
 - 地道、正宗等现有字段无法表达的要求：开放要求。
+- “安静”是 quiet_environment/higher；“想热闹”通常是 quiet_environment/lower 或 crowded/higher，按原话选择。
+- “服务好”是 service/higher；“停车方便”是 parking/higher；“少排队”是 queue_time/lower；这些都不是开放要求。
 - 用户说地点时填写搜索中心和合理半径；用户没说新地点则为 null，程序沿用旧地点或定位。
 - 用户明确说到店时间时生成 open_at 等于目录时区 ISO 时间；没说时不要生成，程序使用请求时刻。
 
@@ -724,9 +727,15 @@ def _messages(
             enabled=business_tool_available,
         ),
         "category_candidates": candidates,
-        "required_fixed_review_plans": _visible_persistent_review_candidates(
-            request
-        ),
+        "required_fixed_review_plans": _visible_persistent_review_candidates(request),
+        "fixed_soft_preference_fields": [
+            {
+                "field": field,
+                "scale_meaning": aspect_meaning(field),
+                "allowed_directions": ["higher", "lower"],
+            }
+            for field in ASPECT_FIELDS
+        ],
         "output_contract": _OUTPUT_CONTRACT,
     }
     return [
@@ -1011,7 +1020,9 @@ def _validate_dialogue_evidence(
 
     if turn_index == request.turn_index:
         if text not in request.query_text:
-            raise ValueError("current-query evidence must appear in the current message")
+            raise ValueError(
+                "current-query evidence must appear in the current message"
+            )
         return
     if turn_index >= request.turn_index:
         raise ValueError("session evidence must come from an earlier turn")
@@ -1044,7 +1055,10 @@ def _known_user_texts(request: PreferenceFusionRequest) -> dict[int, list[str]]:
     if previous.scene is not None:
         bases.append(previous.scene.basis)
     for basis in bases:
-        if basis.source in {"current_query", "session"} and basis.turn_index is not None:
+        if (
+            basis.source in {"current_query", "session"}
+            and basis.turn_index is not None
+        ):
             values.setdefault(basis.turn_index, []).append(basis.text)
     return values
 
@@ -1264,11 +1278,21 @@ def _scene_requirements(
         and request.scene_baseline.scene == scene.kind
     ):
         return (
-            [item.model_copy(deep=True) for item in request.scene_baseline.default_constraints],
-            [item.model_copy(deep=True) for item in request.scene_baseline.soft_preferences],
+            [
+                item.model_copy(deep=True)
+                for item in request.scene_baseline.default_constraints
+            ],
+            [
+                item.model_copy(deep=True)
+                for item in request.scene_baseline.soft_preferences
+            ],
         )
     previous = request.previous_state
-    if previous is not None and previous.scene is not None and previous.scene.kind == scene.kind:
+    if (
+        previous is not None
+        and previous.scene is not None
+        and previous.scene.kind == scene.kind
+    ):
         return (
             [
                 item.model_copy(deep=True)
@@ -1364,9 +1388,7 @@ def _materialize_open_requirements(
             text=item.evidence_text,
             turn_index=item.evidence_turn_index,
         )
-        suffix = _stable_suffix(
-            [item.text, item.behavior, item.evidence_turn_index]
-        )
+        suffix = _stable_suffix([item.text, item.behavior, item.evidence_turn_index])
         result.append(
             OpenRequirement(
                 key=f"open.{item.behavior}.{suffix}",
@@ -1466,8 +1488,7 @@ def _semantic_relation(
         if _target_set(left) == _target_set(right):
             return "same" if left.direction == right.direction else "conflict"
         if (
-            _SOURCE_PRIORITY[controller.source]
-            > _SOURCE_PRIORITY[candidate.source]
+            _SOURCE_PRIORITY[controller.source] > _SOURCE_PRIORITY[candidate.source]
             and left.direction == "match"
         ):
             return "shadow"
@@ -1757,9 +1778,8 @@ def _materialize_state(
 
     scene = _materialize_scene(request, proposal.scene)
     compact_hard = list(proposal.hard_constraints)
-    if (
-        proposal.search_center is not None
-        and not any(item.field == "distance_km" for item in compact_hard)
+    if proposal.search_center is not None and not any(
+        item.field == "distance_km" for item in compact_hard
     ):
         # 地点只有坐标还不能限制候选范围。大模型同时给出地点尺度，程序把它
         # 补成真正可执行的距离硬条件，后续仍走同一个数据库过滤入口。
@@ -1773,10 +1793,7 @@ def _materialize_state(
             )
         )
     hard_constraints = _resolve_hard_constraints(
-        [
-            _materialize_hard_requirement(request, item, facts)
-            for item in compact_hard
-        ]
+        [_materialize_hard_requirement(request, item, facts) for item in compact_hard]
     )
     defaults, persistent = _persistent_candidates(request, scene)
     default_constraints = _resolve_default_constraints(defaults, hard_constraints)
@@ -1845,9 +1862,7 @@ def _materialize_review_search_descriptions(
             and item.target_value == preference.target_value
         ]
         if len(matching) > 1:
-            raise ValueError(
-                f"duplicate review plans for aspect {preference.field}"
-            )
+            raise ValueError(f"duplicate review plans for aspect {preference.field}")
         if matching:
             positive = matching[0].positive_descriptions
             negative = matching[0].negative_descriptions

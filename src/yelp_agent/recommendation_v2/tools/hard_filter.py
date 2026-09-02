@@ -104,9 +104,18 @@ class StructuredHardFilterTool:
         self,
         business_catalog: BusinessFactCatalog,
         category_catalog: FixedCategoryCatalog,
+        *,
+        default_candidate_business_ids: list[str] | tuple[str, ...] | None = None,
     ) -> None:
         self._businesses = business_catalog
         self._categories = category_catalog
+        self._default_candidate_business_ids = (
+            None
+            if default_candidate_business_ids is None
+            else tuple(default_candidate_business_ids)
+        )
+        if self._default_candidate_business_ids is not None:
+            self._validate_scope(self._default_candidate_business_ids)
 
     def execute(
         self,
@@ -137,12 +146,15 @@ class StructuredHardFilterTool:
         if geography is not None and state.search_center != geography.search_center:
             raise ValueError("geographic distances use a different search center")
 
-        scope = candidate_business_ids
+        # 正式流程当前只允许已经拥有离线软偏好画像的500家商户参加。
+        # 调用方仍可在单次执行时传入更小范围，例如继续追问上一轮的第三家。
+        scope: list[str] | tuple[str, ...] | None = (
+            candidate_business_ids
+            if candidate_business_ids is not None
+            else self._default_candidate_business_ids
+        )
         if scope is not None:
-            if len(scope) != len(set(scope)):
-                raise ValueError("candidate business IDs must be unique")
-            for business_id in scope:
-                self._businesses.get(business_id)
+            self._validate_scope(scope)
 
         with duckdb.connect(database=":memory:") as connection:
             self._register_sources(
@@ -243,7 +255,7 @@ class StructuredHardFilterTool:
         connection: duckdb.DuckDBPyConnection,
         *,
         geography: GeographicDistanceResult | None,
-        scope: list[str] | None,
+        scope: list[str] | tuple[str, ...] | None,
         visit_time: datetime | None,
     ) -> None:
         """把已校验的事实文件和本轮工具结果注册成只读查询表。"""
@@ -266,6 +278,7 @@ class StructuredHardFilterTool:
                     ),
                 ),
             )
+
         if scope is not None:
             connection.register(
                 "candidate_scope",
@@ -295,6 +308,14 @@ class StructuredHardFilterTool:
                     ),
                 ),
             )
+
+    def _validate_scope(self, scope: list[str] | tuple[str, ...]) -> None:
+        """提前拒绝重复或不存在的商家，避免查询时静默丢失。"""
+
+        if len(scope) != len(set(scope)):
+            raise ValueError("candidate business IDs must be unique")
+        for business_id in scope:
+            self._businesses.get(business_id)
 
     @staticmethod
     def _from_sql(

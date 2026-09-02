@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter
-from collections.abc import Callable
 from typing import Protocol, Self
 
 from pydantic import Field
@@ -17,6 +17,9 @@ from yelp_agent.recommendation_v2.answer_synthesis import (
     RecommendationAnswer,
     RecommendationAnswerSynthesizer,
     build_recommendation_answer_synthesizer,
+)
+from yelp_agent.recommendation_v2.business_aspect_profiles import (
+    load_business_aspect_profile_catalog,
 )
 from yelp_agent.recommendation_v2.business_facts import (
     catalog_local_time,
@@ -77,9 +80,7 @@ class RecommendationInput(StrictModel):
     user_id: str = Field(min_length=1)
     session_id: str = Field(min_length=1)
     query_text: str = Field(min_length=1, max_length=4000)
-    request_time: datetime = Field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    request_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class RecommendationWorkflowTiming(StrictModel):
@@ -232,10 +233,7 @@ class RecommendationWorkflow:
                     geography=geography,
                 )
                 hard_filter_ms = (perf_counter() - hard_filter_started) * 1000
-            if (
-                hard_filter is not None
-                and self._review_evidence_ranker is not None
-            ):
+            if hard_filter is not None and self._review_evidence_ranker is not None:
                 review_started = perf_counter()
                 review_evidence_ranking = self._review_evidence_ranker.rank(
                     state=attempt.state,
@@ -258,9 +256,7 @@ class RecommendationWorkflow:
                         ranking=review_evidence_ranking,
                         on_delta=on_answer_delta,
                     )
-                    answer_synthesis_ms = (
-                        perf_counter() - answer_started
-                    ) * 1000
+                    answer_synthesis_ms = (perf_counter() - answer_started) * 1000
             elif (
                 hard_filter is not None
                 and self._baseline_ranking_tool is not None
@@ -285,7 +281,9 @@ class RecommendationWorkflow:
                     for item in attempt.state.referenced_businesses
                 }
                 for item in presented:
-                    previous_references[(item.presented_turn_index, item.position)] = item
+                    previous_references[(item.presented_turn_index, item.position)] = (
+                        item
+                    )
                 state = attempt.state.model_copy(
                     update={
                         "referenced_businesses": [
@@ -302,9 +300,7 @@ class RecommendationWorkflow:
                     state_revision=attempt.state.revision,
                     ordered_business_ids=[item.business_id for item in presented],
                     evidence_review_ids_by_business=(
-                        {}
-                        if answer is None
-                        else answer.selected_review_ids_by_business
+                        {} if answer is None else answer.selected_review_ids_by_business
                     ),
                 )
                 if presented
@@ -346,9 +342,7 @@ def _ensure_open_time_constraint(
 ) -> UnifiedRecommendationState:
     """用户没说到店时间时，用本轮请求时刻补一条可覆盖的营业默认值。"""
 
-    defaults = [
-        item for item in state.default_constraints if item.field != "open_at"
-    ]
+    defaults = [item for item in state.default_constraints if item.field != "open_at"]
     if not any(item.field == "open_at" for item in state.hard_constraints):
         local = catalog_local_time(request_time)
         defaults.append(
@@ -387,9 +381,7 @@ def _presented_businesses(
         aspect_scores: dict[AspectField, float] = {}
         requirement_fields = {
             requirement.requirement_id: (
-                None
-                if requirement.preference is None
-                else requirement.preference.field
+                None if requirement.preference is None else requirement.preference.field
             )
             for requirement in ranking.requirements
         }
@@ -423,6 +415,10 @@ def build_recommendation_workflow(
 
     root = Path(project_root)
     business_catalog = load_business_fact_catalog()
+    aspect_profiles = load_business_aspect_profile_catalog()
+    supported_business_ids = [
+        item.business_id for item in aspect_profiles.supported_businesses()
+    ]
     profile_store = UserProfileStore(
         root / "data" / "features" / "user_profiles" / "v1"
     )
@@ -433,7 +429,11 @@ def build_recommendation_workflow(
         hard_filter_tool=StructuredHardFilterTool(
             business_catalog,
             load_fixed_category_catalog(),
+            default_candidate_business_ids=supported_business_ids,
         ),
-        review_evidence_ranker=build_review_evidence_ranker(),
+        review_evidence_ranker=build_review_evidence_ranker(
+            profile_catalog=aspect_profiles,
+            project_root=root,
+        ),
         answer_synthesizer=build_recommendation_answer_synthesizer(),
     )

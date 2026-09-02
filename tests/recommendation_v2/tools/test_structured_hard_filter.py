@@ -206,3 +206,27 @@ def test_open_at_is_a_real_hard_filter_and_unknown_hours_are_excluded(
 
     assert result.candidate_business_ids == ["b1", "b3"]
     assert result.steps[0].unknown_excluded_count == 1
+
+
+def test_default_supported_business_scope_is_applied_before_hard_constraints(
+    tmp_path,
+) -> None:
+    businesses, categories = _catalogs(tmp_path)
+    state = UnifiedRecommendationState(
+        user_id="user-1",
+        session_id="session-1",
+        revision=1,
+        turn_index=1,
+        latest_query_text="find a restaurant",
+    )
+    tool = StructuredHardFilterTool(
+        businesses,
+        categories,
+        default_candidate_business_ids=["b1", "b3"],
+    )
+
+    result = tool.execute(state)
+
+    assert result.source_business_count == 2
+    assert result.candidate_business_ids == ["b1", "b3"]
+    assert "candidate_scope" in result.generated_sql

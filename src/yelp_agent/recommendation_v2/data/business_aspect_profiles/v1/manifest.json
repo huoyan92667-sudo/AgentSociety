@@ -1,0 +1,32 @@
+{
+  "aspect_count": 14,
+  "business_count": 500,
+  "created_at": "2026-09-02T04:13:37.756434Z",
+  "evidence_count": 51725,
+  "evidence_counts_by_group": {
+    "high_degree": 21903,
+    "low_degree": 18600,
+    "middle_degree": 11222
+  },
+  "output_sha256": {
+    "aspect_directions": "68043d5d9e371dcadc7d3ff2926853ed317026ed4a3af3fb91ec700643e5a3cb",
+    "database": "acd2281a98086652d761df9d9ba1aa70d43630ce675650bb3e79546412072d93",
+    "supported_businesses": "62eb484d5406a6234e187a19532da9fb036c25a740aa00001f0b300e86e7876b"
+  },
+  "profile_version": "1.0.0",
+  "representative_review_count": 29488,
+  "schema_version": 1,
+  "score_count": 7000,
+  "source_directory": "C:\\Users\\29072\\Desktop\\important\\server_output",
+  "source_invalid_output_count": 4,
+  "source_model_input_count": 160949,
+  "source_sha256": {
+    "business_aspect_profiles": "e9febe259e77124556e3d8770c041237ae81760b23291d2040b022ebeb24f79d",
+    "direction_definitions": "9789d2ac615cbd60ca74fdd01e8e669fc04aff7dcdbb58f3cd485bb0f2cb42ab",
+    "invalid_outputs": "d1ea99307036e49d4ccc6e1202c41bcc8b700bbd8cfad061ea167fd43ca88557",
+    "judge_manifest": "d28dcf7fcb868dd278eb4f8a5c0b63d68e590bce0581f6d48fd9a49d5ec303a8"
+  },
+  "source_valid_output_count": 160945,
+  "unusable_score_count": 1832,
+  "usable_score_count": 5168
+}

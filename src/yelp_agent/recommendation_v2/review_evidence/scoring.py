@@ -127,6 +127,7 @@ def _ranked_evidence(
         role=role,  # type: ignore[arg-type]
         review_time=candidate.review_time,
         stars=candidate.stars,
+        useful=candidate.useful,
         review_text=candidate.review_text,
         matched_segment_text=candidate.matched_segment_text,
         positive_similarity=candidate.positive_similarity,

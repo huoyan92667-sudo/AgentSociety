@@ -211,6 +211,14 @@ def test_model_receives_only_retrieved_category_candidates_and_compact_contract(
     assert "allowed_dining_categories" not in payload
     assert "final_output_schema" not in payload
     assert "output_contract" in payload
+    fixed_fields = {
+        item["field"]: item["scale_meaning"]
+        for item in payload["fixed_soft_preference_fields"]
+    }
+    assert len(fixed_fields) == 14
+    assert fixed_fields["quiet_environment"] == "环境从非常吵到非常安静"
+    assert fixed_fields["service"] == "服务从很差到很好"
+    assert fixed_fields["parking"] == "停车从很困难到很方便"
     assert len(generator.calls[0][1].content) < 8_000
 
 

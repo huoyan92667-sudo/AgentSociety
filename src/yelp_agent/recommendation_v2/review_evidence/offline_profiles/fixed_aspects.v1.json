@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "description": "固定14项客观程度的离线粗筛定义。关键词只给BM25，完整英文句只给向量检索；两条路线都只负责找候选，不判断相关程度或强度。",
+  "aspects": [
+    {
+      "id": "food_quality",
+      "high_keywords": ["delicious", "tasty", "flavorful", "fresh food", "cooked perfectly", "excellent food", "high quality ingredients"],
+      "low_keywords": ["bland", "tasteless", "stale food", "undercooked", "overcooked", "terrible food", "poor quality food"],
+      "high_semantic_queries": ["The food is delicious, fresh, flavorful, and cooked well.", "The dishes taste excellent and the ingredients are high quality."],
+      "low_semantic_queries": ["The food is bland, stale, badly cooked, or tastes terrible.", "The dishes are undercooked, overcooked, flavorless, or poor quality."]
+    },
+    {
+      "id": "service",
+      "high_keywords": ["friendly staff", "attentive", "helpful staff", "excellent service", "great service", "quick service", "prompt service"],
+      "low_keywords": ["rude staff", "inattentive", "ignored us", "terrible service", "poor service", "slow service", "unhelpful staff"],
+      "high_semantic_queries": ["The staff are friendly, attentive, helpful, and provide prompt service.", "Employees respond quickly and take good care of customers."],
+      "low_semantic_queries": ["The staff are rude, inattentive, slow, or ignore customers.", "Customers receive poor service or have difficulty getting help."]
+    },
+    {
+      "id": "price_value",
+      "high_keywords": ["good value", "worth the price", "reasonably priced", "affordable", "great deal", "excellent value"],
+      "low_keywords": ["overpriced", "not worth the price", "poor value", "too expensive", "expensive for", "bad value"],
+      "high_semantic_queries": ["The meal is affordable, reasonably priced, and worth the money.", "The portions and quality provide good value for the price."],
+      "low_semantic_queries": ["The restaurant is overpriced, expensive, or not worth the money.", "The price is too high for the quality or quantity received."]
+    },
+    {
+      "id": "quiet_environment",
+      "high_keywords": ["quiet", "peaceful", "calm atmosphere", "relaxing atmosphere", "easy to talk", "low noise"],
+      "low_keywords": ["noisy", "very loud", "too loud", "deafening", "hard to talk", "could not hear", "need to shout"],
+      "high_semantic_queries": ["The restaurant is quiet, peaceful, calm, and suitable for conversation.", "Customers can talk comfortably without raising their voices."],
+      "low_semantic_queries": ["The restaurant is loud and noisy, making conversation difficult.", "Customers cannot hear each other or need to shout over the noise."]
+    },
+    {
+      "id": "crowded",
+      "high_keywords": ["crowded", "packed", "cramped", "shoulder to shoulder", "no room", "extremely busy", "tables too close"],
+      "low_keywords": ["not crowded", "plenty of space", "spacious", "uncrowded", "few people", "roomy"],
+      "high_semantic_queries": ["The restaurant is crowded, packed, cramped, or extremely busy.", "There are too many people and very little space between customers."],
+      "low_semantic_queries": ["The restaurant is uncrowded, spacious, and has plenty of room.", "There are few people and customers do not feel cramped."]
+    },
+    {
+      "id": "queue_time",
+      "high_keywords": ["long wait", "waited forever", "waited an hour", "slow line", "long queue", "took forever to be seated"],
+      "low_keywords": ["no wait", "seated immediately", "seated right away", "short wait", "quick line", "walked right in"],
+      "high_semantic_queries": ["Customers wait a long time in a line or queue before being seated.", "Getting a table takes a very long time or feels like forever."],
+      "low_semantic_queries": ["Customers are seated immediately or wait only a short time.", "There is no line and no meaningful wait for a table."]
+    },
+    {
+      "id": "portion_size",
+      "high_keywords": ["generous portions", "large portions", "huge portions", "plenty of food", "good portion", "big serving"],
+      "low_keywords": ["small portions", "tiny portions", "skimpy portions", "portion was small", "not enough food", "small serving"],
+      "high_semantic_queries": ["The portions are large, generous, and provide plenty of food.", "Serving sizes are substantial and enough to satisfy customers."],
+      "low_semantic_queries": ["The portions are small, tiny, skimpy, or do not provide enough food.", "Serving sizes are much smaller than customers expect."]
+    },
+    {
+      "id": "parking",
+      "high_keywords": ["easy parking", "plenty of parking", "free parking", "convenient parking", "parking lot", "available spaces"],
+      "low_keywords": ["difficult parking", "hard to park", "no parking", "expensive parking", "limited parking", "parking lot full", "could not find parking"],
+      "high_semantic_queries": ["Parking is easy, convenient, free, or plentiful near the restaurant.", "The restaurant has a useful parking lot or many available spaces."],
+      "low_semantic_queries": ["Parking is difficult, limited, expensive, full, or unavailable.", "Customers struggle to find a place to park near the restaurant."]
+    },
+    {
+      "id": "pet_friendly",
+      "high_keywords": ["dog friendly", "pet friendly", "dogs are welcome", "allowed our dog", "water bowl for dogs", "pets welcome"],
+      "low_keywords": ["no dogs allowed", "not pet friendly", "dogs not allowed", "would not allow our dog", "pets prohibited"],
+      "high_semantic_queries": ["Dogs and other pets are welcome and treated well at the restaurant.", "The restaurant provides a pet-friendly space or amenities for dogs."],
+      "low_semantic_queries": ["Dogs or pets are not allowed and the restaurant is not pet friendly.", "Customers are refused service or seating because they brought a pet."]
+    },
+    {
+      "id": "family_friendly",
+      "high_keywords": ["kid friendly", "family friendly", "great for kids", "children are welcome", "kids menu", "high chair"],
+      "low_keywords": ["not kid friendly", "not family friendly", "adults only", "no children", "children unwelcome", "bad for kids"],
+      "high_semantic_queries": ["The restaurant is suitable for families, children, and young kids.", "Children are welcome and the restaurant offers helpful family amenities."],
+      "low_semantic_queries": ["The restaurant is unsuitable for children or is not family friendly.", "Children are unwelcome, restricted, or have a poor experience here."]
+    },
+    {
+      "id": "date_suitable",
+      "high_keywords": ["date night", "romantic atmosphere", "romantic dinner", "perfect for a date", "anniversary dinner", "intimate dinner"],
+      "low_keywords": ["not romantic", "bad for a date", "poor date spot", "not good for a date", "uncomfortable date"],
+      "high_semantic_queries": ["The restaurant is romantic and well suited to a date or anniversary.", "The atmosphere supports an intimate meal for two people."],
+      "low_semantic_queries": ["The restaurant is not romantic and is a poor place for a date.", "The atmosphere makes an intimate date uncomfortable or unsuitable."]
+    },
+    {
+      "id": "group_suitable",
+      "high_keywords": ["great for groups", "large groups", "group dinner", "party of ten", "accommodated our group", "private room"],
+      "low_keywords": ["not good for groups", "cannot accommodate groups", "too small for groups", "split our group", "group refused"],
+      "high_semantic_queries": ["The restaurant can comfortably accommodate large groups and parties.", "Group dinners are handled well with enough space and suitable seating."],
+      "low_semantic_queries": ["The restaurant cannot accommodate groups or is too small for a party.", "Large groups are split up, refused, or have difficulty dining together."]
+    },
+    {
+      "id": "spiciness",
+      "high_keywords": ["very spicy", "extremely spicy", "painfully spicy", "too spicy", "intense heat", "mouth on fire", "numbing heat"],
+      "low_keywords": ["not spicy", "no heat", "very mild", "barely spicy", "mild flavor", "lacks spice"],
+      "high_semantic_queries": ["The food is very spicy and has an intense heat level.", "The dish is much hotter than most customers expect."],
+      "low_semantic_queries": ["The food is mild and has almost no heat.", "The dish is not spicy even for customers who avoid heat." ]
+    },
+    {
+      "id": "cleanliness",
+      "high_keywords": ["very clean", "spotless", "clean restaurant", "clean bathroom", "well maintained", "hygienic"],
+      "low_keywords": ["dirty", "filthy", "unsanitary", "sticky tables", "dirty bathroom", "poorly maintained", "unclean"],
+      "high_semantic_queries": ["The restaurant, tables, and bathrooms are clean and well maintained.", "The dining area is spotless, hygienic, and carefully maintained."],
+      "low_semantic_queries": ["The restaurant is dirty, filthy, sticky, or unsanitary.", "Tables, bathrooms, or dining areas are poorly cleaned and maintained."]
+    }
+  ]
+}

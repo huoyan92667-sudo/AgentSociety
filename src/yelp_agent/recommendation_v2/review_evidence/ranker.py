@@ -13,19 +13,24 @@ from yelp_agent.recommendation_v2.tools.hard_filter import (
 )
 
 from .descriptions import PreferenceDescriptionBuilder
+from .offline_aspects import OfflineAspectEvidenceResolver
 from .retrieval import ReviewEvidenceRetriever
 from .schema import (
     BusinessPreferenceEvidence,
+    PreferenceRankingLayer,
     PreferenceSearchDescription,
     RankedEvidenceBusiness,
     ReviewEvidenceRankingResult,
+    ReviewRetrievalMetrics,
 )
 from .scoring import EvidenceScoringConfig, aggregate_business_evidence
 
 _FORMULA = (
-    "证据分=0.5+0.5×正证据分-0.5×反证据分；"
-    "偏好权重=强度/100×0.75^(优先级-1)；"
-    "最终分=0.6×偏好综合分+0.3×商家评分/5+0.1×距离分"
+    "固定14项满足分=0.5+(按用户方向转换后的离线程度-0.5)×证据充分程度，"
+    "证据不可用时按0.5；长尾证据分=0.5+0.5×正证据分-0.5×反证据分；"
+    "每条偏好换成明确满足、比较满足、一般或证据不足、比较不满足、明确不满足五档，"
+    "按priority从前到后逐层比较；全部偏好档位相同后，依次按商家评分、评论数、距离兜底。"
+    "原偏好综合分和最终分只保留作新旧对照，不再决定名次"
 )
 
 
@@ -37,16 +42,15 @@ class ReviewEvidenceRanker:
         *,
         description_builder: PreferenceDescriptionBuilder,
         retriever: ReviewEvidenceRetriever,
+        offline_aspects: OfflineAspectEvidenceResolver | None = None,
         scoring_config: EvidenceScoringConfig | None = None,
     ) -> None:
         scoring_config = scoring_config or EvidenceScoringConfig()
-        if (
-            scoring_config.acceptance_threshold
-            != retriever.acceptance_threshold
-        ):
+        if scoring_config.acceptance_threshold != retriever.acceptance_threshold:
             raise ValueError("retrieval and scoring acceptance thresholds must match")
         self._description_builder = description_builder
         self._retriever = retriever
+        self._offline_aspects = offline_aspects
         self._scoring_config = scoring_config
 
     def close(self) -> None:
@@ -81,11 +85,11 @@ class ReviewEvidenceRanker:
             from .descriptions import DescriptionBuildResult
 
             description_result = DescriptionBuildResult(
-                descriptions=[item.model_copy(deep=True) for item in prepared_descriptions]
+                descriptions=[
+                    item.model_copy(deep=True) for item in prepared_descriptions
+                ]
             )
-        description_latency_ms = (
-            time.perf_counter() - description_started
-        ) * 1000
+        description_latency_ms = (time.perf_counter() - description_started) * 1000
         call = description_result.call
         if description_result.failure_reason is not None:
             return ReviewEvidenceRankingResult(
@@ -106,19 +110,47 @@ class ReviewEvidenceRanker:
             )
 
         business_ids = hard_filter.candidate_business_ids
-        evidence_by_requirement: dict[
-            str, dict[str, BusinessPreferenceEvidence]
-        ] = {}
-        retrieval_metrics = None
+        evidence_by_requirement: dict[str, dict[str, BusinessPreferenceEvidence]] = {}
+        retrieval_metrics: ReviewRetrievalMetrics | None = None
+        scoring_started = time.perf_counter()
         try:
-            retrieval = self._retriever.retrieve_many(
-                description_result.descriptions,
-                business_ids,
-                cutoff_time=reference_time,
-            )
-            retrieval_metrics = retrieval.metrics
-            scoring_started = time.perf_counter()
-            for requirement in description_result.descriptions:
+            fixed_requirements = [
+                item
+                for item in description_result.descriptions
+                if item.kind == "fixed_aspect"
+            ]
+            dynamic_requirements = [
+                item
+                for item in description_result.descriptions
+                if item.kind == "long_tail"
+            ]
+            if fixed_requirements and self._offline_aspects is not None:
+                evidence_by_requirement.update(
+                    self._offline_aspects.assess_many(
+                        fixed_requirements,
+                        business_ids,
+                        reference_time=reference_time,
+                    )
+                )
+            elif fixed_requirements:
+                # 兼容旧的离线实验构造方式。正式运行时一定会传入离线画像，
+                # 因此固定14项不会再走这条动态评论检索路线。
+                dynamic_requirements = [*fixed_requirements, *dynamic_requirements]
+
+            if dynamic_requirements:
+                retrieval = self._retriever.retrieve_many(
+                    dynamic_requirements,
+                    business_ids,
+                    cutoff_time=reference_time,
+                )
+                retrieval_metrics = retrieval.metrics
+            else:
+                retrieval = None
+                retrieval_metrics = ReviewRetrievalMetrics()
+
+            for requirement in dynamic_requirements:
+                if retrieval is None:  # pragma: no cover - 由上面的分支保证
+                    raise RuntimeError("dynamic requirements have no retrieval result")
                 recalled = retrieval.by_requirement[requirement.requirement_id]
                 evidence_by_requirement[requirement.requirement_id] = {
                     business_id: aggregate_business_evidence(
@@ -148,7 +180,7 @@ class ReviewEvidenceRanker:
                 description_latency_ms=description_latency_ms,
                 description_warning=description_result.warning,
                 retrieval_metrics=retrieval_metrics,
-                failure_reason=f"review retrieval failed: {exc}",
+                failure_reason=f"review evidence loading failed: {exc}",
             )
 
         candidates = [
@@ -160,16 +192,7 @@ class ReviewEvidenceRanker:
             )
             for candidate in hard_filter.candidates
         ]
-        ordered = sorted(
-            candidates,
-            key=lambda item: (
-                -item.final_score,
-                -item.preference_score,
-                -item.rating_score,
-                item.distance_km if item.distance_km is not None else math.inf,
-                item.business.business_id,
-            ),
-        )[:5]
+        ordered = sorted(candidates, key=_priority_layered_sort_key)[:5]
         ranking = [
             item.model_copy(update={"final_rank": index})
             for index, item in enumerate(ordered, start=1)
@@ -204,28 +227,42 @@ class ReviewEvidenceRanker:
         business_id = candidate.business.business_id
         weighted_scores: list[tuple[float, float]] = []
         evidence: list[BusinessPreferenceEvidence] = []
+        priority_layers: list[PreferenceRankingLayer] = []
         handled_preference_keys: set[str] = set()
         for requirement in review_requirements:
-            assessment = evidence_by_requirement[requirement.requirement_id][business_id]
+            assessment = evidence_by_requirement[requirement.requirement_id][
+                business_id
+            ]
             evidence.append(assessment)
             weighted_scores.append(
-                (_preference_weight(requirement.priority, requirement.preference_strength), assessment.evidence_score)
+                (
+                    _preference_weight(
+                        requirement.priority, requirement.preference_strength
+                    ),
+                    assessment.evidence_score,
+                )
             )
             if requirement.preference is not None:
                 handled_preference_keys.add(requirement.preference.key)
+            priority_layers.append(_evidence_ranking_layer(requirement, assessment))
 
         for preference in preferences:
-            if preference.key in handled_preference_keys or preference.field in ASPECT_FIELDS:
+            if (
+                preference.key in handled_preference_keys
+                or preference.field in ASPECT_FIELDS
+            ):
                 continue
+            score = _structured_preference_score(preference, candidate)
             weighted_scores.append(
                 (
                     _preference_weight(
                         preference.priority,
                         preference.preference_strength,
                     ),
-                    _structured_preference_score(preference, candidate),
+                    score,
                 )
             )
+            priority_layers.append(_structured_ranking_layer(preference, score))
 
         preference_score = _weighted_mean(weighted_scores, default=0.5)
         rating_score = candidate.business.rating / 5.0
@@ -234,9 +271,7 @@ class ReviewEvidenceRanker:
             if candidate.distance_km is not None
             else 0.5
         )
-        final_score = (
-            0.6 * preference_score + 0.3 * rating_score + 0.1 * distance_score
-        )
+        final_score = 0.6 * preference_score + 0.3 * rating_score + 0.1 * distance_score
         return RankedEvidenceBusiness(
             final_rank=1,
             business=candidate.business,
@@ -245,8 +280,96 @@ class ReviewEvidenceRanker:
             rating_score=rating_score,
             distance_score=distance_score,
             final_score=final_score,
+            priority_layers=sorted(
+                priority_layers,
+                key=lambda item: (item.priority, item.requirement_id),
+            ),
             preference_evidence=evidence,
         )
+
+
+def _priority_layered_sort_key(item: RankedEvidenceBusiness) -> tuple[object, ...]:
+    """先逐层比较偏好档位；同档时才回到稳定的商家基础顺序。"""
+
+    ordered_layers = sorted(
+        item.priority_layers,
+        key=lambda layer: (layer.priority, layer.requirement_id),
+    )
+    return (
+        *(-layer.satisfaction_tier for layer in ordered_layers),
+        -item.business.rating,
+        -item.business.review_count,
+        item.distance_km if item.distance_km is not None else math.inf,
+        item.business.business_id,
+    )
+
+
+def _evidence_ranking_layer(
+    requirement: PreferenceSearchDescription,
+    assessment: BusinessPreferenceEvidence,
+) -> PreferenceRankingLayer:
+    """把评论证据结果压成稳定档位；证据不足只能进入中间未知档。"""
+
+    level = assessment.satisfaction_level or _score_level(assessment.evidence_score)
+    preference = requirement.preference
+    return PreferenceRankingLayer(
+        priority=requirement.priority,
+        requirement_id=requirement.requirement_id,
+        requirement_text=requirement.requirement_text,
+        field=None if preference is None else preference.field,
+        controlling_source=(
+            None if preference is None else preference.controlling_source
+        ),
+        satisfaction_score=assessment.evidence_score,
+        satisfaction_level=level,
+        satisfaction_tier=_level_tier(level),
+    )
+
+
+def _structured_ranking_layer(
+    preference: SoftPreference,
+    score: float,
+) -> PreferenceRankingLayer:
+    """把评分、距离等已知商家事实也放进同一套逐层比较结构。"""
+
+    level = _score_level(score)
+    return PreferenceRankingLayer(
+        priority=preference.priority,
+        requirement_id=preference.key,
+        requirement_text=preference.sources[0].text,
+        field=preference.field,
+        controlling_source=preference.controlling_source,
+        satisfaction_score=score,
+        satisfaction_level=level,
+        satisfaction_tier=_level_tier(level),
+    )
+
+
+def _score_level(score: float) -> str:
+    """统一动态评论和结构化事实的五档阈值。"""
+
+    if score >= 0.8:
+        return "明确满足"
+    if score >= 0.6:
+        return "比较满足"
+    if score > 0.4:
+        return "一般"
+    if score > 0.2:
+        return "比较不满足"
+    return "明确不满足"
+
+
+def _level_tier(level: str) -> int:
+    """证据不足与一般同处中间档，既不冒充满足也不被当成反证。"""
+
+    return {
+        "明确满足": 4,
+        "比较满足": 3,
+        "一般": 2,
+        "证据不足": 2,
+        "比较不满足": 1,
+        "明确不满足": 0,
+    }[level]
 
 
 def _preference_weight(priority: int, strength: int) -> float:

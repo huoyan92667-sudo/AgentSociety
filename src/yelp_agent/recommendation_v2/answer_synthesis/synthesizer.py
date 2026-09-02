@@ -37,7 +37,7 @@ _SYSTEM_PROMPT = """
 4. “整体食物不错”不能改写成某道具体菜很好；只有评论直接支持时才能下具体菜品结论。
 5. 一条评论同时包含优点、缺点或适用条件时，必须保留完整意思。
 6. 有重要反面证据时要告诉用户；没有直接证据时明确说证据不足，不能硬夸。
-7. 结合软偏好的先后顺序解释个性化原因，但不要暴露内部字段名、相似度、公式和计算过程。
+7. 结合软偏好的先后顺序和 preference_assessments 中的通俗档位解释个性化原因，但不要暴露内部字段名、相似度、公式和计算过程。证据不足或争议高时必须降低结论强度。
 8. 每家控制在一小段：核心推荐理由、最相关的真实证据、必要的风险或条件。
 9. 营业时间来自历史 Yelp 数据；如果提到，只能表述为“数据记录显示”，不能声称实时准确。
 10. top_count 是本轮真实商家数。只按已有 rank 从1介绍到 top_count，介绍完最后一家直接结束。严禁补写不存在的名次、道歉段落、额外商家，也禁止在末尾再次比较或重新排序。
@@ -102,6 +102,12 @@ class RecommendationAnswerSynthesizer:
                     "business": business_facts,
                     "straight_line_distance_km": ranked.distance_km,
                     "visit_context": _visit_context(state, ranked.business),
+                    # 只告诉回答模型通俗档位，不暴露精确内部计算分，避免它
+                    # 根据小数自行重新排序。真实顺序仍以程序给出的rank为准。
+                    "preference_assessments": [
+                        _answer_assessment(item, requirement_by_id)
+                        for item in ranked.preference_evidence
+                    ],
                     "evidence": [
                         {
                             "review_id": item.review_id,
@@ -277,6 +283,39 @@ def _select_business_evidence(
             break
         _append_unique(selected, seen, item)
     return selected[:2]
+
+
+def _answer_assessment(
+    assessment: BusinessPreferenceEvidence,
+    requirement_by_id: dict[str, PreferenceSearchDescription],
+) -> dict[str, object]:
+    """把内部数值压成回答可用的档位，并保留证据不足与争议提醒。"""
+
+    requirement = requirement_by_id.get(assessment.requirement_id)
+    level = assessment.satisfaction_level
+    if level is None:
+        if assessment.recalled_review_count == 0:
+            level = "证据不足"
+        elif assessment.evidence_score >= 0.8:
+            level = "明确满足"
+        elif assessment.evidence_score >= 0.6:
+            level = "比较满足"
+        elif assessment.evidence_score > 0.4:
+            level = "一般"
+        elif assessment.evidence_score > 0.2:
+            level = "比较不满足"
+        else:
+            level = "明确不满足"
+    return {
+        "requirement": (
+            assessment.requirement_id
+            if requirement is None
+            else requirement.requirement_text
+        ),
+        "satisfaction_level": level,
+        "evidence_sufficiency_level": assessment.evidence_sufficiency_level,
+        "controversy_level": assessment.controversy_level,
+    }
 
 
 def _review_context(

@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from yelp_agent.agent.llm import OpenAICompatibleLLM
 from yelp_agent.config import AgentConfig
+from yelp_agent.recommendation_v2.business_aspect_profiles import (
+    BusinessAspectProfileCatalog,
+    load_business_aspect_profile_catalog,
+)
 from yelp_agent.review_rag.config import load_review_rag_config
 from yelp_agent.semantic_embedding import (
     LocalEmbeddingEnvironment,
@@ -16,6 +22,7 @@ from yelp_agent.semantic_embedding.config import load_local_embedding_environmen
 
 from .descriptions import PreferenceDescriptionBuilder
 from .full_reviews import FullReviewStore
+from .offline_aspects import OfflineAspectEvidenceResolver
 from .qdrant_store import QdrantReviewSegmentStore
 from .ranker import ReviewEvidenceRanker
 from .retrieval import ReviewEvidenceRetriever
@@ -23,7 +30,27 @@ from .scoring import EvidenceScoringConfig
 from .segment_vectors import ReviewSegmentVectorStore
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
-_REVIEW_RAG_CONFIG = _PROJECT_ROOT / "configs" / "review_rag.yaml"
+
+
+class _LazyReviewEvidenceRetriever:
+    """只有出现固定14项以外的自由要求时，才启动向量模型和Qdrant。"""
+
+    recall_threshold = 0.55
+    acceptance_threshold = 0.60
+    direction_margin = 0.05
+
+    def __init__(self, factory: Callable[[], ReviewEvidenceRetriever]) -> None:
+        self._factory = factory
+        self._retriever: ReviewEvidenceRetriever | None = None
+
+    def retrieve_many(self, *args: Any, **kwargs: Any):
+        if self._retriever is None:
+            self._retriever = self._factory()
+        return self._retriever.retrieve_many(*args, **kwargs)
+
+    def close(self) -> None:
+        if self._retriever is not None:
+            self._retriever.close()
 
 
 def _local_embedding_environment() -> LocalEmbeddingEnvironment:
@@ -49,6 +76,8 @@ def _local_embedding_environment() -> LocalEmbeddingEnvironment:
 def build_review_evidence_ranker(
     *,
     qdrant_url: str | None = None,
+    profile_catalog: BusinessAspectProfileCatalog | None = None,
+    project_root: str | Path | None = None,
 ) -> ReviewEvidenceRanker:
     """建立真实运行时；固定14种不会调用大模型，只有长尾要求才会调用。"""
 
@@ -63,7 +92,35 @@ def build_review_evidence_ranker(
             thinking="disabled",
         )
     )
-    rag_config = load_review_rag_config(_REVIEW_RAG_CONFIG)
+    retriever = _LazyReviewEvidenceRetriever(
+        lambda: _build_dynamic_review_retriever(
+            qdrant_url=qdrant_url,
+            project_root=project_root,
+        )
+    )
+    return ReviewEvidenceRanker(
+        description_builder=PreferenceDescriptionBuilder(generator),
+        retriever=retriever,
+        offline_aspects=OfflineAspectEvidenceResolver(
+            profile_catalog or load_business_aspect_profile_catalog()
+        ),
+        scoring_config=EvidenceScoringConfig(
+            acceptance_threshold=0.60,
+            top_each_side=5,
+            half_life_days=730,
+        ),
+    )
+
+
+def _build_dynamic_review_retriever(
+    *,
+    qdrant_url: str | None,
+    project_root: str | Path | None,
+) -> ReviewEvidenceRetriever:
+    """建立昂贵的自由评论检索环境；固定14项不会调用这里。"""
+
+    root = _PROJECT_ROOT if project_root is None else Path(project_root)
+    rag_config = load_review_rag_config(root / "configs" / "review_rag.yaml")
     encoder = LocalQwenEmbeddingEncoder.from_environment(
         rag_config.semantic_config().model_copy(update={"batch_size": 16}),
         _local_embedding_environment(),
@@ -72,7 +129,7 @@ def build_review_evidence_ranker(
         qdrant_url or os.environ.get("QDRANT_URL", "http://localhost:6333")
     )
     index_root = (
-        _PROJECT_ROOT
+        root
         / "src"
         / "yelp_agent"
         / "recommendation_v2"
@@ -81,13 +138,11 @@ def build_review_evidence_ranker(
         / "v1"
         / "index"
     )
-    retriever = ReviewEvidenceRetriever(
+    return ReviewEvidenceRetriever(
         store=store,
         encoder=encoder,
-        segment_vectors=ReviewSegmentVectorStore(
-            index_root / "segment_embeddings.npy"
-        ),
-        full_reviews=FullReviewStore(),
+        segment_vectors=ReviewSegmentVectorStore(index_root / "segment_embeddings.npy"),
+        full_reviews=FullReviewStore(root / "data" / "processed" / "reviews.parquet"),
         recall_threshold=0.55,
         acceptance_threshold=0.60,
         direction_margin=0.05,
@@ -99,13 +154,4 @@ def build_review_evidence_ranker(
         search_concurrency=4,
         enable_bm25=True,
         rrf_k=60,
-    )
-    return ReviewEvidenceRanker(
-        description_builder=PreferenceDescriptionBuilder(generator),
-        retriever=retriever,
-        scoring_config=EvidenceScoringConfig(
-            acceptance_threshold=0.60,
-            top_each_side=5,
-            half_life_days=730,
-        ),
     )
