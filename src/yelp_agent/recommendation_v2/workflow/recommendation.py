@@ -19,9 +19,11 @@ from yelp_agent.recommendation_v2.answer_synthesis import (
     build_recommendation_answer_synthesizer,
 )
 from yelp_agent.recommendation_v2.business_aspect_profiles import (
+    BusinessAspectProfileCatalog,
     load_business_aspect_profile_catalog,
 )
 from yelp_agent.recommendation_v2.business_facts import (
+    BusinessFactCatalog,
     catalog_local_time,
     load_business_fact_catalog,
 )
@@ -81,6 +83,8 @@ class RecommendationInput(StrictModel):
     session_id: str = Field(min_length=1)
     query_text: str = Field(min_length=1, max_length=4000)
     request_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    # 独立工作流可直接生成答案；嵌入 Agent 时由外层主模型读取排序证据后回答。
+    synthesize_answer: bool = True
 
 
 class RecommendationWorkflowTiming(StrictModel):
@@ -248,6 +252,7 @@ class RecommendationWorkflow:
                     review_evidence_ranking.status == "success"
                     and review_evidence_ranking.ranking
                     and self._answer_synthesizer is not None
+                    and request.synthesize_answer
                 ):
                     answer_started = perf_counter()
                     answer = self._answer_synthesizer.synthesize(
@@ -300,7 +305,7 @@ class RecommendationWorkflow:
                     state_revision=attempt.state.revision,
                     ordered_business_ids=[item.business_id for item in presented],
                     evidence_review_ids_by_business=(
-                        {} if answer is None else answer.selected_review_ids_by_business
+                        _ranking_review_ids(review_evidence_ranking)
                     ),
                 )
                 if presented
@@ -408,14 +413,35 @@ def _presented_businesses(
     return result
 
 
+def _ranking_review_ids(
+    ranking: ReviewEvidenceRankingResult | None,
+) -> dict[str, list[str]]:
+    """答案由外层主模型生成时，仍从真实排序结果保存本轮代表性证据编号。"""
+
+    if ranking is None or ranking.status != "success":
+        return {}
+    result: dict[str, list[str]] = {}
+    for business in ranking.ranking:
+        review_ids: list[str] = []
+        for preference in business.preference_evidence:
+            review_ids.extend(item.review_id for item in preference.positive_evidence[:1])
+            review_ids.extend(item.review_id for item in preference.negative_evidence[:1])
+        result[business.business.business_id] = list(dict.fromkeys(review_ids))
+    return result
+
+
 def build_recommendation_workflow(
     project_root: str | Path,
+    *,
+    business_catalog: BusinessFactCatalog | None = None,
+    aspect_profiles: BusinessAspectProfileCatalog | None = None,
+    review_evidence_ranker: ReviewEvidenceRanker | None = None,
 ) -> RecommendationWorkflow:
-    """使用项目真实画像文件和真实模型配置建立新版推荐入口。"""
+    """建立推荐入口；Agent 可注入共享评论资源，避免重复加载本地模型。"""
 
     root = Path(project_root)
-    business_catalog = load_business_fact_catalog()
-    aspect_profiles = load_business_aspect_profile_catalog()
+    business_catalog = business_catalog or load_business_fact_catalog()
+    aspect_profiles = aspect_profiles or load_business_aspect_profile_catalog()
     supported_business_ids = [
         item.business_id for item in aspect_profiles.supported_businesses()
     ]
@@ -431,9 +457,12 @@ def build_recommendation_workflow(
             load_fixed_category_catalog(),
             default_candidate_business_ids=supported_business_ids,
         ),
-        review_evidence_ranker=build_review_evidence_ranker(
-            profile_catalog=aspect_profiles,
-            project_root=root,
+        review_evidence_ranker=(
+            review_evidence_ranker
+            or build_review_evidence_ranker(
+                profile_catalog=aspect_profiles,
+                project_root=root,
+            )
         ),
         answer_synthesizer=build_recommendation_answer_synthesizer(),
     )

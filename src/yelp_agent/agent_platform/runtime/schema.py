@@ -128,6 +128,17 @@ class ModelMessage(StrictModel):
         return self
 
 
+class ContextStats(StrictModel):
+    """记录本次模型上下文各部分字符量，用于验证压缩是否生效。"""
+
+    working_memory_chars: int = Field(default=0, ge=0)
+    episode_summary_chars: int = Field(default=0, ge=0)
+    completed_turn_chars: int = Field(default=0, ge=0)
+    current_turn_chars: int = Field(default=0, ge=0)
+    included_completed_turns: int = Field(default=0, ge=0)
+    included_episodes: int = Field(default=0, ge=0)
+
+
 class ModelRequest(StrictModel):
     """主循环交给模型适配层的一次完整请求。"""
 
@@ -138,6 +149,7 @@ class ModelRequest(StrictModel):
     messages: list[ModelMessage] = Field(min_length=1)
     tools: list[ToolSchema] = Field(default_factory=list)
     source_event_seqs: list[int] = Field(default_factory=list)
+    context_stats: ContextStats | None = None
 
 
 class ModelResponse(StrictModel):

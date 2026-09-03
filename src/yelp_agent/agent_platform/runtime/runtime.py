@@ -6,6 +6,7 @@ from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 
 from ..llm.adapter import LanguageModel
+from ..memory.compaction import ConversationCompactor
 from ..persistence.hooks import PersistLargeToolResultHook
 from ..persistence.schema import RecoveryReport
 from ..persistence.store import ResultStore, RuntimePersistence
@@ -39,6 +40,7 @@ class AgentRuntime:
         system_prompt: str = DEFAULT_SYSTEM_PROMPT,
         max_model_tool_result_chars: int = 8_000,
         large_tool_result_threshold_bytes: int = 64 * 1024,
+        memory_summary_model: LanguageModel | None = None,
     ) -> None:
         registry = ToolRegistry(tools)
         configured_hooks = ToolPipelineHooks(
@@ -67,6 +69,11 @@ class AgentRuntime:
             pipeline=pipeline,
             context_builder=ContextBuilder(system_prompt),
             limits=limits or AgentLimits(),
+            conversation_compactor=(
+                None
+                if memory_summary_model is None
+                else ConversationCompactor(memory_summary_model)
+            ),
         )
 
     async def handle(

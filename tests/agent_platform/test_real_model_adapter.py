@@ -175,3 +175,43 @@ def test_settings_hide_api_key() -> None:
 
     assert "secret-value" not in repr(settings)
     assert settings.api_key.get_secret_value() == "secret-value"
+
+
+def test_malformed_tool_arguments_are_returned_to_pipeline_for_correction() -> None:
+    async def scenario() -> None:
+        response = SimpleNamespace(
+            id="provider-request-invalid",
+            model="deepseek-chat",
+            choices=[
+                SimpleNamespace(
+                    message=SimpleNamespace(
+                        content=None,
+                        tool_calls=[
+                            SimpleNamespace(
+                                id="call-invalid",
+                                function=SimpleNamespace(
+                                    name="lookup_business_facts",
+                                    arguments='{"business_ids":["business-1"',
+                                ),
+                            )
+                        ],
+                    )
+                )
+            ],
+            usage=SimpleNamespace(prompt_tokens=50, completion_tokens=10),
+        )
+        model = OpenAICompatibleAgentModel(
+            AgentModelSettings(api_key="secret-key", model="deepseek-chat"),
+            client=FakeClient([response]),
+        )
+
+        result = await model.generate(
+            _request([ModelMessage(role="user", content="查一下商家")])
+        )
+
+        assert isinstance(result.action, ToolCallsAction)
+        assert "__invalid_arguments_json__" in result.action.calls[0].arguments
+
+    import asyncio
+
+    asyncio.run(scenario())

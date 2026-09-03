@@ -344,6 +344,7 @@ class ToolPipeline:
             nested_model_usage=body.nested_model_usage,
             nested_model_calls=body.nested_model_calls,
             terminal_answer=body.terminal_answer,
+            memory_update=body.memory_update,
         )
 
     @staticmethod

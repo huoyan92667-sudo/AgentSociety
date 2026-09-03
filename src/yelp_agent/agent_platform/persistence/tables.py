@@ -36,6 +36,7 @@ class AgentSessionRow(Base):
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     active_turn_id: Mapped[str | None] = mapped_column(String(64))
     last_event_seq: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_turn_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -48,6 +49,13 @@ class AgentSessionRow(Base):
 
 class AgentTurnRow(Base):
     __tablename__ = "agent_turns"
+    __table_args__ = (
+        UniqueConstraint(
+            "session_id",
+            "turn_index",
+            name="uq_agent_turn_session_index",
+        ),
+    )
 
     turn_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     session_id: Mapped[str] = mapped_column(
@@ -55,6 +63,7 @@ class AgentTurnRow(Base):
         nullable=False,
         index=True,
     )
+    turn_index: Mapped[int] = mapped_column(Integer, nullable=False)
     user_message: Mapped[str] = mapped_column(Text, nullable=False)
     request_time: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -133,6 +142,63 @@ class DomainStateVersionRow(Base):
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     state_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
     source_event_id: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+
+class WorkingMemoryRow(Base):
+    """每个会话只有一份最新工作记忆，原始事实仍以事件表为准。"""
+
+    __tablename__ = "agent_working_memories"
+
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("agent_sessions.session_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    memory_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+
+class ConversationEpisodeRow(Base):
+    """已经结束的一段对话总结；完整原话通过来源轮次查回。"""
+
+    __tablename__ = "agent_conversation_episodes"
+    __table_args__ = (
+        Index(
+            "ix_agent_episodes_session_created",
+            "session_id",
+            "created_at",
+        ),
+        Index(
+            "ix_agent_episodes_user_created",
+            "user_id",
+            "created_at",
+        ),
+    )
+
+    episode_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("agent_sessions.session_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[str] = mapped_column(String(128), nullable=False)
+    topic: Mapped[str] = mapped_column(String(300), nullable=False)
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    details_json: Mapped[dict[str, Any]] = mapped_column(JSON_TYPE, nullable=False)
+    source_started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+    source_ended_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

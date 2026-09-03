@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -11,6 +12,7 @@ from typing import cast
 from uuid import uuid4
 
 from ..llm.adapter import LanguageModel
+from ..memory.compaction import ConversationCompactor
 from ..observability.usage import TurnUsageTracker
 from ..persistence.schema import LLMCallRecord, RecoveryReport, TurnStatus
 from ..persistence.store import RuntimePersistence
@@ -53,6 +55,7 @@ class AgentLoop:
         pipeline: ToolPipeline,
         context_builder: ContextBuilder,
         limits: AgentLimits,
+        conversation_compactor: ConversationCompactor | None = None,
     ) -> None:
         self._model = model
         self._store = session_store
@@ -60,6 +63,7 @@ class AgentLoop:
         self._pipeline = pipeline
         self._context_builder = context_builder
         self._limits = limits
+        self._conversation_compactor = conversation_compactor
 
     async def run(
         self,
@@ -84,6 +88,46 @@ class AgentLoop:
             request_time=value.request_time,
             now=self._now(),
         )
+        # 新消息意味着用户已经有机会回应上一条追问；本轮若仍缺信息，
+        # AskUserAction 会再次写入最新问题。
+        await self._store.set_pending_question(
+            session_id=session.session_id,
+            question=None,
+            now=self._now(),
+        )
+
+        if self._conversation_compactor is not None:
+            try:
+                compaction = await self._conversation_compactor.compact_if_needed(
+                    store=self._store,
+                    session=session,
+                    current_turn_id=state.turn_id,
+                )
+            # 旧对话压缩失败不应阻断当前用户问题；原始轮次仍在数据库中。
+            except Exception:  # noqa: BLE001
+                compaction = None
+            if compaction is not None and compaction.response is not None:
+                usage.record_model(compaction.response)
+                await self._store.record_llm_call(
+                    LLMCallRecord(
+                        llm_call_id=uuid4().hex,
+                        session_id=session.session_id,
+                        turn_id=state.turn_id,
+                        step_index=1,
+                        purpose="conversation_summary",
+                        provider=compaction.response.provider,
+                        model=compaction.response.model,
+                        status="success",
+                        input_tokens=compaction.response.usage.input_tokens,
+                        output_tokens=compaction.response.usage.output_tokens,
+                        latency_ms=compaction.response.latency_ms,
+                        provider_request_id=(
+                            compaction.response.provider_request_id
+                        ),
+                        error_code=compaction.error_code,
+                        created_at=self._now(),
+                    )
+                )
 
         try:
             return await asyncio.wait_for(
@@ -160,6 +204,11 @@ class AgentLoop:
                     ).hexdigest(),
                     "source_event_seqs": request.source_event_seqs,
                     "tool_names": [item.name for item in tool_schemas],
+                    "context_stats": (
+                        None
+                        if request.context_stats is None
+                        else request.context_stats.model_dump(mode="json")
+                    ),
                 },
                 turn_id=state.turn_id,
                 step_index=step_index,
@@ -184,6 +233,11 @@ class AgentLoop:
                 )
 
             if isinstance(response.action, AskUserAction):
+                await self._store.set_pending_question(
+                    session_id=session.session_id,
+                    question=response.action.question,
+                    now=self._now(),
+                )
                 await self._close_step(session, state, "awaiting_user")
                 return await self._finish(
                     session=session,
@@ -263,6 +317,12 @@ class AgentLoop:
                     turn_id=state.turn_id,
                     step_index=step_index,
                 )
+                if result.status == "success" and result.memory_update is not None:
+                    await self._store.apply_tool_memory_update(
+                        session_id=session.session_id,
+                        update=result.memory_update,
+                        now=self._now(),
+                    )
             if len(calls) == 1 and result.terminal_answer is not None:
                 answer = result.terminal_answer
                 # 某些高层工具已经完成证据约束下的最终总结。此时直接结束，
@@ -490,8 +550,20 @@ class AgentLoop:
 
     @staticmethod
     def _tool_result_event_payload(result: ToolResult) -> dict:
-        """最终回答另有助手消息保存，工具事件不再复制一遍长答案。"""
+        """正式值和模型正文相同时只存一份，读取上下文时原样恢复。"""
 
         payload = result.model_dump(mode="json")
         payload.pop("terminal_answer", None)
+        canonical_value = (
+            "工具执行成功。"
+            if result.value is None
+            else json.dumps(
+                result.value,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        )
+        if result.model_content == canonical_value:
+            payload.pop("model_content", None)
+            payload["model_content_from_value"] = True
         return payload

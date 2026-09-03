@@ -21,8 +21,12 @@ from yelp_agent.agent_platform.domains.restaurant import build_restaurant_tools
 from yelp_agent.agent_platform.persistence.schema import DomainStateVersion
 from yelp_agent.models import StrictModel
 from yelp_agent.recommendation_v2.answer_synthesis import RecommendationAnswer
+from yelp_agent.recommendation_v2.business_aspect_profiles import (
+    load_business_aspect_profile_catalog,
+)
 from yelp_agent.recommendation_v2.business_facts import load_business_fact_catalog
 from yelp_agent.recommendation_v2.preference_fusion import PreferenceFusionAttempt
+from yelp_agent.recommendation_v2.review_evidence import DirectReviewEvidenceResult
 from yelp_agent.recommendation_v2.schema import UnifiedRecommendationState
 from yelp_agent.recommendation_v2.workflow import RecommendationTurnResult
 
@@ -96,6 +100,21 @@ class MemoryDomainStateStore:
         return self.value
 
 
+class FakeDirectReviewSearch:
+    def __init__(self) -> None:
+        self.calls: list[dict] = []
+
+    def search(self, **kwargs) -> DirectReviewEvidenceResult:
+        self.calls.append(kwargs)
+        return DirectReviewEvidenceResult(
+            status="success",
+            latency_ms=12,
+            model_call_count=1,
+            input_tokens=120,
+            output_tokens=30,
+        )
+
+
 def test_agent_selects_recommendation_and_tool_receives_exact_user_message() -> None:
     async def scenario() -> None:
         workflow = FakeWorkflow()
@@ -153,9 +172,10 @@ def test_agent_selects_recommendation_and_tool_receives_exact_user_message() -> 
         assert result.usage.output_tokens == 41
         tool_message = model.requests[1].messages[-1]
         assert tool_message.role == "tool"
-        # 工具上下文只保留状态和展示商家，不再复制完整最终回答。
+        # 主模型读取正式工具结果；内部淘汰候选和工作流旧答案不重复进入会话。
         assert "已经按完整原话处理" not in (tool_message.content or "")
-        assert '"presented_businesses":[]' in (tool_message.content or "")
+        assert '"top5":[]' in (tool_message.content or "")
+        assert workflow.requests[0].synthesize_answer is False
 
     asyncio.run(scenario())
 
@@ -267,5 +287,195 @@ def test_terminal_tool_answer_is_not_rewritten_by_main_model() -> None:
         assert final_message.payload["model"] == "tool:complete_recommendation"
         tool_result = next(event for event in events if event.type == "tool/result")
         assert "terminal_answer" not in tool_result.payload["result"]
+
+    asyncio.run(scenario())
+
+
+def test_main_model_can_resolve_a_named_business_then_choose_facts_tool() -> None:
+    async def scenario() -> None:
+        catalog = load_business_fact_catalog()
+        business = next(item for item in catalog.all() if item.name == "Spice 28")
+        tools = build_restaurant_tools(
+            workflow=FakeWorkflow(),  # type: ignore[arg-type]
+            business_catalog=catalog,
+            state_store=MemoryDomainStateStore(),
+        )
+        model = ScriptedLanguageModel(
+            [
+                ModelResponse(
+                    action=ToolCallsAction(
+                        calls=[
+                            ToolCall(
+                                call_id="find-business",
+                                tool_name="search_restaurant_businesses",
+                                arguments={"name": "Spice 28"},
+                            )
+                        ]
+                    ),
+                    model="main-model",
+                ),
+                ModelResponse(
+                    action=ToolCallsAction(
+                        calls=[
+                            ToolCall(
+                                call_id="read-facts",
+                                tool_name="lookup_business_facts",
+                                arguments={"business_ids": [business.business_id]},
+                            )
+                        ]
+                    ),
+                    model="main-model",
+                ),
+                ModelResponse(
+                    action=FinalAnswerAction(answer="已经根据真实商家资料回答。"),
+                    model="main-model",
+                ),
+            ]
+        )
+        runtime = AgentRuntime(
+            model=model,
+            session_store=MemorySessionStore(),
+            tools=tools.definitions,
+        )
+
+        result = await runtime.handle(
+            AgentTurnInput(
+                user_id="user-1",
+                session_id="named-business",
+                message="Spice 28 的地址和营业时间是什么？",
+                request_time=NOW,
+            )
+        )
+
+        assert result.status == "completed"
+        assert result.used_tools == [
+            "search_restaurant_businesses",
+            "lookup_business_facts",
+        ]
+        search_message = model.requests[1].messages[-1].content or ""
+        assert business.business_id in search_message
+        facts_message = model.requests[2].messages[-1].content or ""
+        assert business.address in facts_message
+
+    asyncio.run(scenario())
+
+
+def test_main_model_can_read_fixed_aspect_evidence_without_rerunning_recommendation() -> None:
+    async def scenario() -> None:
+        facts = load_business_fact_catalog()
+        profiles = load_business_aspect_profile_catalog()
+        business = profiles.supported_businesses()[0]
+        tools = build_restaurant_tools(
+            workflow=FakeWorkflow(),  # type: ignore[arg-type]
+            business_catalog=facts,
+            state_store=MemoryDomainStateStore(),
+            aspect_catalog=profiles,
+        )
+        model = ScriptedLanguageModel(
+            [
+                ModelResponse(
+                    action=ToolCallsAction(
+                        calls=[
+                            ToolCall(
+                                call_id="read-service-evidence",
+                                tool_name="lookup_business_aspect_evidence",
+                                arguments={
+                                    "business_ids": [business.business_id],
+                                    "aspect_ids": ["service"],
+                                },
+                            )
+                        ]
+                    ),
+                    model="main-model",
+                ),
+                ModelResponse(
+                    action=FinalAnswerAction(answer="已经根据服务评论证据回答。"),
+                    model="main-model",
+                ),
+            ]
+        )
+        runtime = AgentRuntime(
+            model=model,
+            session_store=MemorySessionStore(),
+            tools=tools.definitions,
+        )
+
+        result = await runtime.handle(
+            AgentTurnInput(
+                user_id="user-1",
+                session_id="aspect-follow-up",
+                message="第三家服务怎么样？",
+                request_time=NOW,
+            )
+        )
+
+        assert result.used_tools == ["lookup_business_aspect_evidence"]
+        tool_message = model.requests[1].messages[-1].content or ""
+        assert '"aspect_id":"service"' in tool_message
+        assert '"evidence_sufficiency"' in tool_message
+        assert '"controversy"' in tool_message
+
+    asyncio.run(scenario())
+
+
+def test_main_model_can_send_a_long_tail_need_to_direct_review_search() -> None:
+    async def scenario() -> None:
+        catalog = load_business_fact_catalog()
+        business = catalog.all()[0]
+        review_search = FakeDirectReviewSearch()
+        tools = build_restaurant_tools(
+            workflow=FakeWorkflow(),  # type: ignore[arg-type]
+            business_catalog=catalog,
+            state_store=MemoryDomainStateStore(),
+            direct_review_search=review_search,  # type: ignore[arg-type]
+        )
+        model = ScriptedLanguageModel(
+            [
+                ModelResponse(
+                    action=ToolCallsAction(
+                        calls=[
+                            ToolCall(
+                                call_id="search-long-tail",
+                                tool_name="search_business_review_evidence",
+                                arguments={
+                                    "business_ids": [business.business_id],
+                                    "evidence_queries": ["是否适合进行安静的商务谈判"],
+                                },
+                            )
+                        ]
+                    ),
+                    model="main-model",
+                ),
+                ModelResponse(
+                    action=FinalAnswerAction(answer="已经根据评论证据回答。"),
+                    model="main-model",
+                ),
+            ]
+        )
+        runtime = AgentRuntime(
+            model=model,
+            session_store=MemorySessionStore(),
+            tools=tools.definitions,
+        )
+
+        result = await runtime.handle(
+            AgentTurnInput(
+                user_id="user-1",
+                session_id="long-tail-follow-up",
+                message="第三家适合商务谈判吗？",
+                request_time=NOW,
+            )
+        )
+
+        assert result.used_tools == ["search_business_review_evidence"]
+        assert review_search.calls[0]["business_ids"] == [business.business_id]
+        assert review_search.calls[0]["evidence_queries"] == [
+            "是否适合进行安静的商务谈判"
+        ]
+        assert review_search.calls[0]["user_query_text"] == "第三家适合商务谈判吗？"
+        # 主模型调用两次，加上评论工具内部一次检索说法生成。
+        assert result.usage.model_calls == 3
+        assert result.usage.input_tokens == 120
+        assert result.usage.output_tokens == 30
 
     asyncio.run(scenario())

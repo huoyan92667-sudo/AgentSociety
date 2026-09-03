@@ -9,6 +9,17 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
+from ..memory.models import (
+    ConversationEpisode,
+    ConversationEpisodeDraft,
+    ToolMemoryUpdate,
+    WorkingMemory,
+)
+from ..memory.operations import (
+    apply_tool_update,
+    rank_episode_matches,
+    with_pending_question,
+)
 from ..persistence.errors import SessionBusyError, StateVersionConflictError
 from ..persistence.schema import (
     DomainStateVersion,
@@ -32,10 +43,13 @@ class MemorySessionStore:
         self._sessions: dict[str, SessionRecord] = {}
         self._events: dict[str, list[SessionEvent]] = {}
         self._active_turns: dict[str, str] = {}
+        self._last_turn_indexes: dict[str, int] = {}
         self._turns: dict[str, TurnRecord] = {}
         self._llm_calls: dict[str, LLMCallRecord] = {}
         self._domain_states: dict[tuple[str, str], list[DomainStateVersion]] = {}
         self._results: dict[str, ResultArtifact] = {}
+        self._working_memories: dict[str, WorkingMemory] = {}
+        self._episodes: dict[str, ConversationEpisode] = {}
         self._lock = asyncio.Lock()
 
     async def get_or_create(
@@ -64,6 +78,7 @@ class MemorySessionStore:
             )
             self._sessions[session_id] = session
             self._events[session_id] = []
+            self._last_turn_indexes[session_id] = 0
             self._append_event_unlocked(
                 session_id=session_id,
                 event_type="session/created",
@@ -109,6 +124,98 @@ class MemorySessionStore:
                 raise KeyError(f"unknown session: {session_id}")
             return [item.model_copy(deep=True) for item in self._events[session_id]]
 
+    async def list_turn_events(
+        self,
+        *,
+        session_id: str,
+        turn_id: str,
+    ) -> list[SessionEvent]:
+        """只读取当前轮事件，避免上下文重新扫描并回放整个会话。"""
+
+        async with self._lock:
+            if session_id not in self._events:
+                raise KeyError(f"unknown session: {session_id}")
+            return [
+                item.model_copy(deep=True)
+                for item in self._events[session_id]
+                if item.turn_id == turn_id
+            ]
+
+    async def list_recent_turns(
+        self,
+        *,
+        session_id: str,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]:
+        """返回最近已经结束的轮次，并保持由旧到新的对话顺序。"""
+
+        if limit < 1:
+            return []
+        async with self._lock:
+            values = [
+                item
+                for item in self._turns.values()
+                if item.session_id == session_id
+                and item.turn_id != exclude_turn_id
+                and item.ended_at is not None
+                and item.answer is not None
+            ]
+            # 字典按 begin_turn 的插入顺序保存；不要依赖测试机器上可能相同的时钟值。
+            return [item.model_copy(deep=True) for item in values[-limit:]]
+
+    async def list_recent_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]:
+        """读取尚未总结的最近轮次，供主模型直接保持短期上下文。"""
+
+        if limit < 1:
+            return []
+        async with self._lock:
+            values = [
+                item
+                for item in self._turns.values()
+                if item.session_id == session_id
+                and item.turn_id != exclude_turn_id
+                and item.ended_at is not None
+                and item.answer is not None
+                and (
+                    after_turn_index is None
+                    or item.turn_index > after_turn_index
+                )
+            ]
+            return [item.model_copy(deep=True) for item in values[-limit:]]
+
+    async def list_completed_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+    ) -> list[TurnRecord]:
+        """为片段总结读取尚未被总结的已完成轮次。"""
+
+        if limit < 1:
+            return []
+        async with self._lock:
+            values = [
+                item
+                for item in self._turns.values()
+                if item.session_id == session_id
+                and item.ended_at is not None
+                and item.answer is not None
+                and (
+                    after_turn_index is None
+                    or item.turn_index > after_turn_index
+                )
+            ]
+            return [item.model_copy(deep=True) for item in values[:limit]]
+
     async def set_status(
         self,
         *,
@@ -142,9 +249,12 @@ class MemorySessionStore:
                 raise SessionBusyError(f"session already has active turn: {active}")
             if turn_id in self._turns:
                 raise ValueError(f"duplicate turn ID: {turn_id}")
+            turn_index = self._last_turn_indexes.get(session_id, 0) + 1
+            self._last_turn_indexes[session_id] = turn_index
             turn = TurnRecord(
                 turn_id=turn_id,
                 session_id=session_id,
+                turn_index=turn_index,
                 user_message=user_message,
                 request_time=request_time,
                 status="running",
@@ -298,6 +408,112 @@ class MemorySessionStore:
         async with self._lock:
             versions = self._domain_states.get((session_id, domain), [])
             return versions[-1].model_copy(deep=True) if versions else None
+
+    async def get_working_memory(self, session_id: str) -> WorkingMemory | None:
+        async with self._lock:
+            value = self._working_memories.get(session_id)
+            return value.model_copy(deep=True) if value is not None else None
+
+    async def apply_tool_memory_update(
+        self,
+        *,
+        session_id: str,
+        update: ToolMemoryUpdate,
+        now: datetime,
+    ) -> WorkingMemory:
+        async with self._lock:
+            if session_id not in self._sessions:
+                raise KeyError(f"unknown session: {session_id}")
+            merged = apply_tool_update(
+                self._working_memories.get(session_id),
+                session_id=session_id,
+                update=update,
+                now=now,
+            )
+            self._working_memories[session_id] = merged
+            return merged.model_copy(deep=True)
+
+    async def set_pending_question(
+        self,
+        *,
+        session_id: str,
+        question: str | None,
+        now: datetime,
+    ) -> WorkingMemory:
+        async with self._lock:
+            if session_id not in self._sessions:
+                raise KeyError(f"unknown session: {session_id}")
+            updated = with_pending_question(
+                self._working_memories.get(session_id),
+                session_id=session_id,
+                question=question,
+                now=now,
+            )
+            self._working_memories[session_id] = updated
+            return updated.model_copy(deep=True)
+
+    async def save_episode(
+        self,
+        value: ConversationEpisodeDraft,
+        *,
+        now: datetime,
+    ) -> ConversationEpisode:
+        async with self._lock:
+            if value.session_id not in self._sessions:
+                raise KeyError(f"unknown session: {value.session_id}")
+            stored = ConversationEpisode(
+                episode_id=uuid4().hex,
+                created_at=now,
+                **value.model_dump(),
+            )
+            self._episodes[stored.episode_id] = stored
+            current = self._working_memories.get(value.session_id)
+            current = current or WorkingMemory(
+                session_id=value.session_id,
+                updated_at=now,
+            )
+            self._working_memories[value.session_id] = current.model_copy(
+                update={
+                    "version": current.version + (1 if value.session_id in self._working_memories else 0),
+                    "summarized_through": value.source_ended_at,
+                    "summarized_through_turn_index": value.source_end_turn_index,
+                    "updated_at": now,
+                },
+                deep=True,
+            )
+            return stored.model_copy(deep=True)
+
+    async def list_recent_episodes(
+        self,
+        *,
+        session_id: str,
+        limit: int,
+    ) -> list[ConversationEpisode]:
+        if limit < 1:
+            return []
+        async with self._lock:
+            values = [
+                item for item in self._episodes.values() if item.session_id == session_id
+            ]
+            values.sort(key=lambda item: item.created_at, reverse=True)
+            return [item.model_copy(deep=True) for item in values[:limit]]
+
+    async def search_episodes(
+        self,
+        *,
+        user_id: str,
+        query: str,
+        session_id: str | None,
+        limit: int,
+    ) -> list[ConversationEpisode]:
+        async with self._lock:
+            candidates = [
+                item
+                for item in self._episodes.values()
+                if item.user_id == user_id
+                and (session_id is None or item.session_id == session_id)
+            ]
+        return rank_episode_matches(candidates, query, limit=limit)
 
     async def save_result(
         self,

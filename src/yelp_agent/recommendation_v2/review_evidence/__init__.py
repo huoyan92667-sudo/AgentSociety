@@ -6,17 +6,31 @@ from .builder import (
     build_review_evidence_index,
     build_review_segment_source,
 )
+from .direct_search import (
+    DirectReviewEvidenceFinding,
+    DirectReviewEvidenceResult,
+    DirectReviewEvidenceSearch,
+)
 from .ranker import ReviewEvidenceRanker
-from .runtime import build_review_evidence_ranker
+from .runtime import (
+    ReviewEvidenceCapabilities,
+    build_review_evidence_capabilities,
+    build_review_evidence_ranker,
+)
 from .schema import ReviewEvidenceRankingResult
 from .segmenter import OverlapSegmentConfig, segment_review_with_overlap
 
 __all__ = [
     "DEFAULT_EVIDENCE_ROOT",
+    "DirectReviewEvidenceFinding",
+    "DirectReviewEvidenceResult",
+    "DirectReviewEvidenceSearch",
     "OverlapSegmentConfig",
+    "ReviewEvidenceCapabilities",
     "ReviewEvidenceIndexBuildResult",
     "ReviewEvidenceRanker",
     "ReviewEvidenceRankingResult",
+    "build_review_evidence_capabilities",
     "build_review_evidence_index",
     "build_review_evidence_ranker",
     "build_review_segment_source",

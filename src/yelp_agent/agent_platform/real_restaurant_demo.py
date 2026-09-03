@@ -20,6 +20,12 @@ def _arguments() -> argparse.Namespace:
     parser.add_argument("--user-id", required=True, help="真实画像中的用户编号")
     parser.add_argument("--session-id", required=True, help="持久化会话编号")
     parser.add_argument(
+        "--project-root",
+        type=Path,
+        default=None,
+        help="真实数据所在的项目根目录；默认使用当前代码所属项目",
+    )
+    parser.add_argument(
         "--follow-up",
         action="append",
         default=[],
@@ -38,7 +44,11 @@ async def _run() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     args = _arguments()
-    project_root = Path(__file__).resolve().parents[3]
+    project_root = (
+        args.project_root.resolve()
+        if args.project_root is not None
+        else Path(__file__).resolve().parents[3]
+    )
     startup_started = perf_counter()
     application = build_restaurant_agent_application(project_root)
     startup_ms = (perf_counter() - startup_started) * 1000

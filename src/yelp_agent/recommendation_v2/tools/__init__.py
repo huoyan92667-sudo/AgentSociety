@@ -5,10 +5,20 @@ from yelp_agent.recommendation_v2.tools.baseline_ranking import (
     RatingBaselineRankingTool,
     build_legacy_baseline_ranking_tool,
 )
+from yelp_agent.recommendation_v2.tools.business_aspects import (
+    BusinessAspectAssessment,
+    BusinessAspectEvidenceObservation,
+    BusinessAspectEvidenceQuery,
+    BusinessAspectEvidenceTool,
+)
 from yelp_agent.recommendation_v2.tools.business_facts import (
     BusinessFactsObservation,
     BusinessFactsQuery,
     BusinessFactsTool,
+    BusinessNameMatch,
+    BusinessNameSearchObservation,
+    BusinessNameSearchQuery,
+    BusinessNameSearchTool,
 )
 from yelp_agent.recommendation_v2.tools.geography import (
     BusinessDistance,
@@ -30,10 +40,18 @@ from yelp_agent.recommendation_v2.tools.history_business import (
 from yelp_agent.recommendation_v2.tools.user_profile import UserProfileTool
 
 __all__ = [
+    "BusinessAspectAssessment",
+    "BusinessAspectEvidenceObservation",
+    "BusinessAspectEvidenceQuery",
+    "BusinessAspectEvidenceTool",
     "BusinessDistance",
     "BusinessFactsObservation",
     "BusinessFactsQuery",
     "BusinessFactsTool",
+    "BusinessNameMatch",
+    "BusinessNameSearchObservation",
+    "BusinessNameSearchQuery",
+    "BusinessNameSearchTool",
     "FilteredBusiness",
     "GeographicDistanceResult",
     "GeographicDistanceTool",

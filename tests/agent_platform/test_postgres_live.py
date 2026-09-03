@@ -114,10 +114,12 @@ def test_real_postgres_round_trip() -> None:
                 "agent_domain_state_versions",
                 "agent_result_artifacts",
                 "agent_llm_calls",
+                "agent_working_memories",
+                "agent_conversation_episodes",
             }
             assert health.ok is True
             assert health.database_kind == "postgresql"
-            assert revision == "0001_agent_persistence"
+            assert revision == "0003_turn_index"
             assert expected_tables.issubset(set(table_names))
             assert turn.status == "completed"
             assert turn.answer == "真实 PostgreSQL 写入成功。"

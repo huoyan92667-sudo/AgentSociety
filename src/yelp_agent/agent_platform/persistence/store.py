@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Protocol
 
+from ..memory.store import ConversationMemoryStore
 from ..runtime.schema import TurnUsage
 from ..session.events import SessionEvent, SessionStatus
 from ..session.store import SessionStore
@@ -21,7 +22,7 @@ from .schema import (
 )
 
 
-class RuntimePersistence(SessionStore, Protocol):
+class RuntimePersistence(SessionStore, ConversationMemoryStore, Protocol):
     """主循环除了事件追加之外需要的持久化操作。"""
 
     async def begin_turn(
@@ -66,6 +67,38 @@ class RuntimePersistence(SessionStore, Protocol):
     ) -> RecoveryReport: ...
 
     async def healthcheck(self) -> PersistenceHealth: ...
+
+    async def list_recent_turns(
+        self,
+        *,
+        session_id: str,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]: ...
+
+    async def list_recent_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]: ...
+
+    async def list_completed_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+    ) -> list[TurnRecord]: ...
+
+    async def list_turn_events(
+        self,
+        *,
+        session_id: str,
+        turn_id: str,
+    ) -> list[SessionEvent]: ...
 
 
 class DomainStateStore(Protocol):

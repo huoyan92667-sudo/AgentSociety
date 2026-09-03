@@ -279,3 +279,49 @@ def test_multiple_user_turns_are_rebuilt_from_the_same_session_log() -> None:
         "第一轮回答。",
         "第二轮问题。",
     ]
+
+
+def test_default_tool_json_is_stored_once_and_replayed_unchanged() -> None:
+    """正式工具值等于模型正文时，事件不应再复制一份大字符串。"""
+
+    class EmptyInput(StrictModel):
+        pass
+
+    tool = ToolDefinition(
+        name="structured_result",
+        description="返回结构化结果。",
+        input_model=EmptyInput,
+        handler=lambda *_: {"items": [{"name": "第一家"}]},
+    )
+    model = ScriptedLanguageModel(
+        [
+            ModelResponse(
+                action=ToolCallsAction(
+                    calls=[
+                        ToolCall(
+                            call_id="structured-call",
+                            tool_name="structured_result",
+                            arguments={},
+                        )
+                    ]
+                ),
+                model="fake-model",
+            ),
+            ModelResponse(
+                action=FinalAnswerAction(answer="已经读取结果。"),
+                model="fake-model",
+            ),
+        ]
+    )
+    store = MemorySessionStore()
+    runtime = AgentRuntime(model=model, session_store=store, tools=[tool])
+
+    asyncio.run(runtime.handle(_turn("读取结构化结果")))
+
+    events = asyncio.run(store.list_events("session-1"))
+    saved = next(event for event in events if event.type == "tool/result").payload[
+        "result"
+    ]
+    assert "model_content" not in saved
+    assert saved["model_content_from_value"] is True
+    assert model.requests[1].messages[-1].content == '{"items":[{"name":"第一家"}]}'

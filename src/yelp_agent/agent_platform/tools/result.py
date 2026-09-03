@@ -8,6 +8,7 @@ from pydantic import ConfigDict, Field
 
 from yelp_agent.models import StrictModel
 
+from ..memory.models import ToolMemoryUpdate
 from ..runtime.schema import TokenUsage
 
 type ToolStatus = Literal[
@@ -30,6 +31,7 @@ class ToolBodyResult(StrictModel):
     nested_model_usage: TokenUsage = Field(default_factory=TokenUsage)
     nested_model_calls: int = Field(default=0, ge=0)
     terminal_answer: str | None = Field(default=None, min_length=1)
+    memory_update: ToolMemoryUpdate | None = None
 
 
 class ToolResult(StrictModel):
@@ -52,3 +54,4 @@ class ToolResult(StrictModel):
     nested_model_usage: TokenUsage = Field(default_factory=TokenUsage)
     nested_model_calls: int = Field(default=0, ge=0)
     terminal_answer: str | None = Field(default=None, min_length=1)
+    memory_update: ToolMemoryUpdate | None = None

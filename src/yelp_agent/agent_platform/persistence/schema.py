@@ -27,6 +27,9 @@ class TurnRecord(StrictModel):
 
     turn_id: str = Field(min_length=1)
     session_id: str = Field(min_length=1)
+    # 同一会话内严格递增。不能只靠时间判断先后，因为快速连续结束的两轮
+    # 在部分系统上可能得到完全相同的时间值。
+    turn_index: int = Field(ge=1)
     user_message: str = Field(min_length=1)
     request_time: datetime
     status: TurnStatus

@@ -158,9 +158,19 @@ class OpenAICompatibleAgentModel:
             raise ValueError("model tool call is missing a name")
         if not isinstance(arguments_text, str):
             raise TypeError("model tool arguments must be JSON text")
-        arguments = json.loads(arguments_text)
+        try:
+            arguments = json.loads(arguments_text)
+        except json.JSONDecodeError:
+            # 模型偶尔会生成残缺参数。把它变成一条必然无法通过参数校验的
+            # 正常工具调用，让工具流水线把明确错误回给模型自行修正，
+            # 而不是直接终止整轮对话。
+            arguments = {
+                "__invalid_arguments_json__": arguments_text[:2000],
+            }
         if not isinstance(arguments, dict):
-            raise TypeError("model tool arguments must be a JSON object")
+            arguments = {
+                "__invalid_arguments_json__": arguments_text[:2000],
+            }
         return ToolCall(call_id=call_id, tool_name=name, arguments=arguments)
 
     @classmethod

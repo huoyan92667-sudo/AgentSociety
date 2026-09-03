@@ -23,6 +23,11 @@ from yelp_agent.agent_platform import (
     ToolCallsAction,
     ToolDefinition,
 )
+from yelp_agent.agent_platform.memory import (
+    ConversationEpisodeDraft,
+    EntityReference,
+    ToolMemoryUpdate,
+)
 from yelp_agent.agent_platform.persistence.errors import StateVersionConflictError
 from yelp_agent.agent_platform.persistence.tables import AgentTurnRow, LLMCallRow
 from yelp_agent.agent_platform.results import LocalJsonContentStore
@@ -314,6 +319,63 @@ def test_recovery_closes_interrupted_turn_and_allows_next_turn(tmp_path: Path) -
         assert events[-1].type == "turn/end"
         assert events[-1].payload["error_code"] == "runtime_interrupted"
         assert next_turn.status == "running"
+        await database.close()
+
+    asyncio.run(scenario())
+
+
+def test_postgres_store_persists_working_memory_and_searchable_episode(
+    tmp_path: Path,
+) -> None:
+    async def scenario() -> None:
+        database = AgentDatabase(_settings(tmp_path / "conversation-memory.db"))
+        await database.create_schema_for_tests()
+        store = PostgresAgentPersistence(database.sessions)
+        await store.get_or_create(
+            session_id="session-1",
+            user_id="user-1",
+            now=NOW,
+        )
+        memory = await store.apply_tool_memory_update(
+            session_id="session-1",
+            update=ToolMemoryUpdate(
+                focused_entities=[
+                    EntityReference(
+                        entity_type="restaurant",
+                        entity_id="business-1",
+                        display_name="Han Dynasty",
+                        source_turn_id="turn-1",
+                    )
+                ]
+            ),
+            now=NOW,
+        )
+        episode = await store.save_episode(
+            ConversationEpisodeDraft(
+                session_id="session-1",
+                user_id="user-1",
+                topic="费城川菜",
+                summary="用户曾讨论费城的川菜餐厅。",
+                entities=memory.focused_entities,
+                source_turn_ids=["turn-1"],
+                source_started_at=NOW,
+                source_ended_at=NOW,
+            ),
+            now=NOW,
+        )
+
+        reopened = await store.get_working_memory("session-1")
+        matches = await store.search_episodes(
+            user_id="user-1",
+            query="费城川菜",
+            session_id="session-1",
+            limit=3,
+        )
+
+        assert reopened is not None
+        assert reopened.focused_entities[0].entity_id == "business-1"
+        assert reopened.summarized_through == NOW
+        assert matches[0].episode_id == episode.episode_id
         await database.close()
 
     asyncio.run(scenario())

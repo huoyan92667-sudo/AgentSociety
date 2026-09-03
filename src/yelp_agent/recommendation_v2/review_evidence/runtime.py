@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,7 @@ from yelp_agent.semantic_embedding import (
 from yelp_agent.semantic_embedding.config import load_local_embedding_environment
 
 from .descriptions import PreferenceDescriptionBuilder
+from .direct_search import DirectReviewEvidenceSearch
 from .full_reviews import FullReviewStore
 from .offline_aspects import OfflineAspectEvidenceResolver
 from .qdrant_store import QdrantReviewSegmentStore
@@ -30,6 +32,14 @@ from .scoring import EvidenceScoringConfig
 from .segment_vectors import ReviewSegmentVectorStore
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
+
+
+@dataclass(frozen=True, slots=True)
+class ReviewEvidenceCapabilities:
+    """推荐排序和按商家查评论共享同一套模型、向量和Qdrant资源。"""
+
+    ranker: ReviewEvidenceRanker
+    direct_search: DirectReviewEvidenceSearch
 
 
 class _LazyReviewEvidenceRetriever:
@@ -81,6 +91,21 @@ def build_review_evidence_ranker(
 ) -> ReviewEvidenceRanker:
     """建立真实运行时；固定14种不会调用大模型，只有长尾要求才会调用。"""
 
+    return build_review_evidence_capabilities(
+        qdrant_url=qdrant_url,
+        profile_catalog=profile_catalog,
+        project_root=project_root,
+    ).ranker
+
+
+def build_review_evidence_capabilities(
+    *,
+    qdrant_url: str | None = None,
+    profile_catalog: BusinessAspectProfileCatalog | None = None,
+    project_root: str | Path | None = None,
+) -> ReviewEvidenceCapabilities:
+    """建立共享评论能力，避免推荐和单店查询各加载一份本地向量模型。"""
+
     generator = OpenAICompatibleLLM.from_environment(
         AgentConfig(
             enabled=True,
@@ -98,16 +123,26 @@ def build_review_evidence_ranker(
             project_root=project_root,
         )
     )
-    return ReviewEvidenceRanker(
-        description_builder=PreferenceDescriptionBuilder(generator),
+    description_builder = PreferenceDescriptionBuilder(generator)
+    scoring_config = EvidenceScoringConfig(
+        acceptance_threshold=0.60,
+        top_each_side=5,
+        half_life_days=730,
+    )
+    ranker = ReviewEvidenceRanker(
+        description_builder=description_builder,
         retriever=retriever,
         offline_aspects=OfflineAspectEvidenceResolver(
             profile_catalog or load_business_aspect_profile_catalog()
         ),
-        scoring_config=EvidenceScoringConfig(
-            acceptance_threshold=0.60,
-            top_each_side=5,
-            half_life_days=730,
+        scoring_config=scoring_config,
+    )
+    return ReviewEvidenceCapabilities(
+        ranker=ranker,
+        direct_search=DirectReviewEvidenceSearch(
+            description_builder=description_builder,
+            retriever=retriever,  # type: ignore[arg-type]
+            scoring_config=scoring_config,
         ),
     )
 

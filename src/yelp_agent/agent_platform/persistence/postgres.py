@@ -12,6 +12,17 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from ..memory.models import (
+    ConversationEpisode,
+    ConversationEpisodeDraft,
+    ToolMemoryUpdate,
+    WorkingMemory,
+)
+from ..memory.operations import (
+    apply_tool_update,
+    rank_episode_matches,
+    with_pending_question,
+)
 from ..results.content import ArtifactContentStore
 from ..runtime.schema import TurnUsage
 from ..session.events import (
@@ -37,9 +48,11 @@ from .tables import (
     AgentEventRow,
     AgentSessionRow,
     AgentTurnRow,
+    ConversationEpisodeRow,
     DomainStateVersionRow,
     LLMCallRow,
     ResultArtifactRow,
+    WorkingMemoryRow,
 )
 
 
@@ -81,6 +94,7 @@ class PostgresAgentPersistence:
                 status="idle",
                 active_turn_id=None,
                 last_event_seq=1,
+                last_turn_index=0,
                 created_at=now,
                 updated_at=now,
             )
@@ -157,6 +171,117 @@ class PostgresAgentPersistence:
                     raise KeyError(f"unknown session: {session_id}")
         return [self._event_record(row) for row in rows]
 
+    async def list_turn_events(
+        self,
+        *,
+        session_id: str,
+        turn_id: str,
+    ) -> list[SessionEvent]:
+        """只读取一轮模型真正需要的事件，不再扫描整段会话。"""
+
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(AgentEventRow)
+                    .where(
+                        AgentEventRow.session_id == session_id,
+                        AgentEventRow.turn_id == turn_id,
+                    )
+                    .order_by(AgentEventRow.seq)
+                )
+            ).all()
+        return [self._event_record(row) for row in rows]
+
+    async def list_recent_turns(
+        self,
+        *,
+        session_id: str,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]:
+        """读取最近已结束轮次；数据库先限量，再恢复自然对话顺序。"""
+
+        if limit < 1:
+            return []
+        conditions = [
+            AgentTurnRow.session_id == session_id,
+            AgentTurnRow.ended_at.is_not(None),
+            AgentTurnRow.answer.is_not(None),
+        ]
+        if exclude_turn_id is not None:
+            conditions.append(AgentTurnRow.turn_id != exclude_turn_id)
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(AgentTurnRow)
+                    .where(*conditions)
+                    .order_by(AgentTurnRow.turn_index.desc())
+                    .limit(limit)
+                )
+            ).all()
+        return [self._turn_record(row) for row in reversed(rows)]
+
+    async def list_recent_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+        exclude_turn_id: str | None = None,
+    ) -> list[TurnRecord]:
+        """数据库先按最新轮次限量，再按自然对话顺序返回。"""
+
+        if limit < 1:
+            return []
+        conditions = [
+            AgentTurnRow.session_id == session_id,
+            AgentTurnRow.ended_at.is_not(None),
+            AgentTurnRow.answer.is_not(None),
+        ]
+        if after_turn_index is not None:
+            conditions.append(AgentTurnRow.turn_index > after_turn_index)
+        if exclude_turn_id is not None:
+            conditions.append(AgentTurnRow.turn_id != exclude_turn_id)
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(AgentTurnRow)
+                    .where(*conditions)
+                    .order_by(AgentTurnRow.turn_index.desc())
+                    .limit(limit)
+                )
+            ).all()
+        return [self._turn_record(row) for row in reversed(rows)]
+
+    async def list_completed_turns_after(
+        self,
+        *,
+        session_id: str,
+        after_turn_index: int | None,
+        limit: int,
+    ) -> list[TurnRecord]:
+        """按时间正序读取尚未进入片段总结的已结束轮次。"""
+
+        if limit < 1:
+            return []
+        conditions = [
+            AgentTurnRow.session_id == session_id,
+            AgentTurnRow.ended_at.is_not(None),
+            AgentTurnRow.answer.is_not(None),
+        ]
+        if after_turn_index is not None:
+            conditions.append(AgentTurnRow.turn_index > after_turn_index)
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(AgentTurnRow)
+                    .where(*conditions)
+                    .order_by(AgentTurnRow.turn_index)
+                    .limit(limit)
+                )
+            ).all()
+        return [self._turn_record(row) for row in rows]
+
     async def set_status(
         self,
         *,
@@ -185,9 +310,11 @@ class PostgresAgentPersistence:
                 raise SessionBusyError(
                     f"session already has active turn: {session.active_turn_id}"
                 )
+            session.last_turn_index += 1
             row = AgentTurnRow(
                 turn_id=turn_id,
                 session_id=session_id,
+                turn_index=session.last_turn_index,
                 user_message=user_message,
                 request_time=request_time,
                 status="running",
@@ -363,6 +490,177 @@ class PostgresAgentPersistence:
                 .limit(1)
             )
         return self._domain_state_record(row) if row is not None else None
+
+    async def get_working_memory(self, session_id: str) -> WorkingMemory | None:
+        async with self._sessions() as database:
+            row = await database.get(WorkingMemoryRow, session_id)
+        return self._working_memory_record(row) if row is not None else None
+
+    async def apply_tool_memory_update(
+        self,
+        *,
+        session_id: str,
+        update: ToolMemoryUpdate,
+        now: datetime,
+    ) -> WorkingMemory:
+        async with self._sessions.begin() as database:
+            await self._lock_session(database, session_id)
+            row = await database.scalar(
+                select(WorkingMemoryRow)
+                .where(WorkingMemoryRow.session_id == session_id)
+                .with_for_update()
+            )
+            current = self._working_memory_record(row) if row is not None else None
+            merged = apply_tool_update(
+                current,
+                session_id=session_id,
+                update=update,
+                now=now,
+            )
+            if row is None:
+                database.add(self._working_memory_row(merged))
+            else:
+                row.version = merged.version
+                row.memory_json = merged.model_dump(mode="json")
+                row.updated_at = now
+        return merged.model_copy(deep=True)
+
+    async def set_pending_question(
+        self,
+        *,
+        session_id: str,
+        question: str | None,
+        now: datetime,
+    ) -> WorkingMemory:
+        async with self._sessions.begin() as database:
+            await self._lock_session(database, session_id)
+            row = await database.scalar(
+                select(WorkingMemoryRow)
+                .where(WorkingMemoryRow.session_id == session_id)
+                .with_for_update()
+            )
+            current = self._working_memory_record(row) if row is not None else None
+            updated = with_pending_question(
+                current,
+                session_id=session_id,
+                question=question,
+                now=now,
+            )
+            if row is None:
+                database.add(self._working_memory_row(updated))
+            else:
+                row.version = updated.version
+                row.memory_json = updated.model_dump(mode="json")
+                row.updated_at = now
+        return updated.model_copy(deep=True)
+
+    async def save_episode(
+        self,
+        value: ConversationEpisodeDraft,
+        *,
+        now: datetime,
+    ) -> ConversationEpisode:
+        stored = ConversationEpisode(
+            episode_id=uuid4().hex,
+            created_at=now,
+            **value.model_dump(),
+        )
+        async with self._sessions.begin() as database:
+            session = await self._lock_session(database, value.session_id)
+            self._require_user(session, value.user_id)
+            database.add(
+                ConversationEpisodeRow(
+                    episode_id=stored.episode_id,
+                    session_id=stored.session_id,
+                    user_id=stored.user_id,
+                    topic=stored.topic,
+                    summary=stored.summary,
+                    details_json={
+                        "decisions": stored.decisions,
+                        "unresolved_questions": stored.unresolved_questions,
+                        "entities": [
+                            item.model_dump(mode="json") for item in stored.entities
+                        ],
+                        "result_ids": stored.result_ids,
+                        "source_turn_ids": stored.source_turn_ids,
+                        "source_start_turn_index": stored.source_start_turn_index,
+                        "source_end_turn_index": stored.source_end_turn_index,
+                    },
+                    source_started_at=stored.source_started_at,
+                    source_ended_at=stored.source_ended_at,
+                    created_at=now,
+                )
+            )
+            memory_row = await database.scalar(
+                select(WorkingMemoryRow)
+                .where(WorkingMemoryRow.session_id == value.session_id)
+                .with_for_update()
+            )
+            current = (
+                self._working_memory_record(memory_row)
+                if memory_row is not None
+                else WorkingMemory(session_id=value.session_id, updated_at=now)
+            )
+            updated = current.model_copy(
+                update={
+                    "version": current.version + (1 if memory_row is not None else 0),
+                    "summarized_through": value.source_ended_at,
+                    "summarized_through_turn_index": value.source_end_turn_index,
+                    "updated_at": now,
+                },
+                deep=True,
+            )
+            if memory_row is None:
+                database.add(self._working_memory_row(updated))
+            else:
+                memory_row.version = updated.version
+                memory_row.memory_json = updated.model_dump(mode="json")
+                memory_row.updated_at = now
+        return stored.model_copy(deep=True)
+
+    async def list_recent_episodes(
+        self,
+        *,
+        session_id: str,
+        limit: int,
+    ) -> list[ConversationEpisode]:
+        if limit < 1:
+            return []
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(ConversationEpisodeRow)
+                    .where(ConversationEpisodeRow.session_id == session_id)
+                    .order_by(ConversationEpisodeRow.created_at.desc())
+                    .limit(limit)
+                )
+            ).all()
+        return [self._episode_record(row) for row in rows]
+
+    async def search_episodes(
+        self,
+        *,
+        user_id: str,
+        query: str,
+        session_id: str | None,
+        limit: int,
+    ) -> list[ConversationEpisode]:
+        """只在最近200条短总结中排序，不扫描原始事件和工具大结果。"""
+
+        conditions = [ConversationEpisodeRow.user_id == user_id]
+        if session_id is not None:
+            conditions.append(ConversationEpisodeRow.session_id == session_id)
+        async with self._sessions() as database:
+            rows = (
+                await database.scalars(
+                    select(ConversationEpisodeRow)
+                    .where(*conditions)
+                    .order_by(ConversationEpisodeRow.created_at.desc())
+                    .limit(200)
+                )
+            ).all()
+        candidates = [self._episode_record(row) for row in rows]
+        return rank_episode_matches(candidates, query, limit=limit)
 
     async def save_result(
         self,
@@ -613,6 +911,7 @@ class PostgresAgentPersistence:
         return TurnRecord(
             turn_id=row.turn_id,
             session_id=row.session_id,
+            turn_index=row.turn_index,
             user_message=row.user_message,
             request_time=PostgresAgentPersistence._aware(row.request_time),
             status=cast(TurnStatus, row.status),
@@ -638,6 +937,42 @@ class PostgresAgentPersistence:
             version=row.version,
             state=row.state_json,
             source_event_id=row.source_event_id,
+            created_at=PostgresAgentPersistence._aware(row.created_at),
+        )
+
+    @staticmethod
+    def _working_memory_row(value: WorkingMemory) -> WorkingMemoryRow:
+        return WorkingMemoryRow(
+            session_id=value.session_id,
+            version=value.version,
+            memory_json=value.model_dump(mode="json"),
+            updated_at=value.updated_at,
+        )
+
+    @staticmethod
+    def _working_memory_record(row: WorkingMemoryRow) -> WorkingMemory:
+        return WorkingMemory.model_validate(row.memory_json).model_copy(
+            update={"updated_at": PostgresAgentPersistence._aware(row.updated_at)}
+        )
+
+    @staticmethod
+    def _episode_record(row: ConversationEpisodeRow) -> ConversationEpisode:
+        details = row.details_json
+        return ConversationEpisode(
+            episode_id=row.episode_id,
+            session_id=row.session_id,
+            user_id=row.user_id,
+            topic=row.topic,
+            summary=row.summary,
+            decisions=details.get("decisions", []),
+            unresolved_questions=details.get("unresolved_questions", []),
+            entities=details.get("entities", []),
+            result_ids=details.get("result_ids", []),
+            source_turn_ids=details.get("source_turn_ids", []),
+            source_start_turn_index=details.get("source_start_turn_index"),
+            source_end_turn_index=details.get("source_end_turn_index"),
+            source_started_at=PostgresAgentPersistence._aware(row.source_started_at),
+            source_ended_at=PostgresAgentPersistence._aware(row.source_ended_at),
             created_at=PostgresAgentPersistence._aware(row.created_at),
         )
 
